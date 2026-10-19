@@ -1,0 +1,780 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="robots" content="noindex,nofollow">
+<meta name="theme-color" content="#2747c9">
+<meta name="description" content="毎日のニュースを、1分の動くスライド・検索・グラフ・解説・クイズで">
+<title>まいにちニュース帳</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=Zen+Kaku+Gothic+New:wght@400;500;700&display=swap">
+<style>
+:root{padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+/* 朝の掲示板: 1列のカード紙面 + 下のタブ。重要な数字だけ太い見出し書体で */
+:root{
+  --bg:#eef1f4; --surface:#ffffff; --surface2:#f6f8fa; --ink:#141b2d; --muted:#5a6478; --line:#d9dee6;
+  --accent:#2747c9; --accent-soft:#e3e8fb; --warn:#c2410c; --warn-soft:#fdeee6; --ok:#15803d; --ok-soft:#e5f4ea;
+  --g-pol:#2563c9; --g-eco:#17803f; --g-soc:#c25a0c; --g-it:#7c3aed; --g-intl:#c42b2b; --g-spo:#8a5a2b; --g-ent:#c0367a; --g-pred:#475569;
+  --g-pol-s:#e4ecfa; --g-eco-s:#e4f3e9; --g-soc-s:#fbeadb; --g-it-s:#efe7fd; --g-intl-s:#fbe5e5; --g-spo-s:#f3eadf; --g-ent-s:#fbe4ef; --g-pred-s:#e9edf2;
+  --f-display:"Dela Gothic One","Hiragino Sans","Yu Gothic",sans-serif;
+  --f-body:"Zen Kaku Gothic New","Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic","Meiryo",sans-serif;
+  --fs:16px; --radius:14px; --on-accent:#ffffff;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --bg:#0e1320; --surface:#171d2c; --surface2:#1d2436; --ink:#e8ecf4; --muted:#9aa4b8; --line:#2a3247;
+  --accent:#8ea4ff; --accent-soft:#232c4d; --warn:#fb923c; --warn-soft:#3a2416; --ok:#4ade80; --ok-soft:#163222;
+  --g-pol:#7aa7ff; --g-eco:#5fd18a; --g-soc:#f59e5b; --g-it:#b794ff; --g-intl:#ff7b7b; --g-spo:#d6a46e; --g-ent:#ff8cc0; --g-pred:#a3b0c2;
+  --on-accent:#0b1020; --g-pol-s:#1b2a48; --g-eco-s:#16301f; --g-soc-s:#352314; --g-it-s:#2a1f45; --g-intl-s:#3a1a1d; --g-spo-s:#33271b; --g-ent-s:#3b1a2b; --g-pred-s:#232a36;
+  color-scheme:dark}}
+:root[data-theme="dark"]{
+  --bg:#0e1320; --surface:#171d2c; --surface2:#1d2436; --ink:#e8ecf4; --muted:#9aa4b8; --line:#2a3247;
+  --accent:#8ea4ff; --accent-soft:#232c4d; --warn:#fb923c; --warn-soft:#3a2416; --ok:#4ade80; --ok-soft:#163222;
+  --g-pol:#7aa7ff; --g-eco:#5fd18a; --g-soc:#f59e5b; --g-it:#b794ff; --g-intl:#ff7b7b; --g-spo:#d6a46e; --g-ent:#ff8cc0; --g-pred:#a3b0c2;
+  --on-accent:#0b1020; --g-pol-s:#1b2a48; --g-eco-s:#16301f; --g-soc-s:#352314; --g-it-s:#2a1f45; --g-intl-s:#3a1a1d; --g-spo-s:#33271b; --g-ent-s:#3b1a2b; --g-pred-s:#232a36;
+  color-scheme:dark}
+:root[data-size="l"]{--fs:18px} :root[data-size="xl"]{--fs:20px}
+*{box-sizing:border-box}
+[hidden]{display:none!important}
+body{margin:0}
+html{-webkit-text-size-adjust:100%}
+body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:var(--fs);line-height:1.7;margin:0;padding-bottom:calc(76px + env(safe-area-inset-bottom,0px))}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--surface)}
+button{font:inherit;color:inherit}
+a{color:var(--accent)}
+:focus-visible{outline:3px solid var(--accent);outline-offset:2px;border-radius:6px}
+.wrap{max-width:760px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+h1,h2,h3{text-wrap:balance;line-height:1.35;margin:0}
+.num{font-variant-numeric:tabular-nums}
+
+/* header */
+.top{position:sticky;top:env(safe-area-inset-top,0px);z-index:20;background:var(--surface);border-bottom:1px solid var(--line)}
+.top .wrap{display:flex;align-items:center;gap:12px;padding-block:10px}
+.brand{font-family:var(--f-display);font-size:1.15rem;letter-spacing:.02em;display:flex;align-items:center;gap:8px;white-space:nowrap}
+.brand .dot{width:12px;height:12px;border-radius:50%;background:var(--accent);box-shadow:16px 0 0 var(--g-intl),32px 0 0 var(--g-eco);margin-right:34px}
+.top .upd{font-size:.78rem;color:var(--muted);margin-left:auto;text-align:right;line-height:1.3}
+.iconbtn{border:1px solid var(--line);background:var(--surface2);border-radius:10px;min-width:40px;height:40px;cursor:pointer;font-size:.9rem;padding:0 10px}
+
+/* tabs */
+.tabs{position:fixed;left:0;right:0;bottom:0;z-index:25;background:var(--surface);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px)}
+.tabs .wrap{display:grid;grid-template-columns:repeat(6,1fr);gap:2px;padding-block:6px}
+.tab{border:0;background:none;display:flex;flex-direction:column;align-items:center;gap:1px;padding:6px 0;border-radius:10px;cursor:pointer;color:var(--muted);font-size:.7rem;min-width:0}
+.tab .ti{font-size:1.25rem;line-height:1}
+.tab[aria-selected="true"]{color:var(--accent);background:var(--accent-soft);font-weight:700}
+@media (min-width:900px){
+  body{padding-bottom:0}
+  .tabs{position:sticky;top:calc(env(safe-area-inset-top,0px) + 61px);bottom:auto;border-top:0;border-bottom:1px solid var(--line);z-index:19}
+  .tab{flex-direction:row;justify-content:center;gap:6px;font-size:.88rem}
+  .tab .ti{font-size:1rem}
+}
+
+main{padding-block:18px 32px}
+.view{display:flex;flex-direction:column;gap:22px}
+.sec-h{display:flex;align-items:baseline;gap:10px;justify-content:space-between}
+.sec-h h2{font-size:1.2rem}
+.sec-h .sub{font-size:.8rem;color:var(--muted)}
+.hint{font-size:.82rem;color:var(--muted)}
+.card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:16px}
+
+/* chips */
+.chip{display:inline-flex;align-items:center;gap:4px;font-size:.74rem;font-weight:700;padding:2px 9px;border-radius:999px;white-space:nowrap;background:var(--g-pred-s);color:var(--g-pred)}
+.chip.pol{background:var(--g-pol-s);color:var(--g-pol)} .chip.eco{background:var(--g-eco-s);color:var(--g-eco)} .chip.soc{background:var(--g-soc-s);color:var(--g-soc)}
+.chip.it{background:var(--g-it-s);color:var(--g-it)} .chip.intl{background:var(--g-intl-s);color:var(--g-intl)} .chip.spo{background:var(--g-spo-s);color:var(--g-spo)} .chip.ent{background:var(--g-ent-s);color:var(--g-ent)}
+.badge-ok{color:var(--ok);font-size:.78rem;font-weight:700;white-space:nowrap}
+.badge-one{color:var(--warn);font-size:.78rem;font-weight:700;white-space:nowrap}
+
+/* hero row */
+.hero{display:grid;grid-template-columns:1fr;gap:12px}
+.play{display:flex;align-items:center;gap:14px;width:100%;text-align:left;border:0;cursor:pointer;border-radius:var(--radius);padding:16px 18px;background:var(--accent);color:var(--on-accent)}
+.play .pi{width:46px;height:46px;border-radius:50%;background:rgba(255,255,255,.22);display:grid;place-items:center;font-size:1.2rem;flex:none}
+.play b{display:block;font-size:1.08rem;color:inherit}
+.play span{color:inherit}
+.play span{font-size:.82rem;opacity:.9}
+
+.weather{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;align-items:center}
+.weather .big{font-family:var(--f-display);font-size:2rem;line-height:1;white-space:nowrap}
+.weather .big small{font-size:.9rem;font-family:var(--f-body);color:var(--muted)}
+.rainbar{display:flex;gap:6px;flex-wrap:wrap}
+.rain{font-size:.8rem;background:var(--surface2);border:1px solid var(--line);border-radius:8px;padding:2px 8px}
+.weather .notes{grid-column:1/-1;display:flex;flex-direction:column;gap:6px;font-size:.88rem}
+.note{background:var(--warn-soft);color:var(--ink);border-radius:10px;padding:8px 10px}
+
+.three{display:grid;gap:10px}
+.three .t{display:block;width:100%;text-align:left;border:1px solid var(--line);background:var(--surface);border-radius:var(--radius);padding:14px 16px;cursor:pointer;border-left:6px solid var(--g-pred)}
+.three .t.pol{border-left-color:var(--g-pol)} .three .t.intl{border-left-color:var(--g-intl)} .three .t.spo{border-left-color:var(--g-spo)} .three .t.eco{border-left-color:var(--g-eco)}
+.three .lab{font-size:.75rem;color:var(--muted);font-weight:700;letter-spacing:.06em}
+.three h3{font-size:1.08rem;margin:2px 0 4px}
+.three p{margin:0;font-size:.9rem;color:var(--muted)}
+.more{font-size:.82rem;color:var(--accent);font-weight:700}
+@media (min-width:760px){.three{grid-template-columns:repeat(3,1fr)}}
+
+.ten{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.ten li{background:var(--surface);border:1px solid var(--line);border-radius:12px}
+.ten .row{display:grid;grid-template-columns:34px 1fr;gap:10px;align-items:start;padding:12px 14px;width:100%;text-align:left;border:0;background:none;cursor:default}
+.ten .row.link{cursor:pointer}
+.rank{font-family:var(--f-display);font-size:1.25rem;line-height:1.2;color:var(--muted);text-align:center}
+.ten .big .rank{color:var(--accent);font-size:1.6rem}
+.ten h3{font-size:1rem;font-weight:700}
+.ten .big h3{font-size:1.1rem}
+.ten .meta{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:2px}
+.ten p{margin:4px 0 0;font-size:.92rem}
+.ten .pt{margin-top:6px;font-size:.88rem;background:var(--surface2);border-radius:8px;padding:6px 10px}
+
+.bignum{display:flex;flex-direction:column;gap:6px}
+.bignum .v{font-family:var(--f-display);font-size:clamp(2.4rem,9vw,3.4rem);line-height:1.05;color:var(--g-eco)}
+.bignum .v small{font-size:1.1rem}
+.mk{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.mk .m{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 12px;min-width:0}
+.mk .m .k{font-size:.74rem;color:var(--muted)}
+.mk .m .val{font-weight:700;font-size:1.05rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dn{color:var(--g-intl);font-size:.8rem} .up{color:var(--g-eco);font-size:.8rem}
+
+/* search */
+.sbox{display:flex;gap:8px;align-items:center;background:var(--surface);border:2px solid var(--line);border-radius:14px;padding:4px 6px 4px 14px}
+.sbox:focus-within{border-color:var(--accent)}
+.sbox input{flex:1;min-width:0;border:0;background:none;font:inherit;font-size:1.05rem;color:var(--ink);padding:10px 0;outline:none}
+.chips{display:flex;gap:6px;flex-wrap:wrap}
+.fchip{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:5px 12px;font-size:.84rem;cursor:pointer}
+.fchip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.fchip .c{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;vertical-align:middle}
+.hist{display:flex;align-items:flex-end;gap:2px;height:46px;padding-top:4px}
+.hist i{flex:1;background:var(--accent);opacity:.75;border-radius:3px 3px 0 0;min-height:2px}
+.hist-l{display:flex;justify-content:space-between;font-size:.7rem;color:var(--muted)}
+.res{display:flex;flex-direction:column;gap:14px}
+.day h3{font-size:.9rem;color:var(--muted);margin-bottom:6px;position:sticky;top:calc(env(safe-area-inset-top,0px) + 61px);background:var(--bg);padding-block:4px;z-index:2}
+.day ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.item{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+.item .h{font-weight:700;font-size:.97rem}
+.item .s{font-size:.78rem;color:var(--muted);margin-top:2px}
+.item .meta{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:3px}
+mark{background:#ffe066;color:#141b2d;border-radius:3px;padding:0 1px}
+.quick{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px}
+.quick button{flex:none}
+.empty{text-align:center;color:var(--muted);padding:30px 10px}
+
+/* illustrations */
+.ill{border-radius:var(--radius);overflow:hidden;aspect-ratio:12/5;max-width:100%;border:1px solid var(--line)}
+.excard .ico.ill{aspect-ratio:auto;width:56px;height:56px;border-radius:14px}
+.ten .big .ill{margin:0 0 10px;aspect-ratio:12/4}
+.story .ill{border:0;border-radius:16px;max-height:30vh}
+.credit{font-size:.72rem;color:var(--muted);margin-top:4px}
+
+/* quiz */
+.quiz .qq{font-weight:700;font-size:1.02rem;margin:4px 0 10px}
+.quiz .opts{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.quiz .opt{border:2px solid var(--line);background:var(--surface2);border-radius:12px;padding:10px;cursor:pointer;font-weight:700;text-align:center}
+.quiz .opt.right{border-color:var(--ok);background:var(--ok-soft)}
+.quiz .opt.wrong{border-color:var(--g-intl);background:var(--g-intl-s)}
+.quiz .exp{margin-top:10px;font-size:.92rem;background:var(--surface2);border-radius:10px;padding:8px 12px}
+.quiz .qn{display:flex;justify-content:space-between;align-items:center;font-size:.8rem;color:var(--muted)}
+.dots{display:flex;gap:5px}.dots i{width:9px;height:9px;border-radius:50%;background:var(--line)}.dots i.r{background:var(--ok)}.dots i.w{background:var(--g-intl)}.dots i.c{outline:2px solid var(--accent)}
+
+/* explainers */
+.exgrid{display:grid;grid-template-columns:1fr;gap:10px}
+@media (min-width:640px){.exgrid{grid-template-columns:1fr 1fr}}
+.excard{display:grid;grid-template-columns:56px 1fr;gap:12px;text-align:left;width:100%;border:1px solid var(--line);background:var(--surface);border-radius:var(--radius);padding:14px;cursor:pointer;align-items:start}
+.excard .ico{width:56px;height:56px;border-radius:14px;display:grid;place-items:center;font-size:1.7rem;background:var(--surface2)}
+.excard h3{font-size:1.02rem}
+.excard p{margin:2px 0 0;font-size:.85rem;color:var(--muted)}
+.st{font-size:.72rem;font-weight:700}
+.st.live{color:var(--warn)} .st.done{color:var(--ok)}
+
+.sheet{position:fixed;inset:0;z-index:50;background:var(--bg);overflow-y:auto;-webkit-overflow-scrolling:touch}
+.sheet .bar{position:sticky;top:0;z-index:3;background:var(--surface);border-bottom:1px solid var(--line);padding-top:env(safe-area-inset-top,0px)}
+.sheet .bar .wrap{display:flex;align-items:center;gap:10px;padding-block:8px}
+.sheet .bar .ttl{font-weight:700;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sheet .body{padding-block:16px calc(40px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:18px}
+.kid{background:#fff6cc;color:#2a2410;border-radius:var(--radius);padding:16px 18px}
+.kid .l{font-size:.78rem;font-weight:700;letter-spacing:.06em;opacity:.75}
+.kid h2{font-size:1.25rem;margin-top:4px}
+.blk h3{font-size:1.08rem;margin-bottom:8px;display:flex;align-items:center;gap:8px}
+.blk p{margin:0}
+.flow{display:flex;flex-direction:column;align-items:stretch;gap:0}
+.fstep{background:var(--surface);border:2px solid var(--line);border-radius:14px;padding:12px 14px;display:grid;grid-template-columns:40px 1fr;gap:10px;align-items:center;transition:opacity .45s ease, transform .45s ease, border-color .3s}
+.fstep .fi{font-size:1.6rem;text-align:center}
+.fstep b{display:block;font-size:1.02rem}
+.fstep small{display:block;color:var(--muted);font-size:.85rem}
+.farrow{text-align:center;color:var(--muted);font-size:.85rem;padding:4px 0;transition:opacity .45s ease}
+.flow.anim .fstep,.flow.anim .farrow{opacity:.12;transform:translateY(8px)}
+.flow.anim .on{opacity:1;transform:none}
+.flow .fstep.now{border-color:var(--accent)}
+.fplay{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:4px 12px;font-size:.82rem;cursor:pointer;margin-left:auto}
+ul.us{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:6px}
+details.faq{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:0 14px}
+details.faq+details.faq{margin-top:8px}
+details.faq summary{cursor:pointer;font-weight:700;padding:12px 0;list-style:none;display:flex;gap:8px}
+details.faq summary::before{content:"Q";color:var(--accent);font-family:var(--f-display)}
+details.faq[open] summary{border-bottom:1px dashed var(--line)}
+details.faq p{margin:10px 0 12px}
+.tl{list-style:none;margin:0;padding:0 0 0 14px;border-left:3px solid var(--line);display:flex;flex-direction:column;gap:10px}
+.tl li{position:relative}
+.tl li::before{content:"";position:absolute;left:-21px;top:.55em;width:11px;height:11px;border-radius:50%;background:var(--accent);border:2px solid var(--bg)}
+.tl b{font-size:.85rem;color:var(--accent);margin-right:6px}
+.src{font-size:.8rem;color:var(--muted)}
+.stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.stat{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px;text-align:center}
+.stat .v{font-family:var(--f-display);font-size:1.8rem;line-height:1.1;color:var(--g-spo)}
+.stat .k{font-size:.78rem;color:var(--muted)}
+.calc label{font-size:.9rem;display:block;margin-bottom:6px}
+.calc input[type=range]{width:100%}
+.calc .out{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.calc .o{background:var(--g-eco-s);border-radius:12px;padding:10px;text-align:center}
+.calc .o .v{font-family:var(--f-display);font-size:1.5rem;color:var(--g-eco);line-height:1.2}
+.gl{border:0;background:none;padding:0;color:inherit;text-decoration:underline dotted var(--accent) 2px;text-underline-offset:3px;cursor:help}
+.pop{position:fixed;z-index:70;left:max(16px,env(safe-area-inset-left,0px));right:max(16px,env(safe-area-inset-right,0px));bottom:calc(86px + env(safe-area-inset-bottom,0px));max-width:520px;margin:0 auto;background:var(--ink);color:var(--bg);border-radius:14px;padding:14px 16px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
+.pop b{font-size:1.05rem}
+
+/* numbers */
+.chartbox{position:relative;height:220px}
+.legend-note{font-size:.78rem;color:var(--muted);margin-top:6px}
+
+/* plan */
+.plan{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.plan li{display:grid;grid-template-columns:64px 1fr;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 12px;align-items:center}
+.plan .d{text-align:center;line-height:1.2}
+.plan .d .md{font-family:var(--f-display);font-size:1.15rem}
+.plan .d .wd{font-size:.72rem;color:var(--muted)}
+.plan .left{font-size:.75rem;font-weight:700;color:var(--accent)}
+.plan .tx{font-weight:700;font-size:.95rem}
+.plan .mm{font-size:.8rem;color:var(--muted)}
+.score{display:grid;grid-template-columns:140px 1fr;gap:16px;align-items:center}
+.donut{position:relative;width:140px;height:140px}
+.donut .c{position:absolute;inset:0;display:grid;place-items:center;text-align:center;line-height:1.1}
+.donut .c b{font-family:var(--f-display);font-size:1.7rem}
+.donut .c span{font-size:.72rem;color:var(--muted)}
+.tally{display:grid;grid-template-columns:1fr 1fr;gap:6px;font-size:.9rem}
+.pred{display:flex;flex-direction:column;gap:8px}
+.pr{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 12px;display:grid;grid-template-columns:auto 1fr;gap:4px 10px}
+.pr .no{font-family:var(--f-display);color:var(--muted)}
+.pr .r{grid-column:2;font-size:.78rem;color:var(--muted)}
+.res-hit{color:var(--ok);font-weight:700} .res-miss{color:var(--g-intl);font-weight:700} .res-part{color:var(--warn);font-weight:700} .res-wait{color:var(--muted);font-weight:700}
+
+/* words */
+.words{display:grid;grid-template-columns:1fr;gap:8px}
+@media (min-width:640px){.words{grid-template-columns:1fr 1fr}}
+.w{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:12px 14px}
+.w .wt{font-weight:700;font-size:1.05rem}
+.w .wy{font-size:.75rem;color:var(--muted)}
+.w p{margin:4px 0 0;font-size:.92rem}
+.w .ex{margin-top:6px;font-size:.85rem;background:var(--surface2);border-radius:8px;padding:6px 10px}
+
+/* story player */
+.story{position:fixed;inset:0;z-index:80;background:#0b1020;color:#f2f4fa;display:flex;flex-direction:column;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px);user-select:none;-webkit-user-select:none}
+.story .bars{display:flex;gap:4px;padding:10px max(14px,env(safe-area-inset-right,0px)) 6px max(14px,env(safe-area-inset-left,0px))}
+.story .bars i{flex:1;height:4px;border-radius:2px;background:rgba(255,255,255,.25);overflow:hidden}
+.story .bars i b{display:block;height:100%;width:0;background:#fff}
+.story .ctl{display:flex;align-items:center;gap:8px;padding:4px max(14px,env(safe-area-inset-right,0px)) 0 max(14px,env(safe-area-inset-left,0px))}
+.story .ctl .lbl{font-size:.8rem;opacity:.75;margin-right:auto}
+.story .sbtn{border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.08);color:#fff;border-radius:999px;height:36px;min-width:36px;padding:0 12px;cursor:pointer;font-size:.85rem}
+.story .stage{flex:1;position:relative;overflow:hidden}
+.story .slide{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;gap:14px;padding:24px max(26px,env(safe-area-inset-right,0px)) 24px max(26px,env(safe-area-inset-left,0px));max-width:680px;margin:0 auto}
+.story .kick{font-size:.85rem;letter-spacing:.12em;opacity:.75;font-weight:700}
+.story h2{font-family:var(--f-display);font-weight:400;font-size:clamp(1.6rem,6.4vw,2.6rem);line-height:1.3}
+.story p{font-size:1.08rem;line-height:1.75;margin:0;opacity:.92}
+.story .huge{font-family:var(--f-display);font-size:clamp(3.4rem,16vw,6rem);line-height:1}
+.story .tag{display:inline-block;padding:3px 12px;border-radius:999px;font-size:.85rem;font-weight:700;background:rgba(255,255,255,.14);align-self:flex-start}
+.story .tapl,.story .tapr{position:absolute;top:0;bottom:0;width:32%;z-index:2;border:0;background:none;cursor:pointer}
+.story .tapl{left:0} .story .tapr{right:0}
+.story .an{animation:rise .7s cubic-bezier(.2,.8,.2,1) both}
+.story .an.d1{animation-delay:.15s} .story .an.d2{animation-delay:.35s} .story .an.d3{animation-delay:.6s} .story .an.d4{animation-delay:.85s}
+.story .glow{position:absolute;inset:-30%;z-index:0;opacity:.55;filter:blur(60px);animation:drift 12s ease-in-out infinite alternate}
+.story .slide>*:not(.glow){position:relative;z-index:1}
+.story ol.mini{margin:0;padding-left:1.4em;display:flex;flex-direction:column;gap:8px;font-size:1rem}
+@keyframes rise{from{opacity:0;transform:translateY(18px)}to{opacity:1;transform:none}}
+@keyframes drift{from{transform:translate(-6%,-4%) scale(1)}to{transform:translate(6%,5%) scale(1.15)}}
+@media (prefers-reduced-motion: reduce){.story .an,.story .glow{animation:none}.fstep,.farrow{transition:none}}
+
+.foot{font-size:.8rem;color:var(--muted);display:flex;flex-direction:column;gap:6px;border-top:1px solid var(--line);padding-top:14px}
+.setrow{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.seg button{border:0;background:var(--surface);padding:6px 12px;cursor:pointer;font-size:.85rem}
+.seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap">
+    <div class="brand"><span class="dot" aria-hidden="true"></span>まいにちニュース帳</div>
+    <div class="upd" id="upd"></div>
+    <button class="iconbtn" id="setBtn" aria-label="表示の設定" title="表示の設定">Aa</button>
+  </div>
+</header>
+
+<nav class="tabs" aria-label="メニュー">
+  <div class="wrap" role="tablist" id="tabs"></div>
+</nav>
+
+<main class="wrap" id="main"></main>
+
+<div id="sheet" class="sheet" hidden></div>
+<div id="story" class="story" hidden></div>
+<div id="pop" class="pop" hidden role="dialog" aria-live="polite"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.js"></script>
+<script src="data.js"></script>
+<script>
+(function(){
+"use strict";
+const D = window.NEWS_DATA;
+const main = document.getElementById("main");
+const GN = {pol:"政治",eco:"経済",soc:"社会・災害",it:"情報・IT",intl:"国際",spo:"スポーツ・科学",ent:"エンタメ",pred:"予測の判定"};
+const GORDER = ["pol","eco","soc","it","intl","spo","ent"];
+const WD = ["日","月","火","水","木","金","土"];
+const esc = s => String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const bold = s => esc(s).replace(/\*\*(.+?)\*\*/g,"<b>$1</b>");
+const store = {get(k){try{return localStorage.getItem(k)}catch(e){return null}}, set(k,v){try{localStorage.setItem(k,v)}catch(e){}}};
+const css = n => getComputedStyle(document.documentElement).getPropertyValue(n).trim();
+
+// 今日(日本時間)
+function jstToday(){ const n=new Date(Date.now()+9*3600e3); return n.toISOString().slice(0,10); }
+const TODAY = jstToday();
+function md(iso){ const [y,m,d]=iso.split("-").map(Number); const dt=new Date(Date.UTC(y,m-1,d)); return {m, d, w:WD[dt.getUTCDay()], y}; }
+function mdLabel(iso){ const x=md(iso); return `${x.m}/${x.d}(${x.w})`; }
+function daysFrom(iso){ return Math.round((Date.parse(iso)-Date.parse(TODAY))/864e5); }
+function relDay(iso){ const n=daysFrom(iso); return n===0?"今日":n===1?"明日":n===-1?"きのう":mdLabel(iso); }
+
+document.getElementById("upd").innerHTML = `最終更新<br><b class="num">${esc(D.updatedLabel)}</b>`;
+
+// ===== 設定(テーマ・文字サイズ) =====
+const root = document.documentElement;
+function applySettings(){ const t=store.get("nw-theme"); if(t==="light"||t==="dark") root.setAttribute("data-theme",t); else root.removeAttribute("data-theme");
+  const s=store.get("nw-size"); if(s==="l"||s==="xl") root.setAttribute("data-size",s); else root.removeAttribute("data-size"); }
+applySettings();
+
+// ===== 自作イラスト(SVG) =====
+const ILL = (()=>{
+  const W=(inner,bg)=>`<svg viewBox="0 0 360 150" role="img" aria-hidden="true" preserveAspectRatio="xMidYMid slice" style="display:block;width:100%;height:100%"><rect width="360" height="150" fill="${bg}"/>${inner}</svg>`;
+  return {
+    saudi: W(`
+      <circle cx="300" cy="34" r="18" fill="#ffd166"/>
+      <path d="M0 118 Q60 96 120 112 T240 106 T360 110 V150 H0Z" fill="#e9c98f"/>
+      <path d="M0 132 Q90 116 180 128 T360 126 V150 H0Z" fill="#d9b06b"/>
+      <g transform="translate(46 58)"><rect x="0" y="10" width="44" height="58" rx="6" fill="#2b2f3a"/><rect x="0" y="22" width="44" height="6" fill="#ffd166"/><rect x="0" y="50" width="44" height="6" fill="#ffd166"/><ellipse cx="22" cy="10" rx="22" ry="7" fill="#3c4250"/></g>
+      <g transform="translate(108 70)"><rect x="0" y="8" width="34" height="46" rx="5" fill="#2b2f3a"/><rect x="0" y="18" width="34" height="5" fill="#ffd166"/><ellipse cx="17" cy="8" rx="17" ry="6" fill="#3c4250"/></g>
+      <polyline points="170,104 205,92 232,96 262,70 292,58 322,40" fill="none" stroke="#e5484d" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/>
+      <polygon points="322,26 338,46 312,48" fill="#e5484d"/>
+      <text x="196" y="132" font-size="16" font-weight="700" fill="#5b3b0a" font-family="sans-serif">$100超え</text>`, "#fdf1d8"),
+    tax: W(`
+      <rect x="0" y="118" width="360" height="32" fill="#cfe9d8"/>
+      <g transform="translate(52 40)"><path d="M0 18 H96 L84 74 H12Z" fill="#17803f"/><path d="M14 18 Q48 -14 82 18" fill="none" stroke="#17803f" stroke-width="6"/>
+        <circle cx="30" cy="8" r="12" fill="#e5484d"/><rect x="48" y="-6" width="12" height="26" rx="4" fill="#f5c542"/><circle cx="72" cy="10" r="10" fill="#7cc36b"/></g>
+      <g font-family="sans-serif" font-weight="800">
+        <text x="184" y="74" font-size="36" fill="#9aa3ad" text-decoration="line-through">8%</text>
+        <text x="238" y="72" font-size="22" fill="#17803f">→</text>
+        <text x="262" y="80" font-size="50" fill="#17803f">1%</text>
+        <text x="186" y="108" font-size="14" fill="#2a4a35">食料品の消費税(法案)</text></g>`, "#eaf7ee"),
+    cyber: W(`
+      <g stroke="#b9a7f5" stroke-width="2" fill="none" opacity=".8"><path d="M20 30 H120 V70 H200"/><path d="M40 120 H150 V90 H240 V40 H340"/><path d="M260 130 V100 H330"/></g>
+      <g fill="#b9a7f5"><circle cx="20" cy="30" r="5"/><circle cx="200" cy="70" r="5"/><circle cx="40" cy="120" r="5"/><circle cx="340" cy="40" r="5"/><circle cx="330" cy="100" r="5"/></g>
+      <g transform="translate(150 30)"><path d="M30 0 L60 12 V44 Q60 74 30 90 Q0 74 0 44 V12Z" fill="#7c3aed"/><rect x="18" y="38" width="24" height="22" rx="4" fill="#fff"/><path d="M22 38 V30 Q30 20 38 30 V38" fill="none" stroke="#fff" stroke-width="5"/></g>
+      <g transform="translate(262 52)"><rect width="56" height="38" rx="6" fill="#fff" stroke="#7c3aed" stroke-width="3"/><path d="M0 4 L28 24 L56 4" fill="none" stroke="#7c3aed" stroke-width="3"/><circle cx="52" cy="2" r="9" fill="#e5484d"/><text x="48.5" y="7" font-size="13" font-weight="800" fill="#fff" font-family="sans-serif">!</text></g>
+      <g transform="translate(46 60)"><rect width="64" height="40" rx="6" fill="#2b2f3a"/><rect x="6" y="6" width="52" height="26" rx="3" fill="#4ade80" opacity=".25"/><text x="10" y="25" font-size="12" fill="#4ade80" font-family="monospace">****</text><rect x="-6" y="40" width="76" height="6" rx="3" fill="#3c4250"/></g>`, "#f1ecfe"),
+    sato: W(`
+      <rect y="110" width="360" height="40" fill="#5fa35a"/><path d="M120 150 L180 112 L240 150Z" fill="#c9a26b"/>
+      <circle cx="80" cy="60" r="34" fill="#fff" stroke="#d6d6d6" stroke-width="2"/><path d="M58 36 Q72 60 58 84" fill="none" stroke="#e5484d" stroke-width="3" stroke-dasharray="4 4"/><path d="M102 36 Q88 60 102 84" fill="none" stroke="#e5484d" stroke-width="3" stroke-dasharray="4 4"/>
+      <path d="M118 50 Q190 -10 300 40" fill="none" stroke="#8a5a2b" stroke-width="3" stroke-dasharray="2 8" stroke-linecap="round"/>
+      <g font-family="sans-serif" font-weight="800" fill="#3b2a14"><text x="190" y="72" font-size="15">打率 .306</text><text x="190" y="92" font-size="15">39本塁打</text><text x="280" y="92" font-size="15">106打点</text></g>
+      <text x="300" y="44" font-size="26">🇺🇸</text>`, "#f6eee3"),
+    series: W(`
+      <rect y="112" width="360" height="38" fill="#5fa35a"/>
+      <g fill="#ffffff" opacity=".9"><rect x="20" y="20" width="6" height="40"/><rect x="334" y="20" width="6" height="40"/><circle cx="23" cy="18" r="9" fill="#fff6c7"/><circle cx="337" cy="18" r="9" fill="#fff6c7"/></g>
+      <g transform="translate(150 22)"><path d="M10 0 H50 V22 Q50 50 30 54 Q10 50 10 22Z" fill="#f5c542"/><path d="M10 6 H0 Q0 26 12 30" fill="none" stroke="#f5c542" stroke-width="5"/><path d="M50 6 H60 Q60 26 48 30" fill="none" stroke="#f5c542" stroke-width="5"/><rect x="24" y="54" width="12" height="16" fill="#d9a400"/><rect x="12" y="70" width="36" height="10" rx="3" fill="#8a5a2b"/></g>
+      <g font-family="sans-serif" font-weight="800"><text x="40" y="96" font-size="20" fill="#1d4ed8">DeNA</text><text x="146" y="104" font-size="16" fill="#3b2a14">対</text><text x="214" y="96" font-size="18" fill="#b45309">ソフトバンク</text></g>`, "#e9f2fb"),
+    yokohama: W(`
+      <path d="M0 112 H360 V150 H0Z" fill="#9cc7e8"/><path d="M0 120 Q30 114 60 120 T120 120 T180 120 T240 120 T300 120 T360 120" fill="none" stroke="#fff" stroke-width="2"/>
+      <g fill="#7a8aa6"><rect x="30" y="58" width="26" height="54"/><rect x="62" y="40" width="22" height="72"/><rect x="236" y="50" width="30" height="62"/><rect x="300" y="66" width="34" height="46"/></g>
+      <path d="M90 112 V62 Q104 30 118 62 V112Z" fill="#5f6f8c"/>
+      <circle cx="198" cy="70" r="38" fill="none" stroke="#e5484d" stroke-width="4"/><g stroke="#e5484d" stroke-width="2">${Array.from({length:12},(_,i)=>{const a=i*Math.PI/6;return `<line x1="198" y1="70" x2="${(198+38*Math.cos(a)).toFixed(1)}" y2="${(70+38*Math.sin(a)).toFixed(1)}"/>`}).join("")}</g>
+      <g transform="translate(150 84)"><rect width="40" height="28" rx="3" fill="#2563c9"/><rect x="10" y="-4" width="20" height="6" fill="#1e3a8a"/><rect x="12" y="-18" width="16" height="18" fill="#fff" transform="rotate(-8 20 -9)"/></g>`, "#eaf2fb"),
+    past: W(`
+      <g transform="translate(40 26)"><rect width="120" height="100" rx="10" fill="#fff" stroke="#c25a0c" stroke-width="3"/><rect width="120" height="26" rx="10" fill="#c25a0c"/><text x="34" y="19" font-size="14" font-weight="800" fill="#fff" font-family="sans-serif">9〜10月</text>
+        <g fill="#f3d7c0">${Array.from({length:12},(_,i)=>`<rect x="${10+(i%4)*27}" y="${36+Math.floor(i/4)*20}" width="20" height="14" rx="3"/>`).join("")}</g></g>
+      <g transform="translate(206 30)" font-size="34"><text x="0" y="40">🌀</text><text x="52" y="40">🌋</text><text x="0" y="90">🗳️</text><text x="52" y="90">🏛️</text></g>`, "#fdf1e6"),
+    typhoon: W(`
+      <path d="M0 120 Q60 110 120 120 T240 118 T360 122 V150 H0Z" fill="#7fb3d5"/>
+      <g transform="translate(110 70)"><g fill="none" stroke="#c25a0c" stroke-width="7" stroke-linecap="round"><path d="M0 0 m-46 0 a46 46 0 0 1 46 -46"/><path d="M0 0 m46 0 a46 46 0 0 1 -46 46"/><path d="M0 0 m-26 0 a26 26 0 0 1 26 -26" opacity=".7"/><path d="M0 0 m26 0 a26 26 0 0 1 -26 26" opacity=".7"/></g><circle r="8" fill="#c25a0c"/></g>
+      <path d="M170 76 Q220 70 262 92" fill="none" stroke="#c25a0c" stroke-width="3" stroke-dasharray="6 6"/><polygon points="262,92 248,94 256,82" fill="#c25a0c"/>
+      <g fill="#5f8f4e"><ellipse cx="290" cy="104" rx="20" ry="6"/><ellipse cx="322" cy="96" rx="10" ry="4"/></g>
+      <text x="270" y="134" font-size="13" font-weight="700" fill="#1e3a5f" font-family="sans-serif">沖縄・先島</text>
+      <text x="40" y="30" font-size="14" font-weight="800" fill="#7c2d12" font-family="sans-serif">935hPa「猛烈な」</text>`, "#e6f1f9")
+  };
+})();
+
+// ===== タブ =====
+const TABS = [
+  ["today","📰","きょう"],["search","🔎","さがす"],["explain","💡","解説"],["numbers","📈","数字"],["plan","📅","予定・予測"],["words","📖","ことば"]
+];
+const tabsEl = document.getElementById("tabs");
+tabsEl.innerHTML = TABS.map(([k,i,l])=>`<button class="tab" role="tab" id="tab-${k}" data-k="${k}" aria-selected="false"><span class="ti" aria-hidden="true">${i}</span>${l}</button>`).join("");
+tabsEl.addEventListener("click",e=>{const b=e.target.closest(".tab"); if(b) go(b.dataset.k);});
+let current = null; const charts=[];
+function go(k, opts){
+  if(!TABS.some(t=>t[0]===k)) k="today";
+  current=k; store.set("nw-tab",k);
+  tabsEl.querySelectorAll(".tab").forEach(b=>b.setAttribute("aria-selected", String(b.dataset.k===k)));
+  charts.splice(0).forEach(c=>{try{c.destroy()}catch(e){}});
+  ({today:renderToday,search:renderSearch,explain:renderExplain,numbers:renderNumbers,plan:renderPlan,words:renderWords})[k](opts||{});
+  try{ history.replaceState(null,"","#"+k); }catch(e){}
+  if(!(opts&&opts.keepScroll)) window.scrollTo({top:0});
+}
+
+// ===== きょう =====
+function weatherCard(){
+  const w=D.weather; const lab=relDay(w.iso);
+  return `<section class="card" aria-label="天気">
+    <div class="sec-h"><h2>🌤️ ${esc(lab)}の${esc(w.place)}</h2><span class="sub">${esc(w.date)}</span></div>
+    <div class="weather" style="margin-top:8px">
+      <div class="big num">${w.hi}°<small> / ${w.lo}°</small></div>
+      <div><b>${esc(w.sky)}</b><br><span>☔ ${esc(w.umbrella)}</span></div>
+      <div class="rainbar" style="grid-column:1/-1">${w.rain.map(([t,p])=>`<span class="rain num">${t} ${p}%</span>`).join("")}<span class="rain">👕 ${esc(w.wear)}</span></div>
+      <div class="notes">${w.notes.map(n=>`<div class="note">⚠️ ${esc(n)}</div>`).join("")}</div>
+    </div>
+    <div class="hint" style="margin-top:8px">出典: ${esc(w.source)}</div>
+  </section>`;
+}
+function exLink(id){ return id && D.explainers[id] ? ` data-ex="${id}"` : ""; }
+function renderToday(){
+  const t=D.top10;
+  main.innerHTML = `<div class="view">
+    <div class="hero">
+      <button class="play" id="playBtn"><span class="pi" aria-hidden="true">▶</span><span><b>1分で見る 今日のニュース</b><span>動くスライドで自動再生。タップで止めたり進めたり</span></span></button>
+    </div>
+    ${weatherCard()}
+    <section aria-label="今日の3行">
+      <div class="sec-h"><h2>☀️ 今日の3行</h2><span class="sub">時間がない日はここだけでOK</span></div>
+      <div class="three" style="margin-top:10px">${D.three.map(x=>`<button class="t ${x.tone}"${exLink(x.ex)}><span class="lab">${esc(x.label)}</span><h3>${esc(x.title)}</h3><p>${esc(x.text)}</p>${x.ex?'<span class="more">くわしく →</span>':''}</button>`).join("")}</div>
+    </section>
+    <section aria-label="今日のニュース10">
+      <div class="sec-h"><h2>📰 今日のニュース10</h2><span class="sub">関心の高い順</span></div>
+      <ol class="ten" style="margin-top:10px">${t.map((n,i)=>{
+        const big=i<3; const link=n.ex||n.tab;
+        return `<li class="${big?'big':''}"><button class="row${link?' link':''}"${n.ex?` data-ex="${n.ex}"`:''}${n.tab?` data-tab="${n.tab}"`:''} ${link?'':'tabindex="-1"'}>
+          <span class="rank">${i+1}</span>
+          <span>${big&&ILL[n.ill||n.ex]?`<div class="ill">${ILL[n.ill||n.ex]}</div>`:""}<span class="meta"><span class="chip ${n.g}">${GN[n.g]}</span>${n.ok?'<span class="badge-ok">✅ 複数社で確認</span>':'<span class="badge-one">⚠️ 1社のみ</span>'}</span>
+          <h3>${n.icon} ${esc(n.title)}</h3>
+          ${n.text?`<p>${esc(n.text)}</p>`:""}
+          ${n.point?`<div class="pt">💭 <b>ここがポイント</b> ${esc(n.point)}</div>`:""}
+          ${link?`<span class="more">${n.ex?'くわしい解説 →':'グラフを見る →'}</span>`:''}</span></button></li>`;}).join("")}</ol>
+    </section>
+    ${otherNews()}
+    ${D.quiz&&D.quiz.length?`<section class="card quiz" aria-label="今日のクイズ" id="quiz"></section>`:""}
+    <section class="card" aria-label="今日の数字">
+      <div class="sec-h"><h2>🔢 今日の数字</h2></div>
+      <div class="bignum" style="margin-top:6px"><div class="v num">${esc(D.number.value)}<small>${esc(D.number.unit)}</small></div><p style="margin:0">${esc(D.number.caption)}</p><span class="hint">(${esc(D.number.src)})</span></div>
+      ${marketsMini()}
+    </section>
+    ${footer()}
+  </div>`;
+  document.getElementById("playBtn").onclick=openStory;
+  if(document.getElementById("quiz")) drawQuiz(0,[]);
+  main.querySelectorAll("[data-ex]").forEach(b=>b.addEventListener("click",()=>openEx(b.dataset.ex)));
+  main.querySelectorAll("[data-tab]").forEach(b=>b.addEventListener("click",()=>go(b.dataset.tab)));
+  bindFooter();
+}
+function otherNews(){
+  const day=NEWS[0]&&NEWS[0].d; if(!day) return "";
+  const L=NEWS.filter(n=>n.d===day); if(!L.length) return "";
+  return `<section aria-label="今日のほかのニュース"><details class="faq"><summary>📚 ${mdLabel(day)}に記録したニュース すべて(${L.length}件)</summary>
+    <div style="display:flex;flex-direction:column;gap:12px;padding:10px 0 14px">${GORDER.filter(g=>L.some(n=>n.g===g)).map(g=>`<div><span class="chip ${g}">${GN[g]}</span><ul class="us" style="margin-top:6px">${L.filter(n=>n.g===g).map(n=>`<li>${esc(n.h)} ${n.ok?'<span class="badge-ok">✅</span>':'<span class="badge-one">⚠️</span>'}</li>`).join("")}</ul></div>`).join("")}</div></details>
+    <div class="hint" style="margin-top:6px">上のニュース10は、この中から関心の高い順に選んだランキングです。</div></section>`;
+}
+function lastVal(i){ for(let k=D.markets.length-1;k>=0;k--){ if(D.markets[k][i]!=null){ let prev=null; for(let j=k-1;j>=0;j--){ if(D.markets[j][i]!=null){prev=D.markets[j][i];break;} } return {v:D.markets[k][i],d:D.markets[k][0],prev}; } } return null; }
+function marketsMini(){
+  const n=lastVal(1), y=lastVal(2), o=lastVal(3);
+  const diff=(a,dec)=>{ if(!a||a.prev==null) return ""; const d=a.v-a.prev; const s=(d>=0?"▲":"▼")+Math.abs(d).toLocaleString("ja-JP",{maximumFractionDigits:dec}); return `<span class="${d>=0?'up':'dn'}">${s}</span>`; };
+  return `<div class="mk" style="margin-top:12px">
+    <button class="m" data-tab="numbers" style="text-align:left;cursor:pointer"><div class="k">📈 日経平均</div><div class="val num">${n?n.v.toLocaleString("ja-JP")+"円":"—"}</div>${diff(n,0)} <span class="hint">${n?mdLabel(n.d):""}</span></button>
+    <button class="m" data-tab="numbers" style="text-align:left;cursor:pointer"><div class="k">💴 1ドル</div><div class="val num">${y?y.v.toFixed(2)+"円":"—"}</div><span class="hint">${y?mdLabel(y.d):""}</span></button>
+    <button class="m" data-tab="numbers" style="text-align:left;cursor:pointer"><div class="k">🛢️ NY原油</div><div class="val num">${o?o.v.toFixed(2)+"ドル":"—"}</div>${diff(o,2)} <span class="hint">${o?mdLabel(o.d):""}</span></button>
+  </div>`;
+}
+
+// ===== クイズ =====
+function drawQuiz(i,res){
+  const box=document.getElementById("quiz"); if(!box) return; const Q=D.quiz;
+  const dots=`<span class="dots">${Q.map((_,k)=>`<i class="${res[k]===true?'r':res[k]===false?'w':''}${k===i?' c':''}"></i>`).join("")}</span>`;
+  if(i>=Q.length){ const sc=res.filter(Boolean).length; store.set("nw-quiz-"+D.updated.slice(0,10),String(sc));
+    box.innerHTML=`<div class="qn"><span>🧠 今日の${Q.length}問クイズ</span>${dots}</div><div class="qq" style="font-size:1.3rem">${sc}問 正解! ${sc===Q.length?"🎉 満点":sc>0?"👏":"また明日!"}</div><p class="hint" style="margin:0">答えはニュース10と解説にのっています。</p><button class="fchip" id="qre" style="margin-top:10px">もう一度</button>`;
+    document.getElementById("qre").onclick=()=>drawQuiz(0,[]); return; }
+  const q=Q[i];
+  box.innerHTML=`<div class="qn"><span>🧠 今日の${Q.length}問クイズ ・ ${i+1}問目</span>${dots}</div><div class="qq">${esc(q.q)}</div><div class="opts">${q.o.map((o,k)=>`<button class="opt" data-k="${k}">${esc(o)}</button>`).join("")}</div><div id="qexp"></div>`;
+  box.querySelectorAll(".opt").forEach(b=>b.onclick=()=>{ const k=+b.dataset.k; const ok=k===q.a;
+    box.querySelectorAll(".opt").forEach(x=>{x.disabled=true; if(+x.dataset.k===q.a) x.classList.add("right");}); if(!ok) b.classList.add("wrong");
+    res[i]=ok; document.getElementById("qexp").innerHTML=`<div class="exp"><b>${ok?"⭕ 正解!":"❌ ざんねん"}</b> ${esc(q.e)}</div><button class="fchip" id="qnext" style="margin-top:10px">${i+1<Q.length?"次の問題 →":"結果を見る →"}</button>`;
+    document.getElementById("qnext").onclick=()=>drawQuiz(i+1,res); });
+}
+
+// ===== 動くニュース(ストーリー) =====
+let st=null;
+function buildSlides(){
+  const w=D.weather, t=D.top10, S=[];
+  const glow = c => `<div class="glow" style="background:radial-gradient(circle at 30% 30%, ${c}, transparent 60%)"></div>`;
+  S.push({c:"#3b5bff", h:`${glow("#3b5bff")}<div class="kick an">まいにちニュース帳</div><h2 class="an d1">${esc(D.updatedLabel)}<br>のニュース</h2><p class="an d2">1枚ずつ自動で進みます。左右をタップで戻る・進む。</p>`, say:`${D.updatedLabel}のニュースです。`});
+  S.push({c:"#0ea5e9", h:`${glow("#0ea5e9")}<div class="kick an">${esc(relDay(w.iso))}の${esc(w.place)}</div><div class="huge an d1 num">${w.hi}°<span style="font-size:.45em;opacity:.7"> / ${w.lo}°</span></div><h2 class="an d2" style="font-size:1.5rem">${esc(w.sky)}</h2><p class="an d3">☔ ${esc(w.umbrella)}</p>`, say:`${relDay(w.iso)}の東京は${w.sky}。最高${w.hi}度、最低${w.lo}度。${w.umbrella}。`});
+  const tc={pol:"#2563eb",intl:"#ef4444",spo:"#c08443",eco:"#22a35a",soc:"#ea7a2a",it:"#8b5cf6",ent:"#e1508f"};
+  D.three.forEach((x,i)=>S.push({c:tc[x.tone], h:`${glow(tc[x.tone])}<span class="tag an">${i+1} / 3 ・ ${esc(x.label)}</span>${ILL[x.ex]?`<div class="ill an d1">${ILL[x.ex]}</div>`:""}<h2 class="an d1">${esc(x.title)}</h2><p class="an d2">${esc(x.text)}</p>`, say:`${x.label}。${x.title}。${x.text}`}));
+  S.push({c:"#22a35a", h:`${glow("#22a35a")}<div class="kick an">今日の数字</div><div class="huge an d1 num" data-count="${esc(D.number.value)}">0</div><div class="an d1" style="font-size:1.4rem;font-weight:700">${esc(D.number.unit)}</div><p class="an d2">${esc(D.number.caption)}</p>`, say:`今日の数字は${D.number.value}${D.number.unit}。${D.number.caption}`});
+  const rest=t.slice(3,10);
+  S.push({c:"#a855f7", h:`${glow("#a855f7")}<div class="kick an">ほかのニュース</div><ol class="mini" start="4">${rest.map((n,i)=>`<li class="an d${Math.min(4,i+1)}">${n.icon} ${esc(n.title)}</li>`).join("")}</ol>`, say:"ほかのニュースです。"+rest.map(n=>n.title).join("。")});
+  S.push({c:"#3b5bff", h:`${glow("#3b5bff")}<h2 class="an">今日はここまで</h2><p class="an d1">くわしい解説やグラフは、下のタブから見られます。</p><p class="an d2" style="opacity:.7">次の更新: ${esc(D.nextLabel)}</p>`, say:"今日はここまでです。"});
+  return S;
+}
+const DUR=7000;
+function openStory(){
+  const el=document.getElementById("story"); const S=buildSlides();
+  el.innerHTML=`<div class="bars">${S.map(()=>"<i><b></b></i>").join("")}</div>
+    <div class="ctl"><span class="lbl" id="stLbl"></span><button class="sbtn" id="stVoice" aria-pressed="false">🔈 読み上げ</button><button class="sbtn" id="stPause" aria-label="一時停止">❚❚</button><button class="sbtn" id="stClose" aria-label="閉じる">✕</button></div>
+    <div class="stage" id="stStage"><button class="tapl" aria-label="前へ"></button><button class="tapr" aria-label="次へ"></button></div>`;
+  el.hidden=false; document.body.style.overflow="hidden";
+  st={S,i:0,t0:0,el:0,paused:false,raf:0,voice:store.get("nw-voice")==="1"};
+  el.querySelector("#stVoice").setAttribute("aria-pressed",String(st.voice)); el.querySelector("#stVoice").textContent=st.voice?"🔊 読み上げ中":"🔈 読み上げ";
+  el.querySelector("#stClose").onclick=closeStory;
+  el.querySelector("#stPause").onclick=()=>setPause(!st.paused);
+  el.querySelector("#stVoice").onclick=e=>{st.voice=!st.voice; store.set("nw-voice",st.voice?"1":"0"); e.currentTarget.setAttribute("aria-pressed",String(st.voice)); e.currentTarget.textContent=st.voice?"🔊 読み上げ中":"🔈 読み上げ"; if(st.voice) speak(st.S[st.i].say); else stopSpeak();};
+  el.querySelector(".tapl").onclick=()=>show(st.i-1);
+  el.querySelector(".tapr").onclick=()=>show(st.i+1);
+  document.addEventListener("keydown",storyKeys);
+  show(0);
+}
+function storyKeys(e){ if(!st) return; if(e.key==="Escape") closeStory(); if(e.key==="ArrowRight") show(st.i+1); if(e.key==="ArrowLeft") show(st.i-1); if(e.key===" "){e.preventDefault(); setPause(!st.paused);} }
+function speak(txt){ try{ const s=window.speechSynthesis; if(!s) return; s.cancel(); const u=new SpeechSynthesisUtterance(txt); u.lang="ja-JP"; u.rate=1.05; s.speak(u);}catch(e){} }
+function stopSpeak(){ try{ window.speechSynthesis && window.speechSynthesis.cancel(); }catch(e){} }
+function setPause(p){ st.paused=p; const b=document.getElementById("stPause"); b.textContent=p?"▶":"❚❚"; b.setAttribute("aria-label",p?"再生":"一時停止"); if(!p){ st.t0=performance.now()-st.el; tick(); } else { cancelAnimationFrame(st.raf);} }
+function show(i){
+  if(!st) return; if(i<0) i=0; if(i>=st.S.length){ closeStory(); return; }
+  st.i=i; st.el=0; st.t0=performance.now();
+  const stage=document.getElementById("stStage"); stage.querySelectorAll(".slide").forEach(s=>s.remove());
+  const s=document.createElement("div"); s.className="slide"; s.innerHTML=st.S[i].h; stage.prepend(s);
+  document.getElementById("stLbl").textContent=`${i+1} / ${st.S.length}`;
+  document.querySelectorAll("#story .bars b").forEach((b,k)=>b.style.width=k<i?"100%":"0");
+  const cnt=s.querySelector("[data-count]"); if(cnt) countUp(cnt);
+  if(st.voice) speak(st.S[i].say);
+  cancelAnimationFrame(st.raf); if(!st.paused) tick();
+}
+function countUp(el){ const target=parseFloat(el.dataset.count); const dec=(el.dataset.count.split(".")[1]||"").length; const reduce=matchMedia("(prefers-reduced-motion: reduce)").matches; if(reduce){el.textContent=target.toFixed(dec);return;} const t0=performance.now(); const f=t=>{const p=Math.min(1,(t-t0)/1400); const e=1-Math.pow(1-p,3); el.textContent=(target*e).toFixed(dec); if(p<1) requestAnimationFrame(f);}; requestAnimationFrame(f); }
+function tick(){ st.raf=requestAnimationFrame(now=>{ if(!st||st.paused) return; st.el=now-st.t0; const bar=document.querySelectorAll("#story .bars b")[st.i]; if(bar) bar.style.width=Math.min(100,st.el/DUR*100)+"%"; if(st.el>=DUR){ show(st.i+1); return; } tick(); }); }
+function closeStory(){ if(st) cancelAnimationFrame(st.raf); st=null; stopSpeak(); const el=document.getElementById("story"); el.hidden=true; el.innerHTML=""; document.body.style.overflow=""; document.removeEventListener("keydown",storyKeys); document.getElementById("playBtn")?.focus(); }
+
+// ===== さがす =====
+const NEWS = D.news.map(r=>({d:r[0],g:r[1],ok:r[2],h:r[3],s:r[4],th:r[5],p:r[6]})).sort((a,b)=>b.d.localeCompare(a.d));
+const THEMES = [...new Set(NEWS.flatMap(n=>n.th?n.th.split(/[、,]/):[]).filter(Boolean))];
+const sState={q:"",g:new Set(),th:"",ok:false};
+function renderSearch(){
+  main.innerHTML=`<div class="view">
+    <div class="sec-h"><h2>🔎 ニュースをさがす</h2><span class="sub">${NEWS.length}件の記録から</span></div>
+    <label class="sbox" for="q"><span aria-hidden="true">🔎</span><input id="q" type="search" placeholder="会社名・人名・ことばを入れる(例: 台風、原油、阪神)" autocomplete="off" value="${esc(sState.q)}"><button class="iconbtn" id="qx" aria-label="入力を消す">✕</button></label>
+    <div class="quick" aria-label="よく探されることば">${["台風","原油","消費税","不正アクセス","北朝鮮","日経平均","阪神","AI"].map(w=>`<button class="fchip" data-w="${w}">${w}</button>`).join("")}</div>
+    <div><div class="hint" style="margin-bottom:6px">ジャンル(いくつでも選べる)</div><div class="chips" id="gf">${GORDER.map(g=>`<button class="fchip" data-g="${g}" aria-pressed="${sState.g.has(g)}"><span class="c" style="background:var(--g-${g})"></span>${GN[g]}</button>`).join("")}</div></div>
+    <div class="setrow"><label class="hint" for="th">テーマ</label><select id="th" class="fchip" style="padding:6px 10px"><option value="">すべて</option>${THEMES.map(t=>`<option ${sState.th===t?"selected":""}>${esc(t)}</option>`).join("")}</select>
+      <button class="fchip" id="okf" aria-pressed="${sState.ok}">✅ 複数社で確認したものだけ</button></div>
+    <div id="sres"></div>
+  </div>`;
+  const q=document.getElementById("q");
+  q.addEventListener("input",()=>{sState.q=q.value; draw();});
+  document.getElementById("qx").onclick=e=>{e.preventDefault(); sState.q=""; q.value=""; q.focus(); draw();};
+  main.querySelectorAll("[data-w]").forEach(b=>b.onclick=()=>{sState.q=b.dataset.w; q.value=b.dataset.w; draw();});
+  main.querySelectorAll("[data-g]").forEach(b=>b.onclick=()=>{const g=b.dataset.g; sState.g.has(g)?sState.g.delete(g):sState.g.add(g); b.setAttribute("aria-pressed",String(sState.g.has(g))); draw();});
+  document.getElementById("th").onchange=e=>{sState.th=e.target.value; draw();};
+  document.getElementById("okf").onclick=e=>{sState.ok=!sState.ok; e.currentTarget.setAttribute("aria-pressed",String(sState.ok)); draw();};
+  draw();
+  function hl(s, terms){ let out=esc(s); terms.forEach(t=>{ if(!t) return; const re=new RegExp(esc(t).replace(/[.*+?^${}()|[\]\\]/g,"\\$&"),"gi"); out=out.replace(re,m=>`<mark>${m}</mark>`); }); return out; }
+  function draw(){
+    const terms=sState.q.trim().split(/[\s　]+/).filter(Boolean);
+    const list=NEWS.filter(n=>(!sState.g.size||sState.g.has(n.g)) && (!sState.th||(n.th||"").includes(sState.th)) && (!sState.ok||n.ok) && terms.every(t=>(n.h+" "+n.s+" "+(n.th||"")).toLowerCase().includes(t.toLowerCase())));
+    const exHits = terms.length? Object.entries(D.explainers).filter(([k,e])=>terms.every(t=>(e.name+e.now+e.kid+e.more.join("")+e.faq.flat().join("")+e.timeline.flat().join("")).toLowerCase().includes(t.toLowerCase()))):[];
+    const wHits = terms.length? D.glossary.filter(w=>terms.every(t=>(w[0]+w[1]+w[2]).toLowerCase().includes(t.toLowerCase()))):[];
+    // 日ごとの件数の小さなグラフ
+    const byDay={}; list.forEach(n=>byDay[n.d]=(byDay[n.d]||0)+1);
+    const days=Object.keys(byDay).sort(); const max=Math.max(1,...Object.values(byDay));
+    const histo = days.length>1? `<div class="card"><div class="hint">見つかった${list.length}件の日付の分布</div><div class="hist" aria-hidden="true">${days.map(d=>`<i style="height:${Math.max(6,byDay[d]/max*100)}%" title="${mdLabel(d)} ${byDay[d]}件"></i>`).join("")}</div><div class="hist-l"><span>${mdLabel(days[0])}</span><span>${mdLabel(days[days.length-1])}</span></div></div>`:"";
+    const groups={}; list.forEach(n=>(groups[n.d]=groups[n.d]||[]).push(n));
+    const html = `
+      ${exHits.length?`<div><div class="hint" style="margin-bottom:6px">💡 解説ページ</div><div class="exgrid">${exHits.map(([k,e])=>exCard(k,e)).join("")}</div></div>`:""}
+      ${wHits.length?`<div><div class="hint" style="margin-bottom:6px">📖 ことば</div><div class="words">${wHits.map(wordCard).join("")}</div></div>`:""}
+      <div class="sec-h"><h2 style="font-size:1rem">📰 ニュース <span class="num">${list.length}</span>件</h2>${(sState.q||sState.g.size||sState.th||sState.ok)?'<button class="fchip" id="clr">条件をリセット</button>':''}</div>
+      ${histo}
+      ${list.length? `<div class="res">${Object.keys(groups).sort().reverse().map(d=>`<section class="day"><h3>${mdLabel(d)}${d.slice(0,4)!==TODAY.slice(0,4)?" "+d.slice(0,4):""}</h3><ul>${groups[d].map(n=>`<li class="item"><div class="meta"><span class="chip ${n.g}">${GN[n.g]}</span>${n.ok?'<span class="badge-ok">✅</span>':'<span class="badge-one">⚠️ 1社</span>'}${n.p?`<span class="chip">🎯 ${esc(n.p)}</span>`:""}</div><div class="h">${hl(n.h,terms)}</div><div class="s">出典: ${hl(n.s,terms)}</div></li>`).join("")}</ul></section>`).join("")}</div>`
+        : `<div class="empty">見つかりませんでした。<br>ことばを短くするか、ジャンルの選択を外してみてください。</div>`}`;
+    document.getElementById("sres").innerHTML=html;
+    const clr=document.getElementById("clr"); if(clr) clr.onclick=()=>{sState.q="";sState.g.clear();sState.th="";sState.ok=false; renderSearch();};
+    document.querySelectorAll("#sres [data-ex]").forEach(b=>b.onclick=()=>openEx(b.dataset.ex));
+  }
+}
+
+// ===== 解説 =====
+function exCard(k,e){ return `<button class="excard" data-ex="${k}">${ILL[k]?`<span class="ico ill">${ILL[k]}</span>`:`<span class="ico" style="background:var(--g-${e.g}-s)">${e.icon}</span>`}<span><span class="st ${e.status}">${e.status==="live"?"🔥 いま動いている":"✅ 決着"}</span> <span class="hint">・${esc(e.updated)}更新・⏱️${e.min}分</span><h3>${esc(e.name)}</h3><p>${esc(e.now)}</p></span></button>`; }
+function renderExplain(){
+  const E=Object.entries(D.explainers);
+  main.innerHTML=`<div class="view">
+    <div class="sec-h"><h2>💡 くわしく解説</h2><span class="sub">1テーマ1ページ</span></div>
+    <p class="hint" style="margin:0">「ひとことで」→「動く図」→「よくある疑問」の順に読むと、だいたい1分でわかります。</p>
+    <div><h3 style="font-size:.95rem;margin-bottom:8px">🔥 いま動いている話題</h3><div class="exgrid">${E.filter(([,e])=>e.status==="live").map(([k,e])=>exCard(k,e)).join("")}</div></div>
+    <div><h3 style="font-size:.95rem;margin-bottom:8px">✅ 決着した話題・まとめ</h3><div class="exgrid">${E.filter(([,e])=>e.status!=="live").map(([k,e])=>exCard(k,e)).join("")}</div></div>
+    ${footer()}
+  </div>`;
+  main.querySelectorAll("[data-ex]").forEach(b=>b.onclick=()=>openEx(b.dataset.ex)); bindFooter();
+}
+// ことばの自動リンク
+const GTERMS = D.glossary.map(w=>({key:w[0].replace(/\(.*?\)/,""),w})).sort((a,b)=>b.key.length-a.key.length);
+function glossify(html){
+  const used=new Set();
+  return html.replace(/(<[^>]+>)|([^<]+)/g,(m,tag,text)=>{ if(tag) return tag; let t=text;
+    GTERMS.forEach(({key},i)=>{ if(used.has(key)) return; const idx=t.indexOf(key); if(idx<0) return; used.add(key);
+      t=t.slice(0,idx)+`\u0000${i}\u0001`+t.slice(idx+key.length); });
+    return t.replace(/\u0000(\d+)\u0001/g,(_,i)=>`<button class="gl" data-gi="${i}">${esc(GTERMS[i].key)}</button>`); });
+}
+function showPop(i){ const w=GTERMS[i].w; const p=document.getElementById("pop"); p.innerHTML=`<div style="display:flex;justify-content:space-between;gap:10px;align-items:start"><div><b>${esc(w[0])}</b> <span style="opacity:.7;font-size:.8rem">${esc(w[1])}</span></div><button class="iconbtn" id="popx" aria-label="閉じる" style="background:transparent;color:inherit;border-color:currentColor">✕</button></div><p style="margin:6px 0 0">${esc(w[2])}</p>${w[3]?`<p style="margin:6px 0 0;opacity:.85">例: ${esc(w[3])}</p>`:""}`; p.hidden=false; document.getElementById("popx").onclick=()=>p.hidden=true; }
+document.addEventListener("click",e=>{ const g=e.target.closest(".gl"); if(g){ e.preventDefault(); e.stopPropagation(); showPop(+g.dataset.gi); return; } const p=document.getElementById("pop"); if(!p.hidden && !e.target.closest("#pop")) p.hidden=true; });
+
+function openEx(k){
+  const e=D.explainers[k]; if(!e) return; const sh=document.getElementById("sheet");
+  const rel = NEWS.filter(n=>{ const map={saudi:"サウジ・中東",tax:"消費減税",cyber:"不正アクセスとAI"}; if(map[k]) return (n.th||"").includes(map[k]); if(k==="sato") return /佐藤輝明/.test(n.h); if(k==="series") return /日本シリーズ|CS/.test(n.h); if(k==="yokohama") return /横浜市長/.test(n.h); if(k==="past") return n.d<"2026-10-04"; return false; }).slice(0,8);
+  const flow = e.flow.map((f,i)=>`${i>0?`<div class="farrow">⬇️ ${f.via?`<b>${esc(f.via)}</b>`:""}</div>`:""}<div class="fstep"><span class="fi">${f.i}</span><span><b>${esc(f.t)}</b>${f.s?`<small>${esc(f.s)}</small>`:""}</span></div>`).join("");
+  sh.innerHTML=`<div class="bar"><div class="wrap"><button class="iconbtn" id="shx" aria-label="もどる">←</button><span class="ttl">${e.icon} ${esc(e.name)}</span><button class="iconbtn" id="shshare" aria-label="このページのリンクをコピー">🔗 共有</button></div></div>
+  <div class="wrap body">
+    <div class="hint">最終更新 ${esc(e.updated)} ・ ⏱️ 全部で約${e.min}分 ・ 点線のことばはタップで意味が出ます</div>
+    ${ILL[k]?`<div><div class="ill">${ILL[k]}</div><div class="credit">イラスト: 自作(イメージ)</div></div>`:""}
+    <div class="kid"><div class="l">🧒 ひとことで言うと</div><h2>${esc(e.kid)}</h2></div>
+    <div class="blk"><h3>💡 もう少しくわしく</h3><p><b>${glossify(esc(e.more[0]))}</b></p><p style="margin-top:6px">${glossify(esc(e.more[1]))}</p></div>
+    ${e.stats?`<div class="stats">${e.stats.map(([k2,v])=>`<div class="stat"><div class="v num">${esc(v)}</div><div class="k">${esc(k2)}</div></div>`).join("")}</div>`:""}
+    <div class="blk"><h3>🖼️ 動く図でわかる <button class="fplay" id="fplay">▶ もう一度</button></h3><div class="flow" id="flow">${flow}</div></div>
+    ${e.calc?calcBlock():""}
+    <div class="blk"><h3>🙋 わたしたちへの影響</h3><ul class="us">${e.us.map(u=>`<li>${glossify(bold(u))}</li>`).join("")}</ul></div>
+    <div class="blk"><h3>❓ よくある疑問</h3>${e.faq.map(([q,a],i)=>`<details class="faq"${i===0?" open":""}><summary>${esc(q)}</summary><p>${glossify(esc(a))}</p></details>`).join("")}</div>
+    <div class="blk"><h3>📅 これまでの流れ</h3><ol class="tl">${e.timeline.map(([d,t])=>`<li><b>${esc(d)}</b>${esc(t)}</li>`).join("")}</ol></div>
+    ${e.next.length?`<div class="blk"><h3>🔭 次の山場</h3><ul class="us">${e.next.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>`:""}
+    ${rel.length?`<div class="blk"><h3>🗞️ 関係するニュースの記録</h3><div class="res"><ul style="list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px">${rel.map(n=>`<li class="item"><div class="meta"><span class="hint">${mdLabel(n.d)}</span>${n.ok?'<span class="badge-ok">✅</span>':'<span class="badge-one">⚠️ 1社</span>'}</div><div class="h">${esc(n.h)}</div></li>`).join("")}</ul></div></div>`:""}
+    <div class="src">📰 出典: ${esc(e.src)}</div>
+    <button class="iconbtn" id="shx2" style="align-self:flex-start">← 一覧にもどる</button>
+  </div>`;
+  sh.hidden=false; sh.scrollTop=0; document.body.style.overflow="hidden";
+  const close=()=>{ sh.hidden=true; sh.innerHTML=""; document.body.style.overflow=""; document.removeEventListener("keydown",esck); try{ history.replaceState(null,"","#"+(current||"today")); }catch(_){} };
+  const esck=ev=>{ if(ev.key==="Escape") close(); };
+  document.addEventListener("keydown",esck);
+  sh.querySelector("#shx").onclick=close; sh.querySelector("#shx2").onclick=close; sh.querySelector("#shx").focus();
+  animateFlow(); sh.querySelector("#fplay").onclick=animateFlow;
+  try{ history.replaceState(null,"","#"+k); }catch(_){}
+  sh.querySelector("#shshare").onclick=ev=>{ const url=location.href.split("#")[0]+"#"+k; const b=ev.currentTarget;
+    const done=()=>{b.textContent="✅ コピーしました"; setTimeout(()=>b.textContent="🔗 共有",1800);};
+    try{ navigator.clipboard.writeText(url).then(done,()=>{prompt2(url);}); }catch(_){ prompt2(url); } };
+  if(e.calc) bindCalc();
+}
+function animateFlow(){
+  const f=document.getElementById("flow"); if(!f) return; const items=[...f.children];
+  if(matchMedia("(prefers-reduced-motion: reduce)").matches){ f.classList.remove("anim"); return; }
+  f.classList.add("anim"); items.forEach(x=>x.classList.remove("on","now"));
+  items.forEach((x,i)=>setTimeout(()=>{ items.forEach(y=>y.classList.remove("now")); x.classList.add("on"); if(x.classList.contains("fstep")) x.classList.add("now"); if(i===items.length-1) setTimeout(()=>{x.classList.remove("now"); f.classList.remove("anim"); items.forEach(y=>y.classList.remove("on"));},1400); }, 300+i*650));
+}
+function calcBlock(){ return `<div class="blk card calc"><h3>🧮 わが家だといくら? (計算上の例)</h3>
+  <label for="spend">1か月に買う食料品(税こみ): <b class="num" id="spendV">40,000</b>円</label>
+  <input id="spend" type="range" min="5000" max="150000" step="5000" value="40000">
+  <div class="out"><div class="o"><div class="hint">1か月で軽くなる</div><div class="v num" id="mOut">—</div></div><div class="o"><div class="hint">1年で軽くなる</div><div class="v num" id="yOut">—</div></div></div>
+  <p class="hint" style="margin-top:8px">税こみの金額から本体価格を出し、税率が8%→1%になったときの差を計算しています。法案が成立した場合の目安で、お店の値づけによって変わります。外食やお酒は対象外です。</p></div>`; }
+function bindCalc(){ const r=document.getElementById("spend"); const f=()=>{ const v=+r.value; const base=v/1.08; const m=Math.round(base*0.07); document.getElementById("spendV").textContent=v.toLocaleString("ja-JP"); document.getElementById("mOut").textContent=m.toLocaleString("ja-JP")+"円"; document.getElementById("yOut").textContent=(m*12).toLocaleString("ja-JP")+"円"; }; r.addEventListener("input",f); f(); }
+
+function prompt2(url){ const p=document.getElementById("pop"); p.innerHTML=`<b>このリンクを送ってください</b><p style="margin:6px 0 0;word-break:break-all;user-select:all">${esc(url)}</p><button class="iconbtn" id="popx" style="margin-top:8px;background:transparent;color:inherit;border-color:currentColor">閉じる</button>`; p.hidden=false; document.getElementById("popx").onclick=()=>p.hidden=true; }
+
+// ===== 数字 =====
+function renderNumbers(){
+  main.innerHTML=`<div class="view">
+    <div class="sec-h"><h2>📈 株・円・原油の動き</h2><span class="sub">点をタップで値が出ます</span></div>
+    ${marketsMini()}
+    <section class="card"><h3 style="font-size:1rem">📈 日経平均(終値・円)</h3><div class="chartbox"><canvas id="c1" aria-label="日経平均のグラフ"></canvas></div><div class="legend-note">日本の代表的な225社の株価の平均。10/15は下げ幅が過去3番目。</div></section>
+    <section class="card"><h3 style="font-size:1rem">🛢️ NY原油(WTI・1バレルのドル)</h3><div class="chartbox"><canvas id="c3" aria-label="原油のグラフ"></canvas></div><div class="legend-note">1バレル=約159リットル。点線は100ドルの目安。</div></section>
+    <section class="card"><h3 style="font-size:1rem">💴 1ドルが何円か</h3><div class="chartbox"><canvas id="c2" aria-label="円相場のグラフ"></canvas></div><div class="legend-note">数字が大きいほど円安。輸入する食べ物や燃料が高くなりやすい。</div></section>
+    <section class="card"><h3 style="font-size:1rem">🗂️ 記録したニュースのジャンル(10/11〜)</h3><div class="chartbox" style="height:240px"><canvas id="c4" aria-label="ジャンル別の件数"></canvas></div></section>
+    <p class="hint" style="margin:0">日付が飛んでいるのは、土日・祝日で取引がない日や、値を確認できなかった日です。</p>
+    ${footer()}
+  </div>`;
+  bindFooter();
+  main.querySelectorAll("[data-tab]").forEach(b=>b.addEventListener("click",()=>go(b.dataset.tab)));
+  if(!window.Chart){ main.querySelectorAll(".chartbox").forEach(b=>b.innerHTML='<div class="empty">グラフを読み込めませんでした。通信状態を確かめて、ページを開き直してください。</div>'); return; }
+  const ink=css("--ink"), muted=css("--muted"), line=css("--line");
+  Chart.defaults.font.family=css("--f-body"); Chart.defaults.color=muted;
+  const labels=D.markets.map(r=>{const x=md(r[0]); return `${x.m}/${x.d}`;});
+  const mk=(id,idx,color,fmt,extra)=>{ const ctx=document.getElementById(id); const c=new Chart(ctx,{type:"line",data:{labels,datasets:[{data:D.markets.map(r=>r[idx]),borderColor:color,backgroundColor:color+"22",fill:true,tension:.25,spanGaps:true,pointRadius:4,pointHoverRadius:7,pointBackgroundColor:color},...(extra||[])]},
+    options:{maintainAspectRatio:false,interaction:{mode:"nearest",intersect:false},plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.raw==null?"":fmt(c.raw), afterLabel:c=>{const m=D.markets[c.dataIndex][4]; return m||"";}}}},scales:{x:{grid:{display:false}},y:{grid:{color:line},ticks:{callback:v=>fmt(v)}}}}}); charts.push(c); };
+  mk("c1",1,css("--g-pol"),v=>Math.round(v).toLocaleString("ja-JP")+"円");
+  mk("c3",3,css("--g-soc"),v=>v.toFixed(1)+"ドル",[{data:labels.map(()=>100),borderColor:css("--g-intl"),borderDash:[6,5],borderWidth:1.5,pointRadius:0,fill:false,spanGaps:true}]);
+  mk("c2",2,css("--g-eco"),v=>v.toFixed(2)+"円");
+  const cnt=GORDER.map(g=>NEWS.filter(n=>n.g===g && n.d>="2026-10-11").length);
+  charts.push(new Chart(document.getElementById("c4"),{type:"bar",data:{labels:GORDER.map(g=>GN[g]),datasets:[{data:cnt,backgroundColor:GORDER.map(g=>css("--g-"+g)),borderRadius:6}]},options:{indexAxis:"y",maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.raw+"件"}}},scales:{x:{grid:{color:line},ticks:{precision:0}},y:{grid:{display:false}}}}}));
+}
+
+// ===== 予定・予測 =====
+const PRED = D.predictions.map(r=>({no:r[0],t:r[1],c:r[2],d:r[3],r:r[4],now:r[5],m:r[6]}));
+const RL={hit:["✅ 当たり","res-hit"],miss:["❌ 外れ","res-miss"],part:["🔶 一部当たり","res-part"],wait:["⏳ 判定待ち","res-wait"]};
+function renderPlan(){
+  const up=D.schedule.filter(s=>(s[1]||s[0])>=TODAY).sort((a,b)=>a[0].localeCompare(b[0]));
+  const past=D.schedule.filter(s=>(s[1]||s[0])<TODAY);
+  const n={hit:0,miss:0,part:0,wait:0}; PRED.forEach(p=>n[p.r]++);
+  const judged=n.hit+n.miss+n.part; const rate=judged?Math.round((n.hit*100+n.part*50)/judged):0;
+  main.innerHTML=`<div class="view">
+    <div class="sec-h"><h2>📅 これからの予定</h2><span class="sub">近い順</span></div>
+    <ul class="plan">${up.map(s=>{ const dd=daysFrom(s[0]); const x=md(s[0]); const left= dd<=0? (s[1]&&s[1]>=TODAY?"いま":"今日") : dd===1?"明日":`あと${dd}日`;
+      return `<li><div class="d"><div class="md num">${x.m}/${x.d}</div><div class="wd">${x.w}曜${s[1]?"〜":""}</div></div><div><span class="left">${left}</span> <span class="chip ${s[2]}">${GN[s[2]]||""}</span>${s[4]?` <span class="chip">🎯 ${esc(s[4])}</span>`:""}<div class="tx">${esc(s[3])}</div>${s[5]?`<div class="mm">${esc(s[5])}</div>`:""}</div></li>`; }).join("") || '<li><div></div><div class="hint">登録された予定はありません</div></li>'}</ul>
+    ${past.length?`<details class="faq"><summary>終わった予定(${past.length}件)</summary><ul class="us" style="margin:10px 0 12px">${past.map(s=>`<li>${mdLabel(s[0])} ${esc(s[3])}</li>`).join("")}</ul></details>`:""}
+    <div class="sec-h" style="margin-top:6px"><h2>🎯 Claudeの予測の成績</h2><span class="sub">当たり100点・一部50点・外れ0点</span></div>
+    <section class="card score">
+      <div class="donut"><canvas id="dn" width="140" height="140" aria-label="予測の内訳"></canvas><div class="c"><div><b class="num">${rate}%</b><br><span>的中率(${judged}件)</span></div></div></div>
+      <div class="tally"><span class="res-hit">✅ 当たり ${n.hit}</span><span class="res-miss">❌ 外れ ${n.miss}</span><span class="res-part">🔶 一部 ${n.part}</span><span class="res-wait">⏳ 判定待ち ${n.wait}</span><span class="hint" style="grid-column:1/-1">予測は「当たったかどうか」を後で正直に記録するためのものです。</span></div>
+    </section>
+    <div class="chips" id="pf"><button class="fchip" data-f="wait" aria-pressed="true">⏳ 判定待ち</button><button class="fchip" data-f="done" aria-pressed="false">決着した予測</button></div>
+    <div class="pred" id="plist"></div>
+    ${footer()}
+  </div>`;
+  bindFooter();
+  const drawP=f=>{ const L=PRED.filter(p=>f==="wait"?p.r==="wait":p.r!=="wait").sort((a,b)=>(a.d||"9").localeCompare(b.d||"9"));
+    document.getElementById("plist").innerHTML=L.map(p=>`<div class="pr"><span class="no">${esc(p.no)}</span><span><b>${esc(p.t)}</b></span><span class="r"><span class="${RL[p.r][1]}">${RL[p.r][0]}</span> ・ 確度: ${esc(p.c)} ・ 判定日: ${p.d?mdLabel(p.d)+(p.r==="wait"&&daysFrom(p.d)>=0?`(あと${daysFrom(p.d)}日)`:""):"次の発表時"}${p.now?" ・ いま "+esc(p.now):""}${p.m?`<br>${esc(p.m)}`:""}</span></div>`).join(""); };
+  main.querySelectorAll("#pf [data-f]").forEach(b=>b.onclick=()=>{ main.querySelectorAll("#pf [data-f]").forEach(x=>x.setAttribute("aria-pressed",String(x===b))); drawP(b.dataset.f); });
+  drawP("wait");
+  if(window.Chart){ charts.push(new Chart(document.getElementById("dn"),{type:"doughnut",data:{labels:["当たり","外れ","一部","判定待ち"],datasets:[{data:[n.hit,n.miss,n.part,n.wait],backgroundColor:[css("--ok"),css("--g-intl"),css("--warn"),css("--line")],borderWidth:0}]},options:{cutout:"70%",responsive:false,plugins:{legend:{display:false}}}})); }
+}
+
+// ===== ことば =====
+function wordCard(w){ return `<div class="w"><div class="wt">${esc(w[0])} <span class="chip ${w[4]}">${GN[w[4]]}</span></div><div class="wy">${esc(w[1])}</div><p>${esc(w[2])}</p>${w[3]?`<div class="ex">たとえば: ${esc(w[3])}</div>`:""}</div>`; }
+function renderWords(){
+  main.innerHTML=`<div class="view">
+    <div class="sec-h"><h2>📖 ことば辞典</h2><span class="sub">${D.glossary.length}語</span></div>
+    <label class="sbox" for="wq"><span aria-hidden="true">📖</span><input id="wq" type="search" placeholder="ことばやよみがなで探す" autocomplete="off"></label>
+    <div class="chips" id="wf"><button class="fchip" data-g="" aria-pressed="true">すべて</button>${["pol","eco","it","intl","spo"].map(g=>`<button class="fchip" data-g="${g}" aria-pressed="false">${GN[g]}</button>`).join("")}</div>
+    <div class="words" id="wl"></div>
+    ${footer()}
+  </div>`;
+  bindFooter();
+  let g=""; const q=document.getElementById("wq");
+  const draw=()=>{ const t=q.value.trim(); const L=D.glossary.filter(w=>(!g||w[4]===g)&&(!t||(w[0]+w[1]+w[2]).includes(t))); document.getElementById("wl").innerHTML=L.length?L.map(wordCard).join(""):'<div class="empty">見つかりませんでした</div>'; };
+  q.oninput=draw; main.querySelectorAll("#wf [data-g]").forEach(b=>b.onclick=()=>{g=b.dataset.g; main.querySelectorAll("#wf [data-g]").forEach(x=>x.setAttribute("aria-pressed",String(x===b))); draw();});
+  draw();
+}
+
+// ===== フッター・設定 =====
+function footer(){ return `<footer class="foot">
+  <div><b>このページについて</b> 毎日のニュースを、複数の報道機関で確かめてやさしくまとめています。✅=別々の2社以上で確認 ／ ⚠️=1社だけ・見出しだけ。SNSだけの情報やうわさは載せていません。</div>
+  <div>更新は1日4回(朝6:50・昼12:30・夕方5:50・夜10:30ごろ)。次の更新: ${esc(D.nextLabel)}</div>
+  <details><summary style="cursor:pointer">✏️ 訂正の記録</summary><ul class="us" style="margin-top:6px">${D.corrections.map(c=>`<li>${esc(c[0])} ${esc(c[1])}</li>`).join("")}</ul></details>
+  <div>まとめ: Claude(AI)。記事の文章はそのまま写さず、要点と出典を載せています。</div>
+</footer>`; }
+function bindFooter(){}
+document.getElementById("setBtn").onclick=()=>{
+  const p=document.getElementById("pop"); const t=store.get("nw-theme")||"system"; const s=store.get("nw-size")||"m";
+  p.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><b>表示の設定</b><button class="iconbtn" id="popx" aria-label="閉じる" style="background:transparent;color:inherit;border-color:currentColor">✕</button></div>
+    <div class="setrow" style="margin-bottom:10px"><span style="min-width:5em">文字の大きさ</span><span class="seg">${[["m","ふつう"],["l","大きめ"],["xl","特大"]].map(([k,l])=>`<button data-size="${k}" aria-pressed="${s===k}">${l}</button>`).join("")}</span></div>
+    <div class="setrow"><span style="min-width:5em">画面の色</span><span class="seg">${[["system","自動"],["light","明るい"],["dark","暗い"]].map(([k,l])=>`<button data-theme="${k}" aria-pressed="${t===k}">${l}</button>`).join("")}</span></div>`;
+  p.hidden=false;
+  document.getElementById("popx").onclick=()=>p.hidden=true;
+  p.querySelectorAll("[data-size]").forEach(b=>b.onclick=e=>{e.stopPropagation(); store.set("nw-size",b.dataset.size); applySettings(); p.querySelectorAll("[data-size]").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));});
+  p.querySelectorAll("[data-theme]").forEach(b=>b.onclick=e=>{e.stopPropagation(); store.set("nw-theme",b.dataset.theme); applySettings(); p.querySelectorAll("[data-theme]").forEach(x=>x.setAttribute("aria-pressed",String(x===b))); if(current==="numbers"||current==="plan") go(current,{keepScroll:true});});
+};
+document.getElementById("setBtn").addEventListener("click",e=>e.stopPropagation());
+document.getElementById("pop").addEventListener("click",e=>e.stopPropagation());
+
+// 起動
+const h=(location.hash||"").slice(1);
+if(D.explainers[h]){ go("explain"); openEx(h); } else go(TABS.some(t=>t[0]===h)?h:"today");
+})();
+</script>
+</body>
+</html>
