@@ -451,6 +451,16 @@ function relDay(iso){ const n=daysFrom(iso); return n===0?"今日":n===1?"明日
 
 document.getElementById("upd").innerHTML = `最終更新<br><b class="num">${esc(D.updatedLabel)}</b>`;
 
+// ===== 閲覧数の集計(公開するときに使う。いまはオフ) =====
+// 使い方: GoatCounter(https://www.goatcounter.com/ 無料・個人を追わない)で登録し、code に登録した名前を入れて on を true にする。
+// 送るのは「どの画面・どの解説・どのジャンルが開かれたか」の回数だけ。質問の文章・メモ・記録は送らない。
+const STATS = { on:false, code:"" };
+let gcReady=false; const gcQueue=[];
+function track(path,title){ if(!STATS.on||!STATS.code) return; const ev={path:String(path).slice(0,80),title:String(title||path).slice(0,80),event:true};
+  if(gcReady&&window.goatcounter&&window.goatcounter.count){ try{ window.goatcounter.count(ev); }catch(_){} } else gcQueue.push(ev); }
+if(STATS.on&&STATS.code){ window.goatcounter={no_onload:true}; const sc=document.createElement("script"); sc.async=true; sc.src="https://gc.zgo.at/count.js"; sc.dataset.goatcounter=`https://${STATS.code}.goatcounter.com/count`;
+  sc.onload=()=>{ gcReady=true; try{ window.goatcounter.count({path:"/",title:"ひらいた"}); }catch(_){} gcQueue.splice(0).forEach(ev=>{ try{ window.goatcounter.count(ev); }catch(_){} }); }; document.head.appendChild(sc); }
+
 // ===== 設定(テーマ・文字サイズ) =====
 const root = document.documentElement;
 // 着せかえ(見る人のスマホの中だけに保存: nw-look)
@@ -559,7 +569,7 @@ drawTabs();
 tabsEl.addEventListener("click",e=>{const b=e.target.closest(".tab"); if(b) go(b.dataset.k);});
 function go(k, opts){
   if(!TABS.some(t=>t[0]===k)) k="today";
-  current=k; store.set("nw-tab",k);
+  current=k; store.set("nw-tab",k); track("/tab/"+k,"タブ: "+k);
   tabsEl.querySelectorAll(".tab").forEach(b=>b.setAttribute("aria-selected", String(b.dataset.k===k || (k==="words"&&b.dataset.k==="search"))));
   charts.splice(0).forEach(c=>{try{c.destroy()}catch(e){}});
   ({today:renderToday,search:renderSearch,map:renderMap,my:renderMy,explain:renderExplain,numbers:renderNumbers,plan:renderPlan,words:renderWords})[k](opts||{});
@@ -697,6 +707,7 @@ function buildSlides(){
 }
 const DUR=7000;
 function openStory(fn){
+  track(typeof fn==="function"?"/play/week":"/play/today","1分で見る");
   const el=document.getElementById("story"); const S=(typeof fn==="function"?fn:buildSlides)();
   el.innerHTML=`<div class="bars">${S.map(()=>"<i><b></b></i>").join("")}</div>
     <div class="ctl"><span class="lbl" id="stLbl"></span><button class="sbtn" id="stVoice" aria-pressed="false">🔈 読み上げ</button><button class="sbtn" id="stPause" aria-label="一時停止">❚❚</button><button class="sbtn" id="stClose" aria-label="閉じる">✕</button></div>
@@ -805,6 +816,7 @@ function showPop(i){ const w=GTERMS[i].w; if(!ME.words.includes(w[0])){ ME.words
 document.addEventListener("click",e=>{ const g=e.target.closest(".gl"); if(g){ e.preventDefault(); e.stopPropagation(); showPop(+g.dataset.gi); return; } const p=document.getElementById("pop"); if(!p.hidden && !e.target.closest("#pop")) p.hidden=true; });
 
 function openEx(k){
+  if(D.explainers[k]) track("/ex/"+k,"解説: "+D.explainers[k].name);
   const e=D.explainers[k]; if(!e) return; const sh=document.getElementById("sheet");
   if(!ME.readEx[k]) learn(e.g,2); ME.readEx[k]=TODAY; saveMe(); setTimeout(checkBadges,800);
   const rel = NEWS.filter(n=>{ const map={saudi:"サウジ・中東",tax:"消費減税",cyber:"不正アクセスとAI"}; if(map[k]) return (n.th||"").includes(map[k]); if(k==="sato") return /佐藤輝明/.test(n.h); if(k==="series") return /日本シリーズ|CS/.test(n.h); if(k==="yokohama") return /横浜市長/.test(n.h); if(k==="past") return n.d<"2026-10-04"; return false; }).slice(0,8);
@@ -1007,6 +1019,7 @@ function guideAnswerHTML(q,focus){
   if(r.news.length) parts.push(`<div class="gd-a"><b>📰 関係するニュース</b><ul class="us" style="margin:4px 0 0">${r.news.map(n=>`<li>${esc(mdLabel(n.d))} ${esc(n.h)} ${n.ok?"✅":"⚠️"}</li>`).join("")}</ul></div>`);
   if(!parts.length) parts.push(`<div class="gd-a">このアプリの中には、ぴったりの答えが見つかりませんでした。ことばを短くして聞きなおすか、下のボタンでClaudeに聞いてみてください。</div>`);
   if(r.best&&r.best.g) learn(r.best.g,1);
+  track("/ask/"+(r.best?(r.best.k||"word"):(I.today?"today":I.weather?"weather":I.market?"market":"none")),"案内係");
   return parts.join("")+`<button class="fchip gd-deep" data-deep="1">🤖 Claudeでもっと深く聞く(アプリの外で開きます)</button>`;
 }
 function bindGuideOut(el,q,focus){
@@ -1211,7 +1224,7 @@ function pinAttrs(o){ return `data-pk="${esc(o.k)}" data-ph="${esc(o.h)}" data-p
 function pinBtn(o,extraCls){ const on=!!ME.pins[o.k]; return `<button class="pin-btn ${extraCls||""}" ${pinAttrs(o)} aria-pressed="${on}" aria-label="${on?"保存をやめる":"保存する"}" title="あとで読む・メモ">${on?"📌":"📍"}</button>`; }
 document.addEventListener("click",ev=>{ const b=ev.target.closest(".pin-btn"); if(!b) return; ev.preventDefault(); ev.stopPropagation();
   const k=b.dataset.pk; if(ME.pins[k]){ if(ME.pins[k].memo && !b.dataset.confirm){ b.dataset.confirm="1"; toast("メモがあります。もう一度押すと保存をやめます"); setTimeout(()=>delete b.dataset.confirm,3000); return; } delete ME.pins[k]; toast("保存をやめました"); }
-  else { ME.pins[k]={h:b.dataset.ph,g:b.dataset.pg,d:b.dataset.pd,ex:b.dataset.pex,memo:"",at:new Date(Date.now()+9*3600e3).toISOString()}; learn(b.dataset.pg,1); toast("📌 保存しました。「マイ」でメモも書けます"); }
+  else { ME.pins[k]={h:b.dataset.ph,g:b.dataset.pg,d:b.dataset.pd,ex:b.dataset.pex,memo:"",at:new Date(Date.now()+9*3600e3).toISOString()}; learn(b.dataset.pg,1); track("/pin/"+(b.dataset.pg||"other"),"保存: "+(GN[b.dataset.pg]||"その他")); toast("📌 保存しました。「マイ」でメモも書けます"); }
   saveMe(); document.querySelectorAll(`.pin-btn[data-pk="${CSS.escape(k)}"]`).forEach(x=>{ const on=!!ME.pins[k]; x.setAttribute("aria-pressed",String(on)); x.textContent=on?"📌":"📍"; x.setAttribute("aria-label",on?"保存をやめる":"保存する"); });
   if(current==="my") renderMy(); }, true);
 function pinsBlock(){
@@ -1332,7 +1345,7 @@ const GUIDE = [
   ["💬","聞いてみる",["右下の<b>💬</b>で「ニュース案内係」に質問できます。解説のQ&A・ことば辞典・ニュースの記録から、アプリの中で答えをさがします(質問はどこにも送りません)。","もっと深く知りたいときは「Claudeでもっと深く聞く」で、Claude(AI)に聞けます(アプリの外で開きます)。"]],
   ["🎨","自分好みにする",["「マイ」の<b>🎨 着せかえ</b>で、色・文字の大きさ・詰め具合・「きょう」の並び・下のタブの並びを変えられます。","右上の<b>Aa</b>でも、文字の大きさと明るさをすぐ変えられます。"]],
   ["📲","アプリとして使う",["iPhone: Safariの共有ボタン(□に↑)→「ホーム画面に追加」。","Android: Chromeのメニュー(︙)→「ホーム画面に追加」または「アプリをインストール」。","一度開いた内容は、電波がないところでも読めます。"]],
-  ["🔒","記録について",["あなたの記録・保存・着せかえは、<b>このスマホ(ブラウザ)の中だけ</b>に保存されます。ほかの人や作った人には見えません。","更新は1日4回(朝・昼・夕方・夜)です。"]]
+  ["🔒","記録について",["あなたの記録・保存・着せかえは、<b>このスマホ(ブラウザ)の中だけ</b>に保存されます。ほかの人や作った人には見えません。",...(STATS.on&&STATS.code?["サイトをよくするため、<b>どの画面・解説・ジャンルが何回開かれたか</b>だけを数えています(GoatCounter・個人はわかりません)。質問の文章やメモは送りません。"]:[]),"更新は1日4回(朝・昼・夕方・夜)です。"]]
 ];
 function guideBlock(){
   return `<details class="faq" id="guide"${ME.days.length<=1?" open":""}><summary>📘 このアプリの使い方</summary>
