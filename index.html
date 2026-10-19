@@ -889,9 +889,9 @@ function longChart(){
   function draw(){
     if(lsState.r==="tick"){ drawTicks(); return; }
     loadHist().then(H=>{
-      const S=H.series[lsState.s]; if(!S) return;
+      const S=(H.series||{})[lsState.s]; if(!S||!(S.daily||S.monthly)){ document.getElementById("lsSum").innerHTML=""; if(chart){chart.destroy();chart=null;} document.getElementById("lsNote").textContent="この数字の長い期間のデータは準備中です(毎朝7時ごろに自動で取得します)。"; return; }
       const useMonthly = lsState.r==="all" || lsState.r==="1825";
-      let rows = useMonthly ? S.monthly : S.daily;
+      let rows = ((useMonthly ? S.monthly : S.daily)||[]).slice();
       if(lsState.r!=="all"){ const from=new Date(Date.parse(TODAY)-(+lsState.r)*864e5).toISOString().slice(0,useMonthly?7:10); rows=rows.filter(r=>r[0]>=from); }
       // このサイトで記録した最新の値もつなげる(FREDは数日遅れのため)
       if(!useMonthly){ const idx={nikkei:1,yen:2,oil:3}[lsState.s]; const last=rows.length?rows[rows.length-1][0]:""; D.markets.forEach(m=>{ if(m[idx]!=null && m[0]>last) rows.push([m[0],m[idx]]); }); }
