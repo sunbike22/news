@@ -542,6 +542,7 @@ svg.eat{animation:petEat .7s ease both!important}
 .bd-map .tie{stroke:rgba(40,30,20,.45);stroke-width:1;stroke-dasharray:3 3}.bd-map .spot{fill:#8b1d1d}
 .bd-str{z-index:3}
 .bd-str path{fill:none;stroke:#c1121f;stroke-width:2.6;filter:drop-shadow(0 1px 1px rgba(0,0,0,.35));transition:opacity .2s}
+.bd-str .weak path{stroke:#7a4a1f;stroke-width:1.6;stroke-dasharray:5 4}.bd-str .weak text{stroke:#5a3410;font-size:10px}
 .bd-str .mine path{stroke:#f5c400;stroke-width:3;stroke-dasharray:1 0}
 .bd-str text{font-size:12px;font-weight:700;fill:#fff;paint-order:stroke;stroke:#7a0e14;stroke-width:3px}
 .bd-str .dim{opacity:.15}.bd-str .hot path{stroke-width:4.2}.bd-str .auto.hot path{stroke:#ff2d3d}
@@ -1890,6 +1891,7 @@ function mascot(page){ if(LOOK.mascot===false) return ""; const m=MASCOT[page]; 
 document.addEventListener("click",e=>{ const b=e.target.closest(".mascot-av"); if(!b) return; const box=b.parentElement; const m=MASCOT[box.dataset.mascot]; if(!m) return; const L=m[1].map(x=>typeof x==="function"?x():x); const i=(+box.dataset.i+1)%L.length; box.dataset.i=i; box.querySelector(".mascot-b").textContent=L[i]; const sv=b.querySelector("svg"); if(sv){ sv.classList.remove("eat"); void sv.getBoundingClientRect(); sv.classList.add("eat"); } });
 // ===== お知らせ(新しくなったところ)。機能を足したら、いちばん上に1つ足す =====
 const UPDATES=[
+  {id:"2026-10-20h",d:"2026-10-20",t:"🗾 日本版の捜査ボード",L:["捜査ボードで「🗾 日本」を選ぶと、東京・沖縄・北海道など国内の場所どうしを糸でつなげます"]},
   {id:"2026-10-20g",d:"2026-10-20",t:"🎄 クリスマス・お正月 & 👕 ペットの着せかえ",L:["クリスマス(12/1〜25・雪がふります)とお正月(12/31〜1/7)の飾りと限定バッジを追加","ペットの着せかえ(12種類。いろいろ使うと着られる服が増えます)・ペットの部屋・今週の日記","ペットが育つと、ともだちの「ぴよた」がやってきます"]},
   {id:"2026-10-20f",d:"2026-10-20",t:"🎭 ペットが各ページでコスプレ & 🔔 お知らせ",L:["さがす=探偵、地図=探検家、解説=先生、数字=銀行員、予定=占い師、ことば=本の虫、きょう=新聞配達。タップするとひとこと","捜査ボードでは探偵になってヒントをくれます","右上の🔔で、新しくなったところがわかります(着せかえでペットを出さない設定もできます)"]},
   {id:"2026-10-20e",d:"2026-10-20",t:"🧷 捜査ボードがパワーアップ",L:["地図タブの「捜査ボード」で、📝メモを貼ったり🧵黄色い糸で自由につないだりできるように","大きさ(小・中・大)を切り替えられるように","ペットが探偵の格好でヒントをくれます(タップで次のヒント)"]},
@@ -2045,12 +2047,13 @@ main.addEventListener("click",ev=>{ const v=ev.target.closest("[data-vote]"); if
   const ic=ev.target.closest(".ics"); if(ic) icsFor(D.schedule[+ic.dataset.i]); });
 
 // ===== 捜査ボード(コルク板の上で、ニュースを赤い糸でつなぐ。自分のメモと糸も貼れる) =====
-let BD={z:0.75,sel:null,mode:"",from:null};
+let BD={z:0.75,sel:null,mode:"",from:null,area:"world"};
 function bdStore(){ ME.board=ME.board||{}; const B=ME.board; B.notes=B.notes||[]; B.links=B.links||[]; return B; }
 function renderBoard(recentDays){
   petFlag("board");
   const sec=main.querySelector(".mapbox"); sec.classList.add("boardbox");
   sec.innerHTML=`<div class="board-tools" id="bdTools">
+      <span class="seg" role="group" aria-label="範囲"><button data-area="world" aria-pressed="${BD.area==="world"}">🌏 世界</button><button data-area="japan" aria-pressed="${BD.area==="japan"}">🗾 日本</button></span>
       <span class="seg" role="group" aria-label="大きさ"><button data-z="0.5">小</button><button data-z="0.75">中</button><button data-z="1">大</button></span>
       <button class="fchip" id="bdAdd">📝 メモを貼る</button><button class="fchip" id="bdLink">🧵 糸でつなぐ</button></div>
     <div class="bd-msg" id="bdMsg">メモをタップすると、その糸が光ります。</div>
@@ -2060,17 +2063,20 @@ function renderBoard(recentDays){
   const hint=main.querySelector(".mapbox + .hint"); if(hint) hint.textContent="赤い糸=同じテーマのニュース。黄色い糸=あなたがつないだ糸。📝のメモと黄色い糸は、このスマホの中だけに保存されます。場所とテーマは見出しのことばから自動で決めています。";
   const ml=document.getElementById("mapList"); if(ml) ml.innerHTML="";
   const items=NEWS.filter(n=>recentDays.includes(n.d)).map(n=>({n,p:placeOf(n)})).filter(x=>x.p);
-  const JP=[0,139.75,36.2,"日本"]; const G={};
-  items.forEach(x=>{ let pp=x.p; if(pp[1]>122&&pp[1]<147&&pp[2]>24&&pp[2]<46) pp=JP; (G[pp[3]]=G[pp[3]]||{p:pp,list:[],th:new Set()}).list.push(x.n); String(x.n.th||"").split(/[,、]/).map(t=>t.trim()).filter(Boolean).forEach(t=>G[pp[3]].th.add(t)); });
+  const JP=[0,139.75,36.2,"日本"]; const G={}; const inJP=pp=>pp[1]>122&&pp[1]<147&&pp[2]>24&&pp[2]<46; const isJ=BD.area==="japan";
+  sec.querySelectorAll("[data-area]").forEach(b=>b.onclick=()=>{ BD.area=b.dataset.area; BD.sel=null; BD.z=BD.area==="japan"?0.6:0.75; renderMap(); });
+  items.forEach(x=>{ let pp=x.p; if(isJ){ if(!inJP(pp)) return; } else if(inJP(pp)) pp=JP; (G[pp[3]]=G[pp[3]]||{p:pp,list:[],th:new Set()}).list.push(x.n); String(x.n.th||"").split(/[,、]/).map(t=>t.trim()).filter(Boolean).forEach(t=>G[pp[3]].th.add(t)); });
   const groups=Object.values(G);
   getWorld().then(world=>{
-    const bd=document.getElementById("board"); if(!bd) return; const BW=1100,BH=620; const B=bdStore();
-    const proj=d3.geoNaturalEarth1().fitExtent([[20,20],[BW-20,BH-20]],{type:"Sphere"}); const path=d3.geoPath(proj);
+    const bd=document.getElementById("board"); if(!bd) return; const BW=isJ?900:1100,BH=isJ?1000:620; const B=bdStore();
+    if(!groups.length){ bd.innerHTML=`<div class="empty" style="padding:40px;color:#2a2116">この範囲には、まだ場所のわかるニュースがありません。</div>`; return; }
+    const proj=isJ?d3.geoMercator().fitExtent([[30,30],[BW-30,BH-30]],{type:"MultiPoint",coordinates:[[123.5,24],[146,45.6]]}):d3.geoNaturalEarth1().fitExtent([[20,20],[BW-20,BH-20]],{type:"Sphere"}); const path=d3.geoPath(proj);
     const notes=groups.map(g=>{ const [x,y]=proj([g.p[1],g.p[2]]); return {id:"p:"+g.p[3],g,px:x,py:y,x:x-66,y:y-100,w:140,h:88}; });
     for(let it=0;it<300;it++){ notes.forEach((a,i)=>notes.forEach((b,j)=>{ if(i>=j) return; const dx=(a.x+a.w/2)-(b.x+b.w/2), dy=(a.y+a.h/2)-(b.y+b.h/2); const ox=(a.w+18)-Math.abs(dx), oy=(a.h+22)-Math.abs(dy); if(ox>0&&oy>0){ if(ox<oy){ const m=(dx>=0?1:-1)*ox/2; a.x+=m; b.x-=m; } else { const m=(dy>=0?1:-1)*oy/2; a.y+=m; b.y-=m; } } }));
       notes.forEach(a=>{ a.x=Math.max(8,Math.min(BW-a.w-8,a.x)); a.y=Math.max(14,Math.min(BH-a.h-8,a.y)); }); }
     const auto=[]; for(let i=0;i<notes.length;i++) for(let j=i+1;j<notes.length;j++){ const sh=[...notes[i].g.th].filter(t=>notes[j].g.th.has(t)); if(sh.length) auto.push({a:notes[i].id,b:notes[j].id,t:sh[0]}); }
-    const jp=notes.find(n=>n.g.p[3]==="日本");
+    if(isJ){ for(let i=0;i<notes.length;i++) for(let j=i+1;j<notes.length;j++){ if(auto.some(e=>(e.a===notes[i].id&&e.b===notes[j].id))) continue; const gi=new Set(notes[i].g.list.map(n=>n.g)); const sg=[...new Set(notes[j].g.list.map(n=>n.g))].find(g=>gi.has(g)); if(sg) auto.push({a:notes[i].id,b:notes[j].id,t:GN[sg],weak:1}); } }
+    const jp=isJ?null:notes.find(n=>n.g.p[3]==="日本");
     if(jp) notes.forEach(n=>{ if(n===jp) return; [...n.g.th].forEach(T=>{ if(auto.some(e=>[e.a,e.b].includes(n.id)&&[e.a,e.b].includes(jp.id))) return;
       const ex=Object.values(D.explainers).find(e=>gdScore(gdQuery(T),e.name+" "+(e.now||"")+" "+e.kid)>=0.5); if(ex&&(ex.flow||[]).some(f=>/日本|暮らし|ガソリン|家計/.test(f.t))) auto.push({a:n.id,b:jp.id,t:T+"→日本"}); }); });
     const all=()=>[...notes, ...B.notes.map(u=>({id:u.id,u,x:u.x,y:u.y,w:130,h:78}))];
@@ -2079,11 +2085,11 @@ function renderBoard(recentDays){
     const sag=(x1,y1,x2,y2)=>{ const mx=(x1+x2)/2,my=(y1+y2)/2+Math.min(70,Math.hypot(x2-x1,y2-y1)*.14); return {d:`M${x1} ${y1} Q ${mx} ${my} ${x2} ${y2}`,lx:(x1+2*mx+x2)/4,ly:(y1+2*my+y2)/4}; };
     function drawStrings(){ const svg=bd.querySelector(".bd-str"); const L=[...auto.map(e=>({...e,k:"auto"})),...B.links.map((e,i)=>({...e,k:"mine",i}))];
       svg.innerHTML=L.map(e=>{ const A=find(e.a),Bn=find(e.b); if(!A||!Bn) return ""; const [x1,y1]=ctr(A),[x2,y2]=ctr(Bn); const q=sag(x1,y1,x2,y2); const hot=BD.sel&&(e.a===BD.sel||e.b===BD.sel); const dim=BD.sel&&!hot;
-        return `<g class="str ${e.k}${hot?" hot":""}${dim?" dim":""}"><path d="${q.d}"/>${e.t?`<text x="${q.lx}" y="${q.ly}" text-anchor="middle">${esc(e.t)}</text>`:""}</g>`; }).join(""); }
+        return `<g class="str ${e.k}${e.weak?" weak":""}${hot?" hot":""}${dim?" dim":""}"><path d="${q.d}"/>${e.t?`<text x="${q.lx}" y="${q.ly}" text-anchor="middle">${esc(e.t)}</text>`:""}</g>`; }).join(""); }
     function drawNotes(){ const layer=bd.querySelector(".bd-notes");
       layer.innerHTML=notes.map((n,i)=>{ const top=n.g.list[0]; return `<button class="note${BD.sel===n.id?" on":""}" data-id="${esc(n.id)}" style="left:${n.x}px;top:${n.y}px;width:${n.w}px;height:${n.h}px;--tape:var(--g-${top.g});--r:${((i*37)%7)-3}deg"><i class="pinhead"></i><b>${esc(n.g.p[3])}</b><span>${esc(top.h)}</span><small>${n.g.list.length}件${n.g.th.size?" ・ "+esc([...n.g.th][0]):""}</small></button>`; }).join("")
         + B.notes.map(u=>`<div class="note mine${BD.sel===u.id?" on":""}" data-id="${esc(u.id)}" role="button" tabindex="0" style="left:${u.x}px;top:${u.y}px;width:130px;height:78px;--r:${u.r||0}deg"><i class="pinhead blue"></i><span class="mtx">${esc(u.text||"(タップして書く)")}</span><small>あなたのメモ ・ 動かせます</small></div>`).join(""); }
-    bd.innerHTML=`<svg class="bd-map" viewBox="0 0 ${BW} ${BH}" width="${BW}" height="${BH}" aria-hidden="true"><g>${world.features.map(f=>`<path d="${path(f)}"/>`).join("")}</g>${notes.map(n=>`<line x1="${n.px}" y1="${n.py}" x2="${n.x+n.w/2}" y2="${n.y+n.h}" class="tie"/><circle cx="${n.px}" cy="${n.py}" r="4" class="spot"/>`).join("")}</svg>
+    bd.innerHTML=`<svg class="bd-map" viewBox="0 0 ${BW} ${BH}" width="${BW}" height="${BH}" aria-hidden="true"><g>${(isJ?world.features.filter(f=>["392","410","408","156","643","158"].includes(f.id)):world.features).map(f=>`<path d="${path(f)}"/>`).join("")}</g>${notes.map(n=>`<line x1="${n.px}" y1="${n.py}" x2="${n.x+n.w/2}" y2="${n.y+n.h}" class="tie"/><circle cx="${n.px}" cy="${n.py}" r="4" class="spot"/>`).join("")}</svg>
       <div class="bd-notes"></div><svg class="bd-str" viewBox="0 0 ${BW} ${BH}" width="${BW}" height="${BH}" aria-hidden="true"></svg>`;
     bd.style.width=BW+"px"; bd.style.height=BH+"px";
     const wrap=document.getElementById("bdWrap"), sizer=document.getElementById("bdSizer"), msg=document.getElementById("bdMsg"), det=document.getElementById("bdDetail");
@@ -2092,7 +2098,7 @@ function renderBoard(recentDays){
     document.querySelectorAll("#bdTools [data-z]").forEach(b=>b.onclick=()=>setZ(+b.dataset.z));
     const show=()=>{ drawNotes(); drawStrings(); bindNotes(); detail(); };
     function centerOn(n){ wrap.scrollTo({left:(n.x+n.w/2)*BD.z-wrap.clientWidth/2, top:(n.y+n.h/2)*BD.z-wrap.clientHeight/2, behavior:"smooth"}); }
-    function detail(){ const n=BD.sel&&find(BD.sel); if(!n){ det.innerHTML=`<p class="hint" style="margin:0">${groups.length}か所 ・ 赤い糸 ${auto.length}本${B.links.length?` ・ 黄色い糸 ${B.links.length}本`:""}。メモをタップしてね。</p>`; return; }
+    function detail(){ const n=BD.sel&&find(BD.sel); if(!n){ det.innerHTML=`<p class="hint" style="margin:0">${groups.length}か所 ・ 赤い糸 ${auto.filter(e=>!e.weak).length}本${auto.some(e=>e.weak)?` ・ 茶色の点線(同じジャンル) ${auto.filter(e=>e.weak).length}本`:""}${B.links.length?` ・ 黄色い糸 ${B.links.length}本`:""}。メモをタップしてね。</p>`; return; }
       const links=[...auto,...B.links].filter(e=>e.a===n.id||e.b===n.id).map(e=>{ const o=find(e.a===n.id?e.b:e.a); return {o,t:e.t,mine:B.links.includes(e)}; }).filter(x=>x.o);
       const nm=o=>o.g?o.g.p[3]:"📝 "+(o.u.text||"メモ").slice(0,12);
       const linkHTML=links.length?`<div class="chips" style="margin-top:8px">${links.map(l=>`<button class="fchip" data-go="${esc(l.o.id)}">🧵 ${esc(nm(l.o))}${l.t?` ・ ${esc(l.t)}`:""}</button>`).join("")}</div>`:"";
@@ -2122,7 +2128,7 @@ function renderBoard(recentDays){
       H.push("気づいたことは📝メモに書いて、🧵糸でつないでみて!"); if(B.links.length) H.push(`黄色い糸が${B.links.length}本。いい推理だね、名探偵!`); const big=notes.slice().sort((a,b)=>b.g.list.length-a.g.list.length)[0]; if(big) H.push(`いちばん事件が多いのは「${big.g.p[3]}」。${big.g.list.length}件もある!`); return H; };
     const say=()=>{ const H=hints(); const st=petStage(); petEl.innerHTML=`<button class="bd-pet-av" aria-label="${esc(petName())}のヒント">${petSVG(st.i,"happy",null,64,"detective")}</button><div class="bd-bubble"><b>🔍 ${esc(petName())}探偵</b><span>${esc(H[hintI%H.length])}</span></div>`; petEl.querySelector("button").onclick=()=>{ hintI++; say(); }; };
     say();
-    setZ(BD.z); show(); const j=jp||notes[0]; if(j&&!BD.sel){ wrap.scrollLeft=(j.x+j.w/2)*BD.z-wrap.clientWidth*.65; wrap.scrollTop=(j.y)*BD.z-wrap.clientHeight*.3; } else if(BD.sel&&find(BD.sel)) centerOn(find(BD.sel));
+    setZ(BD.z); show(); const j=jp||(isJ?notes.find(n=>n.g.p[3]==="東京"):null)||notes[0]; if(j&&!BD.sel){ wrap.scrollLeft=(j.x+j.w/2)*BD.z-wrap.clientWidth*.65; wrap.scrollTop=(j.y)*BD.z-wrap.clientHeight*.3; } else if(BD.sel&&find(BD.sel)) centerOn(find(BD.sel));
   }).catch(e=>{ try{ console.error(e); }catch(_){} const bd=document.getElementById("board"); if(bd) bd.innerHTML='<div class="empty">ボードを読み込めませんでした。通信状態を確かめて、開き直してください。</div>'; });
 }
 // ===== 写真(Unsplash・撮影者名つき) =====
