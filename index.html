@@ -421,6 +421,13 @@ svg.eat{animation:petEat .7s ease both!important}
 .quiz .opts.one{grid-template-columns:1fr}
 .quiz .opts.one .opt{text-align:left;font-weight:500;font-size:.92rem}
 @media (prefers-reduced-motion: reduce){.pet-card svg,.pet-big svg,svg.eat,.pet-heart{animation:none!important}}
+/* 天気図 */
+.mood-all{display:flex;gap:12px;align-items:center;margin:8px 0 10px}
+.mood-all .mi{font-size:2.4rem;line-height:1}
+.mood-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:8px}
+.mood-c{display:flex;flex-direction:column;align-items:center;gap:2px;border:1px solid var(--line);border-top:4px solid var(--c);background:var(--cs);border-radius:12px;padding:8px 4px;cursor:pointer;color:var(--ink)}
+.mood-c .mi{font-size:1.6rem;line-height:1.2}
+.mood-c b{font-size:.82rem}.mood-c small{font-size:.72rem;color:var(--muted)}
 /* 案内係 */
 .gd-fab{position:fixed;right:max(16px,env(safe-area-inset-right,0px));bottom:calc(84px + env(safe-area-inset-bottom,0px));z-index:24;width:54px;height:54px;border-radius:50%;border:0;background:var(--accent);color:var(--on-accent);font-size:1.5rem;box-shadow:0 6px 18px rgba(0,0,0,.22);cursor:pointer}
 @media (min-width:900px){.gd-fab{bottom:24px}}
@@ -529,10 +536,11 @@ function mmdd(iso){ return iso.slice(5,10); }
 function seasonNow(){ if(LOOK.season==="off") return null; if(LOOK.preview){ const z=SEASONS.find(x=>x.k===LOOK.preview); if(z) return z; }
   const t=mmdd(TODAY); return SEASONS.find(z=> z.from<=z.to ? (t>=z.from&&t<=z.to) : (t>=z.from||t<=z.to)) || null; }
 function inSeason(z,iso){ const t=mmdd(iso); return z.from<=z.to ? (t>=z.from&&t<=z.to) : (t>=z.from||t<=z.to); }
-const SECS = [["pet","🐣 ペット"],["play","▶️ 1分で見る"],["weather","🌤️ 天気"],["three","☀️ 今日の3行"],["ten","📰 今日のニュース10"],["foryou","🎯 あなた向け"],["other","📚 そのほかのニュース"],["quiz","🧠 今日のクイズ"],["number","🔢 今日の数字"]];
+const SECS = [["pet","🐣 ペット"],["play","▶️ 1分で見る"],["weather","🌤️ 天気"],["three","☀️ 今日の3行"],["ten","📰 今日のニュース10"],["mood","🗺️ 世の中の天気図"],["foryou","🎯 あなた向け"],["other","📚 そのほかのニュース"],["quiz","🧠 今日のクイズ"],["number","🔢 今日の数字"]];
 const LOOK = (()=>{ let p={}; try{ p=JSON.parse(store.get("nw-look")||"{}")||{}; }catch(_){ p={}; }
   const fix=(arr,all)=>{ const a=(Array.isArray(arr)?arr:[]).filter(k=>all.includes(k)); all.forEach(k=>{ if(!a.includes(k)) a.push(k); }); return a; };
-  const hadPet=Array.isArray(p.order)&&p.order.includes("pet"); p.order=fix(p.order,SECS.map(s=>s[0])); if(!hadPet){ p.order=p.order.filter(k=>k!=="pet"); p.order.unshift("pet"); } p.off=p.off&&typeof p.off==="object"?p.off:{};
+  const had=new Set(Array.isArray(p.order)?p.order:[]); p.order=fix(p.order,SECS.map(s=>s[0]));
+  if(had.size){ SECS.forEach(([k],i)=>{ if(had.has(k)) return; p.order=p.order.filter(x=>x!==k); if(i===0){ p.order.unshift(k); return; } const prev=SECS[i-1][0]; const at=p.order.indexOf(prev); p.order.splice(at<0?p.order.length:at+1,0,k); }); } p.off=p.off&&typeof p.off==="object"?p.off:{};
   p.tabs=fix(p.tabs,["today","search","map","explain","numbers","plan","my"]); p.tabOff=p.tabOff&&typeof p.tabOff==="object"?p.tabOff:{}; p.tabOff.my=false;
   if(!COLORS.some(c=>c[0]===p.color)) p.color="blue"; if(p.season!=="off") p.season="auto"; if(typeof p.preview!=="string") p.preview=""; if(!["compact","normal","roomy"].includes(p.density)) p.density="normal";
   return p; })();
@@ -668,6 +676,7 @@ function renderToday(){
           ${n.point?`<div class="pt">💭 <b>ここがポイント</b> ${esc(n.point)}</div>`:""}
           ${link?`<span class="more">${n.ex?'くわしい解説 →':'グラフを見る →'}</span>`:''}</span></button></li>`;}).join("")}</ol>
     </section>`;
+  S.mood=moodCard();
   S.foryou=forYou();
   S.other=otherNews();
   S.quiz=D.quiz&&D.quiz.length?`<section class="card quiz" aria-label="今日のクイズ" id="quiz"></section>`:"";
@@ -690,6 +699,7 @@ function renderToday(){
   const sx=document.getElementById("seasonX"); if(sx) sx.onclick=()=>{ store.set("nw-season-hide",TODAY+(seasonNow()||{}).k); document.getElementById("seasonCard")?.remove(); };
   document.getElementById("lookBtnToday").onclick=openLook;
   bindInstall(); bindPersonal(); bindPet(); checkBadges();
+  main.querySelectorAll("[data-mood]").forEach(b=>b.onclick=()=>{ sState.q=""; sState.th=""; sState.ok=false; sState.onlyNew=false; sState.g=new Set([b.dataset.mood]); go("search"); });
   if(document.getElementById("quiz")) drawQuiz(0,[]);
   main.querySelectorAll("[data-ex]").forEach(b=>b.addEventListener("click",()=>openEx(b.dataset.ex)));
   main.querySelectorAll("[data-tab]").forEach(b=>b.addEventListener("click",()=>go(b.dataset.tab)));
@@ -1482,6 +1492,17 @@ function bindPet(){
   const wq=document.getElementById("wq"); if(wq) drawWordQuiz(wq,0,[]);
 }
 
+// ===== 世の中の天気図(見出しのことばから、ジャンルごとの空気を天気で表す目安) =====
+const MOOD_BAD=/死亡|死者|けが|攻撃|戦闘|紛争|空爆|災害|台風|大雨|地震|噴火|事故|墜落|火災|下落|急落|安値|逮捕|起訴|事件|不正|流出|漏えい|被害|拘束|値上がり|高騰|中止|延期|否決|反発|批判|懸念|警報|猛烈|辞任|殺/;
+const MOOD_GOOD=/成功|優勝|初の|初当選|開業|開幕|上昇|最高値|受賞|合意|成立|回復|打ち上げ|勝利|勝ち|記録|達成|発見|開発|新作|発売|公開|登場|オープン|人気|好調|値下げ|減税|容認|再開|改善|笑顔|祝/;
+const MOOD_SKY=[[-99,"⛈️","あらし"],[-1.2,"🌧️","雨"],[-0.4,"☁️","くもり"],[0.2,"🌤️","晴れ時々くもり"],[0.8,"☀️","快晴"]];
+function moodOf(list){ if(!list.length) return null; let sc=0; list.forEach(n=>{ const t=n.h+" "+(n.th||""); if(MOOD_BAD.test(t)) sc-=1; if(MOOD_GOOD.test(t)) sc+=1; }); const v=sc/Math.sqrt(list.length); let w=MOOD_SKY[0]; MOOD_SKY.forEach(x=>{ if(v>=x[0]) w=x; }); return {v,icon:w[1],name:w[2],n:list.length}; }
+function moodCard(){ const day=NEWS[0]&&NEWS[0].d; if(!day) return ""; const L=NEWS.filter(n=>n.d===day);
+  const rows=GORDER.map(g=>({g,m:moodOf(L.filter(n=>n.g===g))})).filter(x=>x.m); if(!rows.length) return ""; const all=moodOf(L);
+  return `<section class="card" aria-label="世の中の天気図"><div class="sec-h"><h2>🗺️ 世の中の天気図</h2><span class="sub">${esc(mdLabel(day))}</span></div>
+    <div class="mood-all"><span class="mi">${all.icon}</span><span><b>きょうの世の中は「${esc(all.name)}」</b><span class="hint" style="display:block">${L.length}件のニュースから</span></span></div>
+    <div class="mood-grid">${rows.map(({g,m})=>`<button class="mood-c" data-mood="${g}" style="--c:var(--g-${g});--cs:var(--g-${g}-s)"><span class="mi">${m.icon}</span><b>${esc(GN[g])}</b><small>${esc(m.name)} ・ ${m.n}件</small></button>`).join("")}</div>
+    <div class="hint" style="margin-top:8px">見出しのことば(「事故」「上昇」など)から自動で決めた目安です。タップでそのジャンルのニュースへ。</div></section>`; }
 // ===== 使い方 =====
 const GUIDE = [
   ["🚀","まずはここから",["「きょう」の<b>▶ 1分で見る</b>を押すと、今日のニュースが動くスライドで流れます。","時間がない日は<b>☀️ 今日の3行</b>だけ読めばOK。","<b>📰 今日のニュース10</b>は、その日に関心が高かった順のランキングです。下の「記録したニュース すべて」で、ほかのニュースも見られます。"]],
