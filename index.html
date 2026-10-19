@@ -2235,7 +2235,8 @@ const PHOTOS={
   sato:["https://images.unsplash.com/photo-1582650448629-3c854f356544?w=1000&q=70&auto=format&fit=crop","Mick Haupt"],
   series:["https://images.unsplash.com/photo-1784657258179-27f2e692b62e?w=1000&q=70&auto=format&fit=crop","Steve DiMatteo"],
   yokohama:["https://images.unsplash.com/photo-1785899472269-51981778ccbd?w=1000&q=70&auto=format&fit=crop","ITT CU"],
-  past:["https://images.unsplash.com/photo-1435527173128-983b87201f4d?w=1000&q=70&auto=format&fit=crop","Eric Rothermel"]
+  past:["https://images.unsplash.com/photo-1435527173128-983b87201f4d?w=1000&q=70&auto=format&fit=crop","Eric Rothermel"],
+  mmx:["https://images.unsplash.com/photo-1770723963970-ace02c7db50e?w=1000&q=70&auto=format&fit=crop","ostudio"]
 };
 function photoBlock(k){ const p=PHOTOS[k]; if(!p) return ""; return `<figure class="photo"><img src="${p[0]}" alt="" loading="lazy" onerror="this.closest('figure').remove()"><figcaption>📷 イメージ写真: ${esc(p[1])} / <a href="https://unsplash.com/?utm_source=mainichi_news&utm_medium=referral" target="_blank" rel="noopener">Unsplash</a></figcaption></figure>`; }
 
