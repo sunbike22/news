@@ -489,22 +489,33 @@ svg.eat{animation:petEat .7s ease both!important}
 .wlink{margin-top:4px;align-self:flex-start;border:1px solid var(--accent);background:var(--accent-soft);color:var(--ink);border-radius:999px;padding:3px 10px;font-size:.78rem;cursor:pointer}
 @media (prefers-reduced-motion: reduce){.rd-moon,.rd-moon span{animation:none}}
 /* 捜査ボード */
-.boardbox{padding:10px}
-.board-tools{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin-bottom:8px}
-.board-wrap{overflow:auto;border-radius:10px;-webkit-overflow-scrolling:touch;box-shadow:inset 0 0 0 6px #6b4a2b, inset 0 0 18px rgba(0,0,0,.45)}
-.board{position:relative;width:1000px;height:560px;transform-origin:0 0;background:#c49a62;background-image:radial-gradient(rgba(90,55,20,.35) 1px,transparent 1.6px),radial-gradient(rgba(255,240,210,.25) 1px,transparent 1.8px),radial-gradient(circle at 30% 20%,#d2a96f,#b88a52);background-size:9px 9px,13px 13px,100% 100%;background-position:0 0,4px 6px,0 0}
+.boardbox{padding:10px;display:flex;flex-direction:column;gap:8px}
+.board-tools{display:flex;gap:6px;align-items:center;flex-wrap:wrap;position:sticky;top:calc(env(safe-area-inset-top,0px) + 70px);z-index:6;background:var(--surface);padding:4px 0}
+.bd-msg{font-size:.85rem;color:var(--muted)}
+.bd-msg.on{color:var(--ink);background:#fff4c2;border:1px solid #e9cf6a;border-radius:10px;padding:6px 10px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;color:#3a2a00}
+.board-wrap{overflow:auto;max-height:62vh;border-radius:10px;-webkit-overflow-scrolling:touch;box-shadow:inset 0 0 0 6px #6b4a2b, inset 0 0 18px rgba(0,0,0,.45);overscroll-behavior:contain}
+.bd-sizer{position:relative}
+.board{position:absolute;left:0;top:0;transform-origin:0 0;background:#c49a62;background-image:radial-gradient(rgba(90,55,20,.35) 1px,transparent 1.6px),radial-gradient(rgba(255,240,210,.25) 1px,transparent 1.8px),radial-gradient(circle at 30% 20%,#d2a96f,#b88a52);background-size:9px 9px,13px 13px,100% 100%;background-position:0 0,4px 6px,0 0}
 .bd-map,.bd-str{position:absolute;inset:0;pointer-events:none}
 .bd-map path{fill:rgba(90,58,25,.16);stroke:rgba(90,58,25,.28);stroke-width:.6}
 .bd-map .tie{stroke:rgba(40,30,20,.45);stroke-width:1;stroke-dasharray:3 3}.bd-map .spot{fill:#8b1d1d}
 .bd-str{z-index:3}
-.bd-str path{fill:none;stroke:#c1121f;stroke-width:2.4;filter:drop-shadow(0 1px 1px rgba(0,0,0,.35));transition:opacity .2s}
-.bd-str text{font-size:11px;font-weight:700;fill:#fff;paint-order:stroke;stroke:#7a0e14;stroke-width:3px}
-.bd-str .dim{opacity:.18}.bd-str .hot path{stroke:#ff2d3d;stroke-width:3.6}
-.note{position:absolute;z-index:2;display:flex;flex-direction:column;gap:2px;text-align:left;background:#fffbe8;color:#2a2116;border:0;border-top:6px solid var(--tape);border-radius:2px;padding:10px 8px 6px;box-shadow:0 3px 8px rgba(0,0,0,.35);cursor:pointer;font-size:11px;line-height:1.35;font-family:var(--f-body)}
-.note b{font-size:12.5px}.note small{color:#7a6a55;font-size:10px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+.bd-str path{fill:none;stroke:#c1121f;stroke-width:2.6;filter:drop-shadow(0 1px 1px rgba(0,0,0,.35));transition:opacity .2s}
+.bd-str .mine path{stroke:#f5c400;stroke-width:3;stroke-dasharray:1 0}
+.bd-str text{font-size:12px;font-weight:700;fill:#fff;paint-order:stroke;stroke:#7a0e14;stroke-width:3px}
+.bd-str .dim{opacity:.15}.bd-str .hot path{stroke-width:4.2}.bd-str .auto.hot path{stroke:#ff2d3d}
+.bd-notes{position:absolute;inset:0;z-index:2}
+.note{position:absolute;display:flex;flex-direction:column;gap:2px;text-align:left;background:#fffbe8;color:#2a2116;border:0;border-top:6px solid var(--tape);border-radius:2px;padding:10px 8px 6px;box-shadow:0 3px 8px rgba(0,0,0,.35);cursor:pointer;font-size:12px;line-height:1.35;font-family:var(--f-body);transform:rotate(var(--r));overflow:hidden;touch-action:none}
+.note b{font-size:13px}.note small{color:#7a6a55;font-size:10.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%;margin-top:auto}
 .note span{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
-.note.on{outline:3px solid #ff2d3d;z-index:4}
-.pinhead{position:absolute;top:-10px;left:50%;width:14px;height:14px;margin-left:-7px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#ff8a8a,#c1121f 60%,#7a0e14);box-shadow:0 2px 3px rgba(0,0,0,.45)}
+.note.mine{background:#fff59d;border-top:0;cursor:grab}
+.note.mine .mtx{-webkit-line-clamp:3;font-weight:700}
+.note.on{outline:3px solid #ff2d3d;z-index:4;transform:rotate(0) scale(1.06)}
+.note.mine.on{outline-color:#1e63d6}
+.pinhead{position:absolute;top:-1px;left:50%;width:14px;height:14px;margin-left:-7px;border-radius:50%;background:radial-gradient(circle at 35% 35%,#ff8a8a,#c1121f 60%,#7a0e14);box-shadow:0 2px 3px rgba(0,0,0,.45)}
+.pinhead.blue{background:radial-gradient(circle at 35% 35%,#8ab4ff,#1e63d6 60%,#0d3a85)}
+.bd-detail .bd-card{background:var(--surface2);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+.bd-detail .memo{margin-top:6px}
 /* 案内係 */
 .gd-fab{position:fixed;right:max(16px,env(safe-area-inset-right,0px));bottom:calc(84px + env(safe-area-inset-bottom,0px));z-index:24;width:54px;height:54px;border-radius:50%;border:0;background:var(--accent);color:var(--on-accent);font-size:1.5rem;box-shadow:0 6px 18px rgba(0,0,0,.22);cursor:pointer}
 @media (min-width:900px){.gd-fab{bottom:24px}}
@@ -1801,11 +1812,12 @@ function renderMy(){
 const PLACES=[
   [/沖縄|先島|石垣|宮古|琉球|那覇/,127.68,26.21,"沖縄"],[/横浜|神奈川|DeNA/,139.64,35.44,"横浜"],[/千葉|印旛|内房/,140.12,35.6,"千葉"],[/伊豆|大島/,139.4,34.75,"伊豆諸島"],
   [/宮崎|延岡/,131.42,31.91,"宮崎"],[/十勝|北海道|旭岳|セイコーマート/,142.8,43.3,"北海道"],[/大分/,131.61,33.24,"大分"],[/福岡|ソフトバンク|九州/,130.4,33.59,"福岡"],
-  [/阪神|大阪|王将/,135.5,34.69,"関西"],[/福生|山手線|東京|首相|国会|衆院|参院|日経平均|日銀|関文科相|簗/,139.75,35.68,"東京"],[/埼玉/,139.65,35.86,"埼玉"],[/西条/,133.18,33.92,"愛媛"],
+  [/阪神|大阪|王将/,135.5,34.69,"関西"],[/埼玉/,139.65,35.86,"埼玉"],[/西条/,133.18,33.92,"愛媛"],
   [/サウジ|リヤド|アラムコ/,46.72,24.69,"サウジアラビア"],[/フーシ|アデン|イエメン/,45.03,12.8,"イエメン"],[/エジプト/,31.24,30.04,"エジプト"],[/ウクライナ/,30.52,50.45,"ウクライナ"],
   [/ロシア|プーチン|記者拘束/,37.62,55.75,"ロシア"],[/北朝鮮/,125.75,39.03,"北朝鮮"],[/中国|GDP/,116.4,39.9,"中国"],[/カナダ/,-75.7,45.42,"カナダ"],
   [/トランプ|米国|ナスダック|FRB|NY原油|大リーグ|ドジャース|カリフォルニア/,-77.04,38.9,"アメリカ"],[/イラン|ホルムズ/,51.39,35.69,"イラン"],[/イスラエル/,35.21,31.77,"イスラエル"],
-  [/トルコ/,32.86,39.93,"トルコ"],[/ジブチ/,43.15,11.59,"ジブチ"],[/グリーンランド/,-51.72,64.18,"グリーンランド"],[/ICC|オランダ/,4.3,52.07,"オランダ(ICC)"],[/MMX|火星/,130.97,30.4,"種子島(打ち上げ)"]
+  [/トルコ/,32.86,39.93,"トルコ"],[/ジブチ/,43.15,11.59,"ジブチ"],[/グリーンランド/,-51.72,64.18,"グリーンランド"],[/ICC|オランダ/,4.3,52.07,"オランダ(ICC)"],[/MMX|火星/,130.97,30.4,"種子島(打ち上げ)"],
+  [/福生|山手線|東京|首相|国会|衆院|参院|日経平均|日銀|関文科相|簗/,139.75,35.68,"東京"]
 ];
 function placeOf(n){ for(const p of PLACES){ if(p[0].test(n.h+" "+(n.th||""))) return p; } return null; }
 let mapState={view:"japan",sel:null};
@@ -1858,41 +1870,79 @@ function renderMap(){
 main.addEventListener("click",ev=>{ const v=ev.target.closest("[data-vote]"); if(v){ ME.votes[v.dataset.no]={v:v.dataset.vote,at:TODAY}; saveMe(); v.parentElement.querySelectorAll("[data-vote]").forEach(x=>x.setAttribute("aria-pressed",String(x===v))); toast("🎯 予想を記録しました。結果が出たらお知らせします"); return; }
   const ic=ev.target.closest(".ics"); if(ic) icsFor(D.schedule[+ic.dataset.i]); });
 
-// ===== 捜査ボード(コルク板の上で、ニュースを赤い糸でつなぐ) =====
+// ===== 捜査ボード(コルク板の上で、ニュースを赤い糸でつなぐ。自分のメモと糸も貼れる) =====
+let BD={z:0.75,sel:null,mode:"",from:null};
+function bdStore(){ ME.board=ME.board||{}; const B=ME.board; B.notes=B.notes||[]; B.links=B.links||[]; return B; }
 function renderBoard(recentDays){
   const sec=main.querySelector(".mapbox"); sec.classList.add("boardbox");
-  sec.innerHTML=`<div class="board-tools"><button class="fchip" id="bdFit">🔍 全体を見る</button><span class="hint">赤い糸=同じテーマ。メモをタップすると、その糸が光ります。</span></div><div class="board-wrap" id="bdWrap"><div class="board" id="board"><div class="empty" style="padding:40px">ボードを用意しています…</div></div></div>`;
-  const hint=main.querySelector(".mapbox + .hint"); if(hint) hint.textContent="同じテーマのニュースが起きた場所どうしを、赤い糸でつないでいます。ボードは指で横に動かせます。場所とテーマは見出しのことばから自動で決めています。";
+  sec.innerHTML=`<div class="board-tools" id="bdTools">
+      <span class="seg" role="group" aria-label="大きさ"><button data-z="0.5">小</button><button data-z="0.75">中</button><button data-z="1">大</button></span>
+      <button class="fchip" id="bdAdd">📝 メモを貼る</button><button class="fchip" id="bdLink">🧵 糸でつなぐ</button></div>
+    <div class="bd-msg" id="bdMsg">メモをタップすると、その糸が光ります。</div>
+    <div class="board-wrap" id="bdWrap"><div class="bd-sizer" id="bdSizer"><div class="board" id="board"><div class="empty" style="padding:40px">ボードを用意しています…</div></div></div></div>
+    <div id="bdDetail" class="bd-detail"></div>`;
+  const hint=main.querySelector(".mapbox + .hint"); if(hint) hint.textContent="赤い糸=同じテーマのニュース。黄色い糸=あなたがつないだ糸。📝のメモと黄色い糸は、このスマホの中だけに保存されます。場所とテーマは見出しのことばから自動で決めています。";
+  const ml=document.getElementById("mapList"); if(ml) ml.innerHTML="";
   const items=NEWS.filter(n=>recentDays.includes(n.d)).map(n=>({n,p:placeOf(n)})).filter(x=>x.p);
   const JP=[0,139.75,36.2,"日本"]; const G={};
   items.forEach(x=>{ let pp=x.p; if(pp[1]>122&&pp[1]<147&&pp[2]>24&&pp[2]<46) pp=JP; (G[pp[3]]=G[pp[3]]||{p:pp,list:[],th:new Set()}).list.push(x.n); String(x.n.th||"").split(/[,、]/).map(t=>t.trim()).filter(Boolean).forEach(t=>G[pp[3]].th.add(t)); });
   const groups=Object.values(G);
   getWorld().then(world=>{
-    const bd=document.getElementById("board"); if(!bd) return; const BW=1000,BH=560;
+    const bd=document.getElementById("board"); if(!bd) return; const BW=1100,BH=620; const B=bdStore();
     const proj=d3.geoNaturalEarth1().fitExtent([[20,20],[BW-20,BH-20]],{type:"Sphere"}); const path=d3.geoPath(proj);
-    const notes=groups.map(g=>{ const [x,y]=proj([g.p[1],g.p[2]]); return {g,px:x,py:y,x:x+20,y:y-60,w:132,h:84}; });
-    for(let it=0;it<200;it++){ notes.forEach((a,i)=>notes.forEach((b,j)=>{ if(i>=j) return; const dx=(a.x+a.w/2)-(b.x+b.w/2), dy=(a.y+a.h/2)-(b.y+b.h/2); const ox=(a.w+10)-Math.abs(dx), oy=(a.h+10)-Math.abs(dy); if(ox>0&&oy>0){ if(ox<oy){ const m=(dx>=0?1:-1)*ox/2; a.x+=m; b.x-=m; } else { const m=(dy>=0?1:-1)*oy/2; a.y+=m; b.y-=m; } } }));
-      notes.forEach(a=>{ a.x=Math.max(6,Math.min(BW-a.w-6,a.x)); a.y=Math.max(6,Math.min(BH-a.h-6,a.y)); }); }
-    const edges=[]; for(let i=0;i<notes.length;i++) for(let j=i+1;j<notes.length;j++){ const sh=[...notes[i].g.th].filter(t=>notes[j].g.th.has(t)); if(sh.length) edges.push({a:i,b:j,t:sh}); }
-    const jpI=notes.findIndex(n=>n.g.p[3]==="日本");
-    if(jpI>=0) notes.forEach((n,i)=>{ if(i===jpI) return; [...n.g.th].forEach(T=>{ if(edges.some(e=>(e.a===i||e.b===i)&&(e.a===jpI||e.b===jpI))) return;
-      const ex=Object.values(D.explainers).find(e=>gdScore(gdQuery(T),e.name+" "+(e.now||"")+" "+e.kid)>=0.5); if(ex && (ex.flow||[]).some(f=>/日本|暮らし|ガソリン|家計/.test(f.t))){ const last=ex.flow[ex.flow.length-1].t.replace(/^[^\s]*\s/,""); edges.push({a:Math.min(i,jpI),b:Math.max(i,jpI),t:[T+"→"+(last.length>10?last.slice(0,10)+"…":last)]}); } }); });
-    const ctr=n=>[n.x+n.w/2,n.y+10];
-    const str=edges.map((e,k)=>{ const [x1,y1]=ctr(notes[e.a]),[x2,y2]=ctr(notes[e.b]); const mx=(x1+x2)/2, my=(y1+y2)/2+Math.min(60,Math.hypot(x2-x1,y2-y1)*.12);
-      return `<g class="str" data-a="${e.a}" data-b="${e.b}"><path d="M${x1} ${y1} Q ${mx} ${my} ${x2} ${y2}"/><text x="${(x1+2*mx+x2)/4}" y="${(y1+2*my+y2)/4}" text-anchor="middle">${esc(e.t[0])}</text></g>`; }).join("");
-    const ties=notes.map(n=>`<line x1="${n.px}" y1="${n.py}" x2="${n.x+n.w/2}" y2="${n.y+n.h}" class="tie"/><circle cx="${n.px}" cy="${n.py}" r="3.5" class="spot"/>`).join("");
-    bd.innerHTML=`<svg class="bd-map" viewBox="0 0 ${BW} ${BH}" width="${BW}" height="${BH}" aria-hidden="true"><g>${world.features.map(f=>`<path d="${path(f)}"/>`).join("")}</g>${ties}</svg>
-      ${notes.map((n,i)=>{ const top=n.g.list[0]; return `<button class="note" data-i="${i}" style="left:${n.x}px;top:${n.y}px;width:${n.w}px;--tape:var(--g-${top.g});transform:rotate(${((i*37)%7)-3}deg)"><i class="pinhead"></i><b>${esc(n.g.p[3])}</b><span>${esc(top.h.length>34?top.h.slice(0,33)+"…":top.h)}</span><small>${n.g.list.length}件${n.g.th.size?" ・ "+esc([...n.g.th][0]):""}</small></button>`; }).join("")}
-      <svg class="bd-str" viewBox="0 0 ${BW} ${BH}" width="${BW}" height="${BH}" aria-hidden="true">${str}</svg>`;
-    const wrap=document.getElementById("bdWrap"); const jp=notes.find(n=>n.g.p[3]==="日本"); wrap.scrollLeft=Math.max(0,(jp?jp.x:BW/2)-wrap.clientWidth*.7);
-    let fit=false; document.getElementById("bdFit").onclick=e=>{ fit=!fit; const sc=Math.min(1,wrap.clientWidth/BW); bd.style.transform=fit?`scale(${sc})`:""; bd.parentElement.style.height=fit?(BH*sc+4)+"px":""; e.target.textContent=fit?"🔍 大きく見る":"🔍 全体を見る"; };
-    const listBox=document.getElementById("mapList");
-    const pick=i=>{ bd.querySelectorAll(".note").forEach(x=>x.classList.toggle("on",+x.dataset.i===i)); bd.querySelectorAll(".str").forEach(x=>{ const hit=+x.dataset.a===i||+x.dataset.b===i; x.classList.toggle("hot",hit); x.classList.toggle("dim",!hit); });
-      const g=notes[i].g; const linked=edges.filter(e=>e.a===i||e.b===i).map(e=>({n:notes[e.a===i?e.b:e.a].g.p[3],t:e.t}));
-      listBox.innerHTML=`<section class="day"><h3>📌 ${esc(g.p[3])}(${g.list.length}件)</h3><ul class="us">${g.list.map(n=>`<li>${esc(mdLabel(n.d))} ${esc(n.h)} ${n.ok?"✅":"⚠️"}</li>`).join("")}</ul>${linked.length?`<p class="hint" style="margin-top:6px">🧵 つながっている場所: ${linked.map(l=>`${esc(l.n)}(${esc(l.t.join("・"))})`).join(" ／ ")}</p>`:""}</section>`; track("/board/"+g.p[3],"捜査ボード"); };
-    bd.querySelectorAll(".note").forEach(b=>b.onclick=()=>pick(+b.dataset.i));
-    listBox.innerHTML=`<p class="hint">${groups.length}か所 ・ 赤い糸 ${edges.length}本。メモをタップしてね。</p>`;
-  }).catch(()=>{ const bd=document.getElementById("board"); if(bd) bd.innerHTML='<div class="empty">ボードを読み込めませんでした。通信状態を確かめて、開き直してください。</div>'; });
+    const notes=groups.map(g=>{ const [x,y]=proj([g.p[1],g.p[2]]); return {id:"p:"+g.p[3],g,px:x,py:y,x:x-66,y:y-100,w:140,h:88}; });
+    for(let it=0;it<300;it++){ notes.forEach((a,i)=>notes.forEach((b,j)=>{ if(i>=j) return; const dx=(a.x+a.w/2)-(b.x+b.w/2), dy=(a.y+a.h/2)-(b.y+b.h/2); const ox=(a.w+18)-Math.abs(dx), oy=(a.h+22)-Math.abs(dy); if(ox>0&&oy>0){ if(ox<oy){ const m=(dx>=0?1:-1)*ox/2; a.x+=m; b.x-=m; } else { const m=(dy>=0?1:-1)*oy/2; a.y+=m; b.y-=m; } } }));
+      notes.forEach(a=>{ a.x=Math.max(8,Math.min(BW-a.w-8,a.x)); a.y=Math.max(14,Math.min(BH-a.h-8,a.y)); }); }
+    const auto=[]; for(let i=0;i<notes.length;i++) for(let j=i+1;j<notes.length;j++){ const sh=[...notes[i].g.th].filter(t=>notes[j].g.th.has(t)); if(sh.length) auto.push({a:notes[i].id,b:notes[j].id,t:sh[0]}); }
+    const jp=notes.find(n=>n.g.p[3]==="日本");
+    if(jp) notes.forEach(n=>{ if(n===jp) return; [...n.g.th].forEach(T=>{ if(auto.some(e=>[e.a,e.b].includes(n.id)&&[e.a,e.b].includes(jp.id))) return;
+      const ex=Object.values(D.explainers).find(e=>gdScore(gdQuery(T),e.name+" "+(e.now||"")+" "+e.kid)>=0.5); if(ex&&(ex.flow||[]).some(f=>/日本|暮らし|ガソリン|家計/.test(f.t))) auto.push({a:n.id,b:jp.id,t:T+"→日本"}); }); });
+    const all=()=>[...notes, ...B.notes.map(u=>({id:u.id,u,x:u.x,y:u.y,w:130,h:78}))];
+    const find=id=>all().find(n=>n.id===id);
+    const ctr=n=>[n.x+n.w/2,n.y+8];
+    const sag=(x1,y1,x2,y2)=>{ const mx=(x1+x2)/2,my=(y1+y2)/2+Math.min(70,Math.hypot(x2-x1,y2-y1)*.14); return {d:`M${x1} ${y1} Q ${mx} ${my} ${x2} ${y2}`,lx:(x1+2*mx+x2)/4,ly:(y1+2*my+y2)/4}; };
+    function drawStrings(){ const svg=bd.querySelector(".bd-str"); const L=[...auto.map(e=>({...e,k:"auto"})),...B.links.map((e,i)=>({...e,k:"mine",i}))];
+      svg.innerHTML=L.map(e=>{ const A=find(e.a),Bn=find(e.b); if(!A||!Bn) return ""; const [x1,y1]=ctr(A),[x2,y2]=ctr(Bn); const q=sag(x1,y1,x2,y2); const hot=BD.sel&&(e.a===BD.sel||e.b===BD.sel); const dim=BD.sel&&!hot;
+        return `<g class="str ${e.k}${hot?" hot":""}${dim?" dim":""}"><path d="${q.d}"/>${e.t?`<text x="${q.lx}" y="${q.ly}" text-anchor="middle">${esc(e.t)}</text>`:""}</g>`; }).join(""); }
+    function drawNotes(){ const layer=bd.querySelector(".bd-notes");
+      layer.innerHTML=notes.map((n,i)=>{ const top=n.g.list[0]; return `<button class="note${BD.sel===n.id?" on":""}" data-id="${esc(n.id)}" style="left:${n.x}px;top:${n.y}px;width:${n.w}px;height:${n.h}px;--tape:var(--g-${top.g});--r:${((i*37)%7)-3}deg"><i class="pinhead"></i><b>${esc(n.g.p[3])}</b><span>${esc(top.h)}</span><small>${n.g.list.length}件${n.g.th.size?" ・ "+esc([...n.g.th][0]):""}</small></button>`; }).join("")
+        + B.notes.map(u=>`<div class="note mine${BD.sel===u.id?" on":""}" data-id="${esc(u.id)}" role="button" tabindex="0" style="left:${u.x}px;top:${u.y}px;width:130px;height:78px;--r:${u.r||0}deg"><i class="pinhead blue"></i><span class="mtx">${esc(u.text||"(タップして書く)")}</span><small>あなたのメモ ・ 動かせます</small></div>`).join(""); }
+    bd.innerHTML=`<svg class="bd-map" viewBox="0 0 ${BW} ${BH}" width="${BW}" height="${BH}" aria-hidden="true"><g>${world.features.map(f=>`<path d="${path(f)}"/>`).join("")}</g>${notes.map(n=>`<line x1="${n.px}" y1="${n.py}" x2="${n.x+n.w/2}" y2="${n.y+n.h}" class="tie"/><circle cx="${n.px}" cy="${n.py}" r="4" class="spot"/>`).join("")}</svg>
+      <div class="bd-notes"></div><svg class="bd-str" viewBox="0 0 ${BW} ${BH}" width="${BW}" height="${BH}" aria-hidden="true"></svg>`;
+    bd.style.width=BW+"px"; bd.style.height=BH+"px";
+    const wrap=document.getElementById("bdWrap"), sizer=document.getElementById("bdSizer"), msg=document.getElementById("bdMsg"), det=document.getElementById("bdDetail");
+    const setZ=z=>{ const cx=(wrap.scrollLeft+wrap.clientWidth/2)/BD.z, cy=(wrap.scrollTop+wrap.clientHeight/2)/BD.z; BD.z=z; bd.style.transform=`scale(${z})`; sizer.style.width=BW*z+"px"; sizer.style.height=BH*z+"px"; wrap.scrollLeft=cx*z-wrap.clientWidth/2; wrap.scrollTop=cy*z-wrap.clientHeight/2;
+      document.querySelectorAll("#bdTools [data-z]").forEach(b=>b.setAttribute("aria-pressed",String(+b.dataset.z===z))); };
+    document.querySelectorAll("#bdTools [data-z]").forEach(b=>b.onclick=()=>setZ(+b.dataset.z));
+    const show=()=>{ drawNotes(); drawStrings(); bindNotes(); detail(); };
+    function centerOn(n){ wrap.scrollTo({left:(n.x+n.w/2)*BD.z-wrap.clientWidth/2, top:(n.y+n.h/2)*BD.z-wrap.clientHeight/2, behavior:"smooth"}); }
+    function detail(){ const n=BD.sel&&find(BD.sel); if(!n){ det.innerHTML=`<p class="hint" style="margin:0">${groups.length}か所 ・ 赤い糸 ${auto.length}本${B.links.length?` ・ 黄色い糸 ${B.links.length}本`:""}。メモをタップしてね。</p>`; return; }
+      const links=[...auto,...B.links].filter(e=>e.a===n.id||e.b===n.id).map(e=>{ const o=find(e.a===n.id?e.b:e.a); return {o,t:e.t,mine:B.links.includes(e)}; }).filter(x=>x.o);
+      const nm=o=>o.g?o.g.p[3]:"📝 "+(o.u.text||"メモ").slice(0,12);
+      const linkHTML=links.length?`<div class="chips" style="margin-top:8px">${links.map(l=>`<button class="fchip" data-go="${esc(l.o.id)}">🧵 ${esc(nm(l.o))}${l.t?` ・ ${esc(l.t)}`:""}</button>`).join("")}</div>`:"";
+      if(n.g){ det.innerHTML=`<div class="bd-card"><b>📌 ${esc(n.g.p[3])}(${n.g.list.length}件)</b><ul class="us" style="margin-top:4px">${n.g.list.slice(0,6).map(x=>`<li>${esc(mdLabel(x.d))} ${esc(x.h)} ${x.ok?"✅":"⚠️"}</li>`).join("")}</ul>${n.g.list.length>6?`<div class="hint">ほか${n.g.list.length-6}件</div>`:""}${linkHTML}<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px"><button class="fchip" data-linkfrom="${esc(n.id)}">🧵 ここから糸を引く</button><button class="fchip" data-clear="1">✕ 選ぶのをやめる</button></div></div>`; }
+      else { det.innerHTML=`<div class="bd-card"><b>📝 あなたのメモ</b><textarea class="memo" id="bdTxt" rows="3" maxlength="120" placeholder="気づいたこと・つながりそうなこと">${esc(n.u.text||"")}</textarea>${linkHTML}<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px"><button class="fchip" data-linkfrom="${esc(n.id)}">🧵 ここから糸を引く</button><button class="fchip" id="bdDel">🗑 はがす</button><button class="fchip" data-clear="1">✕ とじる</button></div></div>`;
+        const t=document.getElementById("bdTxt"); t.oninput=()=>{ n.u.text=t.value.slice(0,120); saveMe(); const el=bd.querySelector(`[data-id="${CSS.escape(n.id)}"] .mtx`); if(el) el.textContent=n.u.text||"(タップして書く)"; };
+        document.getElementById("bdDel").onclick=()=>{ B.notes=B.notes.filter(x=>x.id!==n.id); B.links=B.links.filter(e=>e.a!==n.id&&e.b!==n.id); saveMe(); BD.sel=null; show(); }; }
+      det.querySelectorAll("[data-go]").forEach(b=>b.onclick=()=>{ BD.sel=b.dataset.go; show(); centerOn(find(BD.sel)); });
+      det.querySelectorAll("[data-clear]").forEach(b=>b.onclick=()=>{ BD.sel=null; show(); });
+      det.querySelectorAll("[data-linkfrom]").forEach(b=>b.onclick=()=>{ BD.mode="link"; BD.from=b.dataset.linkfrom; msg.innerHTML="🧵 つなぎたいメモをタップしてね <button class=\"fchip\" id=\"bdCancel\">やめる</button>"; msg.classList.add("on"); document.getElementById("bdCancel").onclick=endLink; }); }
+    function endLink(){ BD.mode=""; BD.from=null; msg.classList.remove("on"); msg.textContent="メモをタップすると、その糸が光ります。"; }
+    function tapNote(id){ if(BD.mode==="link"){ if(!BD.from){ BD.from=id; msg.innerHTML="🧵 つぎに、つなぎたい相手のメモをタップ <button class=\"fchip\" id=\"bdCancel\">やめる</button>"; document.getElementById("bdCancel").onclick=endLink; return; }
+        if(BD.from!==id && !B.links.some(e=>(e.a===BD.from&&e.b===id)||(e.a===id&&e.b===BD.from))){ B.links.push({a:BD.from,b:id}); saveMe(); toast("🧵 糸でつなぎました"); } endLink(); BD.sel=id; show(); return; }
+      BD.sel = BD.sel===id ? null : id; show(); }
+    function bindNotes(){ bd.querySelectorAll(".note").forEach(el=>{ const id=el.dataset.id; const u=B.notes.find(x=>x.id===id);
+      if(!u){ el.onclick=()=>tapNote(id); return; }
+      let st=null; el.onpointerdown=e=>{ st={x:e.clientX,y:e.clientY,ox:u.x,oy:u.y,moved:false}; el.setPointerCapture(e.pointerId); };
+      el.onpointermove=e=>{ if(!st) return; const dx=(e.clientX-st.x)/BD.z, dy=(e.clientY-st.y)/BD.z; if(Math.abs(dx)+Math.abs(dy)>6) st.moved=true; if(!st.moved) return; e.preventDefault(); u.x=Math.max(4,Math.min(BW-134,st.ox+dx)); u.y=Math.max(14,Math.min(BH-82,st.oy+dy)); el.style.left=u.x+"px"; el.style.top=u.y+"px"; drawStrings(); };
+      el.onpointerup=()=>{ if(!st) return; const mv=st.moved; st=null; if(mv) saveMe(); else tapNote(id); };
+      el.onkeydown=e=>{ if(e.key==="Enter") tapNote(id); }; }); }
+    document.getElementById("bdAdd").onclick=()=>{ const x=Math.max(4,Math.min(BW-134,(wrap.scrollLeft+wrap.clientWidth/2)/BD.z-65)), y=Math.max(14,Math.min(BH-82,(wrap.scrollTop+wrap.clientHeight/2)/BD.z-39));
+      const u={id:"u:"+Date.now().toString(36),x,y,text:"",r:Math.round(Math.random()*6-3)}; B.notes.push(u); saveMe(); BD.sel=u.id; show(); setTimeout(()=>{ const t=document.getElementById("bdTxt"); if(t) t.focus(); },50); };
+    document.getElementById("bdLink").onclick=()=>{ if(BD.mode==="link"){ endLink(); return; } BD.mode="link"; BD.from=null; msg.innerHTML="🧵 つなぎたいメモを2つ、順にタップしてね <button class=\"fchip\" id=\"bdCancel\">やめる</button>"; msg.classList.add("on"); document.getElementById("bdCancel").onclick=endLink; };
+    bd.addEventListener("click",e=>{ if(e.target===bd||e.target.closest(".bd-map")){ if(BD.mode!=="link"&&BD.sel){ BD.sel=null; show(); } } });
+    setZ(BD.z); show(); const j=jp||notes[0]; if(j&&!BD.sel){ wrap.scrollLeft=(j.x+j.w/2)*BD.z-wrap.clientWidth*.65; wrap.scrollTop=(j.y)*BD.z-wrap.clientHeight*.3; } else if(BD.sel&&find(BD.sel)) centerOn(find(BD.sel));
+  }).catch(e=>{ const bd=document.getElementById("board"); if(bd) bd.innerHTML='<div class="empty">ボードを読み込めませんでした。通信状態を確かめて、開き直してください。</div>'; });
 }
 // ===== 写真(Unsplash・撮影者名つき) =====
 const PHOTOS={
