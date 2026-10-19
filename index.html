@@ -876,7 +876,7 @@ function renderNumbers(){
   charts.push(new Chart(document.getElementById("c4"),{type:"bar",data:{labels:GORDER.map(g=>GN[g]),datasets:[{data:cnt,backgroundColor:GORDER.map(g=>css("--g-"+g)),borderRadius:6}]},options:{indexAxis:"y",maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.raw+"件"}}},scales:{x:{grid:{color:line},ticks:{precision:0}},y:{grid:{display:false}}}}}));
 }
 
-// ===== 長い期間のグラフ(history.json: FREDのデータを毎日自動で取得) =====
+// ===== 長い期間のグラフ(history.json: FREDなどから毎日自動で取得) =====
 let HIST=null, lsState={s:"nikkei",r:"365"};
 async function loadHist(){ if(HIST) return HIST; const r=await fetch("history.json",{cache:"no-cache"}); if(!r.ok) throw new Error("no"); HIST=await r.json(); return HIST; }
 function longChart(){
@@ -905,7 +905,7 @@ function longChart(){
       const cfg={type:"line",data:{labels:rows.map(r=>useMonthly?r[0].replace("-","/"):r[0].slice(5).replace("-","/")),datasets:[{data:rows.map(r=>r[1]),borderColor:col,backgroundColor:col+"22",fill:true,tension:.2,pointRadius:rows.length>60?0:2,pointHoverRadius:6,borderWidth:2}]},
         options:{maintainAspectRatio:false,interaction:{mode:"index",intersect:false},plugins:{legend:{display:false},tooltip:{callbacks:{title:c=>{const r=rows[c[0].dataIndex][0]; return r.length===7? r.replace("-","年")+"月(月平均)" : r;},label:c=>f(c.raw)}}},scales:{x:{grid:{display:false},ticks:{maxTicksLimit:6,autoSkip:true}},y:{grid:{color:css("--line")},ticks:{callback:v=>f(v)}}}}};
       if(chart){ chart.destroy(); } chart=new Chart(document.getElementById("cl"),cfg); charts.push(chart);
-      document.getElementById("lsNote").innerHTML=`${esc(S.label)}。${useMonthly?"5年以上は月ごとの平均。":"1日ごとの値。"}出典: FRED(米セントルイス連銀)・毎日自動で取得、数日遅れ。いちばん新しい数日はこのサイトの記録でつないでいます。${lsState.s==="yen"?"円の値は米連銀の正午レートで、東京の夕方の値と少しちがいます。":""}`;
+      document.getElementById("lsNote").innerHTML=`${esc(S.label)}。${useMonthly?"5年以上は月ごとの平均。":"1日ごとの値。"}出典: ${esc(S.src||"FRED")}・毎日自動で取得(数日遅れることがあります)。いちばん新しい数日はこのサイトの記録でつないでいます。${lsState.s==="yen"?"円の値は取得先の1日の値で、東京の夕方5時の値と少しちがいます。":""}`;
     }).catch(()=>{ document.getElementById("lsNote").textContent="長い期間のデータは準備中です(毎朝7時ごろに自動で取得します)。"; });
   }
   function drawTicks(){
