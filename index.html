@@ -404,6 +404,23 @@ details.faq p{margin:10px 0 12px}
 .season-card .si{font-size:2rem;line-height:1}
 :root[data-season="halloween"] .season-card{background:linear-gradient(120deg,#2b1840,#4a2470);color:#fff;border-color:#4a2470}
 :root[data-season="halloween"] .season-card .fchip{background:transparent;color:#fff;border-color:rgba(255,255,255,.5)}
+/* ペット */
+.pet-card{display:flex;gap:12px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:10px 14px}
+.pet-av{border:0;background:none;padding:0;cursor:pointer;flex:none}
+.pet-tx{display:flex;flex-direction:column;gap:4px;min-width:0;font-size:.9rem}
+.pet-bt{display:flex;gap:6px;flex-wrap:wrap;margin-top:2px}
+.pet-feed{background:var(--accent);color:var(--on-accent);border-color:var(--accent);font-weight:700}
+.pet-feed:disabled{opacity:.45}
+.pet-big{display:flex;justify-content:center}
+.pet-card svg,.pet-big svg{animation:petIdle 2.6s ease-in-out infinite;transform-origin:50% 90%}
+svg.eat{animation:petEat .7s ease both!important}
+@keyframes petIdle{0%,100%{transform:translateY(0) scale(1,1)}50%{transform:translateY(-3px) scale(1.02,.98)}}
+@keyframes petEat{0%{transform:scale(1)}30%{transform:translateY(-14px) scale(1.08,.92)}60%{transform:translateY(0) scale(.95,1.05)}100%{transform:scale(1)}}
+.pet-heart{position:absolute;z-index:95;font-size:1.3rem;pointer-events:none;animation:petHeart 1.4s ease-out both}
+@keyframes petHeart{from{opacity:1;transform:translateY(0)}to{opacity:0;transform:translateY(-60px) scale(1.4)}}
+.quiz .opts.one{grid-template-columns:1fr}
+.quiz .opts.one .opt{text-align:left;font-weight:500;font-size:.92rem}
+@media (prefers-reduced-motion: reduce){.pet-card svg,.pet-big svg,svg.eat,.pet-heart{animation:none!important}}
 /* 案内係 */
 .gd-fab{position:fixed;right:max(16px,env(safe-area-inset-right,0px));bottom:calc(84px + env(safe-area-inset-bottom,0px));z-index:24;width:54px;height:54px;border-radius:50%;border:0;background:var(--accent);color:var(--on-accent);font-size:1.5rem;box-shadow:0 6px 18px rgba(0,0,0,.22);cursor:pointer}
 @media (min-width:900px){.gd-fab{bottom:24px}}
@@ -512,10 +529,10 @@ function mmdd(iso){ return iso.slice(5,10); }
 function seasonNow(){ if(LOOK.season==="off") return null; if(LOOK.preview){ const z=SEASONS.find(x=>x.k===LOOK.preview); if(z) return z; }
   const t=mmdd(TODAY); return SEASONS.find(z=> z.from<=z.to ? (t>=z.from&&t<=z.to) : (t>=z.from||t<=z.to)) || null; }
 function inSeason(z,iso){ const t=mmdd(iso); return z.from<=z.to ? (t>=z.from&&t<=z.to) : (t>=z.from||t<=z.to); }
-const SECS = [["play","▶️ 1分で見る"],["weather","🌤️ 天気"],["three","☀️ 今日の3行"],["ten","📰 今日のニュース10"],["foryou","🎯 あなた向け"],["other","📚 そのほかのニュース"],["quiz","🧠 今日のクイズ"],["number","🔢 今日の数字"]];
+const SECS = [["pet","🐣 ペット"],["play","▶️ 1分で見る"],["weather","🌤️ 天気"],["three","☀️ 今日の3行"],["ten","📰 今日のニュース10"],["foryou","🎯 あなた向け"],["other","📚 そのほかのニュース"],["quiz","🧠 今日のクイズ"],["number","🔢 今日の数字"]];
 const LOOK = (()=>{ let p={}; try{ p=JSON.parse(store.get("nw-look")||"{}")||{}; }catch(_){ p={}; }
   const fix=(arr,all)=>{ const a=(Array.isArray(arr)?arr:[]).filter(k=>all.includes(k)); all.forEach(k=>{ if(!a.includes(k)) a.push(k); }); return a; };
-  p.order=fix(p.order,SECS.map(s=>s[0])); p.off=p.off&&typeof p.off==="object"?p.off:{};
+  const hadPet=Array.isArray(p.order)&&p.order.includes("pet"); p.order=fix(p.order,SECS.map(s=>s[0])); if(!hadPet){ p.order=p.order.filter(k=>k!=="pet"); p.order.unshift("pet"); } p.off=p.off&&typeof p.off==="object"?p.off:{};
   p.tabs=fix(p.tabs,["today","search","map","explain","numbers","plan","my"]); p.tabOff=p.tabOff&&typeof p.tabOff==="object"?p.tabOff:{}; p.tabOff.my=false;
   if(!COLORS.some(c=>c[0]===p.color)) p.color="blue"; if(p.season!=="off") p.season="auto"; if(typeof p.preview!=="string") p.preview=""; if(!["compact","normal","roomy"].includes(p.density)) p.density="normal";
   return p; })();
@@ -632,6 +649,7 @@ function renderToday(){
   S.play=`<div class="hero">
       <button class="play" id="playBtn"><span class="pi" aria-hidden="true">▶</span><span><b>1分で見る 今日のニュース</b><span>動くスライドで自動再生。タップで止めたり進めたり</span></span></button>
     </div>`;
+  S.pet=petCard();
   S.weather=weatherCard();
   S.three=`<section aria-label="今日の3行">
       <div class="sec-h"><h2>☀️ 今日の3行</h2><span class="sub">時間がない日はここだけでOK</span></div>
@@ -671,7 +689,7 @@ function renderToday(){
   const pb=document.getElementById("playBtn"); if(pb) pb.onclick=openStory;
   const sx=document.getElementById("seasonX"); if(sx) sx.onclick=()=>{ store.set("nw-season-hide",TODAY+(seasonNow()||{}).k); document.getElementById("seasonCard")?.remove(); };
   document.getElementById("lookBtnToday").onclick=openLook;
-  bindInstall(); bindPersonal(); checkBadges();
+  bindInstall(); bindPersonal(); bindPet(); checkBadges();
   if(document.getElementById("quiz")) drawQuiz(0,[]);
   main.querySelectorAll("[data-ex]").forEach(b=>b.addEventListener("click",()=>openEx(b.dataset.ex)));
   main.querySelectorAll("[data-tab]").forEach(b=>b.addEventListener("click",()=>go(b.dataset.tab)));
@@ -716,13 +734,13 @@ function drawQuiz(i,res){
   const box=document.getElementById("quiz"); if(!box) return; const Q=D.quiz;
   const dots=`<span class="dots">${Q.map((_,k)=>`<i class="${res[k]===true?'r':res[k]===false?'w':''}${k===i?' c':''}"></i>`).join("")}</span>`;
   if(i>=Q.length){ const sc=res.filter(Boolean).length; store.set("nw-quiz-"+D.updated.slice(0,10),String(sc)); ME.quiz[D.updated.slice(0,10)]=Math.max(+ME.quiz[D.updated.slice(0,10)]||0,sc); saveMe(); checkBadges();
-    box.innerHTML=`<div class="qn"><span>🧠 今日の${Q.length}問クイズ</span>${dots}</div><div class="qq" style="font-size:1.3rem">${sc}問 正解! ${sc===Q.length?"🎉 満点":sc>0?"👏":"また明日!"}</div><p class="hint" style="margin:0">答えはニュース10と解説にのっています。</p><button class="fchip" id="qre" style="margin-top:10px">もう一度</button>`;
-    document.getElementById("qre").onclick=()=>drawQuiz(0,[]); return; }
+    box.innerHTML=`<div class="qn"><span>🧠 今日の${Q.length}問クイズ</span>${dots}</div><div class="qq" style="font-size:1.3rem">${sc}問 正解! ${sc===Q.length?"🎉 満点":sc>0?"👏":"また明日!"}</div><p class="hint" style="margin:0">答えはニュース10と解説にのっています。</p><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px"><button class="fchip" id="qre">もう一度</button><button class="fchip" id="qmore">📖 おかわりクイズ(マイ) →</button>${petInit().food>0?`<button class="fchip" data-feed="1">🍙 ×${petInit().food} ${esc(petName())}にあげる</button>`:""}</div>`;
+    document.getElementById("qre").onclick=()=>drawQuiz(0,[]); document.getElementById("qmore").onclick=()=>go("my"); box.querySelectorAll("[data-feed]").forEach(b=>b.onclick=()=>petFeed(b)); return; }
   const q=Q[i];
   box.innerHTML=`<div class="qn"><span>🧠 今日の${Q.length}問クイズ ・ ${i+1}問目</span>${dots}</div><div class="qq">${esc(q.q)}</div><div class="opts">${q.o.map((o,k)=>`<button class="opt" data-k="${k}">${esc(o)}</button>`).join("")}</div><div id="qexp"></div>`;
   box.querySelectorAll(".opt").forEach(b=>b.onclick=()=>{ const k=+b.dataset.k; const ok=k===q.a;
     box.querySelectorAll(".opt").forEach(x=>{x.disabled=true; if(+x.dataset.k===q.a) x.classList.add("right");}); if(!ok) b.classList.add("wrong");
-    res[i]=ok; document.getElementById("qexp").innerHTML=`<div class="exp"><b>${ok?"⭕ 正解!":"❌ ざんねん"}</b> ${esc(q.e)}</div><button class="fchip" id="qnext" style="margin-top:10px">${i+1<Q.length?"次の問題 →":"結果を見る →"}</button>`;
+    res[i]=ok; const got=ok?petEarn("q|"+TODAY+"|"+D.updated.slice(0,16)+"|"+i,1):0; document.getElementById("qexp").innerHTML=`<div class="exp"><b>${ok?"⭕ 正解!":"❌ ざんねん"}</b> ${got?`🍙 ${esc(petName())}のごはんを1つゲット! `:""}${esc(q.e)}</div><button class="fchip" id="qnext" style="margin-top:10px">${i+1<Q.length?"次の問題 →":"結果を見る →"}</button>`;
     document.getElementById("qnext").onclick=()=>drawQuiz(i+1,res); });
 }
 
@@ -1254,6 +1272,8 @@ const BADGES=[
   ["quiz","🧠","クイズ満点","今日のクイズで満点",()=>Object.values(ME.quiz).some(v=>+v>=3)],
   ["w10","📖","ことば10個","ことばの意味を10個しらべた",()=>ME.words.length>=10],
   ["vote","🎯","予想的中","自分の予想が当たった",()=>voteResults().win>=1],
+  ["pet1","🐣","生まれた!","ペットがたまごからかえった",()=>petStage().i>=1],
+  ["pet3","🐥","おとなになった","ペットがおとなに育った",()=>petStage().i>=3],
   ["halloween","🎃","ハロウィン","ハロウィンの期間(10/24〜31)に開いた",()=>ME.days.some(d=>inSeason(SEASONS[0],d))],
   ["vote5","🔮","予想名人","予想が5回当たった",()=>voteResults().win>=5]
 ];
@@ -1377,13 +1397,98 @@ function icsFor(s){
   const blob=new Blob([body],{type:"text/calendar"}); const url=URL.createObjectURL(blob); const a=document.createElement("a"); a.href=url; a.download=`yotei-${d}.ics`; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(url),5000);
 }
 
+// ===== ペット(ニュースで育つ。クイズの正解で「ごはん」がもらえる) =====
+const PET_STAGES=[[0,"たまご"],[10,"あかちゃん"],[40,"こども"],[100,"おとな"],[220,"ものしり"],[400,"ニュース名人"]];
+const PET_ACC={pol:["tie","ネクタイ","政治"],eco:["glasses","メガネ","経済"],soc:["helmet","ヘルメット","社会"],it:["phones","ヘッドホン","IT"],intl:["scarf","マフラー","国際"],spo:["band","ハチマキ","スポーツ・科学"],ent:["popcorn","ポップコーン","エンタメ"],fas:["ribbon","リボン","ファッション"],home:["hammer","トンカチ","インテリア・DIY"],food:["chef","コック帽","レシピ・料理"],life:["mug","マグカップ","ライフスタイル"],trip:["straw","むぎわら帽子","旅行"]};
+const PET_DAY_MAX=8;
+function petInit(){ ME.pet=ME.pet||{}; const p=ME.pet; p.name=p.name||""; p.fed=+p.fed||0; p.food=+p.food||0; p.got=p.got||{}; p.feedDay=p.feedDay||""; p.earnDay=p.earnDay||{d:"",n:0};
+  Object.keys(p.got).forEach(k=>{ if(k.slice(2,12)<new Date(Date.parse(TODAY)-7*864e5).toISOString().slice(0,10)) delete p.got[k]; }); return p; }
+function petName(){ return (ME.pet&&ME.pet.name)||"よむまる"; }
+function petXP(){ const p=petInit(); return p.fed*5 + ME.days.length*2 + Object.keys(ME.readEx).length*3 + ME.words.length; }
+function petStage(){ const xp=petXP(); let i=0; PET_STAGES.forEach((s,k)=>{ if(xp>=s[0]) i=k; }); const nx=PET_STAGES[i+1]; return {i,name:PET_STAGES[i][1],xp,next:nx,prog:nx?(xp-PET_STAGES[i][0])/(nx[0]-PET_STAGES[i][0]):1}; }
+function petTopGenre(){ let best=null,v=2.5; Object.entries(ME.auto||{}).forEach(([g,n])=>{ if(PET_ACC[g]&&n>v){v=n;best=g;} }); return best; }
+function petGap(){ const ds=[...ME.days].filter(d=>d<TODAY).sort(); if(!ds.length) return 0; return Math.round((Date.parse(TODAY)-Date.parse(ds[ds.length-1]))/864e5); }
+function petMood(){ const p=petInit(); if(p.feedDay===TODAY) return "happy"; if(petGap()>=3) return "sulk"; return "hungry"; }
+function petEarn(key,n){ const p=petInit(); if(p.got[key]) return 0; if(p.earnDay.d!==TODAY) p.earnDay={d:TODAY,n:0}; if(p.earnDay.n>=PET_DAY_MAX) return 0;
+  const add=Math.min(n||1,PET_DAY_MAX-p.earnDay.n); p.got[key]=1; p.food+=add; p.earnDay.n+=add; saveMe(); return add; }
+function petSVG(stage,mood,acc,size){
+  const S=size||120; const egg=stage===0;
+  const body=egg?`<path d="M60 22c22 0 34 30 34 52s-15 34-34 34-34-12-34-34 12-52 34-52z" fill="#fff7e6" stroke="#e8c98f" stroke-width="3"/><path d="M38 70l8-6 8 7 8-7 8 7 8-6 8 6" fill="none" stroke="#e8c98f" stroke-width="3" stroke-linejoin="round"/>`
+    : `<ellipse cx="60" cy="74" rx="${34+stage*1.2}" ry="${31+stage}" fill="${stage>=5?"url(#pg)":"#ffcf6e"}"/><ellipse cx="60" cy="86" rx="${20+stage}" ry="${12+stage*.6}" fill="#fff1cf" opacity=".85"/>`;
+  const leaf=egg?"":stage>=4?`<path d="M60 44V30" stroke="#3f8f3a" stroke-width="3"/><g transform="translate(60 26)">${[0,72,144,216,288].map(a=>`<ellipse rx="5" ry="8" transform="rotate(${a}) translate(0 -7)" fill="#ff8fb3"/>`).join("")}<circle r="4.5" fill="#ffd34d"/></g>`
+    : `<path d="M60 44q0-10 2-14" stroke="#3f8f3a" stroke-width="3" fill="none"/><path d="M62 31q10-10 18-4-6 9-18 4z" fill="#58b84f"/>${stage>=2?`<path d="M61 34q-10-8-17-2 6 8 17 2z" fill="#6cc763"/>`:""}`;
+  const eyes=egg?"": mood==="happy"?`<path d="M42 70q5-6 10 0M68 70q5-6 10 0" stroke="#3a2a14" stroke-width="3.2" fill="none" stroke-linecap="round"/>`
+    : mood==="sulk"?`<path d="M41 67l11 3M79 67l-11 3" stroke="#3a2a14" stroke-width="3" stroke-linecap="round"/><circle cx="47" cy="72" r="2.6" fill="#3a2a14"/><circle cx="73" cy="72" r="2.6" fill="#3a2a14"/>`
+    : `<circle cx="47" cy="70" r="4" fill="#3a2a14"/><circle cx="73" cy="70" r="4" fill="#3a2a14"/><circle cx="48.3" cy="68.6" r="1.3" fill="#fff"/><circle cx="74.3" cy="68.6" r="1.3" fill="#fff"/>`;
+  const mouth=egg?"": mood==="happy"?`<path d="M54 79q6 7 12 0" fill="#c2453a"/>` : mood==="sulk"?`<path d="M54 82q6-5 12 0" stroke="#3a2a14" stroke-width="2.6" fill="none" stroke-linecap="round"/><path d="M90 50l6-4M92 56l7 0M90 62l6 4" stroke="#e5484d" stroke-width="2.4" stroke-linecap="round"/>` : `<ellipse cx="60" cy="80" rx="4" ry="3.2" fill="#c2453a"/>`;
+  const blush=egg?"":`<ellipse cx="38" cy="78" rx="5" ry="3" fill="#ff9aa2" opacity=".7"/><ellipse cx="82" cy="78" rx="5" ry="3" fill="#ff9aa2" opacity=".7"/>`;
+  const A=egg?"":({
+    glasses:`<g fill="none" stroke="#2b2b2b" stroke-width="2.6"><circle cx="47" cy="70" r="9"/><circle cx="73" cy="70" r="9"/><path d="M56 70h8"/></g>`,
+    tie:`<path d="M56 94h8l-2 4 4 14-6 5-6-5 4-14z" fill="#d23a3a"/>`,
+    helmet:`<path d="M30 56q30-32 60 0z" fill="#f5c400"/><rect x="28" y="54" width="64" height="5" rx="2" fill="#d9a800"/>`,
+    phones:`<path d="M26 72q0-40 34-40t34 40" fill="none" stroke="#4b5563" stroke-width="5"/><rect x="20" y="64" width="11" height="18" rx="4" fill="#374151"/><rect x="89" y="64" width="11" height="18" rx="4" fill="#374151"/>`,
+    scarf:`<path d="M30 92q30 12 60 0v8q-30 12-60 0z" fill="#2563c9"/><path d="M76 98l6 16h-9l-3-14z" fill="#c42b2b"/>`,
+    band:`<rect x="28" y="52" width="64" height="8" rx="3" fill="#fff" stroke="#e5484d" stroke-width="1.5"/><circle cx="60" cy="56" r="3.2" fill="#e5484d"/>`,
+    popcorn:`<g transform="translate(88 82)"><path d="M0 0h18l-3 22H3z" fill="#fff" stroke="#e5484d" stroke-width="1.5"/><path d="M5 0v22M9 0v22M13 0v22" stroke="#e5484d" stroke-width="1.5"/><g fill="#fff3c4" stroke="#e8c36a">${[[3,-3],[9,-5],[15,-3],[6,-8],[12,-9]].map(([x,y])=>`<circle cx="${x}" cy="${y}" r="3.6"/>`).join("")}</g></g>`,
+    ribbon:`<g transform="translate(80 42)"><path d="M0 0l-12-8v16zM0 0l12-8v16z" fill="#ec4899"/><circle r="3.4" fill="#be185d"/></g>`,
+    hammer:`<g transform="translate(92 74) rotate(25)"><rect x="-2" y="0" width="4" height="26" rx="2" fill="#a16207"/><rect x="-9" y="-6" width="18" height="8" rx="2" fill="#6b7280"/></g>`,
+    chef:`<g><rect x="40" y="38" width="40" height="12" rx="2" fill="#fff" stroke="#ddd"/><circle cx="46" cy="32" r="10" fill="#fff" stroke="#ddd"/><circle cx="60" cy="27" r="12" fill="#fff" stroke="#ddd"/><circle cx="74" cy="32" r="10" fill="#fff" stroke="#ddd"/></g>`,
+    mug:`<g transform="translate(88 82)"><rect width="16" height="18" rx="3" fill="#0e7490"/><path d="M16 4q7 0 7 6t-7 6" fill="none" stroke="#0e7490" stroke-width="3"/><path d="M4 -3q2-4 0-8M10 -3q2-4 0-8" stroke="#94a3b8" stroke-width="1.6" fill="none"/></g>`,
+    straw:`<ellipse cx="60" cy="48" rx="38" ry="7" fill="#e9c46a"/><path d="M40 48q2-18 20-18t20 18z" fill="#f2d07a"/><rect x="40" y="42" width="40" height="5" fill="#d23a3a"/>`
+  })[acc]||"";
+  return `<svg viewBox="0 0 120 120" width="${S}" height="${S}" role="img" aria-label="${esc(petName())}"><defs><linearGradient id="pg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe08a"/><stop offset="1" stop-color="#ffb84d"/></linearGradient></defs><ellipse cx="60" cy="112" rx="30" ry="4" fill="#000" opacity=".12"/>${leaf}${body}${blush}${eyes}${mouth}${A}${stage>=5?`<text x="60" y="20" text-anchor="middle" font-size="16">👑</text>`:""}</svg>`;
+}
+function petLine(mood,st){ const n=petName(); if(st.i===0) return mood==="happy"?`たまごがあたたかい…もうすぐ生まれそう!`:`たまごの中から音がする。ニュースを読むと、${n}が生まれるよ。`;
+  if(mood==="happy") return ["ごはんおいしかった!また明日もニュース読もうね","いっしょに読むと、ぼくも賢くなる気がする!","きょうのクイズ、たのしかったね"][new Date().getDate()%3];
+  if(mood==="sulk") return `${petGap()}日ぶり…さみしかったんだから。(ぷい) ごはんをくれたら、ゆるしてあげる。`;
+  return "おなかすいた〜。クイズに正解すると、ごはん(🍙)がもらえるよ!"; }
+function petCard(){ const p=petInit(); const st=petStage(); const mood=petMood(); const acc=petTopGenre();
+  return `<section class="pet-card" aria-label="ペット"><button class="pet-av" data-tab="my" aria-label="${esc(petName())}のページへ">${petSVG(st.i,mood,acc&&PET_ACC[acc][0],76)}</button>
+    <div class="pet-tx"><b>${esc(petName())} <small class="hint">${esc(st.name)}</small></b><span>${esc(petLine(mood,st))}</span>
+      <span class="pet-bt">${p.food>0?`<button class="fchip pet-feed" data-feed="1">🍙 ×${p.food} あげる</button>`:""}<button class="fchip" data-petquiz="1">🧠 クイズでごはん</button></span></div></section>`; }
+function petFeed(btnEl){ const p=petInit(); if(p.food<=0) return; p.food--; p.fed++; const first=p.feedDay!==TODAY; p.feedDay=TODAY; saveMe(); checkBadges();
+  const av=document.querySelector(".pet-av svg, .pet-big svg"); if(av){ av.classList.remove("eat"); void av.getBoundingClientRect(); av.classList.add("eat"); const r=av.getBoundingClientRect();
+    for(let i=0;i<3;i++){ const h=document.createElement("span"); h.className="pet-heart"; h.textContent="❤️"; h.style.left=(r.left+r.width*(.3+i*.2))+"px"; h.style.top=(r.top+window.scrollY+10)+"px"; h.style.animationDelay=(i*.15)+"s"; document.body.appendChild(h); setTimeout(()=>h.remove(),1500); } }
+  toast(first?`${petName()}「ありがとう!」 +5 そだち`:`もぐもぐ… +5 そだち`); setTimeout(()=>go(current,{keepScroll:true}),700); }
+// おかわりクイズ(ことば辞典から毎日3問)
+function seeded(seed){ let s=0; for(const c of seed) s=(s*31+c.charCodeAt(0))>>>0; return ()=>{ s=(s*1664525+1013904223)>>>0; return s/4294967296; }; }
+function wordQuiz(){ const W=D.glossary.filter(w=>w[2]&&w[2].length>8); if(W.length<4) return []; const r=seeded("wq"+TODAY); const pool=[...W].sort(()=>r()-.5);
+  const cut=t=>{ const x=t.split("。")[0]; return x.length>40?x.slice(0,38)+"…":x; };
+  return pool.slice(0,3).map((w,i)=>{ const others=W.filter(o=>o!==w).sort(()=>r()-.5).slice(0,3).map(o=>cut(o[2])); const a=Math.floor(r()*4); const o=[...others]; o.splice(a,0,cut(w[2])); return {q:`「${w[0].replace(/\(.*?\)/,"")}」の意味は?`,o,a,e:`${w[0]}: ${w[2]}`}; }); }
+function drawWordQuiz(box,i,res){ const Q=wordQuiz(); if(!Q.length){ box.innerHTML=""; return; }
+  const dots=`<span class="dots">${Q.map((_,k)=>`<i class="${res[k]===true?'r':res[k]===false?'w':''}${k===i?' c':''}"></i>`).join("")}</span>`;
+  if(i>=Q.length){ const sc=res.filter(Boolean).length; box.innerHTML=`<div class="qn"><span>📖 おかわりクイズ(ことば)</span>${dots}</div><div class="qq">${sc}問 正解!</div><p class="hint" style="margin:0">ことばのクイズは毎日3問入れかわります。</p>`; return; }
+  const q=Q[i]; box.innerHTML=`<div class="qn"><span>📖 おかわりクイズ ・ ${i+1}問目</span>${dots}</div><div class="qq">${esc(q.q)}</div><div class="opts one">${q.o.map((o,k)=>`<button class="opt" data-k="${k}">${esc(o)}</button>`).join("")}</div><div class="wqexp"></div>`;
+  box.querySelectorAll(".opt").forEach(b=>b.onclick=()=>{ const ok=+b.dataset.k===q.a; box.querySelectorAll(".opt").forEach(x=>{x.disabled=true; if(+x.dataset.k===q.a) x.classList.add("right");}); if(!ok) b.classList.add("wrong"); res[i]=ok;
+    const got=ok?petEarn("w|"+TODAY+"|"+i,1):0;
+    box.querySelector(".wqexp").innerHTML=`<div class="exp"><b>${ok?"⭕ 正解!":"❌ ざんねん"}</b> ${got?"🍙 ごはんを1つゲット! ":""}${esc(q.e)}</div><button class="fchip wqn" style="margin-top:10px">${i+1<Q.length?"次の問題 →":"結果を見る →"}</button>`;
+    box.querySelector(".wqn").onclick=()=>{ drawWordQuiz(box,i+1,res); const pf=document.getElementById("petFood"); if(pf) pf.textContent=petInit().food; }; }); }
+function petBig(){ const p=petInit(); const st=petStage(); const mood=petMood(); const acc=petTopGenre();
+  return `<section class="card pet-big-card" aria-label="ペット">
+    <div class="pet-big">${petSVG(st.i,mood,acc&&PET_ACC[acc][0],150)}</div>
+    <div style="text-align:center"><b style="font-size:1.2rem">${esc(petName())}</b> <span class="chip" style="margin-left:4px">${esc(st.name)}</span>
+      <div class="hint" style="margin-top:4px">${esc(petLine(mood,st))}</div></div>
+    <div class="bar" style="margin-top:10px"><i style="width:${Math.round(st.prog*100)}%"></i></div>
+    <div class="hint" style="text-align:center;margin-top:4px">そだち ${st.xp}${st.next?` ・ 「${esc(st.next[1])}」まで あと${st.next[0]-st.xp}`:" ・ 最高の姿!"}</div>
+    <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:10px"><button class="fchip pet-feed" data-feed="1" ${p.food>0?"":"disabled"}>🍙 ごはん <b id="petFood">${p.food}</b> こ ・ あげる</button><button class="fchip" id="petRename">✏️ 名前</button></div>
+    <div class="hint" style="margin-top:8px">${acc?`🎒 よく読むジャンルが「${esc(PET_ACC[acc][2])}」なので、${esc(PET_ACC[acc][1])}をつけています。`:"🎒 よく読むジャンルが決まると、小物をつけはじめます。"}</div>
+    <details class="faq plain" style="margin-top:6px"><summary>そだて方</summary><ul class="us"><li>🧠 クイズに正解 → 🍙 ごはん(1日${PET_DAY_MAX}こまで)。あげると そだち +5</li><li>📅 開いた日 +2 ・ 💡 解説を読む +3 ・ 📖 ことばを調べる +1</li><li>3日以上あけると、すねます。ごはんをあげると元気に。</li><li>たまご → あかちゃん → こども → おとな → ものしり → ニュース名人</li></ul></details>
+    <div class="quiz" id="wq" style="margin-top:12px;border-top:1px solid var(--line);padding-top:12px"></div>
+  </section>`; }
+function bindPet(){
+  document.querySelectorAll("[data-feed]").forEach(b=>b.onclick=()=>petFeed(b));
+  document.querySelectorAll("[data-petquiz]").forEach(b=>b.onclick=()=>{ const q=document.getElementById("quiz"); if(q){ q.scrollIntoView({behavior:"smooth",block:"center"}); } else go("my"); });
+  const rn=document.getElementById("petRename"); if(rn) rn.onclick=()=>{ const v=prompt("名前をつけてね(10文字まで)",petName()); if(v&&v.trim()){ petInit().name=v.trim().slice(0,10); saveMe(); go(current,{keepScroll:true}); } };
+  const wq=document.getElementById("wq"); if(wq) drawWordQuiz(wq,0,[]);
+}
+
 // ===== 使い方 =====
 const GUIDE = [
   ["🚀","まずはここから",["「きょう」の<b>▶ 1分で見る</b>を押すと、今日のニュースが動くスライドで流れます。","時間がない日は<b>☀️ 今日の3行</b>だけ読めばOK。","<b>📰 今日のニュース10</b>は、その日に関心が高かった順のランキングです。下の「記録したニュース すべて」で、ほかのニュースも見られます。"]],
   ["🔖","マークの見かた",["<b>✅</b> 別々の報道機関2社以上で確かめたニュース。","<b>⚠️</b> まだ1社だけ・見出しだけのニュース。続報で確かめられたら✅に変わります。","<b>NEW</b> 前に開いたあとに増えたニュース。"]],
   ["👆","さわってみよう",["<b>点線のことば</b>をタップすると、意味がその場で出ます。調べたことばは「マイ」にたまります。","<b>📍</b>を押すと、そのニュースを保存できます。保存したものは「マイ」で見られて、メモも書けます。","「くわしい解説 →」から、<b>図・Q&A・これまでの流れ</b>つきの解説が読めます。<b>🔊 聞く</b>で読み上げもできます。"]],
   ["🧭","下のタブ",["<b>📰 きょう</b> 今日のまとめ ／ <b>🔎 さがす</b> ことばやジャンルで過去のニュースを検索 ／ <b>🗺️ 地図</b> どこで起きたかを地図で","<b>💡 解説</b> 大きな話題をやさしく ／ <b>📈 数字</b> 日経平均・円・原油のグラフ(数時間ごと〜全期間) ／ <b>📅 予定</b> これからの予定と、Claudeの予測","<b>⭐ マイ</b> あなたの記録・保存・着せかえ"]],
-  ["🎯","続けるとたのしいこと",["開いた日・解説・クイズ・ことば・予想で<b>ポイント</b>がたまり、レベルとバッジが上がります。","「予定」の予測に<b>あなたも予想</b>して、答え合わせができます。Claudeと的中率くらべも。","毎日の連続記録は「マイ」のカレンダーで見られます。"]],
+  ["🎯","続けるとたのしいこと",["<b>🐣 ペット</b>がニュースといっしょに育ちます。クイズに正解すると🍙ごはんがもらえて、あげると大きくなります。よく読むジャンルで小物が変わり、3日あけるとすねます。","開いた日・解説・クイズ・ことば・予想で<b>ポイント</b>がたまり、レベルとバッジが上がります。","「予定」の予測に<b>あなたも予想</b>して、答え合わせができます。Claudeと的中率くらべも。","毎日の連続記録は「マイ」のカレンダーで見られます。"]],
   ["💬","聞いてみる",["右下の<b>💬</b>で「ニュース案内係」に質問できます。解説のQ&A・ことば辞典・ニュースの記録から、アプリの中で答えをさがします(質問はどこにも送りません)。","もっと深く知りたいときは「Claudeでもっと深く聞く」で、Claude(AI)に聞けます(アプリの外で開きます)。"]],
   ["🎨","自分好みにする",["「マイ」の<b>🎨 着せかえ</b>で、色・文字の大きさ・詰め具合・「きょう」の並び・下のタブの並びを変えられます。","右上の<b>Aa</b>でも、文字の大きさと明るさをすぐ変えられます。"]],
   ["📲","アプリとして使う",["iPhone: Safariの共有ボタン(□に↑)→「ホーム画面に追加」。","Android: Chromeのメニュー(︙)→「ホーム画面に追加」または「アプリをインストール」。","一度開いた内容は、電波がないところでも読めます。"]],
@@ -1403,6 +1508,7 @@ function renderMy(){
   main.innerHTML=`<div class="view">
     <div class="sec-h"><h2>⭐ わたしの記録</h2><span class="sub">このスマホの中だけに保存</span></div>
     <button class="lookcard" id="lookBtnMy"><span class="pal" aria-hidden="true" style="padding-left:5px">${COLORS.slice(1,6).map(c=>`<i style="background:${c[2]}"></i>`).join("")}</span><span><b>🎨 着せかえ</b><span class="hint" style="display:block">色・文字・画面の並び・タブを、わたし好みに</span></span></button>
+    ${petBig()}
     ${pinsBlock()}
     ${guideBlock()}
     <section class="card lvcard"><div class="lvrow"><div class="lvbig">Lv.${lv.i+1}</div><div><b style="font-size:1.1rem">${esc(lv.name)}</b><div class="hint">${lv.pt}ポイント${lv.next?` ・ 次の「${esc(lv.next[1])}」まで あと${lv.next[0]-lv.pt}`:" ・ 最高レベル!"}</div></div></div>
@@ -1435,7 +1541,7 @@ function renderMy(){
   main.querySelectorAll("[data-tab]").forEach(b=>b.onclick=()=>go(b.dataset.tab));
   main.querySelectorAll("#myInt [data-g]").forEach(b=>b.onclick=()=>{ const g=b.dataset.g; ME.interests[g]=!ME.interests[g]; b.setAttribute("aria-pressed",String(!!ME.interests[g])); saveMe(); });
   document.getElementById("weekBtn2").onclick=()=>openStory(buildWeekSlides);
-  document.getElementById("lookBtnMy").onclick=openLook;
+  document.getElementById("lookBtnMy").onclick=openLook; bindPet();
   bindPins();
   document.getElementById("resetMe").onclick=()=>{ document.getElementById("resetConfirm").innerHTML='<p>本当に消しますか? 元にはもどせません。</p><button class="fchip" id="resetYes">消す</button>'; document.getElementById("resetYes").onclick=()=>{ try{ localStorage.removeItem("nw-me"); }catch(_){} location.reload(); }; };
 }
