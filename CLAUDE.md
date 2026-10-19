@@ -10,7 +10,7 @@
 - `robots.txt` と `<meta name="robots" content="noindex">` — 検索エンジンに出さないための設定。消さない。
 
 ## 長い期間のグラフ
-- `history.json` は GitHub Actions(`.github/workflows/history.yml` → `tools/fetch_history.py`)が毎朝自動で作る(FRED → 取れなければ Stooq・Frankfurter。取れない系列は前回分を残す)。手で書き換えない。
+- `history.json` は GitHub Actions(`.github/workflows/history.yml` → `tools/fetch_history.py`)が毎朝自動で作る(FRED → 取れなければ 日経平均は日経の公式CSV・Yahoo・Stooq、円は Frankfurter。取れない系列は前回分を残す)。手で書き換えない。
 - `data.js` の `ticks` は1ドル(円)の数時間ごとの記録(Alpha Vantage のリアルタイムレート)。サイト更新のたびに1点足し、30日より古い点は消す。日経平均・原油の時間ごとのデータは無料の確かな取得先がないので扱わない。
 
 ## 聞いてみる(ニュース案内係)

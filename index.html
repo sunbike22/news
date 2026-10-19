@@ -494,6 +494,13 @@ svg.eat{animation:petEat .7s ease both!important}
 .wn span{font-size:1.4rem;line-height:1.2}.wn small{color:var(--muted);font-size:.8rem}
 .wlink{margin-top:4px;align-self:flex-start;border:1px solid var(--accent);background:var(--accent-soft);color:var(--ink);border-radius:999px;padding:3px 10px;font-size:.78rem;cursor:pointer}
 @media (prefers-reduced-motion: reduce){.rd-moon,.rd-moon span{animation:none}}
+/* はじめての案内 */
+.ob{position:fixed;inset:0;z-index:80;background:rgba(10,14,30,.55);display:grid;place-items:center;padding:16px;animation:rise .3s ease both}
+.ob-card{background:var(--surface);color:var(--ink);border-radius:20px;max-width:380px;width:100%;padding:20px;text-align:center;box-shadow:0 20px 50px rgba(0,0,0,.35)}
+.ob-pet svg{animation:petIdle 2.6s ease-in-out infinite;transform-origin:50% 90%}
+.ob-card h2{font-size:1.2rem;margin:6px 0}.ob-card p{text-align:left;margin:0 0 14px}
+.ob-dots{display:flex;gap:6px;justify-content:center}.ob-dots i{width:8px;height:8px;border-radius:50%;background:var(--line)}.ob-dots i.on{background:var(--accent)}
+.ob-bt{display:flex;justify-content:space-between}.ob-bt .fchip{padding:8px 16px;font-size:.95rem}
 /* 予想ノート・カード・ランキング */
 .mp-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:6px;font-size:.9rem}.mp-row label{display:flex;align-items:center;gap:6px}
 .mp-row input[type=date]{font:inherit;padding:4px 6px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink)}
@@ -1962,8 +1969,19 @@ function paperImage(nm,P){ const W=1080,H=1350; const c=document.createElement("
   P.forEach(([k,p],i)=>{ if(y>H-120) return; x.fillStyle="#7a1f1f"; x.font="700 24px sans-serif"; x.fillText(`${GN[p.g]||""} ${p.d?mdLabel(p.d):""}`,70,y); y+=(i===0?66:50); x.fillStyle="#1b1b1b"; wrap(p.h,W-140,i===0?62:46,(i===0?"900 54px":"800 38px")+" serif",3); if(p.memo){ x.fillStyle="#444"; wrap("✍️ "+p.memo,W-140,38,"30px sans-serif",2); } y+=18; x.fillStyle="#bbb"; x.fillRect(70,y-10,W-140,2); y+=26; });
   x.fillStyle="#555"; x.font="24px sans-serif"; x.textAlign="center"; x.fillText("※ 自分で保存したニュースとメモで作った新聞です",W/2,H-50);
   c.toBlob(async b=>{ const f=new File([b],"my-newspaper.png",{type:"image/png"}); try{ if(navigator.canShare&&navigator.canShare({files:[f]})){ await navigator.share({files:[f],title:nm}); return; } }catch(_){ return; } const u=URL.createObjectURL(b); const a=document.createElement("a"); a.href=u; a.download="my-newspaper.png"; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(u),4000); },"image/png"); }
+// ===== はじめての人への案内(3ステップ。ペットが案内する) =====
+function onboard(force){ if(!force && (store.get("nw-onboard")==="1" || ME.days.length>1)) return; const ov=document.createElement("div"); ov.className="ob"; ov.setAttribute("role","dialog"); ov.setAttribute("aria-label","はじめての方へ");
+  const S=[["newsboy","こんにちは! ぼくは"+petName()+"。","まいにちニュース帳へようこそ。<b>☀️ 今日の3行</b>と<b>📰 ニュース10</b>を読めば、今日のことがだいたいわかるよ。時間がない日は<b>▶ 1分で見る</b>がおすすめ。"],
+    ["detective","いっしょに育とう!","<b>🧠 クイズ</b>に正解すると、ぼくのごはん🍙になるんだ。ニュースを読むほど、ぼくは大きくなるよ。点線のことばはタップで意味が出るよ。"],
+    ["professor","きみ好みにしてね","<b>⭐ マイ</b>の🎨着せかえで、色やならびを変えられるよ。わからないことは右下の<b>💬</b>で聞いてね。新しくなったところは右上の<b>🔔</b>で!"]];
+  let i=0; const draw=()=>{ const [c,t,b]=S[i]; ov.innerHTML=`<div class="ob-card"><div class="ob-pet">${petSVG(Math.max(1,petStage().i),"happy",null,110,c)}</div><div class="ob-dots">${S.map((_,k)=>`<i class="${k===i?"on":""}"></i>`).join("")}</div><h2>${esc(t)}</h2><p>${b}</p>
+    <div class="ob-bt"><button class="fchip" id="obSkip">${i<S.length-1?"とばす":""}</button><button class="fchip pet-feed" id="obNext">${i<S.length-1?"つぎへ →":"はじめる!"}</button></div></div>`;
+    ov.querySelector("#obNext").onclick=()=>{ if(i<S.length-1){ i++; draw(); } else done(); }; const sk=ov.querySelector("#obSkip"); if(i<S.length-1) sk.onclick=done; else sk.style.visibility="hidden"; ov.querySelector("#obNext").focus(); };
+  const done=()=>{ store.set("nw-onboard","1"); ov.remove(); };
+  document.body.appendChild(ov); draw(); }
 // ===== お知らせ(新しくなったところ)。機能を足したら、いちばん上に1つ足す =====
 const UPDATES=[
+  {id:"2026-10-20j",d:"2026-10-20",t:"🐣 はじめての人への案内 & 📈 日経平均の長期グラフ",L:["はじめて開いた人に、ペットが3ステップで使い方を案内します(マイからもう一度見られます)","日経平均の長い期間のグラフが見られるようになりました(日経の公式データ)"]},
   {id:"2026-10-20i",d:"2026-10-20",t:"🔮 予想ノート・🃏 ことばカード・🗞️ 自分の新聞",L:["予定タブに「わたしの予想ノート」。何年先の予想でも書いておけて、その日が来たら答え合わせ","調べたことばがカードになって集まります(N・R・SR)","保存したニュースとメモで「自分だけの新聞」を作って画像で送れます。もらった挑戦状の点数でランキングも","解説の流れが横にスクロールする年表になりました"]},
   {id:"2026-10-20h",d:"2026-10-20",t:"🗾 日本版の捜査ボード",L:["捜査ボードで「🗾 日本」を選ぶと、東京・沖縄・北海道など国内の場所どうしを糸でつなげます"]},
   {id:"2026-10-20g",d:"2026-10-20",t:"🎄 クリスマス・お正月 & 👕 ペットの着せかえ",L:["クリスマス(12/1〜25・雪がふります)とお正月(12/31〜1/7)の飾りと限定バッジを追加","ペットの着せかえ(12種類。いろいろ使うと着られる服が増えます)・ペットの部屋・今週の日記","ペットが育つと、ともだちの「ぴよた」がやってきます"]},
@@ -2046,13 +2064,14 @@ function renderMy(){
     <section class="card"><b>🎯 気になるジャンル</b><div class="hint" style="margin:4px 0 8px">選んだジャンルが「あなた向け」に並びます。読んだ解説からも少しずつ学びます。</div>
       <div class="chips" id="myInt">${GORDER.map(g=>`<button class="fchip" data-g="${g}" aria-pressed="${!!ME.interests[g]}"><span class="c" style="background:var(--g-${g})"></span>${GN[g]}</button>`).join("")}</div></section>
     <button class="fchip" id="weekBtn2" style="align-self:flex-start">📅 1週間のふりかえりを見る(1分)</button>
+    <button class="fchip" id="obAgain" style="align-self:flex-start">🐣 はじめての案内をもう一度見る</button>
     <details class="faq plain"><summary>記録について</summary><p>記録は、あなたのスマホ(ブラウザ)の中だけに保存されます。ほかの人や作った人には見えません。ブラウザのデータを消すと記録も消えます。</p><button class="fchip" id="resetMe" style="margin-bottom:12px">記録をすべて消す</button><div id="resetConfirm"></div></details>
     ${footer()}
   </div>`;
   main.querySelectorAll("[data-tab]").forEach(b=>b.onclick=()=>go(b.dataset.tab));
   main.querySelectorAll("#myInt [data-g]").forEach(b=>b.onclick=()=>{ const g=b.dataset.g; ME.interests[g]=!ME.interests[g]; b.setAttribute("aria-pressed",String(!!ME.interests[g])); saveMe(); });
   document.getElementById("weekBtn2").onclick=()=>openStory(buildWeekSlides);
-  document.getElementById("lookBtnMy").onclick=openLook; bindPet(); bindCaps(); document.getElementById("myPaperBtn").onclick=openMyPaper; main.querySelectorAll("[data-flip]").forEach(b=>b.onclick=()=>b.classList.toggle("flip")); document.getElementById("updBtn").onclick=openUpdates;
+  document.getElementById("lookBtnMy").onclick=openLook; bindPet(); bindCaps(); document.getElementById("myPaperBtn").onclick=openMyPaper; document.getElementById("obAgain").onclick=()=>onboard(true); main.querySelectorAll("[data-flip]").forEach(b=>b.onclick=()=>b.classList.toggle("flip")); document.getElementById("updBtn").onclick=openUpdates;
   bindPins();
   document.getElementById("resetMe").onclick=()=>{ document.getElementById("resetConfirm").innerHTML='<p>本当に消しますか? 元にはもどせません。</p><button class="fchip" id="resetYes">消す</button>'; document.getElementById("resetYes").onclick=()=>{ try{ localStorage.removeItem("nw-me"); }catch(_){} location.reload(); }; };
 }
@@ -2226,6 +2245,7 @@ function speakEx(k,btn){ const e=D.explainers[k]; if(!e) return; try{ const s=wi
   const u=new SpeechSynthesisUtterance(txt); u.lang="ja-JP"; u.rate=1.05; u.onend=()=>{ btn.textContent="🔊 聞く"; }; s.speak(u); btn.textContent="■ 止める"; }catch(_){} }
 
 // 起動
+setTimeout(()=>{ try{ onboard(); }catch(_){} },600);
 try{ saveRival(); }catch(_){}
 document.getElementById("bellBtn").onclick=openUpdates; markBell();
 document.getElementById("gdFab").onclick=openGuide;
