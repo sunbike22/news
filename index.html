@@ -65,7 +65,7 @@ h1,h2,h3{text-wrap:balance;line-height:1.35;margin:0}
 
 /* tabs */
 .tabs{position:fixed;left:0;right:0;bottom:0;z-index:25;background:var(--surface);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px)}
-.tabs .wrap{display:grid;grid-template-columns:repeat(6,1fr);gap:2px;padding-block:6px}
+.tabs .wrap{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;padding-block:6px}
 .tab{border:0;background:none;display:flex;flex-direction:column;align-items:center;gap:1px;padding:6px 0;border-radius:10px;cursor:pointer;color:var(--muted);font-size:.7rem;min-width:0}
 .tab .ti{font-size:1.25rem;line-height:1}
 .tab[aria-selected="true"]{color:var(--accent);background:var(--accent-soft);font-weight:700}
@@ -160,6 +160,43 @@ mark{background:#ffe066;color:#141b2d;border-radius:3px;padding:0 1px}
 .quick button{flex:none}
 .empty{text-align:center;color:var(--muted);padding:30px 10px}
 
+/* personal */
+:root{--map-sea:#dce8f3;--map-land:#f4f1ea;--map-jp:#fff;--map-line:#b9c4d2}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){--map-sea:#0f1a2c;--map-land:#26304a;--map-jp:#3a4766;--map-line:#41507a}}
+:root[data-theme="dark"]{--map-sea:#0f1a2c;--map-land:#26304a;--map-jp:#3a4766;--map-line:#41507a}
+.me-strip{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.ms{display:flex;align-items:center;gap:8px;border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:8px 10px;cursor:pointer;text-align:left;min-width:0;font-size:.78rem;line-height:1.25}
+.ms b{display:block;font-size:.98rem}
+.ms .mi{font-size:1.35rem}
+.ms.new{border-color:var(--accent);background:var(--accent-soft)}
+.newchip{background:var(--accent-soft);color:var(--accent)}
+.result{border-color:var(--ok);background:var(--ok-soft)}
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(92px + env(safe-area-inset-bottom,0px));z-index:90;background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:999px;font-weight:700;font-size:.9rem;box-shadow:0 8px 24px rgba(0,0,0,.25);animation:rise .4s ease both;max-width:calc(100% - 32px);text-align:center}
+.toast.out{opacity:0;transition:opacity .5s}
+.lvrow{display:flex;gap:14px;align-items:center}
+.lvbig{font-family:var(--f-display);font-size:2rem;color:var(--accent)}
+.lvcard .bar{height:12px;border-radius:6px;background:var(--surface2);border:1px solid var(--line);overflow:hidden;margin-top:10px}
+.lvcard .bar i{display:block;height:100%;background:var(--accent);border-radius:6px}
+.statgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.cal{display:grid;grid-template-columns:repeat(7,1fr);gap:5px;margin:10px 0 6px}
+.cal i{aspect-ratio:1;border-radius:6px;background:var(--surface2);border:1px solid var(--line)}
+.cal i.on{background:var(--ok);border-color:var(--ok)}
+.cal i.today{outline:2px solid var(--accent);outline-offset:1px}
+.badges{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
+.bd{display:flex;flex-direction:column;align-items:center;gap:2px;padding:10px 4px;border-radius:12px;background:var(--surface2);filter:grayscale(1);opacity:.45;text-align:center}
+.bd span{font-size:1.6rem}.bd small{font-size:.72rem}
+.bd.got{filter:none;opacity:1;background:var(--accent-soft)}
+.vote{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:4px}
+.ics{margin-top:6px;font-size:.78rem;padding:3px 10px}
+.mapbox{padding:8px}
+.mapsvg svg{display:block;border-radius:10px}
+.pin .pulse{animation:pulse 2.2s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
+@keyframes pulse{0%,100%{transform:scale(1);opacity:.25}50%{transform:scale(1.35);opacity:.05}}
+.photo{margin:0}
+.photo img{display:block;width:100%;aspect-ratio:12/6;object-fit:cover;border-radius:var(--radius);background:var(--surface2)}
+.photo figcaption{font-size:.72rem;color:var(--muted);margin-top:4px}
+@media (prefers-reduced-motion: reduce){.pin .pulse{animation:none}}
+
 /* install */
 .install{display:grid;grid-template-columns:48px 1fr auto;gap:12px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:12px 14px}
 .install img{width:48px;height:48px;border-radius:12px}
@@ -218,6 +255,7 @@ ul.us{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:6px}
 details.faq{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:0 14px}
 details.faq+details.faq{margin-top:8px}
 details.faq summary{cursor:pointer;font-weight:700;padding:12px 0;list-style:none;display:flex;gap:8px}
+details.faq.plain summary::before{content:"▸"}
 details.faq summary::before{content:"Q";color:var(--accent);font-family:var(--f-display)}
 details.faq[open] summary{border-bottom:1px dashed var(--line)}
 details.faq p{margin:10px 0 12px}
@@ -418,18 +456,18 @@ const ILL = (()=>{
 
 // ===== タブ =====
 const TABS = [
-  ["today","📰","きょう"],["search","🔎","さがす"],["explain","💡","解説"],["numbers","📈","数字"],["plan","📅","予定・予測"],["words","📖","ことば"]
+  ["today","📰","きょう"],["search","🔎","さがす"],["map","🗺️","地図"],["explain","💡","解説"],["numbers","📈","数字"],["plan","📅","予定"],["my","⭐","マイ"],["words","📖","ことば",1]
 ];
 const tabsEl = document.getElementById("tabs");
-tabsEl.innerHTML = TABS.map(([k,i,l])=>`<button class="tab" role="tab" id="tab-${k}" data-k="${k}" aria-selected="false"><span class="ti" aria-hidden="true">${i}</span>${l}</button>`).join("");
+tabsEl.innerHTML = TABS.filter(t=>!t[3]).map(([k,i,l])=>`<button class="tab" role="tab" id="tab-${k}" data-k="${k}" aria-selected="false"><span class="ti" aria-hidden="true">${i}</span>${l}</button>`).join("");
 tabsEl.addEventListener("click",e=>{const b=e.target.closest(".tab"); if(b) go(b.dataset.k);});
 let current = null; const charts=[];
 function go(k, opts){
   if(!TABS.some(t=>t[0]===k)) k="today";
   current=k; store.set("nw-tab",k);
-  tabsEl.querySelectorAll(".tab").forEach(b=>b.setAttribute("aria-selected", String(b.dataset.k===k)));
+  tabsEl.querySelectorAll(".tab").forEach(b=>b.setAttribute("aria-selected", String(b.dataset.k===k || (k==="words"&&b.dataset.k==="search"))));
   charts.splice(0).forEach(c=>{try{c.destroy()}catch(e){}});
-  ({today:renderToday,search:renderSearch,explain:renderExplain,numbers:renderNumbers,plan:renderPlan,words:renderWords})[k](opts||{});
+  ({today:renderToday,search:renderSearch,map:renderMap,my:renderMy,explain:renderExplain,numbers:renderNumbers,plan:renderPlan,words:renderWords})[k](opts||{});
   try{ history.replaceState(null,"","#"+k); }catch(e){}
   if(!(opts&&opts.keepScroll)) window.scrollTo({top:0});
 }
@@ -455,12 +493,14 @@ function renderToday(){
     <div class="hero">
       <button class="play" id="playBtn"><span class="pi" aria-hidden="true">▶</span><span><b>1分で見る 今日のニュース</b><span>動くスライドで自動再生。タップで止めたり進めたり</span></span></button>
     </div>
+    ${personalCards()}
     ${installCard()}
     ${navigator.onLine===false?'<div class="offline">📴 いまはオフラインです。前に読み込んだ内容を表示しています。</div>':''}
     ${weatherCard()}
     <section aria-label="今日の3行">
       <div class="sec-h"><h2>☀️ 今日の3行</h2><span class="sub">時間がない日はここだけでOK</span></div>
       <div class="three" style="margin-top:10px">${D.three.map(x=>`<button class="t ${x.tone}"${exLink(x.ex)}><span class="lab">${esc(x.label)}</span><h3>${esc(x.title)}</h3><p>${esc(x.text)}</p>${x.ex?'<span class="more">くわしく →</span>':''}</button>`).join("")}</div>
+      <button class="fchip" id="shareImg" style="margin-top:10px">🖼️ 画像にして送る</button>
     </section>
     <section aria-label="今日のニュース10">
       <div class="sec-h"><h2>📰 今日のニュース10</h2><span class="sub">関心の高い順</span></div>
@@ -474,6 +514,7 @@ function renderToday(){
           ${n.point?`<div class="pt">💭 <b>ここがポイント</b> ${esc(n.point)}</div>`:""}
           ${link?`<span class="more">${n.ex?'くわしい解説 →':'グラフを見る →'}</span>`:''}</span></button></li>`;}).join("")}</ol>
     </section>
+    ${forYou()}
     ${otherNews()}
     ${D.quiz&&D.quiz.length?`<section class="card quiz" aria-label="今日のクイズ" id="quiz"></section>`:""}
     <section class="card" aria-label="今日の数字">
@@ -484,7 +525,7 @@ function renderToday(){
     ${footer()}
   </div>`;
   document.getElementById("playBtn").onclick=openStory;
-  bindInstall();
+  bindInstall(); bindPersonal(); checkBadges();
   if(document.getElementById("quiz")) drawQuiz(0,[]);
   main.querySelectorAll("[data-ex]").forEach(b=>b.addEventListener("click",()=>openEx(b.dataset.ex)));
   main.querySelectorAll("[data-tab]").forEach(b=>b.addEventListener("click",()=>go(b.dataset.tab)));
@@ -528,7 +569,7 @@ if("serviceWorker" in navigator){ window.addEventListener("load",()=>{ navigator
 function drawQuiz(i,res){
   const box=document.getElementById("quiz"); if(!box) return; const Q=D.quiz;
   const dots=`<span class="dots">${Q.map((_,k)=>`<i class="${res[k]===true?'r':res[k]===false?'w':''}${k===i?' c':''}"></i>`).join("")}</span>`;
-  if(i>=Q.length){ const sc=res.filter(Boolean).length; store.set("nw-quiz-"+D.updated.slice(0,10),String(sc));
+  if(i>=Q.length){ const sc=res.filter(Boolean).length; store.set("nw-quiz-"+D.updated.slice(0,10),String(sc)); ME.quiz[D.updated.slice(0,10)]=Math.max(+ME.quiz[D.updated.slice(0,10)]||0,sc); saveMe(); checkBadges();
     box.innerHTML=`<div class="qn"><span>🧠 今日の${Q.length}問クイズ</span>${dots}</div><div class="qq" style="font-size:1.3rem">${sc}問 正解! ${sc===Q.length?"🎉 満点":sc>0?"👏":"また明日!"}</div><p class="hint" style="margin:0">答えはニュース10と解説にのっています。</p><button class="fchip" id="qre" style="margin-top:10px">もう一度</button>`;
     document.getElementById("qre").onclick=()=>drawQuiz(0,[]); return; }
   const q=Q[i];
@@ -555,8 +596,8 @@ function buildSlides(){
   return S;
 }
 const DUR=7000;
-function openStory(){
-  const el=document.getElementById("story"); const S=buildSlides();
+function openStory(fn){
+  const el=document.getElementById("story"); const S=(typeof fn==="function"?fn:buildSlides)();
   el.innerHTML=`<div class="bars">${S.map(()=>"<i><b></b></i>").join("")}</div>
     <div class="ctl"><span class="lbl" id="stLbl"></span><button class="sbtn" id="stVoice" aria-pressed="false">🔈 読み上げ</button><button class="sbtn" id="stPause" aria-label="一時停止">❚❚</button><button class="sbtn" id="stClose" aria-label="閉じる">✕</button></div>
     <div class="stage" id="stStage"><button class="tapl" aria-label="前へ"></button><button class="tapr" aria-label="次へ"></button></div>`;
@@ -593,7 +634,7 @@ function closeStory(){ if(st) cancelAnimationFrame(st.raf); st=null; stopSpeak()
 // ===== さがす =====
 const NEWS = D.news.map(r=>({d:r[0],g:r[1],ok:r[2],h:r[3],s:r[4],th:r[5],p:r[6]})).sort((a,b)=>b.d.localeCompare(a.d));
 const THEMES = [...new Set(NEWS.flatMap(n=>n.th?n.th.split(/[、,]/):[]).filter(Boolean))];
-const sState={q:"",g:new Set(),th:"",ok:false};
+const sState={q:"",g:new Set(),th:"",ok:false,onlyNew:false};
 function renderSearch(){
   main.innerHTML=`<div class="view">
     <div class="sec-h"><h2>🔎 ニュースをさがす</h2><span class="sub">${NEWS.length}件の記録から</span></div>
@@ -601,7 +642,7 @@ function renderSearch(){
     <div class="quick" aria-label="よく探されることば">${["台風","原油","消費税","不正アクセス","北朝鮮","日経平均","阪神","AI"].map(w=>`<button class="fchip" data-w="${w}">${w}</button>`).join("")}</div>
     <div><div class="hint" style="margin-bottom:6px">ジャンル(いくつでも選べる)</div><div class="chips" id="gf">${GORDER.map(g=>`<button class="fchip" data-g="${g}" aria-pressed="${sState.g.has(g)}"><span class="c" style="background:var(--g-${g})"></span>${GN[g]}</button>`).join("")}</div></div>
     <div class="setrow"><label class="hint" for="th">テーマ</label><select id="th" class="fchip" style="padding:6px 10px"><option value="">すべて</option>${THEMES.map(t=>`<option ${sState.th===t?"selected":""}>${esc(t)}</option>`).join("")}</select>
-      <button class="fchip" id="okf" aria-pressed="${sState.ok}">✅ 複数社で確認したものだけ</button></div>
+      <button class="fchip" id="okf" aria-pressed="${sState.ok}">✅ 複数社で確認したものだけ</button>${NEW_KEYS.size?`<button class="fchip" id="newf" aria-pressed="${sState.onlyNew}">🆕 新着だけ(${NEW_KEYS.size})</button>`:""}<button class="fchip" id="toWords">📖 ことば辞典</button></div>
     <div id="sres"></div>
   </div>`;
   const q=document.getElementById("q");
@@ -610,12 +651,14 @@ function renderSearch(){
   main.querySelectorAll("[data-w]").forEach(b=>b.onclick=()=>{sState.q=b.dataset.w; q.value=b.dataset.w; draw();});
   main.querySelectorAll("[data-g]").forEach(b=>b.onclick=()=>{const g=b.dataset.g; sState.g.has(g)?sState.g.delete(g):sState.g.add(g); b.setAttribute("aria-pressed",String(sState.g.has(g))); draw();});
   document.getElementById("th").onchange=e=>{sState.th=e.target.value; draw();};
+  const nf=document.getElementById("newf"); if(nf) nf.onclick=e=>{sState.onlyNew=!sState.onlyNew; e.currentTarget.setAttribute("aria-pressed",String(sState.onlyNew)); draw();};
+  document.getElementById("toWords").onclick=()=>go("words");
   document.getElementById("okf").onclick=e=>{sState.ok=!sState.ok; e.currentTarget.setAttribute("aria-pressed",String(sState.ok)); draw();};
   draw();
   function hl(s, terms){ let out=esc(s); terms.forEach(t=>{ if(!t) return; const re=new RegExp(esc(t).replace(/[.*+?^${}()|[\]\\]/g,"\\$&"),"gi"); out=out.replace(re,m=>`<mark>${m}</mark>`); }); return out; }
   function draw(){
     const terms=sState.q.trim().split(/[\s　]+/).filter(Boolean);
-    const list=NEWS.filter(n=>(!sState.g.size||sState.g.has(n.g)) && (!sState.th||(n.th||"").includes(sState.th)) && (!sState.ok||n.ok) && terms.every(t=>(n.h+" "+n.s+" "+(n.th||"")).toLowerCase().includes(t.toLowerCase())));
+    const list=NEWS.filter(n=>(!sState.g.size||sState.g.has(n.g)) && (!sState.th||(n.th||"").includes(sState.th)) && (!sState.ok||n.ok) && (!sState.onlyNew||isNew(n)) && terms.every(t=>(n.h+" "+n.s+" "+(n.th||"")).toLowerCase().includes(t.toLowerCase())));
     const exHits = terms.length? Object.entries(D.explainers).filter(([k,e])=>terms.every(t=>(e.name+e.now+e.kid+e.more.join("")+e.faq.flat().join("")+e.timeline.flat().join("")).toLowerCase().includes(t.toLowerCase()))):[];
     const wHits = terms.length? D.glossary.filter(w=>terms.every(t=>(w[0]+w[1]+w[2]).toLowerCase().includes(t.toLowerCase()))):[];
     // 日ごとの件数の小さなグラフ
@@ -626,12 +669,12 @@ function renderSearch(){
     const html = `
       ${exHits.length?`<div><div class="hint" style="margin-bottom:6px">💡 解説ページ</div><div class="exgrid">${exHits.map(([k,e])=>exCard(k,e)).join("")}</div></div>`:""}
       ${wHits.length?`<div><div class="hint" style="margin-bottom:6px">📖 ことば</div><div class="words">${wHits.map(wordCard).join("")}</div></div>`:""}
-      <div class="sec-h"><h2 style="font-size:1rem">📰 ニュース <span class="num">${list.length}</span>件</h2>${(sState.q||sState.g.size||sState.th||sState.ok)?'<button class="fchip" id="clr">条件をリセット</button>':''}</div>
+      <div class="sec-h"><h2 style="font-size:1rem">📰 ニュース <span class="num">${list.length}</span>件</h2>${(sState.q||sState.g.size||sState.th||sState.ok||sState.onlyNew)?'<button class="fchip" id="clr">条件をリセット</button>':''}</div>
       ${histo}
-      ${list.length? `<div class="res">${Object.keys(groups).sort().reverse().map(d=>`<section class="day"><h3>${mdLabel(d)}${d.slice(0,4)!==TODAY.slice(0,4)?" "+d.slice(0,4):""}</h3><ul>${groups[d].map(n=>`<li class="item"><div class="meta"><span class="chip ${n.g}">${GN[n.g]}</span>${n.ok?'<span class="badge-ok">✅</span>':'<span class="badge-one">⚠️ 1社</span>'}${n.p?`<span class="chip">🎯 ${esc(n.p)}</span>`:""}</div><div class="h">${hl(n.h,terms)}</div><div class="s">出典: ${hl(n.s,terms)}</div></li>`).join("")}</ul></section>`).join("")}</div>`
+      ${list.length? `<div class="res">${Object.keys(groups).sort().reverse().map(d=>`<section class="day"><h3>${mdLabel(d)}${d.slice(0,4)!==TODAY.slice(0,4)?" "+d.slice(0,4):""}</h3><ul>${groups[d].map(n=>`<li class="item"><div class="meta"><span class="chip ${n.g}">${GN[n.g]}</span>${n.ok?'<span class="badge-ok">✅</span>':'<span class="badge-one">⚠️ 1社</span>'}${n.p?`<span class="chip">🎯 ${esc(n.p)}</span>`:""}${isNew(n)?'<span class="chip newchip">🆕</span>':''}</div><div class="h">${hl(n.h,terms)}</div><div class="s">出典: ${hl(n.s,terms)}</div></li>`).join("")}</ul></section>`).join("")}</div>`
         : `<div class="empty">見つかりませんでした。<br>ことばを短くするか、ジャンルの選択を外してみてください。</div>`}`;
     document.getElementById("sres").innerHTML=html;
-    const clr=document.getElementById("clr"); if(clr) clr.onclick=()=>{sState.q="";sState.g.clear();sState.th="";sState.ok=false; renderSearch();};
+    const clr=document.getElementById("clr"); if(clr) clr.onclick=()=>{sState.q="";sState.g.clear();sState.th="";sState.ok=false;sState.onlyNew=false; renderSearch();};
     document.querySelectorAll("#sres [data-ex]").forEach(b=>b.onclick=()=>openEx(b.dataset.ex));
   }
 }
@@ -658,17 +701,19 @@ function glossify(html){
       t=t.slice(0,idx)+`\u0000${i}\u0001`+t.slice(idx+key.length); });
     return t.replace(/\u0000(\d+)\u0001/g,(_,i)=>`<button class="gl" data-gi="${i}">${esc(GTERMS[i].key)}</button>`); });
 }
-function showPop(i){ const w=GTERMS[i].w; const p=document.getElementById("pop"); p.innerHTML=`<div style="display:flex;justify-content:space-between;gap:10px;align-items:start"><div><b>${esc(w[0])}</b> <span style="opacity:.7;font-size:.8rem">${esc(w[1])}</span></div><button class="iconbtn" id="popx" aria-label="閉じる" style="background:transparent;color:inherit;border-color:currentColor">✕</button></div><p style="margin:6px 0 0">${esc(w[2])}</p>${w[3]?`<p style="margin:6px 0 0;opacity:.85">例: ${esc(w[3])}</p>`:""}`; p.hidden=false; document.getElementById("popx").onclick=()=>p.hidden=true; }
+function showPop(i){ const w=GTERMS[i].w; if(!ME.words.includes(w[0])){ ME.words.push(w[0]); saveMe(); checkBadges(); } const p=document.getElementById("pop"); p.innerHTML=`<div style="display:flex;justify-content:space-between;gap:10px;align-items:start"><div><b>${esc(w[0])}</b> <span style="opacity:.7;font-size:.8rem">${esc(w[1])}</span></div><button class="iconbtn" id="popx" aria-label="閉じる" style="background:transparent;color:inherit;border-color:currentColor">✕</button></div><p style="margin:6px 0 0">${esc(w[2])}</p>${w[3]?`<p style="margin:6px 0 0;opacity:.85">例: ${esc(w[3])}</p>`:""}`; p.hidden=false; document.getElementById("popx").onclick=()=>p.hidden=true; }
 document.addEventListener("click",e=>{ const g=e.target.closest(".gl"); if(g){ e.preventDefault(); e.stopPropagation(); showPop(+g.dataset.gi); return; } const p=document.getElementById("pop"); if(!p.hidden && !e.target.closest("#pop")) p.hidden=true; });
 
 function openEx(k){
   const e=D.explainers[k]; if(!e) return; const sh=document.getElementById("sheet");
+  if(!ME.readEx[k]) learn(e.g,2); ME.readEx[k]=TODAY; saveMe(); setTimeout(checkBadges,800);
   const rel = NEWS.filter(n=>{ const map={saudi:"サウジ・中東",tax:"消費減税",cyber:"不正アクセスとAI"}; if(map[k]) return (n.th||"").includes(map[k]); if(k==="sato") return /佐藤輝明/.test(n.h); if(k==="series") return /日本シリーズ|CS/.test(n.h); if(k==="yokohama") return /横浜市長/.test(n.h); if(k==="past") return n.d<"2026-10-04"; return false; }).slice(0,8);
   const flow = e.flow.map((f,i)=>`${i>0?`<div class="farrow">⬇️ ${f.via?`<b>${esc(f.via)}</b>`:""}</div>`:""}<div class="fstep"><span class="fi">${f.i}</span><span><b>${esc(f.t)}</b>${f.s?`<small>${esc(f.s)}</small>`:""}</span></div>`).join("");
   sh.innerHTML=`<div class="bar"><div class="wrap"><button class="iconbtn" id="shx" aria-label="もどる">←</button><span class="ttl">${e.icon} ${esc(e.name)}</span><button class="iconbtn" id="shshare" aria-label="このページのリンクをコピー">🔗 共有</button></div></div>
   <div class="wrap body">
     <div class="hint">最終更新 ${esc(e.updated)} ・ ⏱️ 全部で約${e.min}分 ・ 点線のことばはタップで意味が出ます</div>
-    ${ILL[k]?`<div><div class="ill">${ILL[k]}</div><div class="credit">イラスト: 自作(イメージ)</div></div>`:""}
+    ${PHOTOS[k]?photoBlock(k):ILL[k]?`<div><div class="ill">${ILL[k]}</div><div class="credit">イラスト: 自作(イメージ)</div></div>`:""}
+    <button class="fchip" id="exSpeak" style="align-self:flex-start">🔊 聞く</button>
     <div class="kid"><div class="l">🧒 ひとことで言うと</div><h2>${esc(e.kid)}</h2></div>
     <div class="blk"><h3>💡 もう少しくわしく</h3><p><b>${glossify(esc(e.more[0]))}</b></p><p style="margin-top:6px">${glossify(esc(e.more[1]))}</p></div>
     ${e.stats?`<div class="stats">${e.stats.map(([k2,v])=>`<div class="stat"><div class="v num">${esc(v)}</div><div class="k">${esc(k2)}</div></div>`).join("")}</div>`:""}
@@ -683,7 +728,7 @@ function openEx(k){
     <button class="iconbtn" id="shx2" style="align-self:flex-start">← 一覧にもどる</button>
   </div>`;
   sh.hidden=false; sh.scrollTop=0; document.body.style.overflow="hidden";
-  const close=()=>{ sh.hidden=true; sh.innerHTML=""; document.body.style.overflow=""; document.removeEventListener("keydown",esck); try{ history.replaceState(null,"","#"+(current||"today")); }catch(_){} };
+  const close=()=>{ try{ window.speechSynthesis&&window.speechSynthesis.cancel(); }catch(_){} sh.hidden=true; sh.innerHTML=""; document.body.style.overflow=""; document.removeEventListener("keydown",esck); try{ history.replaceState(null,"","#"+(current||"today")); }catch(_){} };
   const esck=ev=>{ if(ev.key==="Escape") close(); };
   document.addEventListener("keydown",esck);
   sh.querySelector("#shx").onclick=close; sh.querySelector("#shx2").onclick=close; sh.querySelector("#shx").focus();
@@ -693,6 +738,7 @@ function openEx(k){
     const done=()=>{b.textContent="✅ コピーしました"; setTimeout(()=>b.textContent="🔗 共有",1800);};
     try{ navigator.clipboard.writeText(url).then(done,()=>{prompt2(url);}); }catch(_){ prompt2(url); } };
   if(e.calc) bindCalc();
+  sh.querySelector("#exSpeak").onclick=ev=>speakEx(k,ev.currentTarget);
 }
 function animateFlow(){
   const f=document.getElementById("flow"); if(!f) return; const items=[...f.children];
@@ -747,9 +793,9 @@ function renderPlan(){
   main.innerHTML=`<div class="view">
     <div class="sec-h"><h2>📅 これからの予定</h2><span class="sub">近い順</span></div>
     <ul class="plan">${up.map(s=>{ const dd=daysFrom(s[0]); const x=md(s[0]); const left= dd<=0? (s[1]&&s[1]>=TODAY?"いま":"今日") : dd===1?"明日":`あと${dd}日`;
-      return `<li><div class="d"><div class="md num">${x.m}/${x.d}</div><div class="wd">${x.w}曜${s[1]?"〜":""}</div></div><div><span class="left">${left}</span> <span class="chip ${s[2]}">${GN[s[2]]||""}</span>${s[4]?` <span class="chip">🎯 ${esc(s[4])}</span>`:""}<div class="tx">${esc(s[3])}</div>${s[5]?`<div class="mm">${esc(s[5])}</div>`:""}</div></li>`; }).join("") || '<li><div></div><div class="hint">登録された予定はありません</div></li>'}</ul>
+      return `<li><div class="d"><div class="md num">${x.m}/${x.d}</div><div class="wd">${x.w}曜${s[1]?"〜":""}</div></div><div><span class="left">${left}</span> <span class="chip ${s[2]}">${GN[s[2]]||""}</span>${s[4]?` <span class="chip">🎯 ${esc(s[4])}</span>`:""}<div class="tx">${esc(s[3])}</div>${s[5]?`<div class="mm">${esc(s[5])}</div>`:""}<button class="fchip ics" data-i="${D.schedule.indexOf(s)}">📅 カレンダーに追加</button></div></li>`; }).join("") || '<li><div></div><div class="hint">登録された予定はありません</div></li>'}</ul>
     ${past.length?`<details class="faq"><summary>終わった予定(${past.length}件)</summary><ul class="us" style="margin:10px 0 12px">${past.map(s=>`<li>${mdLabel(s[0])} ${esc(s[3])}</li>`).join("")}</ul></details>`:""}
-    <div class="sec-h" style="margin-top:6px"><h2>🎯 Claudeの予測の成績</h2><span class="sub">当たり100点・一部50点・外れ0点</span></div>
+    <div class="sec-h" style="margin-top:6px"><h2>🎯 予測と、あなたの予想</h2><span class="sub">当たり100点・一部50点・外れ0点</span></div>
     <section class="card score">
       <div class="donut"><canvas id="dn" width="140" height="140" aria-label="予測の内訳"></canvas><div class="c"><div><b class="num">${rate}%</b><br><span>的中率(${judged}件)</span></div></div></div>
       <div class="tally"><span class="res-hit">✅ 当たり ${n.hit}</span><span class="res-miss">❌ 外れ ${n.miss}</span><span class="res-part">🔶 一部 ${n.part}</span><span class="res-wait">⏳ 判定待ち ${n.wait}</span><span class="hint" style="grid-column:1/-1">予測は「当たったかどうか」を後で正直に記録するためのものです。</span></div>
@@ -760,11 +806,13 @@ function renderPlan(){
   </div>`;
   bindFooter();
   const drawP=f=>{ const L=PRED.filter(p=>f==="wait"?p.r==="wait":p.r!=="wait").sort((a,b)=>(a.d||"9").localeCompare(b.d||"9"));
-    document.getElementById("plist").innerHTML=L.map(p=>`<div class="pr"><span class="no">${esc(p.no)}</span><span><b>${esc(p.t)}</b></span><span class="r"><span class="${RL[p.r][1]}">${RL[p.r][0]}</span> ・ 確度: ${esc(p.c)} ・ 判定日: ${p.d?mdLabel(p.d)+(p.r==="wait"&&daysFrom(p.d)>=0?`(あと${daysFrom(p.d)}日)`:""):"次の発表時"}${p.now?" ・ いま "+esc(p.now):""}${p.m?`<br>${esc(p.m)}`:""}</span></div>`).join(""); };
+    document.getElementById("plist").innerHTML=L.map(p=>`<div class="pr"><span class="no">${esc(p.no)}</span><span><b>${esc(p.t)}</b></span>${p.r==="wait"?voteRow(p):ME.votes[p.no]?`<span class="r">あなたの予想: ${ME.votes[p.no].v==="yes"?"当たる":"外れる"}</span>`:""}<span class="r"><span class="${RL[p.r][1]}">${RL[p.r][0]}</span> ・ 確度: ${esc(p.c)} ・ 判定日: ${p.d?mdLabel(p.d)+(p.r==="wait"&&daysFrom(p.d)>=0?`(あと${daysFrom(p.d)}日)`:""):"次の発表時"}${p.now?" ・ いま "+esc(p.now):""}${p.m?`<br>${esc(p.m)}`:""}</span></div>`).join(""); };
   main.querySelectorAll("#pf [data-f]").forEach(b=>b.onclick=()=>{ main.querySelectorAll("#pf [data-f]").forEach(x=>x.setAttribute("aria-pressed",String(x===b))); drawP(b.dataset.f); });
   drawP("wait");
   if(window.Chart){ charts.push(new Chart(document.getElementById("dn"),{type:"doughnut",data:{labels:["当たり","外れ","一部","判定待ち"],datasets:[{data:[n.hit,n.miss,n.part,n.wait],backgroundColor:[css("--ok"),css("--g-intl"),css("--warn"),css("--line")],borderWidth:0}]},options:{cutout:"70%",responsive:false,plugins:{legend:{display:false}}}})); }
 }
+
+function voteRow(p){ const v=ME.votes[p.no]&&ME.votes[p.no].v; return `<span class="r vote">あなたは? <button class="fchip" data-vote="yes" data-no="${esc(p.no)}" aria-pressed="${v==="yes"}">⭕ 当たる</button><button class="fchip" data-vote="no" data-no="${esc(p.no)}" aria-pressed="${v==="no"}">❌ 外れる</button></span>`; }
 
 // ===== ことば =====
 function wordCard(w){ return `<div class="w"><div class="wt">${esc(w[0])} <span class="chip ${w[4]}">${GN[w[4]]}</span></div><div class="wy">${esc(w[1])}</div><p>${esc(w[2])}</p>${w[3]?`<div class="ex">たとえば: ${esc(w[3])}</div>`:""}</div>`; }
@@ -803,6 +851,263 @@ document.getElementById("setBtn").onclick=()=>{
 };
 document.getElementById("setBtn").addEventListener("click",e=>e.stopPropagation());
 document.getElementById("pop").addEventListener("click",e=>e.stopPropagation());
+
+// ===== 一人ひとりの記録(見る人のスマホの中だけに保存) =====
+const ME = (()=>{ let p={}; try{ p=JSON.parse(store.get("nw-me")||"{}")||{}; }catch(_){ p={}; }
+  p.interests=p.interests||{}; p.auto=p.auto||{}; p.days=p.days||[]; p.readEx=p.readEx||{}; p.quiz=p.quiz||{}; p.words=p.words||[]; p.votes=p.votes||{}; p.seen=p.seen||[]; p.badges=p.badges||[]; p.notified=p.notified||{};
+  return p; })();
+function saveMe(){ store.set("nw-me", JSON.stringify(ME)); }
+const nkey = n => (n.d+"|"+n.h).slice(0,80);
+// 訪問日と連続記録
+(function(){ if(!ME.days.includes(TODAY)){ ME.days.push(TODAY); ME.days=ME.days.slice(-400); } saveMe(); })();
+function streak(){ const set=new Set(ME.days); let c=0; let d=new Date(Date.parse(TODAY)); while(set.has(d.toISOString().slice(0,10))){ c++; d=new Date(d.getTime()-864e5); } return c; }
+function bestStreak(){ const ds=[...ME.days].sort(); let best=0,cur=0,prev=null; ds.forEach(d=>{ cur = prev && Date.parse(d)-Date.parse(prev)===864e5 ? cur+1 : 1; best=Math.max(best,cur); prev=d; }); return best; }
+// 新着(前回見たあとに増えたニュース)
+const FIRST_VISIT = ME.seen.length===0;
+const PREV_SEEN = new Set(ME.seen);
+const NEW_KEYS = new Set(FIRST_VISIT?[]:NEWS.filter(n=>!PREV_SEEN.has(nkey(n))).map(nkey));
+ME.seen = NEWS.map(nkey).slice(0,800); saveMe();
+const isNew = n => NEW_KEYS.has(nkey(n));
+// 関心(自分で選んだもの+読んだものから少しずつ学ぶ)
+function interestScore(g){ return (ME.interests[g]?5:0) + Math.min(4,(ME.auto[g]||0)/2); }
+function learn(g,w){ if(!g) return; ME.auto[g]=(ME.auto[g]||0)+(w||1); saveMe(); }
+function hasInterests(){ return Object.values(ME.interests).some(Boolean); }
+// 予想ゲームの採点
+function voteResults(){ let win=0, lose=0, half=0, open=0; const settled=[];
+  Object.entries(ME.votes).forEach(([no,v])=>{ const p=PRED.find(x=>x.no===no); if(!p) return; if(p.r==="wait"){ open++; return; }
+    const ok = p.r==="part" ? "half" : ((p.r==="hit")===(v.v==="yes") ? "win" : "lose");
+    if(ok==="win") win++; else if(ok==="lose") lose++; else half++; settled.push({p,v,ok}); });
+  return {win,lose,half,open,settled}; }
+// ポイントとレベル(続けるほど育つ)
+const LEVELS=[[0,"ニュースの入り口"],[20,"ニュース好き"],[60,"話題の流れがわかる人"],[120,"家族に解説できる人"],[250,"ニュース博士"],[450,"ニュース名人"]];
+function points(){ const vr=voteResults(); const quizOK=Object.values(ME.quiz).reduce((a,b)=>a+(+b||0),0);
+  return ME.days.length*2 + Object.keys(ME.readEx).length*3 + quizOK*2 + ME.words.length + vr.win*5 + vr.half*2; }
+function level(){ const pt=points(); let i=0; LEVELS.forEach((l,k)=>{ if(pt>=l[0]) i=k; }); const next=LEVELS[i+1]; return {pt,i,name:LEVELS[i][1],next,prog: next? (pt-LEVELS[i][0])/(next[0]-LEVELS[i][0]) : 1}; }
+const BADGES=[
+  ["first","🌱","はじめの一歩","はじめて開いた",()=>ME.days.length>=1],
+  ["s3","🔥","3日連続","3日続けて開いた",()=>bestStreak()>=3],
+  ["s7","🏅","1週間連続","7日続けて開いた",()=>bestStreak()>=7],
+  ["s30","🏆","1か月連続","30日続けて開いた",()=>bestStreak()>=30],
+  ["ex5","💡","解説5本","解説を5本読んだ",()=>Object.keys(ME.readEx).length>=5],
+  ["quiz","🧠","クイズ満点","今日のクイズで満点",()=>Object.values(ME.quiz).some(v=>+v>=3)],
+  ["w10","📖","ことば10個","ことばの意味を10個しらべた",()=>ME.words.length>=10],
+  ["vote","🎯","予想的中","自分の予想が当たった",()=>voteResults().win>=1],
+  ["vote5","🔮","予想名人","予想が5回当たった",()=>voteResults().win>=5]
+];
+function newBadges(){ const got=[]; BADGES.forEach(b=>{ if(!ME.badges.includes(b[0]) && b[4]()){ ME.badges.push(b[0]); got.push(b); } }); if(got.length) saveMe(); return got; }
+function toast(msg){ const t=document.createElement("div"); t.className="toast"; t.setAttribute("role","status"); t.innerHTML=msg; document.body.appendChild(t); setTimeout(()=>t.classList.add("out"),2600); setTimeout(()=>t.remove(),3200); }
+function checkBadges(){ newBadges().forEach((b,i)=>setTimeout(()=>toast(`${b[1]} バッジ「${esc(b[2])}」を手に入れました`),400+i*1200)); }
+
+// きょう画面に出すカード
+function personalCards(){
+  const out=[]; const s=streak(); const lv=level();
+  const newCount=NEW_KEYS.size;
+  out.push(`<section class="me-strip" aria-label="あなたの記録">
+    <button class="ms" data-tab="my"><span class="mi">🔥</span><span><b class="num">${s}日</b>連続</span></button>
+    <button class="ms" data-tab="my"><span class="mi">⭐</span><span><b>Lv.${lv.i+1}</b>${esc(lv.name)}</span></button>
+    ${newCount?`<button class="ms new" id="newBtn"><span class="mi">🆕</span><span><b class="num">${newCount}件</b>前回から</span></button>`:`<button class="ms" id="weekBtn"><span class="mi">📅</span><span><b>1週間</b>ふりかえり</span></button>`}
+  </section>`);
+  const vr=voteResults(); const fresh=vr.settled.filter(x=>!ME.notified[x.p.no]);
+  if(fresh.length){ out.push(`<section class="card result" aria-label="予想の結果"><b>🎯 あなたの予想の結果が出ました</b><ul class="us" style="margin-top:6px">${fresh.map(x=>`<li>${esc(x.p.t)} → <b>${x.ok==="win"?"⭕ 当たり!":x.ok==="lose"?"❌ はずれ":"🔶 半分当たり"}</b></li>`).join("")}</ul></section>`);
+    fresh.forEach(x=>ME.notified[x.p.no]=1); saveMe(); }
+  if(!hasInterests() && store.get("nw-int-hide")!=="1"){
+    out.push(`<section class="card" aria-label="関心を選ぶ"><b>🎯 気になるジャンルを選んでください</b><p class="hint" style="margin:4px 0 10px">選ぶと「あなた向け」に並びます。読んだ解説からも少しずつ学びます。記録はこのスマホの中だけに残ります。</p><div class="chips" id="intPick">${GORDER.map(g=>`<button class="fchip" data-g="${g}" aria-pressed="false"><span class="c" style="background:var(--g-${g})"></span>${GN[g]}</button>`).join("")}</div><div style="display:flex;gap:8px;margin-top:10px"><button class="fchip" id="intSave" style="background:var(--accent);color:var(--on-accent);border-color:var(--accent)">決める</button><button class="fchip" id="intLater">あとで</button></div></section>`);
+  }
+  return out.join("");
+}
+function forYou(){
+  const any=GORDER.some(g=>interestScore(g)>0); if(!any) return "";
+  const days=[...new Set(NEWS.map(n=>n.d))].slice(0,2); const topH=new Set(D.top10.map(t=>t.title));
+  const L=NEWS.filter(n=>days.includes(n.d) && interestScore(n.g)>0 && !topH.has(n.h)).sort((a,b)=>interestScore(b.g)-interestScore(a.g) || b.ok-a.ok || b.d.localeCompare(a.d)).slice(0,5);
+  if(!L.length) return "";
+  return `<section aria-label="あなた向け"><div class="sec-h"><h2>🎯 あなた向け</h2><button class="fchip" data-tab="my">関心を変える</button></div>
+    <ul class="ten" style="margin-top:10px">${L.map(n=>`<li><div class="row"><span class="rank">・</span><span><span class="meta"><span class="chip ${n.g}">${GN[n.g]}</span>${isNew(n)?'<span class="chip newchip">🆕</span>':''}${n.ok?'<span class="badge-ok">✅</span>':'<span class="badge-one">⚠️ 1社</span>'}<span class="hint">${mdLabel(n.d)}</span></span><h3>${esc(n.h)}</h3></span></div></li>`).join("")}</ul></section>`;
+}
+function bindPersonal(){
+  const nb=document.getElementById("newBtn"); if(nb) nb.onclick=()=>{ sState.onlyNew=true; go("search"); };
+  const wb=document.getElementById("weekBtn"); if(wb) wb.onclick=()=>openStory(buildWeekSlides);
+  const pick=document.getElementById("intPick");
+  if(pick){ pick.querySelectorAll("[data-g]").forEach(b=>b.onclick=()=>b.setAttribute("aria-pressed",String(b.getAttribute("aria-pressed")!=="true")));
+    document.getElementById("intSave").onclick=()=>{ pick.querySelectorAll("[data-g]").forEach(b=>ME.interests[b.dataset.g]=b.getAttribute("aria-pressed")==="true"); saveMe(); go("today",{keepScroll:true}); };
+    document.getElementById("intLater").onclick=()=>{ store.set("nw-int-hide","1"); go("today",{keepScroll:true}); }; }
+  const sh=document.getElementById("shareImg"); if(sh) sh.onclick=shareImage;
+}
+
+// ===== 1週間のふりかえり(スライド) =====
+function buildWeekSlides(){
+  const since=new Date(Date.parse(TODAY)-6*864e5).toISOString().slice(0,10);
+  const W=NEWS.filter(n=>n.d>=since); const okW=W.filter(n=>n.ok);
+  const glow = c => `<div class="glow" style="background:radial-gradient(circle at 30% 30%, ${c}, transparent 60%)"></div>`;
+  const th={}; W.forEach(n=>(n.th||"").split(/[、,]/).filter(Boolean).forEach(t=>th[t]=(th[t]||0)+1));
+  const topTh=Object.entries(th).sort((a,b)=>b[1]-a[1]).slice(0,4);
+  const gc={}; W.forEach(n=>gc[n.g]=(gc[n.g]||0)+1);
+  const S=[];
+  S.push({h:`${glow("#3b5bff")}<div class="kick an">1週間のふりかえり</div><h2 class="an d1">${mdLabel(since)}〜${mdLabel(TODAY)}</h2><p class="an d2">この1週間に記録したニュースは <b class="num">${W.length}件</b>。そのうち2社以上で確かめたものは <b class="num">${okW.length}件</b>。</p>`, say:`1週間のふりかえりです。記録したニュースは${W.length}件でした。`});
+  if(topTh.length) S.push({h:`${glow("#ef4444")}<div class="kick an">よく出てきた話題</div><ol class="mini">${topTh.map(([t,c],i)=>`<li class="an d${i+1}"><b>${esc(t)}</b> … ${c}件</li>`).join("")}</ol><p class="an d4" style="opacity:.8">同じ話題が何日も続くと、流れが見えてきます。</p>`, say:"よく出てきた話題は、"+topTh.map(x=>x[0]).join("、")+"でした。"});
+  const bars=GORDER.filter(g=>gc[g]).map(g=>`<div class="an d1" style="display:grid;grid-template-columns:7.5em 1fr 2.5em;gap:8px;align-items:center;font-size:.95rem"><span>${GN[g]}</span><span style="height:12px;border-radius:6px;background:var(--g-${g});width:${Math.max(6,gc[g]/Math.max(...Object.values(gc))*100)}%"></span><span class="num">${gc[g]}</span></div>`).join("");
+  S.push({h:`${glow("#22a35a")}<div class="kick an">ジャンル別の数</div><div style="display:flex;flex-direction:column;gap:10px">${bars}</div>`, say:"ジャンル別の数です。"});
+  const picks=GORDER.map(g=>okW.find(n=>n.g===g)).filter(Boolean).slice(0,5);
+  if(picks.length) S.push({h:`${glow("#a855f7")}<div class="kick an">ジャンルごとの1本</div><ol class="mini">${picks.map((n,i)=>`<li class="an d${Math.min(4,i+1)}"><b>${GN[n.g]}</b> ${esc(n.h)}</li>`).join("")}</ol>`, say:picks.map(n=>n.h).join("。")});
+  const myDays=ME.days.filter(d=>d>=since).length; const myEx=Object.values(ME.readEx).filter(d=>d>=since).length;
+  S.push({h:`${glow("#f59e0b")}<div class="kick an">あなたの1週間</div><div class="huge an d1 num">${myDays}<span style="font-size:.4em"> 日</span></div><p class="an d2">開いた日 ${myDays}日 ・ 読んだ解説 ${myEx}本 ・ いま ${streak()}日連続</p><p class="an d3" style="opacity:.8">続けるほど、話題の「つながり」が見えるようになります。</p>`, say:`あなたは今週${myDays}日開きました。`});
+  return S;
+}
+
+// ===== シェア画像(今日の3行) =====
+async function shareImage(){
+  const btn=document.getElementById("shareImg"); if(btn) btn.textContent="画像を作っています…";
+  try{ await document.fonts.ready; }catch(_){}
+  const W=1080,H=1350,c=document.createElement("canvas"); c.width=W; c.height=H; const x=c.getContext("2d");
+  const font=(w,s)=>`${w} ${s}px "Zen Kaku Gothic New","Hiragino Sans","Yu Gothic",sans-serif`;
+  x.fillStyle="#eef1f4"; x.fillRect(0,0,W,H);
+  x.fillStyle="#2747c9"; x.fillRect(0,0,W,210);
+  x.fillStyle="#fff"; x.font=`64px "Dela Gothic One","Hiragino Sans",sans-serif`; x.fillText("まいにちニュース帳",70,118);
+  x.font=font(700,36); x.fillText(`${D.updatedLabel} の「今日の3行」`,70,175);
+  const cols={intl:"#c42b2b",pol:"#2563c9",spo:"#8a5a2b",eco:"#17803f",soc:"#c25a0c",it:"#7c3aed",ent:"#c0367a"};
+  const wrap=(t,max,size,w)=>{ x.font=font(w,size); const lines=[]; let cur=""; for(const ch of t){ if(x.measureText(cur+ch).width>max){ lines.push(cur); cur=ch; } else cur+=ch; } if(cur) lines.push(cur); return lines; };
+  let y=260;
+  D.three.forEach(t=>{ const tl=wrap(t.title,880,46,700).slice(0,2); const bl=wrap(t.text,880,32,400).slice(0,3);
+    const hgt=60+tl.length*60+bl.length*46+30;
+    x.fillStyle="#fff"; x.beginPath(); x.roundRect?x.roundRect(60,y,960,hgt,28):x.rect(60,y,960,hgt); x.fill();
+    x.fillStyle=cols[t.tone]||"#475569"; x.fillRect(60,y,14,hgt);
+    x.fillStyle="#5a6478"; x.font=font(700,28); x.fillText(t.label,100,y+48);
+    x.fillStyle="#141b2d"; tl.forEach((l,i)=>{ x.font=font(700,46); x.fillText(l,100,y+108+i*60); });
+    x.fillStyle="#3b4458"; bl.forEach((l,i)=>{ x.font=font(400,32); x.fillText(l,100,y+108+tl.length*60+i*46-10); });
+    y+=hgt+28; });
+  x.fillStyle="#5a6478"; x.font=font(400,28); x.fillText("2社以上で確かめたニュースだけ ・ まとめ: Claude(AI)",70,H-90);
+  x.fillStyle="#2747c9"; x.font=font(700,32); x.fillText(location.host+location.pathname,70,H-44);
+  const blob=await new Promise(r=>c.toBlob(r,"image/png"));
+  const file=new File([blob],`news-${TODAY}.png`,{type:"image/png"});
+  try{ if(navigator.canShare && navigator.canShare({files:[file]})){ await navigator.share({files:[file],title:"まいにちニュース帳",text:"今日の3行 "+location.href.split("#")[0]}); if(btn) btn.textContent="🖼️ 画像にして送る"; return; } }catch(_){}
+  const url=URL.createObjectURL(blob); const a=document.createElement("a"); a.href=url; a.download=file.name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(url),5000);
+  if(btn) btn.textContent="✅ 画像を保存しました";
+}
+
+// ===== 予定をカレンダーへ(.ics) =====
+function icsFor(s){
+  const d=s[0].replace(/-/g,""); const endIso=s[1]||s[0]; const e=new Date(Date.parse(endIso)+864e5).toISOString().slice(0,10).replace(/-/g,"");
+  const clean=t=>String(t).replace(/[\;,]/g,m=>"\\"+m).replace(/\n/g," ");
+  const body=["BEGIN:VCALENDAR","VERSION:2.0","PRODID:-//mainichi-news//JA","BEGIN:VEVENT",`UID:${d}-${Math.abs([...s[3]].reduce((a,c)=>a*31+c.charCodeAt(0)|0,7))}@news`,`DTSTAMP:${new Date().toISOString().replace(/[-:]/g,"").slice(0,15)}Z`,`DTSTART;VALUE=DATE:${d}`,`DTEND;VALUE=DATE:${e}`,`SUMMARY:${clean(s[3])}`,`DESCRIPTION:${clean((s[5]||"")+" (まいにちニュース帳)")}`,"END:VEVENT","END:VCALENDAR"].join("\r\n");
+  const blob=new Blob([body],{type:"text/calendar"}); const url=URL.createObjectURL(blob); const a=document.createElement("a"); a.href=url; a.download=`yotei-${d}.ics`; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(url),5000);
+}
+
+// ===== マイ =====
+function renderMy(){
+  const lv=level(); const s=streak(); const vr=voteResults();
+  const quizOK=Object.values(ME.quiz).reduce((a,b)=>a+(+b||0),0);
+  const last28=[...Array(28)].map((_,i)=>new Date(Date.parse(TODAY)-(27-i)*864e5).toISOString().slice(0,10));
+  const readNames=Object.keys(ME.readEx).filter(k=>D.explainers[k]).map(k=>D.explainers[k].name);
+  main.innerHTML=`<div class="view">
+    <div class="sec-h"><h2>⭐ わたしの記録</h2><span class="sub">このスマホの中だけに保存</span></div>
+    <section class="card lvcard"><div class="lvrow"><div class="lvbig">Lv.${lv.i+1}</div><div><b style="font-size:1.1rem">${esc(lv.name)}</b><div class="hint">${lv.pt}ポイント${lv.next?` ・ 次の「${esc(lv.next[1])}」まで あと${lv.next[0]-lv.pt}`:" ・ 最高レベル!"}</div></div></div>
+      <div class="bar"><i style="width:${Math.round(lv.prog*100)}%"></i></div>
+      <div class="hint" style="margin-top:6px">開いた日 +2 ・ 解説を読む +3 ・ クイズ正解 +2 ・ ことばを調べる +1 ・ 予想が当たる +5</div></section>
+    <div class="statgrid">
+      <div class="stat"><div class="v num">${s}</div><div class="k">🔥 いまの連続日数</div></div>
+      <div class="stat"><div class="v num">${bestStreak()}</div><div class="k">🏅 いちばん長い連続</div></div>
+      <div class="stat"><div class="v num">${Object.keys(ME.readEx).length}</div><div class="k">💡 読んだ解説</div></div>
+      <div class="stat"><div class="v num">${quizOK}</div><div class="k">🧠 クイズ正解</div></div>
+      <div class="stat"><div class="v num">${ME.words.length}</div><div class="k">📖 調べたことば</div></div>
+      <div class="stat"><div class="v num">${vr.win}</div><div class="k">🎯 当たった予想</div></div>
+    </div>
+    <section class="card"><b>📅 この4週間</b><div class="cal" aria-label="開いた日">${last28.map(d=>`<i class="${ME.days.includes(d)?"on":""}${d===TODAY?" today":""}" title="${mdLabel(d)}"></i>`).join("")}</div><div class="hint">色がついた日が、開いた日です。</div></section>
+    <section class="card"><b>🌱 続けると、こうなる</b>
+      <ul class="us" style="margin-top:8px">
+        <li>同じ話題を何日も追うと、ニュースが「点」ではなく<b>「流れ」</b>で見えるようになります。いまあなたが追えている話題: <b>${readNames.length?esc(readNames.join("・")):"まだありません(解説を読むと増えます)"}</b></li>
+        <li>出てきたことばを調べるほど、ニュースを<b>自分の言葉で説明</b>できるようになります。調べたことば: <b>${ME.words.length?esc(ME.words.slice(-8).join("・")):"まだありません(点線のことばをタップ)"}</b></li>
+        <li>予想して答え合わせをすると、<b>先を読む力</b>がつきます。下の「予定・予測」で、あなたも予想できます。</li>
+      </ul></section>
+    <section class="card"><b>🎯 わたしの予想</b><div class="hint" style="margin:4px 0 8px">当たり ${vr.win} ・ はずれ ${vr.lose} ・ 半分 ${vr.half} ・ 結果待ち ${vr.open}</div>
+      <div class="hint">Claudeの的中率と比べてみましょう。予想は「予定」タブの予測から選べます。</div><button class="fchip" data-tab="plan" style="margin-top:8px">予想しに行く →</button></section>
+    <section class="card"><b>🏅 バッジ</b><div class="badges">${BADGES.map(b=>`<div class="bd ${ME.badges.includes(b[0])?"got":""}" title="${esc(b[3])}"><span>${b[1]}</span><small>${esc(b[2])}</small></div>`).join("")}</div></section>
+    <section class="card"><b>🎯 気になるジャンル</b><div class="hint" style="margin:4px 0 8px">選んだジャンルが「あなた向け」に並びます。読んだ解説からも少しずつ学びます。</div>
+      <div class="chips" id="myInt">${GORDER.map(g=>`<button class="fchip" data-g="${g}" aria-pressed="${!!ME.interests[g]}"><span class="c" style="background:var(--g-${g})"></span>${GN[g]}</button>`).join("")}</div></section>
+    <button class="fchip" id="weekBtn2" style="align-self:flex-start">📅 1週間のふりかえりを見る(1分)</button>
+    <details class="faq plain"><summary>記録について</summary><p>記録は、あなたのスマホ(ブラウザ)の中だけに保存されます。ほかの人や作った人には見えません。ブラウザのデータを消すと記録も消えます。</p><button class="fchip" id="resetMe" style="margin-bottom:12px">記録をすべて消す</button><div id="resetConfirm"></div></details>
+    ${footer()}
+  </div>`;
+  main.querySelectorAll("[data-tab]").forEach(b=>b.onclick=()=>go(b.dataset.tab));
+  main.querySelectorAll("#myInt [data-g]").forEach(b=>b.onclick=()=>{ const g=b.dataset.g; ME.interests[g]=!ME.interests[g]; b.setAttribute("aria-pressed",String(!!ME.interests[g])); saveMe(); });
+  document.getElementById("weekBtn2").onclick=()=>openStory(buildWeekSlides);
+  document.getElementById("resetMe").onclick=()=>{ document.getElementById("resetConfirm").innerHTML='<p>本当に消しますか? 元にはもどせません。</p><button class="fchip" id="resetYes">消す</button>'; document.getElementById("resetYes").onclick=()=>{ try{ localStorage.removeItem("nw-me"); }catch(_){} location.reload(); }; };
+}
+
+// ===== 地図 =====
+const PLACES=[
+  [/沖縄|先島|石垣|宮古|琉球|那覇/,127.68,26.21,"沖縄"],[/横浜|神奈川|DeNA/,139.64,35.44,"横浜"],[/千葉|印旛|内房/,140.12,35.6,"千葉"],[/伊豆|大島/,139.4,34.75,"伊豆諸島"],
+  [/宮崎|延岡/,131.42,31.91,"宮崎"],[/十勝|北海道|旭岳|セイコーマート/,142.8,43.3,"北海道"],[/大分/,131.61,33.24,"大分"],[/福岡|ソフトバンク|九州/,130.4,33.59,"福岡"],
+  [/阪神|大阪|王将/,135.5,34.69,"関西"],[/福生|山手線|東京|首相|国会|衆院|参院|日経平均|日銀|関文科相|簗/,139.75,35.68,"東京"],[/埼玉/,139.65,35.86,"埼玉"],[/西条/,133.18,33.92,"愛媛"],
+  [/サウジ|リヤド|アラムコ/,46.72,24.69,"サウジアラビア"],[/フーシ|アデン|イエメン/,45.03,12.8,"イエメン"],[/エジプト/,31.24,30.04,"エジプト"],[/ウクライナ/,30.52,50.45,"ウクライナ"],
+  [/ロシア|プーチン|記者拘束/,37.62,55.75,"ロシア"],[/北朝鮮/,125.75,39.03,"北朝鮮"],[/中国|GDP/,116.4,39.9,"中国"],[/カナダ/,-75.7,45.42,"カナダ"],
+  [/トランプ|米国|ナスダック|FRB|NY原油|大リーグ|ドジャース|カリフォルニア/,-77.04,38.9,"アメリカ"],[/イラン|ホルムズ/,51.39,35.69,"イラン"],[/イスラエル/,35.21,31.77,"イスラエル"],
+  [/トルコ/,32.86,39.93,"トルコ"],[/ジブチ/,43.15,11.59,"ジブチ"],[/グリーンランド/,-51.72,64.18,"グリーンランド"],[/ICC|オランダ/,4.3,52.07,"オランダ(ICC)"],[/MMX|火星/,130.97,30.4,"種子島(打ち上げ)"]
+];
+function placeOf(n){ for(const p of PLACES){ if(p[0].test(n.h+" "+(n.th||""))) return p; } return null; }
+let mapState={view:"japan",sel:null};
+function loadScript(src){ return new Promise((res,rej)=>{ if(document.querySelector(`script[src="${src}"]`)) return res(); const s=document.createElement("script"); s.src=src; s.onload=res; s.onerror=rej; document.head.appendChild(s); }); }
+let WORLD=null;
+async function getWorld(){ if(WORLD) return WORLD; await loadScript("https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"); await loadScript("https://cdn.jsdelivr.net/npm/topojson-client@3.1.0/dist/topojson-client.min.js");
+  const topo=await (await fetch("https://cdn.jsdelivr.net/npm/world-atlas@2.0.2/countries-50m.json")).json(); WORLD=topojson.feature(topo,topo.objects.countries); return WORLD; }
+function renderMap(){
+  const recentDays=[...new Set(NEWS.map(n=>n.d))].slice(0,7);
+  main.innerHTML=`<div class="view">
+    <div class="sec-h"><h2>🗺️ ニュースの地図</h2><span class="sub">直近7日分</span></div>
+    <div class="chips"><button class="fchip" data-v="japan" aria-pressed="${mapState.view==="japan"}">🗾 日本</button><button class="fchip" data-v="world" aria-pressed="${mapState.view==="world"}">🌏 世界</button></div>
+    <div class="card mapbox"><div id="map" class="mapsvg"><div class="empty">地図を読み込んでいます…</div></div></div>
+    <p class="hint" style="margin:0">● をタップすると、その場所のニュースが下に出ます。点が大きいほどニュースが多い場所です。場所は見出しのことばから自動で決めた目安です。</p>
+    <div id="mapList"></div>
+    ${footer()}
+  </div>`;
+  main.querySelectorAll("[data-v]").forEach(b=>b.onclick=()=>{ mapState.view=b.dataset.v; mapState.sel=null; renderMap(); });
+  const items=NEWS.filter(n=>recentDays.includes(n.d)).map(n=>({n,p:placeOf(n)})).filter(x=>x.p);
+  const JP=[0,139.75,36.2,"日本(国内)"];
+  const groups={}; items.forEach(x=>{ let pp=x.p; if(mapState.view==="world" && pp[1]>122 && pp[1]<147 && pp[2]>24 && pp[2]<46) pp=JP; const k=pp[3]; (groups[k]=groups[k]||{p:pp,list:[]}).list.push(x.n); });
+  getWorld().then(world=>{
+    const el=document.getElementById("map"); if(!el) return; const W=el.clientWidth||360, H=Math.round(W*(mapState.view==="japan"?1.05:0.62));
+    const proj = mapState.view==="japan" ? d3.geoMercator().fitExtent([[10,10],[W-10,H-10]],{type:"MultiPoint",coordinates:[[123,24],[146,45.5]]}) : d3.geoNaturalEarth1().fitExtent([[6,6],[W-6,H-6]],{type:"Sphere"});
+    const path=d3.geoPath(proj);
+    const svg=d3.create("svg").attr("viewBox",`0 0 ${W} ${H}`).attr("width","100%").attr("role","img").attr("aria-label",mapState.view==="japan"?"日本の地図":"世界の地図");
+    svg.append("rect").attr("width",W).attr("height",H).attr("fill","var(--map-sea)");
+    svg.append("g").selectAll("path").data(world.features).join("path").attr("d",path).attr("fill",d=>d.id==="392"?"var(--map-jp)":"var(--map-land)").attr("stroke","var(--map-line)").attr("stroke-width",.6);
+    const vis=Object.values(groups).filter(gp=>{ const xy=proj([gp.p[1],gp.p[2]]); return xy && xy[0]>=0 && xy[0]<=W && xy[1]>=0 && xy[1]<=H; });
+    const g=svg.append("g");
+    vis.forEach(gp=>{ const [x,y]=proj([gp.p[1],gp.p[2]]); const r=6+Math.min(12,gp.list.length*2.2); const col=css("--g-"+gp.list[0].g)||"#c42b2b";
+      const node=g.append("g").attr("class","pin").attr("tabindex",0).attr("role","button").attr("aria-label",`${gp.p[3]} ${gp.list.length}件`).style("cursor","pointer");
+      node.append("circle").attr("cx",x).attr("cy",y).attr("r",r+6).attr("fill",col).attr("opacity",.18).attr("class","pulse");
+      node.append("circle").attr("cx",x).attr("cy",y).attr("r",r).attr("fill",col).attr("stroke","#fff").attr("stroke-width",2);
+      node.append("text").attr("x",x).attr("y",y+4).attr("text-anchor","middle").attr("font-size",11).attr("font-weight",700).attr("fill","#fff").text(gp.list.length);
+      const pick=()=>{ mapState.sel=gp.p[3]; drawList(); };
+      node.on("click",pick).on("keydown",ev=>{ if(ev.key==="Enter"||ev.key===" "){ ev.preventDefault(); pick(); } }); });
+    el.innerHTML=""; el.appendChild(svg.node());
+    const others=Object.values(groups).filter(gp=>!vis.includes(gp));
+    function drawList(){ const box=document.getElementById("mapList"); if(!box) return;
+      const show = mapState.sel ? Object.values(groups).filter(gp=>gp.p[3]===mapState.sel) : vis.sort((a,b)=>b.list.length-a.list.length);
+      box.innerHTML = `${mapState.sel?`<button class="fchip" id="mapAll" style="margin-bottom:8px">← すべての場所</button>`:""}${show.map(gp=>`<section class="day"><h3>📍 ${esc(gp.p[3])}(${gp.list.length}件)</h3><ul>${gp.list.map(n=>`<li class="item"><div class="meta"><span class="chip ${n.g}">${GN[n.g]}</span>${n.ok?'<span class="badge-ok">✅</span>':'<span class="badge-one">⚠️ 1社</span>'}<span class="hint">${mdLabel(n.d)}</span></div><div class="h">${esc(n.h)}</div></li>`).join("")}</ul></section>`).join("")}
+        ${!mapState.sel&&others.length?`<p class="hint">この地図の外の場所: ${others.map(o=>`${esc(o.p[3])}(${o.list.length})`).join("・")} → 「${mapState.view==="japan"?"🌏 世界":"🗾 日本"}」に切り替えると見られます。</p>`:""}`;
+      const all=document.getElementById("mapAll"); if(all) all.onclick=()=>{ mapState.sel=null; drawList(); }; }
+    drawList();
+  }).catch(()=>{ const el=document.getElementById("map"); if(el) el.innerHTML='<div class="empty">地図を読み込めませんでした。通信状態を確かめて、開き直してください。</div>'; });
+}
+
+main.addEventListener("click",ev=>{ const v=ev.target.closest("[data-vote]"); if(v){ ME.votes[v.dataset.no]={v:v.dataset.vote,at:TODAY}; saveMe(); v.parentElement.querySelectorAll("[data-vote]").forEach(x=>x.setAttribute("aria-pressed",String(x===v))); toast("🎯 予想を記録しました。結果が出たらお知らせします"); return; }
+  const ic=ev.target.closest(".ics"); if(ic) icsFor(D.schedule[+ic.dataset.i]); });
+
+// ===== 写真(Unsplash・撮影者名つき) =====
+const PHOTOS={
+  saudi:["https://images.unsplash.com/photo-1516199423456-1f1e91b06f25?w=1000&q=70&auto=format&fit=crop","Zbynek Burival"],
+  tax:["https://images.unsplash.com/photo-1681369738123-e8d551a9ecfd?w=1000&q=70&auto=format&fit=crop","Ishaq Robin"],
+  sato:["https://images.unsplash.com/photo-1582650448629-3c854f356544?w=1000&q=70&auto=format&fit=crop","Mick Haupt"],
+  series:["https://images.unsplash.com/photo-1784657258179-27f2e692b62e?w=1000&q=70&auto=format&fit=crop","Steve DiMatteo"],
+  yokohama:["https://images.unsplash.com/photo-1785899472269-51981778ccbd?w=1000&q=70&auto=format&fit=crop","ITT CU"],
+  past:["https://images.unsplash.com/photo-1435527173128-983b87201f4d?w=1000&q=70&auto=format&fit=crop","Eric Rothermel"]
+};
+function photoBlock(k){ const p=PHOTOS[k]; if(!p) return ""; return `<figure class="photo"><img src="${p[0]}" alt="" loading="lazy" onerror="this.closest('figure').remove()"><figcaption>📷 イメージ写真: ${esc(p[1])} / <a href="https://unsplash.com/?utm_source=mainichi_news&utm_medium=referral" target="_blank" rel="noopener">Unsplash</a></figcaption></figure>`; }
+
+// ===== 解説の読み上げ =====
+function speakEx(k,btn){ const e=D.explainers[k]; if(!e) return; try{ const s=window.speechSynthesis; if(!s) return;
+  if(s.speaking){ s.cancel(); btn.textContent="🔊 聞く"; return; }
+  const txt=[e.name,"ひとことで言うと。",e.kid,e.more[0],e.more[1],"わたしたちへの影響。",...e.us.map(u=>u.replace(/\*\*/g,"")),...e.faq.map(([q,a])=>q+" "+a)].join("。 ");
+  const u=new SpeechSynthesisUtterance(txt); u.lang="ja-JP"; u.rate=1.05; u.onend=()=>{ btn.textContent="🔊 聞く"; }; s.speak(u); btn.textContent="■ 止める"; }catch(_){} }
 
 // 起動
 const h=(location.hash||"").slice(1);

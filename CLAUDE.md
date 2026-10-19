@@ -9,6 +9,11 @@
 - `manifest.webmanifest`・`sw.js`・`icon-*.png`・`apple-touch-icon.png` — ホーム画面に追加してアプリのように使うための設定。`sw.js` は前回の内容をオフラインでも読めるようにする(index.html と data.js はネット優先)。
 - `robots.txt` と `<meta name="robots" content="noindex">` — 検索エンジンに出さないための設定。消さない。
 
+## 一人ひとりの記録(マイ)
+- 連続日数・読んだ解説・クイズ・調べたことば・予想・関心のジャンルは、見る人のブラウザの localStorage(キー `nw-me`)だけに保存する。サーバーや外部には送らない。
+- 地図の場所は index.html の `PLACES`(見出しのことば→場所)で決める。新しい場所が増えたらここに足す。
+- 解説の写真は index.html の `PHOTOS`(Unsplash・撮影者名つき)。
+
 ## 読む人
 - スマホで見る人が中心。幅 390px で横にはみ出さないこと。文字は大きめ。
 - 老若男女、ニュースに詳しくない人にもわかる、やさしい言葉で書く。
