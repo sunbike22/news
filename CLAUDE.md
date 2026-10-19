@@ -11,7 +11,7 @@
 
 ## 長い期間のグラフ
 - `history.json` は GitHub Actions(`.github/workflows/history.yml` → `tools/fetch_history.py`)が毎朝 FRED から自動で作る。手で書き換えない。
-- 時間ごとのデータは無料の確かな取得先がないので扱わない。
+- `data.js` の `ticks` は1ドル(円)の数時間ごとの記録(Alpha Vantage のリアルタイムレート)。サイト更新のたびに1点足し、30日より古い点は消す。日経平均・原油の時間ごとのデータは無料の確かな取得先がないので扱わない。
 
 ## AIに聞く
 - 解説ページの「AIに聞く」は、解説の要点と質問を入れた状態で claude.ai を開くだけ。サイトにAPIキーは置かない。

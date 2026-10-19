@@ -769,7 +769,7 @@ function renderNumbers(){
     ${marketsMini()}
     <section class="card" id="longBox"><h3 style="font-size:1rem">🕰️ 長い期間で見る</h3>
       <div class="chips" style="margin-top:8px" id="lsSer"><button class="fchip" data-s="nikkei" aria-pressed="true">📈 日経平均</button><button class="fchip" data-s="yen" aria-pressed="false">💴 1ドル</button><button class="fchip" data-s="oil" aria-pressed="false">🛢️ 原油</button></div>
-      <div class="chips" style="margin-top:6px" id="lsRng"><button class="fchip" data-r="30" aria-pressed="false">1か月</button><button class="fchip" data-r="90" aria-pressed="false">3か月</button><button class="fchip" data-r="365" aria-pressed="true">1年</button><button class="fchip" data-r="1825" aria-pressed="false">5年</button><button class="fchip" data-r="all" aria-pressed="false">全期間</button></div>
+      <div class="chips" style="margin-top:6px" id="lsRng"><button class="fchip" data-r="tick" aria-pressed="false">数時間ごと</button><button class="fchip" data-r="30" aria-pressed="false">1か月</button><button class="fchip" data-r="90" aria-pressed="false">3か月</button><button class="fchip" data-r="365" aria-pressed="true">1年</button><button class="fchip" data-r="1825" aria-pressed="false">5年</button><button class="fchip" data-r="all" aria-pressed="false">全期間</button></div>
       <div class="lsum" id="lsSum"></div>
       <div class="chartbox" style="height:240px"><canvas id="cl" aria-label="長い期間のグラフ"></canvas></div>
       <div class="legend-note" id="lsNote">データを読み込んでいます…</div></section>
@@ -808,6 +808,7 @@ function longChart(){
   box.querySelectorAll("#lsRng [data-r]").forEach(x=>x.setAttribute("aria-pressed",String(x.dataset.r===lsState.r)));
   let chart=null;
   function draw(){
+    if(lsState.r==="tick"){ drawTicks(); return; }
     loadHist().then(H=>{
       const S=H.series[lsState.s]; if(!S) return;
       const useMonthly = lsState.r==="all" || lsState.r==="1825";
@@ -827,6 +828,19 @@ function longChart(){
       if(chart){ chart.destroy(); } chart=new Chart(document.getElementById("cl"),cfg); charts.push(chart);
       document.getElementById("lsNote").innerHTML=`${esc(S.label)}。${useMonthly?"5年以上は月ごとの平均。":"1日ごとの値。"}出典: FRED(米セントルイス連銀)・毎日自動で取得、数日遅れ。いちばん新しい数日はこのサイトの記録でつないでいます。${lsState.s==="yen"?"円の値は米連銀の正午レートで、東京の夕方の値と少しちがいます。":""}`;
     }).catch(()=>{ document.getElementById("lsNote").textContent="長い期間のデータは準備中です(毎朝7時ごろに自動で取得します)。"; });
+  }
+  function drawTicks(){
+    const note=document.getElementById("lsNote"), sum=document.getElementById("lsSum");
+    if(lsState.s!=="yen"){ sum.innerHTML=""; if(chart){chart.destroy();chart=null;} note.textContent="数時間ごとの値は、いまは「1ドル(円)」だけです。日経平均と原油は、無料で取れる確かなデータが1日ごとのためです。"; return; }
+    const T=(D.ticks||[]).filter(t=>Date.parse(t[0])>Date.now()-7*864e5);
+    if(T.length<2){ sum.innerHTML=""; if(chart){chart.destroy();chart=null;} note.textContent="数時間ごとの記録を集めはじめたところです。1日4回(サイトの更新のたび)1点ずつ増えていきます。"; return; }
+    const lab=t=>{ const d=new Date(Date.parse(t)+9*3600e3); return `${d.getUTCMonth()+1}/${d.getUTCDate()} ${d.getUTCHours()}時`; };
+    const first=T[0][1], last=T[T.length-1][1], diff=last-first;
+    sum.innerHTML=`<div><span class="hint">この間の変化</span><b class="${diff>=0?'up':'dn'}">${diff>=0?"▲":"▼"}${Math.abs(diff).toFixed(2)}円</b></div><div><span class="hint">いま</span><b>${last.toFixed(2)}円</b><small class="hint">${lab(T[T.length-1][0])}</small></div><div><span class="hint">記録した点</span><b>${T.length}点</b><small class="hint">直近7日</small></div>`;
+    const col=css("--g-eco");
+    if(chart) chart.destroy();
+    chart=new Chart(document.getElementById("cl"),{type:"line",data:{labels:T.map(t=>lab(t[0])),datasets:[{data:T.map(t=>t[1]),borderColor:col,backgroundColor:col+"22",fill:true,tension:.2,pointRadius:3,borderWidth:2}]},options:{maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.raw.toFixed(2)+"円"}}},scales:{x:{grid:{display:false},ticks:{maxTicksLimit:5}},y:{grid:{color:css("--line")},ticks:{callback:v=>v.toFixed(1)+"円"}}}}}); charts.push(chart);
+    note.textContent="1ドルあたりの円(日本時間)。出典: Alpha Vantage のリアルタイムレート。サイトの更新(1日4回)のたびに1点ずつ記録しています。";
   }
   draw();
 }
