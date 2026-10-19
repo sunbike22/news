@@ -357,6 +357,41 @@ details.faq p{margin:10px 0 12px}
 .seg button{border:0;background:var(--surface);padding:6px 12px;cursor:pointer;font-size:.85rem}
 .seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+
+/* 着せかえ(詰め具合) */
+:root[data-density="compact"] .view{gap:12px}
+:root[data-density="compact"] .card{padding:12px}
+:root[data-density="compact"] .ten{gap:5px}
+:root[data-density="compact"] .ten .row{padding:8px 12px}
+:root[data-density="compact"] .ten .ill,:root[data-density="compact"] .ten .pt,:root[data-density="compact"] .ten li:not(.big) p{display:none}
+:root[data-density="compact"] body{line-height:1.6}
+:root[data-density="roomy"] .view{gap:30px}
+:root[data-density="roomy"] .card{padding:20px}
+:root[data-density="roomy"] .ten{gap:12px}
+:root[data-density="roomy"] .ten .row{padding:16px 16px}
+:root[data-density="roomy"] body{line-height:1.85}
+/* 着せかえ画面 */
+.lk-sec{display:flex;flex-direction:column;gap:10px}
+.lk-sec>h3{font-size:1.05rem}
+.sw{display:flex;gap:10px;flex-wrap:wrap}
+.sw button{width:46px;height:46px;border-radius:50%;border:3px solid var(--surface);box-shadow:0 0 0 1px var(--line);cursor:pointer;padding:0}
+.sw button[aria-pressed="true"]{box-shadow:0 0 0 3px var(--ink)}
+.lk-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.lk-list li{display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:6px 6px 6px 12px}
+.lk-list li.off .nm{opacity:.45;text-decoration:line-through}
+.lk-list .nm{flex:1;min-width:0;font-weight:700}
+.lk-list .mv{width:40px;height:40px;border:1px solid var(--line);background:var(--surface2);border-radius:10px;cursor:pointer;font-size:1rem}
+.lk-list .mv:disabled{opacity:.3;cursor:default}
+.lk-list .sw2{min-width:64px;height:40px;border-radius:999px;border:1px solid var(--line);background:var(--surface2);cursor:pointer;font-size:.82rem;font-weight:700}
+.lk-list .sw2[aria-pressed="true"]{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+.lk-list .lock{min-width:64px;text-align:center;font-size:.78rem;color:var(--muted)}
+.presets{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}
+.presets button{text-align:left;border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:10px 12px;cursor:pointer}
+.presets button b{display:block}
+.presets button span{font-size:.8rem;color:var(--muted)}
+.lookcard{display:flex;align-items:center;gap:12px;background:linear-gradient(120deg,var(--accent-soft),var(--surface));border:1px solid var(--line);border-radius:var(--radius);padding:14px 16px;width:100%;text-align:left;cursor:pointer}
+.lookcard .pal{display:flex;flex:none}
+.lookcard .pal i{width:18px;height:18px;border-radius:50%;margin-left:-5px;border:2px solid var(--surface)}
 </style>
 </head>
 <body>
@@ -405,8 +440,33 @@ document.getElementById("upd").innerHTML = `最終更新<br><b class="num">${esc
 
 // ===== 設定(テーマ・文字サイズ) =====
 const root = document.documentElement;
+// 着せかえ(見る人のスマホの中だけに保存: nw-look)
+const COLORS = [
+  ["blue","あお",   "#2747c9","#e3e8fb","#8ea4ff","#232c4d"],
+  ["green","みどり","#15803d","#e2f3e8","#5fd18a","#16301f"],
+  ["teal","うみ",   "#0f766e","#dcf2ef","#5eead4","#14302d"],
+  ["orange","だいだい","#c2410c","#fdeee6","#fb923c","#3a2416"],
+  ["pink","さくら", "#be185d","#fce7f1","#f9a8d4","#3b1a2b"],
+  ["purple","むらさき","#6d28d9","#ede7fd","#c4b5fd","#2a1f45"],
+  ["mono","すみ",   "#1f2937","#e5e7eb","#e5e7eb","#2a3247"]
+];
+(function(){ const st=document.createElement("style"); let s="";
+  COLORS.slice(1).forEach(([k,,a,as])=>{ s+=`:root[data-color="${k}"]{--accent:${a};--accent-soft:${as}}`; });
+  COLORS.slice(1).forEach(([k,,,,d,ds])=>{ const v=`--accent:${d};--accent-soft:${ds}`; s+=`@media (prefers-color-scheme: dark){:root:not([data-theme="light"])[data-color="${k}"]{${v}}}:root[data-theme="dark"][data-color="${k}"]{${v}}`; });
+  st.textContent=s; document.head.appendChild(st); })();
+const SECS = [["play","▶️ 1分で見る"],["weather","🌤️ 天気"],["three","☀️ 今日の3行"],["ten","📰 今日のニュース10"],["foryou","🎯 あなた向け"],["other","📚 そのほかのニュース"],["quiz","🧠 今日のクイズ"],["number","🔢 今日の数字"]];
+const LOOK = (()=>{ let p={}; try{ p=JSON.parse(store.get("nw-look")||"{}")||{}; }catch(_){ p={}; }
+  const fix=(arr,all)=>{ const a=(Array.isArray(arr)?arr:[]).filter(k=>all.includes(k)); all.forEach(k=>{ if(!a.includes(k)) a.push(k); }); return a; };
+  p.order=fix(p.order,SECS.map(s=>s[0])); p.off=p.off&&typeof p.off==="object"?p.off:{};
+  p.tabs=fix(p.tabs,["today","search","map","explain","numbers","plan","my"]); p.tabOff=p.tabOff&&typeof p.tabOff==="object"?p.tabOff:{}; p.tabOff.my=false;
+  if(!COLORS.some(c=>c[0]===p.color)) p.color="blue"; if(!["compact","normal","roomy"].includes(p.density)) p.density="normal";
+  return p; })();
+function saveLook(){ store.set("nw-look", JSON.stringify(LOOK)); }
 function applySettings(){ const t=store.get("nw-theme"); if(t==="light"||t==="dark") root.setAttribute("data-theme",t); else root.removeAttribute("data-theme");
-  const s=store.get("nw-size"); if(s==="l"||s==="xl") root.setAttribute("data-size",s); else root.removeAttribute("data-size"); }
+  const s=store.get("nw-size"); if(s==="l"||s==="xl") root.setAttribute("data-size",s); else root.removeAttribute("data-size");
+  if(LOOK.color!=="blue") root.setAttribute("data-color",LOOK.color); else root.removeAttribute("data-color");
+  if(LOOK.density!=="normal") root.setAttribute("data-density",LOOK.density); else root.removeAttribute("data-density");
+  const m=document.querySelector('meta[name="theme-color"]'); if(m) m.setAttribute("content",(COLORS.find(c=>c[0]===LOOK.color)||COLORS[0])[2]); }
 applySettings();
 
 // ===== 自作イラスト(SVG) =====
@@ -473,9 +533,14 @@ const TABS = [
   ["today","📰","きょう"],["search","🔎","さがす"],["map","🗺️","地図"],["explain","💡","解説"],["numbers","📈","数字"],["plan","📅","予定"],["my","⭐","マイ"],["words","📖","ことば",1]
 ];
 const tabsEl = document.getElementById("tabs");
-tabsEl.innerHTML = TABS.filter(t=>!t[3]).map(([k,i,l])=>`<button class="tab" role="tab" id="tab-${k}" data-k="${k}" aria-selected="false"><span class="ti" aria-hidden="true">${i}</span>${l}</button>`).join("");
-tabsEl.addEventListener("click",e=>{const b=e.target.closest(".tab"); if(b) go(b.dataset.k);});
+function drawTabs(){
+  const shown=LOOK.tabs.filter(k=>!LOOK.tabOff[k]).map(k=>TABS.find(t=>t[0]===k)).filter(Boolean);
+  tabsEl.style.gridTemplateColumns=`repeat(${shown.length},minmax(0,1fr))`;
+  tabsEl.innerHTML = shown.map(([k,i,l])=>`<button class="tab" role="tab" id="tab-${k}" data-k="${k}" aria-selected="${String(k===current||(current==="words"&&k==="search"))}"><span class="ti" aria-hidden="true">${i}</span>${l}</button>`).join("");
+}
 let current = null; const charts=[];
+drawTabs();
+tabsEl.addEventListener("click",e=>{const b=e.target.closest(".tab"); if(b) go(b.dataset.k);});
 function go(k, opts){
   if(!TABS.some(t=>t[0]===k)) k="today";
   current=k; store.set("nw-tab",k);
@@ -503,20 +568,17 @@ function weatherCard(){
 function exLink(id){ return id && D.explainers[id] ? ` data-ex="${id}"` : ""; }
 function renderToday(){
   const t=D.top10;
-  main.innerHTML = `<div class="view">
-    <div class="hero">
+  const S={};
+  S.play=`<div class="hero">
       <button class="play" id="playBtn"><span class="pi" aria-hidden="true">▶</span><span><b>1分で見る 今日のニュース</b><span>動くスライドで自動再生。タップで止めたり進めたり</span></span></button>
-    </div>
-    ${personalCards()}
-    ${installCard()}
-    ${navigator.onLine===false?'<div class="offline">📴 いまはオフラインです。前に読み込んだ内容を表示しています。</div>':''}
-    ${weatherCard()}
-    <section aria-label="今日の3行">
+    </div>`;
+  S.weather=weatherCard();
+  S.three=`<section aria-label="今日の3行">
       <div class="sec-h"><h2>☀️ 今日の3行</h2><span class="sub">時間がない日はここだけでOK</span></div>
       <div class="three" style="margin-top:10px">${D.three.map(x=>`<button class="t ${x.tone}"${exLink(x.ex)}><span class="lab">${esc(x.label)}</span><h3>${esc(x.title)}</h3><p>${esc(x.text)}</p>${x.ex?'<span class="more">くわしく →</span>':''}</button>`).join("")}</div>
       <button class="fchip" id="shareImg" style="margin-top:10px">🖼️ 画像にして送る</button>
-    </section>
-    <section aria-label="今日のニュース10">
+    </section>`;
+  S.ten=`<section aria-label="今日のニュース10">
       <div class="sec-h"><h2>📰 今日のニュース10</h2><span class="sub">関心の高い順</span></div>
       <ol class="ten" style="margin-top:10px">${t.map((n,i)=>{
         const big=i<3; const link=n.ex||n.tab;
@@ -527,18 +589,26 @@ function renderToday(){
           ${n.text?`<p>${esc(n.text)}</p>`:""}
           ${n.point?`<div class="pt">💭 <b>ここがポイント</b> ${esc(n.point)}</div>`:""}
           ${link?`<span class="more">${n.ex?'くわしい解説 →':'グラフを見る →'}</span>`:''}</span></button></li>`;}).join("")}</ol>
-    </section>
-    ${forYou()}
-    ${otherNews()}
-    ${D.quiz&&D.quiz.length?`<section class="card quiz" aria-label="今日のクイズ" id="quiz"></section>`:""}
-    <section class="card" aria-label="今日の数字">
+    </section>`;
+  S.foryou=forYou();
+  S.other=otherNews();
+  S.quiz=D.quiz&&D.quiz.length?`<section class="card quiz" aria-label="今日のクイズ" id="quiz"></section>`:"";
+  S.number=`<section class="card" aria-label="今日の数字">
       <div class="sec-h"><h2>🔢 今日の数字</h2></div>
       <div class="bignum" style="margin-top:6px"><div class="v num">${esc(D.number.value)}<small>${esc(D.number.unit)}</small></div><p style="margin:0">${esc(D.number.caption)}</p><span class="hint">(${esc(D.number.src)})</span></div>
       ${marketsMini()}
-    </section>
+    </section>`;
+  const body=LOOK.order.filter(k=>!LOOK.off[k]).map(k=>S[k]||"").join("");
+  main.innerHTML = `<div class="view">
+    ${personalCards()}
+    ${installCard()}
+    ${navigator.onLine===false?'<div class="offline">📴 いまはオフラインです。前に読み込んだ内容を表示しています。</div>':''}
+    ${body||'<div class="card"><b>表示する項目がありません</b><div class="hint">着せかえで、見たい項目をオンにしてください。</div></div>'}
+    <button class="fchip" id="lookBtnToday" style="align-self:flex-start">🎨 この画面の並びを変える</button>
     ${footer()}
   </div>`;
-  document.getElementById("playBtn").onclick=openStory;
+  const pb=document.getElementById("playBtn"); if(pb) pb.onclick=openStory;
+  document.getElementById("lookBtnToday").onclick=openLook;
   bindInstall(); bindPersonal(); checkBadges();
   if(document.getElementById("quiz")) drawQuiz(0,[]);
   main.querySelectorAll("[data-ex]").forEach(b=>b.addEventListener("click",()=>openEx(b.dataset.ex)));
@@ -931,13 +1001,64 @@ document.getElementById("setBtn").onclick=()=>{
   const p=document.getElementById("pop"); const t=store.get("nw-theme")||"system"; const s=store.get("nw-size")||"m";
   p.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><b>表示の設定</b><button class="iconbtn" id="popx" aria-label="閉じる" style="background:transparent;color:inherit;border-color:currentColor">✕</button></div>
     <div class="setrow" style="margin-bottom:10px"><span style="min-width:5em">文字の大きさ</span><span class="seg">${[["m","ふつう"],["l","大きめ"],["xl","特大"]].map(([k,l])=>`<button data-size="${k}" aria-pressed="${s===k}">${l}</button>`).join("")}</span></div>
-    <div class="setrow"><span style="min-width:5em">画面の色</span><span class="seg">${[["system","自動"],["light","明るい"],["dark","暗い"]].map(([k,l])=>`<button data-theme="${k}" aria-pressed="${t===k}">${l}</button>`).join("")}</span></div>`;
+    <div class="setrow"><span style="min-width:5em">画面の色</span><span class="seg">${[["system","自動"],["light","明るい"],["dark","暗い"]].map(([k,l])=>`<button data-theme="${k}" aria-pressed="${t===k}">${l}</button>`).join("")}</span></div>
+    <button id="popLook" style="margin-top:12px;border:0;background:transparent;color:inherit;text-decoration:underline;cursor:pointer;padding:0">🎨 色・並び・タブも変える(着せかえ) →</button>`;
   p.hidden=false;
   document.getElementById("popx").onclick=()=>p.hidden=true;
+  document.getElementById("popLook").onclick=()=>{ p.hidden=true; openLook(); };
   p.querySelectorAll("[data-size]").forEach(b=>b.onclick=e=>{e.stopPropagation(); store.set("nw-size",b.dataset.size); applySettings(); p.querySelectorAll("[data-size]").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));});
   p.querySelectorAll("[data-theme]").forEach(b=>b.onclick=e=>{e.stopPropagation(); store.set("nw-theme",b.dataset.theme); applySettings(); p.querySelectorAll("[data-theme]").forEach(x=>x.setAttribute("aria-pressed",String(x===b))); if(current==="numbers"||current==="plan") go(current,{keepScroll:true});});
 };
 document.getElementById("setBtn").addEventListener("click",e=>e.stopPropagation());
+
+// ===== 着せかえ(わたし好みのニュースアプリにする) =====
+const TABNAME = k=>{ const t=TABS.find(x=>x[0]===k); return t?`${t[1]} ${t[2]}`:k; };
+const PRESETS = [
+  ["read","📰 しっかり読む","解説やクイズもぜんぶ",{density:"roomy",order:["play","three","ten","foryou","weather","other","quiz","number"],off:{}}],
+  ["quick","⚡ さっと見る","朝の5分で要点だけ",{density:"compact",order:["weather","three","ten","number","foryou","play","other","quiz"],off:{play:true,other:true,quiz:true}}],
+  ["fun","🎈 たのしむ","動画とクイズを上に",{density:"normal",order:["play","quiz","three","ten","foryou","weather","number","other"],off:{}}],
+  ["money","💴 お金と暮らし","天気と数字を先に",{density:"normal",order:["weather","number","three","ten","foryou","other","quiz","play"],off:{}}]
+];
+function openLook(){
+  const sh=document.getElementById("sheet");
+  const draw=()=>{
+    const th=store.get("nw-theme")||"system", sz=store.get("nw-size")||"m";
+    const listRow=(arr,i,name,on,kind,locked)=>`<li class="${on?"":"off"}"><span class="nm">${esc(name)}</span>
+      <button class="mv" data-mv="${kind}" data-i="${i}" data-d="-1" aria-label="${esc(name)}を上へ" ${i===0?"disabled":""}>↑</button>
+      <button class="mv" data-mv="${kind}" data-i="${i}" data-d="1" aria-label="${esc(name)}を下へ" ${i===arr.length-1?"disabled":""}>↓</button>
+      ${locked?`<span class="lock">いつも表示</span>`:`<button class="sw2" data-sw="${kind}" data-k="${arr[i]}" aria-pressed="${on}">${on?"表示":"非表示"}</button>`}</li>`;
+    sh.innerHTML=`<div class="bar"><div class="wrap"><button class="iconbtn" id="lkx" aria-label="もどる">←</button><span class="ttl">🎨 着せかえ</span><button class="iconbtn" id="lkdone">できた</button></div></div>
+    <div class="wrap body">
+      <div class="hint">あなた好みのニュースアプリに作りかえられます。変えるとすぐ反映され、このスマホの中だけに保存されます。</div>
+      <section class="lk-sec"><h3>おまかせセット</h3><div class="presets">${PRESETS.map(p=>`<button data-preset="${p[0]}"><b>${p[1]}</b><span>${esc(p[2])}</span></button>`).join("")}</div></section>
+      <section class="lk-sec"><h3>テーマの色</h3><div class="sw">${COLORS.map(c=>`<button data-col="${c[0]}" aria-pressed="${LOOK.color===c[0]}" aria-label="${c[1]}" title="${c[1]}" style="background:${c[2]}"></button>`).join("")}</div>
+        <div class="setrow"><span style="min-width:5em">画面</span><span class="seg">${[["system","自動"],["light","明るい"],["dark","暗い"]].map(([k,l])=>`<button data-lt="${k}" aria-pressed="${th===k}">${l}</button>`).join("")}</span></div></section>
+      <section class="lk-sec"><h3>文字と詰め具合</h3>
+        <div class="setrow"><span style="min-width:5em">文字</span><span class="seg">${[["m","ふつう"],["l","大きめ"],["xl","特大"]].map(([k,l])=>`<button data-ls="${k}" aria-pressed="${sz===k}">${l}</button>`).join("")}</span></div>
+        <div class="setrow"><span style="min-width:5em">詰め具合</span><span class="seg">${[["compact","ぎっしり"],["normal","ふつう"],["roomy","ゆったり"]].map(([k,l])=>`<button data-ld="${k}" aria-pressed="${LOOK.density===k}">${l}</button>`).join("")}</span></div>
+        <div class="hint">「ぎっしり」は、ニュース10の4位以下を見出しだけにして、1画面にたくさん並べます。</div></section>
+      <section class="lk-sec"><h3>「きょう」の画面の並び</h3><div class="hint">↑↓で順番、右のボタンで表示/かくす。</div>
+        <ul class="lk-list">${LOOK.order.map((k,i)=>listRow(LOOK.order,i,(SECS.find(s=>s[0]===k)||[k,k])[1],!LOOK.off[k],"sec",false)).join("")}</ul></section>
+      <section class="lk-sec"><h3>下のタブの並び</h3><div class="hint">よく使うタブを左に。使わないタブはかくせます(「マイ」はいつも表示)。</div>
+        <ul class="lk-list">${LOOK.tabs.map((k,i)=>listRow(LOOK.tabs,i,TABNAME(k),!LOOK.tabOff[k],"tab",k==="my")).join("")}</ul></section>
+      <button class="fchip" id="lkreset" style="align-self:flex-start">はじめの見た目にもどす</button>
+    </div>`;
+    sh.querySelector("#lkx").onclick=close; sh.querySelector("#lkdone").onclick=close;
+    sh.querySelectorAll("[data-col]").forEach(b=>b.onclick=()=>{ LOOK.color=b.dataset.col; saveLook(); applySettings(); redraw(); });
+    sh.querySelectorAll("[data-lt]").forEach(b=>b.onclick=()=>{ store.set("nw-theme",b.dataset.lt); applySettings(); redraw(); });
+    sh.querySelectorAll("[data-ls]").forEach(b=>b.onclick=()=>{ store.set("nw-size",b.dataset.ls); applySettings(); redraw(); });
+    sh.querySelectorAll("[data-ld]").forEach(b=>b.onclick=()=>{ LOOK.density=b.dataset.ld; saveLook(); applySettings(); redraw(); });
+    sh.querySelectorAll("[data-mv]").forEach(b=>b.onclick=()=>{ const arr=b.dataset.mv==="sec"?LOOK.order:LOOK.tabs; const i=+b.dataset.i, j=i+(+b.dataset.d); if(j<0||j>=arr.length) return; [arr[i],arr[j]]=[arr[j],arr[i]]; saveLook(); drawTabs(); redraw(`[data-mv="${b.dataset.mv}"][data-i="${j}"][data-d="${b.dataset.d}"]`); });
+    sh.querySelectorAll("[data-sw]").forEach(b=>b.onclick=()=>{ const o=b.dataset.sw==="sec"?LOOK.off:LOOK.tabOff; o[b.dataset.k]=!o[b.dataset.k]; saveLook(); drawTabs(); redraw(); });
+    sh.querySelectorAll("[data-preset]").forEach(b=>b.onclick=()=>{ const p=PRESETS.find(x=>x[0]===b.dataset.preset); if(!p) return; LOOK.density=p[3].density; LOOK.order=p[3].order.slice(); LOOK.off=Object.assign({},p[3].off); saveLook(); applySettings(); redraw(); toast(`「${p[1].replace(/^\S+ /,"")}」にしました`); });
+    sh.querySelector("#lkreset").onclick=()=>{ LOOK.color="blue"; LOOK.density="normal"; LOOK.order=SECS.map(s=>s[0]); LOOK.off={}; LOOK.tabs=["today","search","map","explain","numbers","plan","my"]; LOOK.tabOff={}; store.set("nw-theme","system"); store.set("nw-size","m"); saveLook(); applySettings(); drawTabs(); redraw(); };
+  };
+  const redraw=(focusSel)=>{ const y=sh.scrollTop; draw(); sh.scrollTop=y; if(focusSel){ const f=sh.querySelector(focusSel); if(f&&!f.disabled) f.focus(); } };
+  const close=()=>{ sh.hidden=true; sh.innerHTML=""; document.body.style.overflow=""; document.removeEventListener("keydown",esck); go(current||"today",{keepScroll:true}); };
+  const esck=ev=>{ if(ev.key==="Escape") close(); };
+  document.addEventListener("keydown",esck);
+  draw(); sh.hidden=false; sh.scrollTop=0; document.body.style.overflow="hidden"; sh.querySelector("#lkx").focus();
+}
 document.getElementById("pop").addEventListener("click",e=>e.stopPropagation());
 
 // ===== 一人ひとりの記録(見る人のスマホの中だけに保存) =====
@@ -1110,6 +1231,7 @@ function renderMy(){
   const readNames=Object.keys(ME.readEx).filter(k=>D.explainers[k]).map(k=>D.explainers[k].name);
   main.innerHTML=`<div class="view">
     <div class="sec-h"><h2>⭐ わたしの記録</h2><span class="sub">このスマホの中だけに保存</span></div>
+    <button class="lookcard" id="lookBtnMy"><span class="pal" aria-hidden="true" style="padding-left:5px">${COLORS.slice(0,5).map(c=>`<i style="background:${c[2]}"></i>`).join("")}</span><span><b>🎨 着せかえ</b><span class="hint" style="display:block">色・文字・画面の並び・タブを、わたし好みに</span></span></button>
     ${pinsBlock()}
     <section class="card lvcard"><div class="lvrow"><div class="lvbig">Lv.${lv.i+1}</div><div><b style="font-size:1.1rem">${esc(lv.name)}</b><div class="hint">${lv.pt}ポイント${lv.next?` ・ 次の「${esc(lv.next[1])}」まで あと${lv.next[0]-lv.pt}`:" ・ 最高レベル!"}</div></div></div>
       <div class="bar"><i style="width:${Math.round(lv.prog*100)}%"></i></div>
@@ -1141,6 +1263,7 @@ function renderMy(){
   main.querySelectorAll("[data-tab]").forEach(b=>b.onclick=()=>go(b.dataset.tab));
   main.querySelectorAll("#myInt [data-g]").forEach(b=>b.onclick=()=>{ const g=b.dataset.g; ME.interests[g]=!ME.interests[g]; b.setAttribute("aria-pressed",String(!!ME.interests[g])); saveMe(); });
   document.getElementById("weekBtn2").onclick=()=>openStory(buildWeekSlides);
+  document.getElementById("lookBtnMy").onclick=openLook;
   bindPins();
   document.getElementById("resetMe").onclick=()=>{ document.getElementById("resetConfirm").innerHTML='<p>本当に消しますか? 元にはもどせません。</p><button class="fchip" id="resetYes">消す</button>'; document.getElementById("resetYes").onclick=()=>{ try{ localStorage.removeItem("nw-me"); }catch(_){} location.reload(); }; };
 }
