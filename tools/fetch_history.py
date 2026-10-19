@@ -29,6 +29,44 @@ def stooq(sym):
             continue
     return rows
 
+def yahoo(sym):
+    rows = []
+    for host in ("query1", "query2"):
+        try:
+            j = json.loads(get(f"https://{host}.finance.yahoo.com/v8/finance/chart/{sym}?range=max&interval=1d", timeout=40))
+            r = j["chart"]["result"][0]
+            ts = r["timestamp"]; cl = r["indicators"]["quote"][0]["close"]
+            for t, c in zip(ts, cl):
+                if c is None:
+                    continue
+                d = (datetime.datetime.fromtimestamp(t, datetime.timezone.utc) + datetime.timedelta(hours=9)).strftime("%Y-%m-%d")
+                rows.append((d, round(float(c), 2)))
+            if rows:
+                return rows
+        except Exception:  # noqa: BLE001
+            continue
+    return rows
+
+def nikkei_official():
+    rows = []
+    for name in ("nikkei_stock_average_daily_jp.csv", "nikkei_stock_average_daily_en.csv"):
+        try:
+            txt = get(f"https://indexes.nikkei.co.jp/nkave/historical/{name}", timeout=40)
+        except Exception:  # noqa: BLE001
+            continue
+        for row in csv.reader(io.StringIO(txt)):
+            if len(row) < 2:
+                continue
+            d = row[0].strip().replace("/", "-")
+            try:
+                if len(d) == 10 and d[4] == "-":
+                    rows.append((d, round(float(row[1].replace(",", "")), 2)))
+            except ValueError:
+                continue
+        if rows:
+            break
+    return rows
+
 def frankfurter():
     rows = []
     for start, end in (("1999-01-04", "2012-12-31"), ("2013-01-01", "")):
@@ -37,9 +75,9 @@ def frankfurter():
     return rows
 
 SERIES = {
-    "nikkei": ("日経平均株価(終値)", "円", [("FRED", lambda: fred("NIKKEI225")), ("Stooq", lambda: stooq("%5Enkx"))]),
+    "nikkei": ("日経平均株価(終値)", "円", [("FRED", lambda: fred("NIKKEI225")), ("Yahoo", lambda: yahoo("%5EN225")), ("日経公式CSV", nikkei_official), ("Stooq", lambda: stooq("%5Enkx"))]),
     "yen":    ("1ドルあたりの円", "円", [("FRED", lambda: fred("DEXJPUS")), ("Frankfurter(欧州中央銀行)", frankfurter)]),
-    "oil":    ("NY原油 WTI", "ドル", [("FRED", lambda: fred("DCOILWTICO")), ("Stooq", lambda: stooq("cl.f"))]),
+    "oil":    ("NY原油 WTI", "ドル", [("FRED", lambda: fred("DCOILWTICO")), ("Yahoo", lambda: yahoo("CL%3DF")), ("Stooq", lambda: stooq("cl.f"))]),
 }
 
 old = {}
