@@ -4,7 +4,7 @@
 元のデータは Notion の「ニュース」ページとデータベース。1日4回の自動更新でまとめている。
 
 ## ファイル
-- `index.html` — 見た目と動き(HTML・CSS・JavaScript を1ファイルに)。外部ライブラリは Chart.js(jsDelivr)と Google Fonts だけ。
+- `index.html` — 見た目と動き(HTML・CSS・JavaScript を1ファイルに)。外部ライブラリは Chart.js・地図用の d3/topojson(jsDelivr)、Google Fonts、閲覧数の GoatCounter(gc.zgo.at)だけ。
 - `data.js` — 中身のデータ(`window.NEWS_DATA`)。ニュースの更新では、基本的にこのファイルだけを書き換える。
 - `manifest.webmanifest`・`sw.js`・`icon-*.png`・`apple-touch-icon.png` — ホーム画面に追加してアプリのように使うための設定。`sw.js` は前回の内容をオフラインでも読めるようにする(index.html と data.js はネット優先)。
 - `robots.txt` と `<meta name="robots" content="noindex">` — 検索エンジンに出さないための設定。消さない。
@@ -21,7 +21,7 @@
 ## 一人ひとりの記録(マイ)
 - 連続日数・読んだ解説・クイズ・調べたことば・予想・関心のジャンルは、見る人のブラウザの localStorage(キー `nw-me`)だけに保存する。サーバーや外部には送らない。
 - 📍で保存したニュースとメモも `nw-me` の `pins` に入る(見る人のスマホの中だけ)。
-- 例外: 閲覧数の集計(index.html の `STATS`)。いまはオフ。公開するときだけ GoatCounter の code を入れて on にする。送るのは画面・解説・ジャンルごとの回数だけ(`track()`)。質問文・メモ・記録は送らない。オンにするときは使い方の「記録について」に自動で一文が出る。
+- 例外: 閲覧数の集計(index.html の `STATS`)。2026-10-20 からオン(GoatCounter、code は `subikep22`、管理画面 https://subikep22.goatcounter.com、スクリプトは gc.zgo.at)。送るのは画面・解説・ジャンルごとの回数だけ(`track()`)。質問文・メモ・記録は送らない。オンにするときは使い方の「記録について」に自動で一文が出る。
 - ペット(`ME.pet`): 育ち(そだち)は ごはん×5+開いた日×2+読んだ解説×3+調べたことば で計算。クイズの正解1問=ごはん1こ(1日8こまで、同じ問題は1回だけ)。小物は `PET_ACC`(よく読むジャンル)、段階は `PET_STAGES`。絵は自作SVG(`petSVG`)。おかわりクイズは ことば辞典から毎日3問(`wordQuiz`)。
 - ペットの着せかえは `WEAR`(服・着られる条件)、部屋は `ROOM`(よく読むジャンルで家具)、日記は `diaryHTML`(直近7日)、ともだち(2匹目)は `friendOn`(おとな または 14日)。使った機能の目印は `ME.flags`。
 - 予想ノート `ME.myPred`、ことばカード `cardsHTML`(レア度 `wordRarity`)、挑戦状の点数ランキング `ME.rivals`、自分だけの新聞 `openMyPaper`(保存したニュース+メモ→画像)、横の年表(解説の `timeline`+`next`)。

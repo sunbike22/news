@@ -652,7 +652,7 @@ document.getElementById("upd").innerHTML = `最終更新<br><b class="num">${esc
 // ===== 閲覧数の集計(公開するときに使う。いまはオフ) =====
 // 使い方: GoatCounter(https://www.goatcounter.com/ 無料・個人を追わない)で登録し、code に登録した名前を入れて on を true にする。
 // 送るのは「どの画面・どの解説・どのジャンルが開かれたか」の回数だけ。質問の文章・メモ・記録は送らない。
-const STATS = { on:false, code:"" };
+const STATS = { on:true, code:"subikep22" };
 let gcReady=false; const gcQueue=[];
 function track(path,title){ if(!STATS.on||!STATS.code) return; const ev={path:String(path).slice(0,80),title:String(title||path).slice(0,80),event:true};
   if(gcReady&&window.goatcounter&&window.goatcounter.count){ try{ window.goatcounter.count(ev); }catch(_){} } else gcQueue.push(ev); }
@@ -1981,6 +1981,7 @@ function onboard(force){ if(!force && (store.get("nw-onboard")==="1" || ME.days.
   document.body.appendChild(ov); draw(); }
 // ===== お知らせ(新しくなったところ)。機能を足したら、いちばん上に1つ足す =====
 const UPDATES=[
+  {id:"2026-10-20k",d:"2026-10-20",t:"📊 よく読まれている話題を数えはじめました",L:["どの画面・解説・ジャンルが何回開かれたかだけを数えます(GoatCounter・だれが見たかはわかりません)","質問の文章・メモ・あなたの記録は送りません。くわしくは「マイ」の使い方の「記録について」へ"]},
   {id:"2026-10-20j",d:"2026-10-20",t:"🐣 はじめての人への案内 & 📈 日経平均の長期グラフ",L:["はじめて開いた人に、ペットが3ステップで使い方を案内します(マイからもう一度見られます)","日経平均の長い期間のグラフが見られるようになりました(日経の公式データ)"]},
   {id:"2026-10-20i",d:"2026-10-20",t:"🔮 予想ノート・🃏 ことばカード・🗞️ 自分の新聞",L:["予定タブに「わたしの予想ノート」。何年先の予想でも書いておけて、その日が来たら答え合わせ","調べたことばがカードになって集まります(N・R・SR)","保存したニュースとメモで「自分だけの新聞」を作って画像で送れます。もらった挑戦状の点数でランキングも","解説の流れが横にスクロールする年表になりました"]},
   {id:"2026-10-20h",d:"2026-10-20",t:"🗾 日本版の捜査ボード",L:["捜査ボードで「🗾 日本」を選ぶと、東京・沖縄・北海道など国内の場所どうしを糸でつなげます"]},
