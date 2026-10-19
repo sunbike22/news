@@ -9,6 +9,13 @@
 - `manifest.webmanifest`・`sw.js`・`icon-*.png`・`apple-touch-icon.png` — ホーム画面に追加してアプリのように使うための設定。`sw.js` は前回の内容をオフラインでも読めるようにする(index.html と data.js はネット優先)。
 - `robots.txt` と `<meta name="robots" content="noindex">` — 検索エンジンに出さないための設定。消さない。
 
+## 長い期間のグラフ
+- `history.json` は GitHub Actions(`.github/workflows/history.yml` → `tools/fetch_history.py`)が毎朝 FRED から自動で作る。手で書き換えない。
+- 時間ごとのデータは無料の確かな取得先がないので扱わない。
+
+## AIに聞く
+- 解説ページの「AIに聞く」は、解説の要点と質問を入れた状態で claude.ai を開くだけ。サイトにAPIキーは置かない。
+
 ## 一人ひとりの記録(マイ)
 - 連続日数・読んだ解説・クイズ・調べたことば・予想・関心のジャンルは、見る人のブラウザの localStorage(キー `nw-me`)だけに保存する。サーバーや外部には送らない。
 - 地図の場所は index.html の `PLACES`(見出しのことば→場所)で決める。新しい場所が増えたらここに足す。

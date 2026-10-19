@@ -197,6 +197,11 @@ mark{background:#ffe066;color:#141b2d;border-radius:3px;padding:0 1px}
 .photo figcaption{font-size:.72rem;color:var(--muted);margin-top:4px}
 @media (prefers-reduced-motion: reduce){.pin .pulse{animation:none}}
 
+.lsum{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0 6px}
+.lsum>div{background:var(--surface2);border-radius:10px;padding:6px 10px;display:flex;flex-direction:column;line-height:1.3;min-width:0}
+.lsum b{font-size:.98rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ask .sbox{border-width:1px}
+
 /* install */
 .install{display:grid;grid-template-columns:48px 1fr auto;gap:12px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:12px 14px}
 .install img{width:48px;height:48px;border-radius:12px}
@@ -724,6 +729,7 @@ function openEx(k){
     <div class="blk"><h3>📅 これまでの流れ</h3><ol class="tl">${e.timeline.map(([d,t])=>`<li><b>${esc(d)}</b>${esc(t)}</li>`).join("")}</ol></div>
     ${e.next.length?`<div class="blk"><h3>🔭 次の山場</h3><ul class="us">${e.next.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>`:""}
     ${rel.length?`<div class="blk"><h3>🗞️ 関係するニュースの記録</h3><div class="res"><ul style="list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px">${rel.map(n=>`<li class="item"><div class="meta"><span class="hint">${mdLabel(n.d)}</span>${n.ok?'<span class="badge-ok">✅</span>':'<span class="badge-one">⚠️ 1社</span>'}</div><div class="h">${esc(n.h)}</div></li>`).join("")}</ul></div></div>`:""}
+    ${askBlock(k)}
     <div class="src">📰 出典: ${esc(e.src)}</div>
     <button class="iconbtn" id="shx2" style="align-self:flex-start">← 一覧にもどる</button>
   </div>`;
@@ -739,6 +745,7 @@ function openEx(k){
     try{ navigator.clipboard.writeText(url).then(done,()=>{prompt2(url);}); }catch(_){ prompt2(url); } };
   if(e.calc) bindCalc();
   sh.querySelector("#exSpeak").onclick=ev=>speakEx(k,ev.currentTarget);
+  bindAsk(k);
 }
 function animateFlow(){
   const f=document.getElementById("flow"); if(!f) return; const items=[...f.children];
@@ -760,6 +767,13 @@ function renderNumbers(){
   main.innerHTML=`<div class="view">
     <div class="sec-h"><h2>📈 株・円・原油の動き</h2><span class="sub">点をタップで値が出ます</span></div>
     ${marketsMini()}
+    <section class="card" id="longBox"><h3 style="font-size:1rem">🕰️ 長い期間で見る</h3>
+      <div class="chips" style="margin-top:8px" id="lsSer"><button class="fchip" data-s="nikkei" aria-pressed="true">📈 日経平均</button><button class="fchip" data-s="yen" aria-pressed="false">💴 1ドル</button><button class="fchip" data-s="oil" aria-pressed="false">🛢️ 原油</button></div>
+      <div class="chips" style="margin-top:6px" id="lsRng"><button class="fchip" data-r="30" aria-pressed="false">1か月</button><button class="fchip" data-r="90" aria-pressed="false">3か月</button><button class="fchip" data-r="365" aria-pressed="true">1年</button><button class="fchip" data-r="1825" aria-pressed="false">5年</button><button class="fchip" data-r="all" aria-pressed="false">全期間</button></div>
+      <div class="lsum" id="lsSum"></div>
+      <div class="chartbox" style="height:240px"><canvas id="cl" aria-label="長い期間のグラフ"></canvas></div>
+      <div class="legend-note" id="lsNote">データを読み込んでいます…</div></section>
+    <h3 style="font-size:1rem;margin:4px 0 -10px">🗓️ このサイトで記録した毎日の値</h3>
     <section class="card"><h3 style="font-size:1rem">📈 日経平均(終値・円)</h3><div class="chartbox"><canvas id="c1" aria-label="日経平均のグラフ"></canvas></div><div class="legend-note">日本の代表的な225社の株価の平均。10/15は下げ幅が過去3番目。</div></section>
     <section class="card"><h3 style="font-size:1rem">🛢️ NY原油(WTI・1バレルのドル)</h3><div class="chartbox"><canvas id="c3" aria-label="原油のグラフ"></canvas></div><div class="legend-note">1バレル=約159リットル。点線は100ドルの目安。</div></section>
     <section class="card"><h3 style="font-size:1rem">💴 1ドルが何円か</h3><div class="chartbox"><canvas id="c2" aria-label="円相場のグラフ"></canvas></div><div class="legend-note">数字が大きいほど円安。輸入する食べ物や燃料が高くなりやすい。</div></section>
@@ -778,9 +792,60 @@ function renderNumbers(){
   mk("c1",1,css("--g-pol"),v=>Math.round(v).toLocaleString("ja-JP")+"円");
   mk("c3",3,css("--g-soc"),v=>v.toFixed(1)+"ドル",[{data:labels.map(()=>100),borderColor:css("--g-intl"),borderDash:[6,5],borderWidth:1.5,pointRadius:0,fill:false,spanGaps:true}]);
   mk("c2",2,css("--g-eco"),v=>v.toFixed(2)+"円");
+  longChart();
   const cnt=GORDER.map(g=>NEWS.filter(n=>n.g===g && n.d>="2026-10-11").length);
   charts.push(new Chart(document.getElementById("c4"),{type:"bar",data:{labels:GORDER.map(g=>GN[g]),datasets:[{data:cnt,backgroundColor:GORDER.map(g=>css("--g-"+g)),borderRadius:6}]},options:{indexAxis:"y",maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.raw+"件"}}},scales:{x:{grid:{color:line},ticks:{precision:0}},y:{grid:{display:false}}}}}));
 }
+
+// ===== 長い期間のグラフ(history.json: FREDのデータを毎日自動で取得) =====
+let HIST=null, lsState={s:"nikkei",r:"365"};
+async function loadHist(){ if(HIST) return HIST; const r=await fetch("history.json",{cache:"no-cache"}); if(!r.ok) throw new Error("no"); HIST=await r.json(); return HIST; }
+function longChart(){
+  const box=document.getElementById("longBox"); if(!box||!window.Chart) return;
+  box.querySelectorAll("#lsSer [data-s]").forEach(b=>b.onclick=()=>{ lsState.s=b.dataset.s; box.querySelectorAll("#lsSer [data-s]").forEach(x=>x.setAttribute("aria-pressed",String(x===b))); draw(); });
+  box.querySelectorAll("#lsRng [data-r]").forEach(b=>b.onclick=()=>{ lsState.r=b.dataset.r; box.querySelectorAll("#lsRng [data-r]").forEach(x=>x.setAttribute("aria-pressed",String(x===b))); draw(); });
+  box.querySelectorAll("#lsSer [data-s]").forEach(x=>x.setAttribute("aria-pressed",String(x.dataset.s===lsState.s)));
+  box.querySelectorAll("#lsRng [data-r]").forEach(x=>x.setAttribute("aria-pressed",String(x.dataset.r===lsState.r)));
+  let chart=null;
+  function draw(){
+    loadHist().then(H=>{
+      const S=H.series[lsState.s]; if(!S) return;
+      const useMonthly = lsState.r==="all" || lsState.r==="1825";
+      let rows = useMonthly ? S.monthly : S.daily;
+      if(lsState.r!=="all"){ const from=new Date(Date.parse(TODAY)-(+lsState.r)*864e5).toISOString().slice(0,useMonthly?7:10); rows=rows.filter(r=>r[0]>=from); }
+      // このサイトで記録した最新の値もつなげる(FREDは数日遅れのため)
+      if(!useMonthly){ const idx={nikkei:1,yen:2,oil:3}[lsState.s]; const last=rows.length?rows[rows.length-1][0]:""; D.markets.forEach(m=>{ if(m[idx]!=null && m[0]>last) rows.push([m[0],m[idx]]); }); }
+      if(!rows.length){ document.getElementById("lsNote").textContent="この期間のデータがありません。"; return; }
+      const first=rows[0][1], lastV=rows[rows.length-1][1], diff=lastV-first, pct=first?diff/first*100:0;
+      const hi=rows.reduce((a,r)=>r[1]>a[1]?r:a), lo=rows.reduce((a,r)=>r[1]<a[1]?r:a);
+      const f=v=> lsState.s==="nikkei"? Math.round(v).toLocaleString("ja-JP")+"円" : v.toFixed(2)+(S.unit);
+      const lab=d=> d.length===7? d.replace("-","/") : `${+d.slice(5,7)}/${+d.slice(8,10)}`;
+      document.getElementById("lsSum").innerHTML=`<div><span class="hint">期間の変化</span><b class="${diff>=0?'up':'dn'}" style="font-size:1.1rem">${diff>=0?"▲":"▼"}${Math.abs(pct).toFixed(1)}%</b></div><div><span class="hint">いちばん高い</span><b>${f(hi[1])}</b><small class="hint">${lab(hi[0])}</small></div><div><span class="hint">いちばん安い</span><b>${f(lo[1])}</b><small class="hint">${lab(lo[0])}</small></div>`;
+      const col=css({nikkei:"--g-pol",yen:"--g-eco",oil:"--g-soc"}[lsState.s]);
+      const cfg={type:"line",data:{labels:rows.map(r=>useMonthly?r[0].replace("-","/"):r[0].slice(5).replace("-","/")),datasets:[{data:rows.map(r=>r[1]),borderColor:col,backgroundColor:col+"22",fill:true,tension:.2,pointRadius:rows.length>60?0:2,pointHoverRadius:6,borderWidth:2}]},
+        options:{maintainAspectRatio:false,interaction:{mode:"index",intersect:false},plugins:{legend:{display:false},tooltip:{callbacks:{title:c=>{const r=rows[c[0].dataIndex][0]; return r.length===7? r.replace("-","年")+"月(月平均)" : r;},label:c=>f(c.raw)}}},scales:{x:{grid:{display:false},ticks:{maxTicksLimit:6,autoSkip:true}},y:{grid:{color:css("--line")},ticks:{callback:v=>f(v)}}}}};
+      if(chart){ chart.destroy(); } chart=new Chart(document.getElementById("cl"),cfg); charts.push(chart);
+      document.getElementById("lsNote").innerHTML=`${esc(S.label)}。${useMonthly?"5年以上は月ごとの平均。":"1日ごとの値。"}出典: FRED(米セントルイス連銀)・毎日自動で取得、数日遅れ。いちばん新しい数日はこのサイトの記録でつないでいます。${lsState.s==="yen"?"円の値は米連銀の正午レートで、東京の夕方の値と少しちがいます。":""}`;
+    }).catch(()=>{ document.getElementById("lsNote").textContent="長い期間のデータは準備中です(毎朝7時ごろに自動で取得します)。"; });
+  }
+  draw();
+}
+
+// ===== AIに聞く(Claudeを開いて質問) =====
+function askAI(context,q){
+  const prompt=`次のニュースの解説を読んで質問があります。中学生にもわかるやさしい日本語で、事実と推測を分けて答えてください。わからないことは「わからない」と答えてください。\n\n【解説】\n${context}\n\n【質問】\n${q}`;
+  const url="https://claude.ai/new?q="+encodeURIComponent(prompt.slice(0,1800));
+  const a=document.createElement("a"); a.href=url; a.target="_blank"; a.rel="noopener"; document.body.appendChild(a); a.click(); a.remove();
+}
+function askBlock(k){ const e=D.explainers[k]; const ex=[e.faq[0]&&e.faq[0][0],"わたしの生活にはどう関係する?","これから先、どうなりそう?"].filter(Boolean);
+  return `<div class="blk card ask"><h3>🤖 AIに聞いてみる</h3><p class="hint" style="margin:0 0 8px">知りたいことを書くと、この解説の内容をつけてClaude(AI)が開きます。Claudeのアカウント(無料で作れます)が必要です。AIの答えはまちがうこともあるので、大事なことは出典で確かめてください。</p>
+    <div class="chips" style="margin-bottom:8px">${ex.map(x=>`<button class="fchip" data-askq="${esc(x)}">${esc(x)}</button>`).join("")}</div>
+    <div class="sbox"><input id="askIn" type="text" placeholder="例: なぜ原油が上がるとガソリンも上がるの?" autocomplete="off"><button class="iconbtn" id="askGo" style="background:var(--accent);color:var(--on-accent);border-color:var(--accent)">聞く</button></div></div>`; }
+function bindAsk(k){ const e=D.explainers[k]; const ctx=[e.name,"ひとことで: "+e.kid,e.more.join(" "),"流れ: "+e.timeline.slice(-5).map(t=>t.join(" ")).join(" / ")].join("\n");
+  const go1=q=>{ if(q&&q.trim()) askAI(ctx,q.trim()); };
+  document.getElementById("askGo").onclick=()=>go1(document.getElementById("askIn").value);
+  document.getElementById("askIn").onkeydown=ev=>{ if(ev.key==="Enter") go1(ev.target.value); };
+  document.querySelectorAll("[data-askq]").forEach(b=>b.onclick=()=>go1(b.dataset.askq)); }
 
 // ===== 予定・予測 =====
 const PRED = D.predictions.map(r=>({no:r[0],t:r[1],c:r[2],d:r[3],r:r[4],now:r[5],m:r[6]}));
