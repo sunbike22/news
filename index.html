@@ -451,6 +451,24 @@ svg.eat{animation:petEat .7s ease both!important}
 .pp-stamp.hit{color:#c62828}.pp-stamp.miss{color:#455a64}.pp-stamp.part{color:#b26a00}
 .pp-art.done h3{padding-right:52px}
 .cap-lock{background:var(--surface2);border:1px dashed var(--line);border-radius:10px;padding:8px 12px;font-size:.9rem}
+/* もしも計算機 */
+.if-row{display:flex;flex-direction:column;gap:6px;padding:10px 0;border-top:1px solid var(--line)}
+.if-row label{display:flex;flex-wrap:wrap;align-items:center;gap:6px;font-size:.92rem}
+.if-row input[type=number]{width:7em;font:inherit;padding:4px 8px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink)}
+.if-row input[type=range]{width:100%;accent-color:var(--accent)}
+.if-out{font-size:1rem;background:var(--surface2);border-radius:10px;padding:6px 10px}
+.if-out .up,.if-out .dn{font-size:inherit;font-weight:700}
+/* 知ってた? */
+.kstack{position:relative;height:150px;margin:10px 0;touch-action:pan-y}
+.kcard{position:absolute;inset:0;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:6px;box-shadow:0 4px 14px rgba(0,0,0,.08);transform:translateY(calc(var(--i)*6px)) scale(calc(1 - var(--i)*.03));transition:transform .3s,opacity .3s;cursor:grab;user-select:none}
+.kcard b{font-size:1.02rem}.kcard .chip{align-self:flex-start}
+.kcard.gone{opacity:0;pointer-events:none}.kcard.gone.r{transform:translateX(120%) rotate(12deg)}.kcard.gone.l{transform:translateX(-120%) rotate(-12deg)}
+.kbtn{display:grid;grid-template-columns:1fr 1fr;gap:8px}.kbtn .fchip{padding:10px;font-size:.95rem;font-weight:700}
+.kdone{display:grid;place-items:center;height:100%;text-align:center;font-weight:700}
+/* 話のタネ */
+.talk{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+.tk{border-left:5px solid var(--c);background:var(--surface2);border-radius:8px;padding:8px 12px;display:flex;flex-direction:column;gap:2px}
+.tk small{color:var(--muted);font-size:.8rem}
 /* 案内係 */
 .gd-fab{position:fixed;right:max(16px,env(safe-area-inset-right,0px));bottom:calc(84px + env(safe-area-inset-bottom,0px));z-index:24;width:54px;height:54px;border-radius:50%;border:0;background:var(--accent);color:var(--on-accent);font-size:1.5rem;box-shadow:0 6px 18px rgba(0,0,0,.22);cursor:pointer}
 @media (min-width:900px){.gd-fab{bottom:24px}}
@@ -559,7 +577,7 @@ function mmdd(iso){ return iso.slice(5,10); }
 function seasonNow(){ if(LOOK.season==="off") return null; if(LOOK.preview){ const z=SEASONS.find(x=>x.k===LOOK.preview); if(z) return z; }
   const t=mmdd(TODAY); return SEASONS.find(z=> z.from<=z.to ? (t>=z.from&&t<=z.to) : (t>=z.from||t<=z.to)) || null; }
 function inSeason(z,iso){ const t=mmdd(iso); return z.from<=z.to ? (t>=z.from&&t<=z.to) : (t>=z.from||t<=z.to); }
-const SECS = [["pet","🐣 ペット"],["play","▶️ 1分で見る"],["weather","🌤️ 天気"],["three","☀️ 今日の3行"],["ten","📰 今日のニュース10"],["mood","🗺️ 世の中の天気図"],["foryou","🎯 あなた向け"],["other","📚 そのほかのニュース"],["quiz","🧠 今日のクイズ"],["number","🔢 今日の数字"]];
+const SECS = [["pet","🐣 ペット"],["play","▶️ 1分で見る"],["weather","🌤️ 天気"],["three","☀️ 今日の3行"],["ten","📰 今日のニュース10"],["mood","🗺️ 世の中の天気図"],["know","👆 知ってた?"],["talk","🍽️ 今日の話のタネ"],["foryou","🎯 あなた向け"],["other","📚 そのほかのニュース"],["quiz","🧠 今日のクイズ"],["number","🔢 今日の数字"]];
 const LOOK = (()=>{ let p={}; try{ p=JSON.parse(store.get("nw-look")||"{}")||{}; }catch(_){ p={}; }
   const fix=(arr,all)=>{ const a=(Array.isArray(arr)?arr:[]).filter(k=>all.includes(k)); all.forEach(k=>{ if(!a.includes(k)) a.push(k); }); return a; };
   const had=new Set(Array.isArray(p.order)?p.order:[]); p.order=fix(p.order,SECS.map(s=>s[0]));
@@ -700,6 +718,8 @@ function renderToday(){
           ${link?`<span class="more">${n.ex?'くわしい解説 →':'グラフを見る →'}</span>`:''}</span></button></li>`;}).join("")}</ol>
     </section>`;
   S.mood=moodCard();
+  S.know=knowCard();
+  S.talk=talkCard();
   S.foryou=forYou();
   S.other=otherNews();
   S.quiz=D.quiz&&D.quiz.length?`<section class="card quiz" aria-label="今日のクイズ" id="quiz"></section>`:"";
@@ -723,7 +743,7 @@ function renderToday(){
   const vg=document.getElementById("vsGo"); if(vg) vg.onclick=()=>{ const q=document.getElementById("quiz"); if(q) q.scrollIntoView({behavior:"smooth",block:"center"}); else toast("いまはクイズがお休みです"); };
   const sx=document.getElementById("seasonX"); if(sx) sx.onclick=()=>{ store.set("nw-season-hide",TODAY+(seasonNow()||{}).k); document.getElementById("seasonCard")?.remove(); };
   document.getElementById("lookBtnToday").onclick=openLook;
-  bindInstall(); bindPersonal(); bindPet(); checkBadges();
+  bindInstall(); bindPersonal(); bindPet(); bindKnow(); bindTalk(); checkBadges();
   main.querySelectorAll("[data-mood]").forEach(b=>b.onclick=()=>{ sState.q=""; sState.th=""; sState.ok=false; sState.onlyNew=false; sState.g=new Set([b.dataset.mood]); go("search"); });
   if(document.getElementById("quiz")) drawQuiz(0,[]);
   main.querySelectorAll("[data-ex]").forEach(b=>b.addEventListener("click",()=>openEx(b.dataset.ex)));
@@ -963,6 +983,7 @@ function renderNumbers(){
   main.innerHTML=`<div class="view">
     <div class="sec-h"><h2>📈 株・円・原油の動き</h2><span class="sub">点をタップで値が出ます</span></div>
     ${marketsMini()}
+    ${ifCalc()}
     <section class="card" id="longBox"><h3 style="font-size:1rem">🕰️ 長い期間で見る</h3>
       <div class="chips" style="margin-top:8px" id="lsSer"><button class="fchip" data-s="nikkei" aria-pressed="true">📈 日経平均</button><button class="fchip" data-s="yen" aria-pressed="false">💴 1ドル</button><button class="fchip" data-s="oil" aria-pressed="false">🛢️ 原油</button></div>
       <div class="chips" style="margin-top:6px" id="lsRng"><button class="fchip" data-r="tick" aria-pressed="false">数時間ごと</button><button class="fchip" data-r="30" aria-pressed="false">1か月</button><button class="fchip" data-r="90" aria-pressed="false">3か月</button><button class="fchip" data-r="365" aria-pressed="true">1年</button><button class="fchip" data-r="1825" aria-pressed="false">5年</button><button class="fchip" data-r="all" aria-pressed="false">全期間</button></div>
@@ -988,6 +1009,7 @@ function renderNumbers(){
   mk("c1",1,css("--g-pol"),v=>Math.round(v).toLocaleString("ja-JP")+"円");
   mk("c3",3,css("--g-soc"),v=>v.toFixed(1)+"ドル",[{data:labels.map(()=>100),borderColor:css("--g-intl"),borderDash:[6,5],borderWidth:1.5,pointRadius:0,fill:false,spanGaps:true}]);
   mk("c2",2,css("--g-eco"),v=>v.toFixed(2)+"円");
+  bindIf();
   longChart();
   const cnt=GORDER.map(g=>NEWS.filter(n=>n.g===g && n.d>="2026-10-11").length);
   charts.push(new Chart(document.getElementById("c4"),{type:"bar",data:{labels:GORDER.map(g=>GN[g]),datasets:[{data:cnt,backgroundColor:GORDER.map(g=>css("--g-"+g)),borderRadius:6}]},options:{indexAxis:"y",maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.raw+"件"}}},scales:{x:{grid:{color:line},ticks:{precision:0}},y:{grid:{display:false}}}}}));
@@ -1573,6 +1595,47 @@ function capsBlock(){ ME.caps=ME.caps||[]; const L=ME.caps.slice().sort((a,b)=>a
   </section>`; }
 function bindCaps(){ document.querySelectorAll("[data-cap]").forEach(b=>b.onclick=()=>{ const m=document.getElementById("capMsg").value.trim(); if(!m){ toast("ひとこと書いてから封をしてね"); return; }
   ME.caps=ME.caps||[]; ME.caps.push({at:TODAY,open:new Date(Date.parse(TODAY)+(+b.dataset.cap)*864e5).toISOString().slice(0,10),msg:m.slice(0,200),top:D.top10.slice(0,3).map(n=>n.title)}); saveMe(); toast("🔒 タイムカプセルに封をしました"); go("my",{keepScroll:true}); }); }
+// ===== もしも計算機(ニュースの数字を自分の暮らしに置きかえる) =====
+function ifCalc(){ const y=lastVal(2); const yen=y?y.v:150;
+  return `<section class="card" id="ifBox"><h3 style="font-size:1rem">🧮 もしも計算機</h3><div class="hint" style="margin:4px 0 10px">ニュースの数字が動いたら、わたしの財布はどうなる?(計算上の目安)</div>
+    <div class="if-row"><b>✈️ 海外旅行</b><label>旅行の予算 <input type="number" id="ifUsd" value="2000" min="0" step="100" inputmode="numeric"> ドル</label>
+      <label>1ドルが <b id="ifYv">${(yen+10).toFixed(0)}</b> 円になったら <input type="range" id="ifY" min="-30" max="30" value="10" aria-label="円の変化"></label><div class="if-out" id="ifYo"></div></div>
+    <div class="if-row"><b>⛽ ガソリン</b><label>1か月に入れる量 <input type="number" id="ifL" value="40" min="0" step="5" inputmode="numeric"> L</label>
+      <label>1Lあたり <b id="ifGv">+10</b> 円 <input type="range" id="ifG" min="-30" max="30" value="10" aria-label="ガソリンの値段の変化"></label><div class="if-out" id="ifGo"></div></div>
+    <div class="if-row"><b>🛒 食料品の消費税</b><label>1か月の食費 <input type="number" id="ifF" value="50000" min="0" step="5000" inputmode="numeric"> 円</label><div class="if-out" id="ifFo"></div></div>
+    <div class="hint">いまの1ドル: ${yen.toFixed(2)}円(${y?esc(mdLabel(y.d)):"—"})。税込みの食費を、8%→1%で計算しています。</div></section>`; }
+function bindIf(){ const $=id=>document.getElementById(id); if(!$("ifBox")) return; const y=lastVal(2); const yen=y?y.v:150; const f=n=>Math.round(n).toLocaleString("ja-JP");
+  const run=()=>{ const usd=+$("ifUsd").value||0, dy=+$("ifY").value; $("ifYv").textContent=(yen+dy).toFixed(0); const d1=usd*dy;
+    $("ifYo").innerHTML=`いま ${f(usd*yen)}円 → <b>${f(usd*(yen+dy))}円</b>(<span class="${d1>0?'dn':'up'}">${d1>=0?"+":""}${f(d1)}円</span>)`;
+    const L=+$("ifL").value||0, dg=+$("ifG").value; $("ifGv").textContent=(dg>=0?"+":"")+dg; const d2=L*dg;
+    $("ifGo").innerHTML=`1か月 <b class="${d2>0?'dn':'up'}">${d2>=0?"+":""}${f(d2)}円</b> ・ 1年で ${d2>=0?"+":""}${f(d2*12)}円`;
+    const F=+$("ifF").value||0; const d3=F/1.08*0.07; $("ifFo").innerHTML=`1か月 <b class="up">−${f(d3)}円</b> ・ 1年で −${f(d3*12)}円(法案が成立した場合)`; };
+  ["ifUsd","ifY","ifL","ifG","ifF"].forEach(id=>$(id).oninput=run); run(); }
+// ===== 知ってた?スワイプ =====
+function knowItems(){ ME.know=ME.know||{}; return NEWS.filter(n=>n.ok && !(nkey(n) in ME.know)).slice(0,5); }
+function knowCard(){ const L=knowItems(); if(!L.length) return "";
+  return `<section class="card know" aria-label="知ってた?"><div class="sec-h"><h2>👆 知ってた?</h2><span class="sub" id="knowN">のこり ${L.length}</span></div>
+    <div class="kstack" id="kstack">${L.map((n,i)=>`<div class="kcard" data-k="${esc(nkey(n))}" data-g="${n.g}" style="z-index:${10-i};--i:${i}"><span class="chip ${n.g}">${esc(GN[n.g])}</span><b>${esc(n.h)}</b><small class="hint">${esc(mdLabel(n.d))}</small></div>`).join("")}</div>
+    <div class="kbtn"><button class="fchip" data-kn="0">🤔 知らなかった</button><button class="fchip" data-kn="1">😎 知ってた</button></div>
+    <div class="hint">左右にはじいてもOK。「知らなかった」が多いジャンルを、あなた向けに多めに出します。</div></section>`; }
+function bindKnow(){ const st=document.getElementById("kstack"); if(!st) return;
+  const top=()=>st.querySelector(".kcard:not(.gone)");
+  const judge=(v)=>{ const c=top(); if(!c) return; ME.know[c.dataset.k]=v; if(!v) learn(c.dataset.g,1); saveMe(); c.classList.add("gone", v?"r":"l");
+    const left=st.querySelectorAll(".kcard:not(.gone)").length; document.getElementById("knowN").textContent="のこり "+left;
+    if(!left){ setTimeout(()=>{ const vals=Object.values(ME.know).slice(-5); const no=vals.filter(x=>!x).length; st.innerHTML=`<div class="kdone">${no>=3?"🧠 知らないことが多かった日! 「あなた向け」に多めに出します。":"😎 よく知っていますね!"}</div>`; },300); } };
+  document.querySelectorAll("[data-kn]").forEach(b=>b.onclick=()=>judge(+b.dataset.kn));
+  let x0=null,cur=null; st.addEventListener("pointerdown",e=>{ cur=top(); if(!cur) return; x0=e.clientX; cur.setPointerCapture&&cur.setPointerCapture(e.pointerId); });
+  st.addEventListener("pointermove",e=>{ if(x0==null||!cur) return; const dx=e.clientX-x0; cur.style.transform=`translateX(${dx}px) rotate(${dx/20}deg)`; });
+  const end=e=>{ if(x0==null||!cur) return; const dx=e.clientX-x0; cur.style.transform=""; x0=null; if(Math.abs(dx)>70) judge(dx>0?1:0); cur=null; };
+  st.addEventListener("pointerup",end); st.addEventListener("pointercancel",end); }
+// ===== 今日の話のタネ(家族や友だちと話す問いかけ) =====
+const TALK={pol:"このニュース、あなたは賛成?反対?その理由は?",eco:"わが家の家計には、どう影響しそう?",soc:"もし自分や家族の身に起きたら、どうする?",it:"自分のスマホやアカウントで、気をつけていることは?",intl:"遠い国の話だけど、日本の暮らしにどうつながると思う?",spo:"いちばんすごいと思ったのはどこ?",ent:"見てみたい?だれといっしょに行きたい?",fas:"自分なら取り入れてみたい?",home:"自分の部屋でやってみたいことは?",food:"作ってみたい?食べてみたい?",life:"自分の毎日に取り入れられそう?",trip:"行ってみたい?だれと行きたい?"};
+function talkCard(){ const L=D.top10.slice(0,3); if(!L.length) return "";
+  return `<section class="card" aria-label="今日の話のタネ"><div class="sec-h"><h2>🍽️ 今日の話のタネ</h2><span class="sub">夕ごはんや休み時間に</span></div>
+    <div class="talk">${L.map(n=>`<div class="tk" style="--c:var(--g-${n.g})"><small>${n.icon} ${esc(n.title)}</small><b>${esc(TALK[n.g]||"どう思う?")}</b></div>`).join("")}</div>
+    <button class="fchip" id="talkShare" style="margin-top:10px">📤 話のタネを送る</button></section>`; }
+function bindTalk(){ const b=document.getElementById("talkShare"); if(!b) return; b.onclick=async()=>{ const t="🍽️ 今日の話のタネ\n"+D.top10.slice(0,3).map(n=>`・${n.title}\n  → ${TALK[n.g]||"どう思う?"}`).join("\n")+"\n"+location.origin+location.pathname;
+  try{ if(navigator.share){ await navigator.share({text:t}); return; } }catch(_){ return; } try{ await navigator.clipboard.writeText(t); toast("📋 コピーしました"); }catch(_){} }; }
 // ===== 使い方 =====
 const GUIDE = [
   ["🚀","まずはここから",["「きょう」の<b>▶ 1分で見る</b>を押すと、今日のニュースが動くスライドで流れます。","時間がない日は<b>☀️ 今日の3行</b>だけ読めばOK。","<b>📰 今日のニュース10</b>は、その日に関心が高かった順のランキングです。下の「記録したニュース すべて」で、ほかのニュースも見られます。"]],
