@@ -400,6 +400,12 @@ details.faq p{margin:10px 0 12px}
 .lookcard .pal{display:flex;flex:none}
 .lookcard .pal i{width:18px;height:18px;border-radius:50%;margin-left:-5px;border:2px solid var(--surface)}
 /* 季節 */
+#snow{position:fixed;inset:0;pointer-events:none;z-index:15;overflow:hidden}
+#snow i{position:absolute;top:-20px;color:#cfe6ff;opacity:.85;font-style:normal;animation:snowfall linear infinite}
+@keyframes snowfall{to{transform:translate(30px,105vh) rotate(180deg)}}
+:root[data-season="xmas"] .season-card{background:linear-gradient(120deg,#14532d,#b91c1c);color:#fff;border-color:#14532d}
+:root[data-season="newyear"] .season-card{background:linear-gradient(120deg,#c8102e,#e8b04a);color:#fff;border-color:#c8102e}
+:root[data-season="xmas"] .season-card .fchip,:root[data-season="newyear"] .season-card .fchip{background:transparent;color:#fff;border-color:rgba(255,255,255,.6)}
 .season-card{display:flex;align-items:center;gap:12px;border-radius:var(--radius);padding:12px 12px 12px 16px;background:linear-gradient(120deg,var(--accent-soft),var(--surface));border:1px solid var(--line)}
 .season-card .si{font-size:2rem;line-height:1}
 :root[data-season="halloween"] .season-card{background:linear-gradient(120deg,#2b1840,#4a2470);color:#fff;border-color:#4a2470}
@@ -631,14 +637,27 @@ const svgUrl=x=>`url("data:image/svg+xml,${encodeURIComponent(x)}")`;
 const SEASONS = [
   { k:"halloween", name:"ハロウィン", icon:"🎃", from:"10-24", to:"10-31",
     greet:"ハッピーハロウィン! 🎃 今日もニュースをどうぞ。期間中に開くと、限定バッジがもらえます。",
-    light:["#d9550a","#fde3cf","#efe4fb","#fffaf5","#f6effd","#d9c8ef"], dark:["#ff9a3c","#3d2410","#140d22","#201631","#291d40","#3d2d5e"] }
+    light:["#d9550a","#fde3cf","#efe4fb","#fffaf5","#f6effd","#d9c8ef"], dark:["#ff9a3c","#3d2410","#140d22","#201631","#291d40","#3d2d5e"] },
+  { k:"xmas", name:"クリスマス", icon:"🎄", from:"12-01", to:"12-25",
+    greet:"メリークリスマス! 🎄 雪がふるニュース帳へようこそ。期間中に開くと、限定バッジがもらえます。",
+    light:["#b91c1c","#fde2e2","#eaf4ec","#fffdf8","#f3f9f4","#cfe3d4"], dark:["#ff7a7a","#4a1a1d","#0c1a12","#14251b","#1a2e22","#2a4434"] },
+  { k:"newyear", name:"お正月", icon:"🎍", from:"12-31", to:"01-07",
+    greet:"あけましておめでとうございます! 🎍 今年もニュース帳をよろしくお願いします。期間中に開くと、限定バッジがもらえます。",
+    light:["#c8102e","#fde0e4","#fbf4ea","#fffdf9","#fdf6ee","#ecd9c4"], dark:["#ff6b7f","#4a1520","#1a0e0e","#261515","#2e1a1a","#4a2c2c"] }
 ];
 (function(){ const st=document.createElement("style"); let s="";
   const v=(a,as,bg,sf,s2,ln)=>`--accent:${a};--accent-soft:${as};--bg:${bg};--surface:${sf};--surface2:${s2};--line:${ln}`;
   SEASONS.forEach(z=>{ s+=`:root[data-season="${z.k}"][data-color]{${v(...z.light)}}`; const d=v(...z.dark); s+=`@media (prefers-color-scheme: dark){:root:not([data-theme="light"])[data-season="${z.k}"][data-color]{${d}}}:root[data-theme="dark"][data-season="${z.k}"][data-color]{${d}}`; });
   const HWPAT=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 22" width="96" height="22"><g transform="translate(4 2) scale(.5)">${PUMP.replace(/^<svg[^>]*>|<\/svg>$/g,"")}</g><g transform="translate(46 4) scale(.6)">${BAT.replace(/^<svg[^>]*>|<\/svg>$/g,"").replace("#2b1840","#7a5aa8")}</g><circle cx="80" cy="6" r="1.4" fill="#f5b342"/><circle cx="34" cy="16" r="1" fill="#f5b342"/></svg>`;
   s+=`:root[data-season="halloween"] .top::after{content:"";position:absolute;left:0;right:0;top:100%;height:22px;pointer-events:none;background:${svgUrl(HWPAT)} repeat-x left center/96px 22px;opacity:.9}`;
+  const XPAT=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 110 24" width="110" height="24"><path d="M14 2l9 14h-5l6 6H4l6-6H5z" fill="#1f7a3a"/><rect x="12" y="20" width="4" height="4" fill="#7a4a1f"/><text x="10.5" y="7" font-size="7" fill="#f5c400">★</text><g transform="translate(40 8)"><rect width="14" height="12" rx="1" fill="#c8102e"/><rect x="6" width="2.5" height="12" fill="#f5c400"/><rect y="4" width="14" height="2.5" fill="#f5c400"/></g><text x="72" y="16" font-size="12" fill="#8fc7ff">❄</text><circle cx="96" cy="8" r="1.6" fill="#f5c400"/></svg>`;
+  s+=`:root[data-season="xmas"] .top::after{content:"";position:absolute;left:0;right:0;top:100%;height:24px;pointer-events:none;background:${svgUrl(XPAT)} repeat-x left center/110px 24px;opacity:.95}`;
+  const NPAT=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 120 24" width="120" height="24"><g><rect x="6" y="8" width="4" height="14" fill="#3f8f3a"/><rect x="11" y="4" width="4" height="18" fill="#3f8f3a"/><rect x="16" y="10" width="4" height="12" fill="#3f8f3a"/><path d="M4 18h18v6H4z" fill="#c9a26b"/></g><path d="M40 22l12-14 12 14z" fill="#5b7fb8"/><path d="M48 13l4-5 4 5-2 1-2-2-2 2z" fill="#fff"/><circle cx="74" cy="12" r="6" fill="#e5484d"/><g transform="translate(92 6)"><circle cx="5" cy="5" r="3" fill="#ff9aa2"/><circle cx="10" cy="3" r="3" fill="#ff9aa2"/><circle cx="12" cy="9" r="3" fill="#ff9aa2"/><circle cx="7" cy="11" r="3" fill="#ff9aa2"/><circle cx="3" cy="9" r="3" fill="#ff9aa2"/><circle cx="7.5" cy="7" r="2" fill="#ffd34d"/></g></svg>`;
+  s+=`:root[data-season="newyear"] .top::after{content:"";position:absolute;left:0;right:0;top:100%;height:24px;pointer-events:none;background:${svgUrl(NPAT)} repeat-x left center/120px 24px;opacity:.95}`;
   st.textContent=s; document.head.appendChild(st); })();
+// 雪(クリスマスの期間だけ。動きを減らす設定では出さない)
+function snow(on){ let el=document.getElementById("snow"); if(!on){ if(el) el.remove(); return; } try{ if(matchMedia("(prefers-reduced-motion: reduce)").matches) return; }catch(_){}
+  if(el) return; el=document.createElement("div"); el.id="snow"; el.setAttribute("aria-hidden","true"); el.innerHTML=Array.from({length:18},(_,i)=>`<i style="left:${(i*53)%100}%;animation-delay:${(i*0.7)%9}s;animation-duration:${8+(i%5)*2}s;font-size:${8+(i%4)*3}px">❄</i>`).join(""); document.body.appendChild(el); }
 function mmdd(iso){ return iso.slice(5,10); }
 function seasonNow(){ if(LOOK.season==="off") return null; if(LOOK.preview){ const z=SEASONS.find(x=>x.k===LOOK.preview); if(z) return z; }
   const t=mmdd(TODAY); return SEASONS.find(z=> z.from<=z.to ? (t>=z.from&&t<=z.to) : (t>=z.from||t<=z.to)) || null; }
@@ -654,7 +673,7 @@ const LOOK = (()=>{ let p={}; try{ p=JSON.parse(store.get("nw-look")||"{}")||{};
 function saveLook(){ store.set("nw-look", JSON.stringify(LOOK)); }
 function applySettings(){ const t=store.get("nw-theme"); if(t==="light"||t==="dark") root.setAttribute("data-theme",t); else root.removeAttribute("data-theme");
   const s=store.get("nw-size"); if(s==="l"||s==="xl") root.setAttribute("data-size",s); else root.removeAttribute("data-size");
-  root.setAttribute("data-color",LOOK.color); { const z=seasonNow(); if(z) root.setAttribute("data-season",z.k); else root.removeAttribute("data-season"); }
+  root.setAttribute("data-color",LOOK.color); { const z=seasonNow(); if(z) root.setAttribute("data-season",z.k); else root.removeAttribute("data-season"); try{ snow(!!z&&z.k==="xmas"); }catch(_){} }
   if(LOOK.density!=="normal") root.setAttribute("data-density",LOOK.density); else root.removeAttribute("data-density");
   const m=document.querySelector('meta[name="theme-color"]'); if(m){ const z=seasonNow(); m.setAttribute("content", z? z.light[0] : (COLORS.find(c=>c[0]===LOOK.color)||COLORS[0])[2]); } }
 applySettings();
@@ -1411,6 +1430,8 @@ const BADGES=[
   ["pet1","🐣","生まれた!","ペットがたまごからかえった",()=>petStage().i>=1],
   ["pet3","🐥","おとなになった","ペットがおとなに育った",()=>petStage().i>=3],
   ["halloween","🎃","ハロウィン","ハロウィンの期間(10/24〜31)に開いた",()=>ME.days.some(d=>inSeason(SEASONS[0],d))],
+  ["xmas","🎄","クリスマス","クリスマスの期間(12/1〜25)に開いた",()=>ME.days.some(d=>inSeason(SEASONS[1],d))],
+  ["newyear","🎍","お正月","お正月(12/31〜1/7)に開いた",()=>ME.days.some(d=>inSeason(SEASONS[2],d))],
   ["vote5","🔮","予想名人","予想が5回当たった",()=>voteResults().win>=5]
 ];
 function newBadges(){ const got=[]; BADGES.forEach(b=>{ if(!ME.badges.includes(b[0]) && b[4]()){ ME.badges.push(b[0]); got.push(b); } }); if(got.length) saveMe(); return got; }
