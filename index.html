@@ -25,6 +25,8 @@
   --accent:#2747c9; --accent-soft:#e3e8fb; --warn:#c2410c; --warn-soft:#fdeee6; --ok:#15803d; --ok-soft:#e5f4ea;
   --g-pol:#2563c9; --g-eco:#17803f; --g-soc:#c25a0c; --g-it:#7c3aed; --g-intl:#c42b2b; --g-spo:#8a5a2b; --g-ent:#c0367a; --g-pred:#475569;
   --g-pol-s:#e4ecfa; --g-eco-s:#e4f3e9; --g-soc-s:#fbeadb; --g-it-s:#efe7fd; --g-intl-s:#fbe5e5; --g-spo-s:#f3eadf; --g-ent-s:#fbe4ef; --g-pred-s:#e9edf2;
+  --g-fas:#c026a3; --g-home:#8a6416; --g-food:#d0451b; --g-life:#0e7490; --g-trip:#4f46e5;
+  --g-fas-s:#f9e0f4; --g-home-s:#f4ead3; --g-food-s:#fbe3d8; --g-life-s:#d8eff5; --g-trip-s:#e4e3fc;
   --f-display:"Dela Gothic One","Hiragino Sans","Yu Gothic",sans-serif;
   --f-body:"Zen Kaku Gothic New","Hiragino Sans","Hiragino Kaku Gothic ProN","Yu Gothic","Meiryo",sans-serif;
   --fs:16px; --radius:14px; --on-accent:#ffffff;
@@ -34,12 +36,16 @@
   --accent:#8ea4ff; --accent-soft:#232c4d; --warn:#fb923c; --warn-soft:#3a2416; --ok:#4ade80; --ok-soft:#163222;
   --g-pol:#7aa7ff; --g-eco:#5fd18a; --g-soc:#f59e5b; --g-it:#b794ff; --g-intl:#ff7b7b; --g-spo:#d6a46e; --g-ent:#ff8cc0; --g-pred:#a3b0c2;
   --on-accent:#0b1020; --g-pol-s:#1b2a48; --g-eco-s:#16301f; --g-soc-s:#352314; --g-it-s:#2a1f45; --g-intl-s:#3a1a1d; --g-spo-s:#33271b; --g-ent-s:#3b1a2b; --g-pred-s:#232a36;
+  --g-fas:#f07ad8; --g-home:#e0b860; --g-food:#ff9573; --g-life:#67d3ec; --g-trip:#a5a1ff;
+  --g-fas-s:#3a1636; --g-home-s:#33291a; --g-food-s:#3a1d14; --g-life-s:#12303a; --g-trip-s:#24224a;
   color-scheme:dark}}
 :root[data-theme="dark"]{
   --bg:#0e1320; --surface:#171d2c; --surface2:#1d2436; --ink:#e8ecf4; --muted:#9aa4b8; --line:#2a3247;
   --accent:#8ea4ff; --accent-soft:#232c4d; --warn:#fb923c; --warn-soft:#3a2416; --ok:#4ade80; --ok-soft:#163222;
   --g-pol:#7aa7ff; --g-eco:#5fd18a; --g-soc:#f59e5b; --g-it:#b794ff; --g-intl:#ff7b7b; --g-spo:#d6a46e; --g-ent:#ff8cc0; --g-pred:#a3b0c2;
   --on-accent:#0b1020; --g-pol-s:#1b2a48; --g-eco-s:#16301f; --g-soc-s:#352314; --g-it-s:#2a1f45; --g-intl-s:#3a1a1d; --g-spo-s:#33271b; --g-ent-s:#3b1a2b; --g-pred-s:#232a36;
+  --g-fas:#f07ad8; --g-home:#e0b860; --g-food:#ff9573; --g-life:#67d3ec; --g-trip:#a5a1ff;
+  --g-fas-s:#3a1636; --g-home-s:#33291a; --g-food-s:#3a1d14; --g-life-s:#12303a; --g-trip-s:#24224a;
   color-scheme:dark}
 :root[data-size="l"]{--fs:18px} :root[data-size="xl"]{--fs:20px}
 *{box-sizing:border-box}
@@ -88,6 +94,7 @@ main{padding-block:18px 32px}
 .chip{display:inline-flex;align-items:center;gap:4px;font-size:.74rem;font-weight:700;padding:2px 9px;border-radius:999px;white-space:nowrap;background:var(--g-pred-s);color:var(--g-pred)}
 .chip.pol{background:var(--g-pol-s);color:var(--g-pol)} .chip.eco{background:var(--g-eco-s);color:var(--g-eco)} .chip.soc{background:var(--g-soc-s);color:var(--g-soc)}
 .chip.it{background:var(--g-it-s);color:var(--g-it)} .chip.intl{background:var(--g-intl-s);color:var(--g-intl)} .chip.spo{background:var(--g-spo-s);color:var(--g-spo)} .chip.ent{background:var(--g-ent-s);color:var(--g-ent)}
+.chip.fas{background:var(--g-fas-s);color:var(--g-fas)} .chip.home{background:var(--g-home-s);color:var(--g-home)} .chip.food{background:var(--g-food-s);color:var(--g-food)} .chip.life{background:var(--g-life-s);color:var(--g-life)} .chip.trip{background:var(--g-trip-s);color:var(--g-trip)}
 .badge-ok{color:var(--ok);font-size:.78rem;font-weight:700;white-space:nowrap}
 .badge-one{color:var(--warn);font-size:.78rem;font-weight:700;white-space:nowrap}
 
@@ -438,8 +445,8 @@ details.faq p{margin:10px 0 12px}
 "use strict";
 const D = window.NEWS_DATA;
 const main = document.getElementById("main");
-const GN = {pol:"政治",eco:"経済",soc:"社会・災害",it:"情報・IT",intl:"国際",spo:"スポーツ・科学",ent:"エンタメ",pred:"予測の判定"};
-const GORDER = ["pol","eco","soc","it","intl","spo","ent"];
+const GN = {pol:"政治",eco:"経済",soc:"社会・災害",it:"情報・IT",intl:"国際",spo:"スポーツ・科学",ent:"エンタメ",fas:"ファッション",home:"インテリア・DIY",food:"レシピ・料理",life:"ライフスタイル",trip:"旅行",pred:"予測の判定"};
+const GORDER = ["pol","eco","soc","it","intl","spo","ent","fas","home","food","life","trip"];
 const WD = ["日","月","火","水","木","金","土"];
 const esc = s => String(s==null?"":s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
 const bold = s => esc(s).replace(/\*\*(.+?)\*\*/g,"<b>$1</b>");
