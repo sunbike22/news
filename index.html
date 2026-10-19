@@ -432,6 +432,25 @@ svg.eat{animation:petEat .7s ease both!important}
 .vs-card{border:2px solid var(--accent);background:var(--accent-soft)}
 .vs-res{display:flex;flex-direction:column;align-items:center;gap:2px;margin:6px 0 10px;padding:10px;border-radius:12px;background:var(--surface2)}
 .vs-res span:first-child{font-size:2rem}
+/* 未来の新聞 */
+.paper{background:#fbf8f0;color:#1b1b1b;border-radius:6px;padding:14px;box-shadow:0 2px 10px rgba(0,0,0,.12);font-family:"Hiragino Mincho ProN","Yu Mincho","Noto Serif JP",serif}
+.pp-head{text-align:center;border-bottom:3px double #1b1b1b;padding-bottom:6px}
+.pp-name{font-size:2.2rem;font-weight:900;letter-spacing:.3em}
+.pp-sub{font-size:.8rem}
+.pp-note{font-size:.75rem;color:#555;margin:6px 0;border-bottom:1px solid #999;padding-bottom:6px}
+.pp-cols{display:grid;grid-template-columns:1fr;gap:10px}
+@media (min-width:600px){.pp-cols{grid-template-columns:1fr 1fr}.pp-art.top{grid-column:1/-1}}
+.pp-art{border-bottom:1px solid #bbb;padding-bottom:8px;position:relative}
+.pp-art h3{font-size:1.1rem;font-weight:900;margin:2px 0}
+.pp-art.top h3{font-size:1.45rem}
+.pp-art p{margin:2px 0;font-size:.9rem}
+.pp-kick{font-size:.72rem;color:#7a1f1f;font-weight:700}
+.pp-my{display:inline-block;font-size:.75rem;border:1px solid #1b1b1b;padding:0 6px;margin-top:4px}
+.pp-sec{margin:12px 0 6px;font-weight:900;border-top:3px double #1b1b1b;padding-top:6px}
+.pp-stamp{position:absolute;right:0;top:0;border:2px solid;border-radius:50%;padding:6px 4px;font-size:.75rem;font-weight:900;transform:rotate(-12deg)}
+.pp-stamp.hit{color:#c62828}.pp-stamp.miss{color:#455a64}.pp-stamp.part{color:#b26a00}
+.pp-art.done h3{padding-right:52px}
+.cap-lock{background:var(--surface2);border:1px dashed var(--line);border-radius:10px;padding:8px 12px;font-size:.9rem}
 /* 案内係 */
 .gd-fab{position:fixed;right:max(16px,env(safe-area-inset-right,0px));bottom:calc(84px + env(safe-area-inset-bottom,0px));z-index:24;width:54px;height:54px;border-radius:50%;border:0;background:var(--accent);color:var(--on-accent);font-size:1.5rem;box-shadow:0 6px 18px rgba(0,0,0,.22);cursor:pointer}
 @media (min-width:900px){.gd-fab{bottom:24px}}
@@ -1135,6 +1154,7 @@ function renderPlan(){
     <ul class="plan">${up.map(s=>{ const dd=daysFrom(s[0]); const x=md(s[0]); const left= dd<=0? (s[1]&&s[1]>=TODAY?"いま":"今日") : dd===1?"明日":`あと${dd}日`;
       return `<li><div class="d"><div class="md num">${x.m}/${x.d}</div><div class="wd">${x.w}曜${s[1]?"〜":""}</div></div><div><span class="left">${left}</span> <span class="chip ${s[2]}">${GN[s[2]]||""}</span>${s[4]?` <span class="chip">🎯 ${esc(s[4])}</span>`:""}<div class="tx">${esc(s[3])}</div>${s[5]?`<div class="mm">${esc(s[5])}</div>`:""}<button class="fchip ics" data-i="${D.schedule.indexOf(s)}">📅 カレンダーに追加</button></div></li>`; }).join("") || '<li><div></div><div class="hint">登録された予定はありません</div></li>'}</ul>
     ${past.length?`<details class="faq"><summary>終わった予定(${past.length}件)</summary><ul class="us" style="margin:10px 0 12px">${past.map(s=>`<li>${mdLabel(s[0])} ${esc(s[3])}</li>`).join("")}</ul></details>`:""}
+    <button class="lookcard" id="paperBtn"><span style="font-size:1.8rem" aria-hidden="true">📰</span><span><b>未来の新聞(予想版)</b><span class="hint" style="display:block">Claudeの予測とあなたの予想を、未来の新聞の紙面に</span></span></button>
     <div class="sec-h" style="margin-top:6px"><h2>🎯 予測と、あなたの予想</h2><span class="sub">当たり100点・一部50点・外れ0点</span></div>
     <section class="card score">
       <div class="donut"><canvas id="dn" width="140" height="140" aria-label="予測の内訳"></canvas><div class="c"><div><b class="num">${rate}%</b><br><span>的中率(${judged}件)</span></div></div></div>
@@ -1144,6 +1164,7 @@ function renderPlan(){
     <div class="pred" id="plist"></div>
     ${footer()}
   </div>`;
+  document.getElementById("paperBtn").onclick=openPaper;
   bindFooter();
   const drawP=f=>{ const L=PRED.filter(p=>f==="wait"?p.r==="wait":p.r!=="wait").sort((a,b)=>(a.d||"9").localeCompare(b.d||"9"));
     document.getElementById("plist").innerHTML=L.map(p=>`<div class="pr"><span class="no">${esc(p.no)}</span><span><b>${esc(p.t)}</b></span>${p.r==="wait"?voteRow(p):ME.votes[p.no]?`<span class="r">あなたの予想: ${ME.votes[p.no].v==="yes"?"当たる":"外れる"}</span>`:""}<span class="r"><span class="${RL[p.r][1]}">${RL[p.r][0]}</span> ・ 確度: ${esc(p.c)} ・ 判定日: ${p.d?mdLabel(p.d)+(p.r==="wait"&&daysFrom(p.d)>=0?`(あと${daysFrom(p.d)}日)`:""):"次の発表時"}${p.now?" ・ いま "+esc(p.now):""}${p.m?`<br>${esc(p.m)}`:""}</span></div>`).join(""); };
@@ -1523,6 +1544,35 @@ async function sendChallenge(sc,total){ const url=location.origin+location.pathn
   try{ await navigator.clipboard.writeText(text+"\n"+url); toast("📋 挑戦状のリンクをコピーしました。LINEなどにはりつけて送ってね"); }catch(_){ prompt("このリンクをコピーして送ってね",url); } }
 function vsResult(sc){ if(!VS) return ""; const r=sc>VS.s?["🏆","あなたの勝ち!"]:sc<VS.s?["😣",`${esc(VS.n)}さんの勝ち…`]:["🤝","引き分け!"];
   return `<div class="vs-res"><span>${r[0]}</span><b>あなた ${sc} - ${VS.s} ${esc(VS.n)}さん</b><span>${r[1]}</span></div>`; }
+// ===== 未来の新聞(予測を新聞の紙面に。答え合わせも並べる) =====
+function openPaper(){
+  const sh=document.getElementById("sheet"); const wait=PRED.filter(p=>p.r==="wait").sort((a,b)=>String(a.d||"9999").localeCompare(String(b.d||"9999"))); const done=PRED.filter(p=>p.r!=="wait").slice(-6).reverse();
+  const last=wait.filter(p=>p.d).map(p=>String(p.d)).sort().pop()||"";
+  const NOW={"🟢":"いま: 近づいている","🟡":"いま: 五分五分","⚪":"いま: まだわからない","🔴":"いま: 遠のいている"}; const ym=(last.match(/(\d{4})-(\d{2})/)||[]); const title=ym[1]?`${ym[1]}年${+ym[2]}月ごろの新聞`:"これからの新聞";
+  const my=no=>{ const v=ME.votes[no]; return v?`<span class="pp-my">あなたの予想: ${v.v==="yes"?"⭕ 起きる":"❌ 起きない"}</span>`:""; };
+  const art=(p,i)=>`<article class="pp-art${i===0?" top":""}"><div class="pp-kick">${esc(p.no)} ・ 確度 ${esc(p.c||"—")} ・ 判定 ${esc(p.d||"—")}</div><h3>${esc(p.t)}</h3><p>${esc([NOW[p.now]||"",p.m||""].filter(Boolean).join(" ・ "))}</p>${my(p.no)}</article>`;
+  sh.innerHTML=`<div class="bar"><div class="wrap"><button class="iconbtn" id="ppx" aria-label="もどる">←</button><span class="ttl">📰 未来の新聞(予想版)</span></div></div>
+  <div class="wrap body"><div class="paper">
+    <div class="pp-head"><div class="pp-name">未来新聞</div><div class="pp-sub">${esc(title)} ・ 予想版 ・ まいにちニュース帳</div></div>
+    <div class="pp-note">※ これは本当の新聞ではありません。Claudeの予測(🎯)を、未来の新聞の形に並べたものです。</div>
+    <div class="pp-cols">${wait.length?wait.map(art).join(""):"<p>いま判定待ちの予測はありません。</p>"}</div>
+    ${done.length?`<div class="pp-sec">答え合わせ済み</div><div class="pp-cols">${done.map(p=>`<article class="pp-art done"><span class="pp-stamp ${p.r}">${p.r==="hit"?"当たり":p.r==="miss"?"外れ":"一部"}</span><h3>${esc(p.t)}</h3><p>${esc(p.m||"")}</p>${my(p.no)}</article>`).join("")}</div>`:""}
+  </div><button class="fchip" id="ppvote" style="align-self:flex-start">🎯 あなたも予想する →</button></div>`;
+  const close=()=>{ sh.hidden=true; sh.innerHTML=""; document.body.style.overflow=""; };
+  sh.querySelector("#ppx").onclick=close; sh.querySelector("#ppvote").onclick=()=>{ close(); go("plan"); };
+  sh.hidden=false; sh.scrollTop=0; document.body.style.overflow="hidden"; track("/paper","未来の新聞");
+}
+// ===== タイムカプセル・あの日のニュース =====
+function capsBlock(){ ME.caps=ME.caps||[]; const L=ME.caps.slice().sort((a,b)=>a.open.localeCompare(b.open));
+  const ago=[[7,"1週間前"],[30,"1か月前"],[365,"1年前"]].map(([n,l])=>{ const d=new Date(Date.parse(TODAY)-n*864e5).toISOString().slice(0,10); const N=NEWS.filter(x=>x.d===d&&x.ok).slice(0,3); return N.length?`<div><b>📆 ${l}の今日(${esc(mdLabel(d))})</b><ul class="us" style="margin-top:4px">${N.map(x=>`<li>${esc(x.h)}</li>`).join("")}</ul></div>`:""; }).join("");
+  return `<section class="card"><b>⏳ タイムカプセル</b><div class="hint" style="margin:4px 0 8px">今の気持ちや予想を書いて封をすると、決めた日まで開けられません。今日のニュース10の上位3つもいっしょに入ります。</div>
+    <textarea id="capMsg" class="memo" rows="2" maxlength="200" placeholder="例: 消費税、ほんとうに1%になってるかな?"></textarea>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px">${[[30,"1か月後"],[90,"3か月後"],[365,"1年後"]].map(([n,l])=>`<button class="fchip" data-cap="${n}">🔒 ${l}に開く</button>`).join("")}</div>
+    ${L.length?`<div style="display:flex;flex-direction:column;gap:8px;margin-top:10px">${L.map((c,i)=>c.open<=TODAY?`<details class="faq plain" open><summary>🎁 ${esc(mdLabel(c.at))}のカプセル(開きました)</summary><p style="margin:4px 0">${esc(c.msg)}</p><div class="hint">そのころのニュース: ${c.top.map(esc).join(" ／ ")}</div></details>`:`<div class="cap-lock">🔒 ${esc(mdLabel(c.at))}に封をしたカプセル ・ あと<b>${Math.ceil((Date.parse(c.open)-Date.parse(TODAY))/864e5)}日</b>で開きます</div>`).join("")}</div>`:""}
+    ${ago?`<div style="display:flex;flex-direction:column;gap:8px;margin-top:12px;border-top:1px solid var(--line);padding-top:10px">${ago}</div>`:""}
+  </section>`; }
+function bindCaps(){ document.querySelectorAll("[data-cap]").forEach(b=>b.onclick=()=>{ const m=document.getElementById("capMsg").value.trim(); if(!m){ toast("ひとこと書いてから封をしてね"); return; }
+  ME.caps=ME.caps||[]; ME.caps.push({at:TODAY,open:new Date(Date.parse(TODAY)+(+b.dataset.cap)*864e5).toISOString().slice(0,10),msg:m.slice(0,200),top:D.top10.slice(0,3).map(n=>n.title)}); saveMe(); toast("🔒 タイムカプセルに封をしました"); go("my",{keepScroll:true}); }); }
 // ===== 使い方 =====
 const GUIDE = [
   ["🚀","まずはここから",["「きょう」の<b>▶ 1分で見る</b>を押すと、今日のニュースが動くスライドで流れます。","時間がない日は<b>☀️ 今日の3行</b>だけ読めばOK。","<b>📰 今日のニュース10</b>は、その日に関心が高かった順のランキングです。下の「記録したニュース すべて」で、ほかのニュースも見られます。"]],
@@ -1551,6 +1601,7 @@ function renderMy(){
     <button class="lookcard" id="lookBtnMy"><span class="pal" aria-hidden="true" style="padding-left:5px">${COLORS.slice(1,6).map(c=>`<i style="background:${c[2]}"></i>`).join("")}</span><span><b>🎨 着せかえ</b><span class="hint" style="display:block">色・文字・画面の並び・タブを、わたし好みに</span></span></button>
     ${petBig()}
     ${pinsBlock()}
+    ${capsBlock()}
     ${guideBlock()}
     <section class="card lvcard"><div class="lvrow"><div class="lvbig">Lv.${lv.i+1}</div><div><b style="font-size:1.1rem">${esc(lv.name)}</b><div class="hint">${lv.pt}ポイント${lv.next?` ・ 次の「${esc(lv.next[1])}」まで あと${lv.next[0]-lv.pt}`:" ・ 最高レベル!"}</div></div></div>
       <div class="bar"><i style="width:${Math.round(lv.prog*100)}%"></i></div>
@@ -1582,7 +1633,7 @@ function renderMy(){
   main.querySelectorAll("[data-tab]").forEach(b=>b.onclick=()=>go(b.dataset.tab));
   main.querySelectorAll("#myInt [data-g]").forEach(b=>b.onclick=()=>{ const g=b.dataset.g; ME.interests[g]=!ME.interests[g]; b.setAttribute("aria-pressed",String(!!ME.interests[g])); saveMe(); });
   document.getElementById("weekBtn2").onclick=()=>openStory(buildWeekSlides);
-  document.getElementById("lookBtnMy").onclick=openLook; bindPet();
+  document.getElementById("lookBtnMy").onclick=openLook; bindPet(); bindCaps();
   bindPins();
   document.getElementById("resetMe").onclick=()=>{ document.getElementById("resetConfirm").innerHTML='<p>本当に消しますか? 元にはもどせません。</p><button class="fchip" id="resetYes">消す</button>'; document.getElementById("resetYes").onclick=()=>{ try{ localStorage.removeItem("nw-me"); }catch(_){} location.reload(); }; };
 }
