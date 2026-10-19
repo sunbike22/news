@@ -392,6 +392,18 @@ details.faq p{margin:10px 0 12px}
 .lookcard{display:flex;align-items:center;gap:12px;background:linear-gradient(120deg,var(--accent-soft),var(--surface));border:1px solid var(--line);border-radius:var(--radius);padding:14px 16px;width:100%;text-align:left;cursor:pointer}
 .lookcard .pal{display:flex;flex:none}
 .lookcard .pal i{width:18px;height:18px;border-radius:50%;margin-left:-5px;border:2px solid var(--surface)}
+/* 案内係 */
+.gd-fab{position:fixed;right:max(16px,env(safe-area-inset-right,0px));bottom:calc(84px + env(safe-area-inset-bottom,0px));z-index:24;width:54px;height:54px;border-radius:50%;border:0;background:var(--accent);color:var(--on-accent);font-size:1.5rem;box-shadow:0 6px 18px rgba(0,0,0,.22);cursor:pointer}
+@media (min-width:900px){.gd-fab{bottom:24px}}
+.gd-msg{display:flex;flex-direction:column;gap:8px}
+.gd-msg.me{align-items:flex-end}
+.gd-q{background:var(--accent);color:var(--on-accent);padding:8px 14px;border-radius:16px 16px 4px 16px;max-width:85%;font-weight:700}
+.gd-a{background:var(--surface);border:1px solid var(--line);padding:10px 14px;border-radius:4px 16px 16px 16px;max-width:100%}
+.gd-out{display:flex;flex-direction:column;gap:8px;margin-top:10px}
+.gd-out:empty{display:none}
+.gd-lk{border:0;background:none;color:var(--accent);font-weight:700;cursor:pointer;padding:0 2px;font-size:.88rem}
+.gd-deep{align-self:flex-start}
+.gd-in{position:sticky;bottom:calc(8px + env(safe-area-inset-bottom,0px));box-shadow:0 4px 16px rgba(0,0,0,.12)}
 </style>
 </head>
 <body>
@@ -412,6 +424,7 @@ details.faq p{margin:10px 0 12px}
 <div id="sheet" class="sheet" hidden></div>
 <div id="story" class="story" hidden></div>
 <div id="pop" class="pop" hidden role="dialog" aria-live="polite"></div>
+<button id="gdFab" class="gd-fab" aria-label="ニュース案内係に聞く"><span aria-hidden="true">💬</span></button>
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.js"></script>
 <script src="data.js"></script>
@@ -935,14 +948,96 @@ function askAI(context,q){
   const a=document.createElement("a"); a.href=url; a.target="_blank"; a.rel="noopener"; document.body.appendChild(a); a.click(); a.remove();
 }
 function askBlock(k){ const e=D.explainers[k]; const ex=[e.faq[0]&&e.faq[0][0],"わたしの生活にはどう関係する?","これから先、どうなりそう?"].filter(Boolean);
-  return `<div class="blk card ask"><h3>🤖 AIに聞いてみる</h3><p class="hint" style="margin:0 0 8px">知りたいことを書くと、この解説の内容をつけてClaude(AI)が開きます。Claudeのアカウント(無料で作れます)が必要です。AIの答えはまちがうこともあるので、大事なことは出典で確かめてください。</p>
+  return `<div class="blk card ask"><h3>💬 聞いてみる</h3><p class="hint" style="margin:0 0 8px">知りたいことを書くと、まずアプリの中の案内係が、解説・ことば辞典・ニュースの記録から答えます。もっと深く知りたいときは、Claude(AI)に聞けます(Claudeのアカウントが必要。AIの答えはまちがうこともあります)。</p>
     <div class="chips" style="margin-bottom:8px">${ex.map(x=>`<button class="fchip" data-askq="${esc(x)}">${esc(x)}</button>`).join("")}</div>
-    <div class="sbox"><input id="askIn" type="text" placeholder="例: なぜ原油が上がるとガソリンも上がるの?" autocomplete="off"><button class="iconbtn" id="askGo" style="background:var(--accent);color:var(--on-accent);border-color:var(--accent)">聞く</button></div></div>`; }
-function bindAsk(k){ const e=D.explainers[k]; const ctx=[e.name,"ひとことで: "+e.kid,e.more.join(" "),"流れ: "+e.timeline.slice(-5).map(t=>t.join(" ")).join(" / ")].join("\n");
-  const go1=q=>{ if(q&&q.trim()) askAI(ctx,q.trim()); };
+    <div class="sbox"><input id="askIn" type="text" placeholder="例: なぜ原油が上がるとガソリンも上がるの?" autocomplete="off"><button class="iconbtn" id="askGo" style="background:var(--accent);color:var(--on-accent);border-color:var(--accent)">聞く</button></div>
+    <div id="askOut" class="gd-out" aria-live="polite"></div></div>`; }
+function exCtx(k){ const e=D.explainers[k]; return [e.name,"ひとことで: "+e.kid,e.more.join(" "),"流れ: "+e.timeline.slice(-5).map(t=>t.join(" ")).join(" / ")].join("\n"); }
+function bindAsk(k){
+  const go1=q=>{ if(!q||!q.trim()) return; const out=document.getElementById("askOut"); out.innerHTML=guideAnswerHTML(q.trim(),k); bindGuideOut(out,q.trim(),k); };
   document.getElementById("askGo").onclick=()=>go1(document.getElementById("askIn").value);
   document.getElementById("askIn").onkeydown=ev=>{ if(ev.key==="Enter") go1(ev.target.value); };
-  document.querySelectorAll("[data-askq]").forEach(b=>b.onclick=()=>go1(b.dataset.askq)); }
+  document.querySelectorAll("[data-askq]").forEach(b=>b.onclick=()=>{ document.getElementById("askIn").value=b.dataset.askq; go1(b.dataset.askq); }); }
+
+// ===== 案内係(サイトの中の情報から答える。外には何も送らない) =====
+const GD_STOP = /(ってなに|って何|でしょうか|ですか|教えて|おしえて|について|知りたい|ください|どういうこと|って|とは|なの|なに|何|は$|の$|か$)/g;
+const gdNorm = s => String(s||"").normalize("NFKC").toLowerCase().replace(/\*\*/g,"").replace(/[?？!！。、,.・「」『』()\s　:：〜~]/g,"");
+function gdGrams(s){ const t=gdNorm(s).replace(GD_STOP," ").replace(/\s+/g," ").trim(); const g=new Set(); t.split(" ").forEach(w=>{ if(w.length===1 && /[一-鿿゠-ヿA-Za-z0-9]/.test(w)) g.add(w); for(let i=0;i<w.length-1;i++) g.add(w.slice(i,i+2)); }); return [...g]; }
+function gdScore(qg,text){ if(!qg.length) return 0; const t=gdNorm(text); let hit=0; qg.forEach(x=>{ if(t.includes(x)) hit++; }); let ex=0; (qg.ex||[]).forEach(x=>{ if(t.includes(x)) ex++; }); return Math.min(1,(hit+Math.min(ex,2)*0.5)/qg.length); }
+const GD_SYN=[[/いつ/,"月から 始まる 日に 年"],[/安く|安い|下が/,"下げる 軽く 減"],[/高く|高い|上が|値上/,"上がる 高値 値上がり"],[/なぜ|どうして|なんで|理由/,"ため 原因 理由"],[/だれ|誰/,"首相 選手 氏 政権"],[/どこ/,"場所 市 県 国 球場"],[/どうなる|これから|今後/,"次 予定 見通し 予測"]];
+function gdQuery(q){ const g=gdGrams(q); const ex=new Set(); GD_SYN.forEach(([re,w])=>{ if(re.test(q)) w.split(" ").forEach(x=>{ if(x.length>=2) for(let i=0;i<x.length-1;i++) ex.add(x.slice(i,i+2)); }); }); g.ex=[...ex].filter(x=>!g.includes(x)); return g; }
+let GD_DOCS=null;
+function gdDocs(){ if(GD_DOCS) return GD_DOCS; const L=[];
+  Object.entries(D.explainers).forEach(([k,e])=>{
+    (e.faq||[]).forEach(([q,a])=>L.push({t:"faq",k,g:e.g,q,a,key:q+" "+q+" "+e.name,body:a}));
+    const sent=[e.kid,...(e.more||[]),...(e.us||[]).map(u=>String(u).replace(/\*\*/g,"")),...(e.timeline||[]).map(t=>t.join(" ")),...(e.next||[]).map(t=>Array.isArray(t)?t.join(" "):String(t))].filter(Boolean).flatMap(x=>String(x).split(/(?<=。)/)).map(x=>x.trim()).filter(x=>x.length>4);
+    L.push({t:"ex",k,g:e.g,q:e.name,a:e.kid,key:e.name+" "+e.name+" "+(e.now||""),body:"",sent});
+  });
+  D.glossary.forEach(w=>L.push({t:"word",g:w[4],q:w[0],a:w[2]+(w[3]?` (たとえば: ${w[3]})`:""),key:w[0]+" "+w[1],body:w[2],w:w[0].replace(/\(.*?\)/,"")}));
+  GD_DOCS=L; return L; }
+function gdIntent(q){ const n=gdNorm(q); return {
+  today:/(今日|きょう).*(ニュース|話題|なに|何)|ニュース.*(今日|きょう)|いちばん|一番|トップ/.test(n),
+  weather:/天気|傘|雨|気温|寒|暑|服/.test(n),
+  market:/日経|株|円相場|ドル|原油|ガソリン/.test(n),
+  when:/いつ|何日|予定|日程/.test(n) }; }
+function guideFind(q,focus){
+  const qg=gdQuery(q); const nq=gdNorm(q); const docs=gdDocs();
+  const sc=docs.map(d=>{ let s=gdScore(qg,d.key)*1.0 + (d.body?gdScore(qg,d.body)*0.45:0);
+    if(d.sent){ let bs=0,bx=null; const when=/いつ|何日|何月/.test(q); d.sent.forEach(x=>{ const v=gdScore(qg,x)+(when&&/\d+(月|年)/.test(x)?0.2:0); if(v>bs){bs=v;bx=x;} }); s+=bs*0.8; d.hit=bs>=0.3?bx:null; }
+    if(d.t==="word" && d.w && d.w.length>=2 && nq.includes(gdNorm(d.w))){ const core=gdNorm(q).replace(GD_STOP,""); const r=d.w.length/Math.max(1,core.length); s+= r>=0.5 ? 1.2 : 0.3; }
+    if(focus && d.k===focus) s+=0.25; if(d.t==="faq") s+=0.05; return {d,s}; }).sort((a,b)=>b.s-a.s);
+  const I=gdIntent(q); const th=(I.weather||I.market||I.today)?0.75:0.45;
+  const best = sc[0] && sc[0].s>=th ? sc[0] : null;
+  const words = sc.filter(x=>x.d.t==="word" && x.s>=0.6 && (!best||x.d!==best.d) && nq.includes(gdNorm(x.d.w))).slice(0,2).map(x=>x.d);
+  const news = NEWS.map(n=>({n,s:gdScore(qg,n.h+" "+(n.th||"")+" "+(n.s||""))})).filter(x=>x.s>=0.34).sort((a,b)=>b.s-a.s||b.n.d.localeCompare(a.n.d)).slice(0,3).map(x=>x.n);
+  const plans = D.schedule.filter(s=>(s[1]||s[0])>=TODAY).map(s=>({s,v:gdScore(qg,s[3]+" "+(s[5]||""))})).filter(x=>x.v>=0.34).sort((a,b)=>b.v-a.v).slice(0,3).map(x=>x.s);
+  return {best: best&&best.d, words, news, plans, intent:I};
+}
+function guideAnswerHTML(q,focus){
+  const r=guideFind(q,focus); const parts=[];
+  const I=r.intent;
+  if(I.today){ parts.push(`<div class="gd-a"><b>今日のニュース 上位3つ</b><ol class="us" style="margin:4px 0 0">${D.top10.slice(0,3).map(n=>`<li>${n.icon} ${esc(n.title)}${n.ex?` <button class="gd-lk" data-gex="${n.ex}">解説 →</button>`:""}</li>`).join("")}</ol></div>`); }
+  if(I.weather && D.weather){ const w=D.weather; parts.push(`<div class="gd-a"><b>🌤️ ${esc(relDay(w.iso))}の${esc(w.place)}</b><br>${esc(w.sky)} ・ 最高${w.hi}° / 最低${w.lo}° ・ ☔ ${esc(w.umbrella)}<div class="hint">出典: ${esc(w.source)}</div>${/明日|あした/.test(q)&&relDay(w.iso)!=="明日"?'<div class="hint">明日の天気は、夜9時ごろの更新で入ります。</div>':""}</div>`); }
+  if(I.market){ const n=lastVal(1), y=lastVal(2), o=lastVal(3); parts.push(`<div class="gd-a"><b>📈 いちばん新しい数字</b><br>日経平均 ${n?n.v.toLocaleString("ja-JP")+"円("+mdLabel(n.d)+")":"—"} ・ 1ドル ${y?y.v.toFixed(2)+"円":"—"} ・ NY原油 ${o?o.v.toFixed(2)+"ドル":"—"} <button class="gd-lk" data-gtab="numbers">グラフ →</button></div>`); }
+  if(r.best){ const d=r.best; const e=d.k&&D.explainers[d.k];
+    const from = d.t==="faq" ? `解説「${esc(e.name)}」のQ&Aより` : d.t==="ex" ? `解説「${esc(e.name)}」より` : "ことば辞典より";
+    parts.push(`<div class="gd-a"><b>${d.t==="word"?"📖 "+esc(d.q):d.t==="faq"?"Q. "+esc(d.q):"💡 "+esc(d.q)}</b><br>${esc(d.t==="ex"&&d.hit?d.hit:d.a)}<div class="hint">${from}${d.k&&d.k!==focus?` <button class="gd-lk" data-gex="${d.k}">解説を読む →</button>`:""}</div></div>`); }
+  r.words.forEach(w=>parts.push(`<div class="gd-a"><b>📖 ${esc(w.q)}</b><br>${esc(w.a)}</div>`));
+  if(r.plans.length && (I.when||!r.best)) parts.push(`<div class="gd-a"><b>📅 これからの予定</b><ul class="us" style="margin:4px 0 0">${r.plans.map(s=>`<li>${esc(mdLabel(s[0]))} ${esc(s[3])}</li>`).join("")}</ul></div>`);
+  if(r.news.length) parts.push(`<div class="gd-a"><b>📰 関係するニュース</b><ul class="us" style="margin:4px 0 0">${r.news.map(n=>`<li>${esc(mdLabel(n.d))} ${esc(n.h)} ${n.ok?"✅":"⚠️"}</li>`).join("")}</ul></div>`);
+  if(!parts.length) parts.push(`<div class="gd-a">このアプリの中には、ぴったりの答えが見つかりませんでした。ことばを短くして聞きなおすか、下のボタンでClaudeに聞いてみてください。</div>`);
+  if(r.best&&r.best.g) learn(r.best.g,1);
+  return parts.join("")+`<button class="fchip gd-deep" data-deep="1">🤖 Claudeでもっと深く聞く(アプリの外で開きます)</button>`;
+}
+function bindGuideOut(el,q,focus){
+  el.querySelectorAll("[data-gex]").forEach(b=>b.onclick=()=>{ const k=b.dataset.gex; closeGuide(); openEx(k); });
+  el.querySelectorAll("[data-gtab]").forEach(b=>b.onclick=()=>{ closeGuide(); go(b.dataset.gtab); });
+  el.querySelectorAll("[data-deep]").forEach(b=>b.onclick=()=>{ const r=guideFind(q,focus); const k=focus||(r.best&&r.best.k); askAI(k?exCtx(k):"(まいにちニュース帳を読んでいて出てきた疑問です)",q); });
+}
+let closeGuide=()=>{};
+function openGuide(){
+  const sh=document.getElementById("sheet");
+  const sug=[...new Set([...D.top10.slice(0,3).map(n=>n.ex).filter(Boolean)].flatMap(k=>{ const e=D.explainers[k]; return e&&e.faq?e.faq.slice(0,1).map(f=>f[0]):[]; }))];
+  const chips=["今日いちばんのニュースは?","明日は傘がいる?","日経平均はいくら?",...sug].slice(0,6);
+  sh.innerHTML=`<div class="bar"><div class="wrap"><button class="iconbtn" id="gdx" aria-label="もどる">←</button><span class="ttl">💬 ニュース案内係</span></div></div>
+  <div class="wrap body">
+    <div class="gd-msg bot"><div class="gd-a">こんにちは。このアプリの解説・ことば辞典・ニュースの記録から、答えをさがします。<span class="hint" style="display:block;margin-top:4px">質問はこのスマホの中だけで調べます(どこにも送りません)。</span></div></div>
+    <div id="gdLog" style="display:flex;flex-direction:column;gap:12px"></div>
+    <div class="chips" id="gdSug">${chips.map(c=>`<button class="fchip" data-gq="${esc(c)}">${esc(c)}</button>`).join("")}</div>
+    <form class="sbox gd-in" id="gdForm"><input id="gdIn" type="text" placeholder="例: 消費税1%っていつから?" autocomplete="off" enterkeyhint="send"><button class="iconbtn" style="background:var(--accent);color:var(--on-accent);border-color:var(--accent)">聞く</button></form>
+  </div>`;
+  const log=sh.querySelector("#gdLog");
+  const ask=q=>{ q=q.trim(); if(!q) return; const u=document.createElement("div"); u.className="gd-msg me"; u.innerHTML=`<div class="gd-q">${esc(q)}</div>`; log.appendChild(u);
+    const a=document.createElement("div"); a.className="gd-msg bot"; a.innerHTML=guideAnswerHTML(q,null); log.appendChild(a); bindGuideOut(a,q,null);
+    sh.querySelector("#gdIn").value=""; u.scrollIntoView({block:"start",behavior:"smooth"}); };
+  sh.querySelector("#gdForm").onsubmit=ev=>{ ev.preventDefault(); ask(sh.querySelector("#gdIn").value); };
+  sh.querySelectorAll("[data-gq]").forEach(b=>b.onclick=()=>ask(b.dataset.gq));
+  const esck=ev=>{ if(ev.key==="Escape") closeGuide(); };
+  closeGuide=()=>{ sh.hidden=true; sh.innerHTML=""; document.body.style.overflow=""; document.removeEventListener("keydown",esck); closeGuide=()=>{}; };
+  sh.querySelector("#gdx").onclick=()=>closeGuide();
+  document.addEventListener("keydown",esck);
+  sh.hidden=false; sh.scrollTop=0; document.body.style.overflow="hidden"; sh.querySelector("#gdIn").focus();
+}
 
 // ===== 予定・予測 =====
 const PRED = D.predictions.map(r=>({no:r[0],t:r[1],c:r[2],d:r[3],r:r[4],now:r[5],m:r[6]}));
@@ -1234,7 +1329,7 @@ const GUIDE = [
   ["👆","さわってみよう",["<b>点線のことば</b>をタップすると、意味がその場で出ます。調べたことばは「マイ」にたまります。","<b>📍</b>を押すと、そのニュースを保存できます。保存したものは「マイ」で見られて、メモも書けます。","「くわしい解説 →」から、<b>図・Q&A・これまでの流れ</b>つきの解説が読めます。<b>🔊 聞く</b>で読み上げもできます。"]],
   ["🧭","下のタブ",["<b>📰 きょう</b> 今日のまとめ ／ <b>🔎 さがす</b> ことばやジャンルで過去のニュースを検索 ／ <b>🗺️ 地図</b> どこで起きたかを地図で","<b>💡 解説</b> 大きな話題をやさしく ／ <b>📈 数字</b> 日経平均・円・原油のグラフ(数時間ごと〜全期間) ／ <b>📅 予定</b> これからの予定と、Claudeの予測","<b>⭐ マイ</b> あなたの記録・保存・着せかえ"]],
   ["🎯","続けるとたのしいこと",["開いた日・解説・クイズ・ことば・予想で<b>ポイント</b>がたまり、レベルとバッジが上がります。","「予定」の予測に<b>あなたも予想</b>して、答え合わせができます。Claudeと的中率くらべも。","毎日の連続記録は「マイ」のカレンダーで見られます。"]],
-  ["🤖","AIに聞く",["解説ページの<b>「AIに聞く」</b>で、その話題について質問できます(質問と解説の要点を入れた状態で Claude が開きます)。"]],
+  ["💬","聞いてみる",["右下の<b>💬</b>で「ニュース案内係」に質問できます。解説のQ&A・ことば辞典・ニュースの記録から、アプリの中で答えをさがします(質問はどこにも送りません)。","もっと深く知りたいときは「Claudeでもっと深く聞く」で、Claude(AI)に聞けます(アプリの外で開きます)。"]],
   ["🎨","自分好みにする",["「マイ」の<b>🎨 着せかえ</b>で、色・文字の大きさ・詰め具合・「きょう」の並び・下のタブの並びを変えられます。","右上の<b>Aa</b>でも、文字の大きさと明るさをすぐ変えられます。"]],
   ["📲","アプリとして使う",["iPhone: Safariの共有ボタン(□に↑)→「ホーム画面に追加」。","Android: Chromeのメニュー(︙)→「ホーム画面に追加」または「アプリをインストール」。","一度開いた内容は、電波がないところでも読めます。"]],
   ["🔒","記録について",["あなたの記録・保存・着せかえは、<b>このスマホ(ブラウザ)の中だけ</b>に保存されます。ほかの人や作った人には見えません。","更新は1日4回(朝・昼・夕方・夜)です。"]]
@@ -1368,6 +1463,7 @@ function speakEx(k,btn){ const e=D.explainers[k]; if(!e) return; try{ const s=wi
   const u=new SpeechSynthesisUtterance(txt); u.lang="ja-JP"; u.rate=1.05; u.onend=()=>{ btn.textContent="🔊 聞く"; }; s.speak(u); btn.textContent="■ 止める"; }catch(_){} }
 
 // 起動
+document.getElementById("gdFab").onclick=openGuide;
 const h=(location.hash||"").slice(1);
 if(D.explainers[h]){ go("explain"); openEx(h); } else go(TABS.some(t=>t[0]===h)?h:"today");
 try{ if(new URLSearchParams(location.search).get("play")==="1") setTimeout(openStory,300); }catch(_){}
