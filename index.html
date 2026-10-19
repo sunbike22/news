@@ -1223,6 +1223,23 @@ function icsFor(s){
   const blob=new Blob([body],{type:"text/calendar"}); const url=URL.createObjectURL(blob); const a=document.createElement("a"); a.href=url; a.download=`yotei-${d}.ics`; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(url),5000);
 }
 
+// ===== 使い方 =====
+const GUIDE = [
+  ["🚀","まずはここから",["「きょう」の<b>▶ 1分で見る</b>を押すと、今日のニュースが動くスライドで流れます。","時間がない日は<b>☀️ 今日の3行</b>だけ読めばOK。","<b>📰 今日のニュース10</b>は、その日に関心が高かった順のランキングです。下の「記録したニュース すべて」で、ほかのニュースも見られます。"]],
+  ["🔖","マークの見かた",["<b>✅</b> 別々の報道機関2社以上で確かめたニュース。","<b>⚠️</b> まだ1社だけ・見出しだけのニュース。続報で確かめられたら✅に変わります。","<b>NEW</b> 前に開いたあとに増えたニュース。"]],
+  ["👆","さわってみよう",["<b>点線のことば</b>をタップすると、意味がその場で出ます。調べたことばは「マイ」にたまります。","<b>📍</b>を押すと、そのニュースを保存できます。保存したものは「マイ」で見られて、メモも書けます。","「くわしい解説 →」から、<b>図・Q&A・これまでの流れ</b>つきの解説が読めます。<b>🔊 聞く</b>で読み上げもできます。"]],
+  ["🧭","下のタブ",["<b>📰 きょう</b> 今日のまとめ ／ <b>🔎 さがす</b> ことばやジャンルで過去のニュースを検索 ／ <b>🗺️ 地図</b> どこで起きたかを地図で","<b>💡 解説</b> 大きな話題をやさしく ／ <b>📈 数字</b> 日経平均・円・原油のグラフ(数時間ごと〜全期間) ／ <b>📅 予定</b> これからの予定と、Claudeの予測","<b>⭐ マイ</b> あなたの記録・保存・着せかえ"]],
+  ["🎯","続けるとたのしいこと",["開いた日・解説・クイズ・ことば・予想で<b>ポイント</b>がたまり、レベルとバッジが上がります。","「予定」の予測に<b>あなたも予想</b>して、答え合わせができます。Claudeと的中率くらべも。","毎日の連続記録は「マイ」のカレンダーで見られます。"]],
+  ["🤖","AIに聞く",["解説ページの<b>「AIに聞く」</b>で、その話題について質問できます(質問と解説の要点を入れた状態で Claude が開きます)。"]],
+  ["🎨","自分好みにする",["「マイ」の<b>🎨 着せかえ</b>で、色・文字の大きさ・詰め具合・「きょう」の並び・下のタブの並びを変えられます。","右上の<b>Aa</b>でも、文字の大きさと明るさをすぐ変えられます。"]],
+  ["📲","アプリとして使う",["iPhone: Safariの共有ボタン(□に↑)→「ホーム画面に追加」。","Android: Chromeのメニュー(︙)→「ホーム画面に追加」または「アプリをインストール」。","一度開いた内容は、電波がないところでも読めます。"]],
+  ["🔒","記録について",["あなたの記録・保存・着せかえは、<b>このスマホ(ブラウザ)の中だけ</b>に保存されます。ほかの人や作った人には見えません。","更新は1日4回(朝・昼・夕方・夜)です。"]]
+];
+function guideBlock(){
+  return `<details class="faq" id="guide"${ME.days.length<=1?" open":""}><summary>📘 このアプリの使い方</summary>
+    <div style="display:flex;flex-direction:column;gap:12px;padding:8px 0 14px">${GUIDE.map(([i,t,L])=>`<div><b>${i} ${esc(t)}</b><ul class="us" style="margin-top:4px">${L.map(x=>`<li>${x}</li>`).join("")}</ul></div>`).join("")}</div></details>`;
+}
+
 // ===== マイ =====
 function renderMy(){
   const lv=level(); const s=streak(); const vr=voteResults();
@@ -1233,6 +1250,7 @@ function renderMy(){
     <div class="sec-h"><h2>⭐ わたしの記録</h2><span class="sub">このスマホの中だけに保存</span></div>
     <button class="lookcard" id="lookBtnMy"><span class="pal" aria-hidden="true" style="padding-left:5px">${COLORS.slice(0,5).map(c=>`<i style="background:${c[2]}"></i>`).join("")}</span><span><b>🎨 着せかえ</b><span class="hint" style="display:block">色・文字・画面の並び・タブを、わたし好みに</span></span></button>
     ${pinsBlock()}
+    ${guideBlock()}
     <section class="card lvcard"><div class="lvrow"><div class="lvbig">Lv.${lv.i+1}</div><div><b style="font-size:1.1rem">${esc(lv.name)}</b><div class="hint">${lv.pt}ポイント${lv.next?` ・ 次の「${esc(lv.next[1])}」まで あと${lv.next[0]-lv.pt}`:" ・ 最高レベル!"}</div></div></div>
       <div class="bar"><i style="width:${Math.round(lv.prog*100)}%"></i></div>
       <div class="hint" style="margin-top:6px">開いた日 +2 ・ 解説を読む +3 ・ クイズ正解 +2 ・ ことばを調べる +1 ・ 予想が当たる +5</div></section>
