@@ -464,21 +464,22 @@ if(STATS.on&&STATS.code){ window.goatcounter={no_onload:true}; const sc=document
 // ===== 設定(テーマ・文字サイズ) =====
 const root = document.documentElement;
 // 着せかえ(見る人のスマホの中だけに保存: nw-look)
-// [キー, 名前, 明るい画面: アクセント・うすい色・背景・面2・線, 暗い画面: アクセント・うすい色・背景・面・面2・線]
+// [キー, 名前, 明るい画面: アクセント・うすい色・背景・面・面2・線, 暗い画面: アクセント・うすい色・背景・面・面2・線]
 const COLORS = [
-  ["blue","あお",     "#2747c9","#e3e8fb","#eef1f4","#f6f8fa","#d9dee6", "#8ea4ff","#232c4d","#0e1320","#171d2c","#1d2436","#2a3247"],
-  ["red","あか",      "#c8323a","#fbe3e4","#f7eeee","#fbf5f5","#ead9da", "#ff8f94","#41191d","#150d0f","#20171a","#281c20","#3b2a2e"],
-  ["green","みどり",  "#15803d","#dff2e5","#edf3ee","#f5f9f6","#d6e3d9", "#5fd18a","#16301f","#0c1410","#141e18","#1a261f","#26372c"],
-  ["yellow","きいろ", "#a16207","#fbf0c6","#f8f4e4","#fcfaf1","#e9e1c4", "#fcd34d","#3a3015","#14120a","#1f1c12","#272317","#3a3420"],
-  ["purple","むらさき","#6d28d9","#ece4fd","#f1eef8","#f8f6fc","#ddd6ec", "#c4b5fd","#2a1f45","#110e1a","#1a1626","#211c30","#322a47"],
-  ["orange","オレンジ","#c2410c","#fde8dc","#f8f0ea","#fcf7f3","#ecdccf", "#fb923c","#3a2416","#150f0b","#201813","#281e17","#3b2c22"],
-  ["pink","ピンク",   "#be185d","#fce4ef","#f8eef3","#fcf6f9","#ecd8e2", "#f9a8d4","#3b1a2b","#150d12","#21151c","#291b23","#3d2934"],
-  ["teal","うみ",     "#0f766e","#d9f1ee","#ecf4f3","#f5faf9","#d3e4e1", "#5eead4","#14302d","#0b1514","#131f1e","#192827","#243a38"],
-  ["mono","すみ",     "#1f2937","#e5e7eb","#f0f0f0","#f7f7f7","#dcdcdc", "#e5e7eb","#2a2f3a","#111214","#1b1c20","#222328","#33353c"]
+  ["blue","あお",     "#2747c9","#d8e2fb","#dde6f8","#f9fbff","#ebf0fc","#c6d2ee", "#8ea4ff","#232c4d","#0e1320","#171d2c","#1d2436","#2a3247"],
+  ["red","あか",      "#cf2f3a","#f8d0d3","#f9dcde","#fff7f7","#fdeced","#ecc3c7", "#ff8088","#4a1a20","#1d0e10","#2a1518","#331a1e","#4c2a2f"],
+  ["green","みどり",  "#15803d","#cdeed6","#d9eedf","#f8fdf9","#eaf7ee","#bfdcc7", "#5fd18a","#16301f","#0b170f","#132219","#192b20","#264030"],
+  ["yellow","きいろ", "#a16207","#f8e49c","#faedc0","#fffcf0","#fdf5da","#e6d8a2", "#fcd34d","#3a3015","#17140a","#231f10","#2b2614","#433b20"],
+  ["purple","むらさき","#7c3aed","#ddd0fc","#e7dcfc","#faf7ff","#f2ecfe","#cfc0f4", "#b794ff","#2e2150","#150f24","#1f1833","#271f40","#3a2f5c"],
+  ["orange","オレンジ","#d9480f","#fcd2b8","#fde0cc","#fff7f1","#feeee2","#f0c6ab", "#ff9a4d","#45260f","#1c120a","#281a10","#312015","#4a3221"],
+  ["pink","ピンク",   "#db2777","#f9c6dc","#fadbe9","#fff4f9","#fde9f2","#f0bdd3", "#ff7eb6","#4a1a33","#1d0e16","#2a1520","#331a28","#4d2a3d"],
+  ["teal","うみ",     "#0f766e","#c4ebe4","#d4efea","#f7fdfc","#e8f8f5","#b6dbd4", "#5eead4","#14302d","#0a1816","#11231f","#172c28","#244440"],
+  ["mono","すみ",     "#1f2937","#dcdee2","#e6e6e6","#fafafa","#f1f1f1","#cfcfcf", "#e5e7eb","#2a2f3a","#111214","#1b1c20","#222328","#33353c"]
 ];
 (function(){ const st=document.createElement("style"); let s="";
-  COLORS.filter(c=>c[0]!=="blue").forEach(([k,,a,as,bg,s2,ln])=>{ s+=`:root[data-color="${k}"]{--accent:${a};--accent-soft:${as};--bg:${bg};--surface2:${s2};--line:${ln}}`; });
-  COLORS.filter(c=>c[0]!=="blue").forEach(([k,,,,,,,a,as,bg,sf,s2,ln])=>{ const v=`--accent:${a};--accent-soft:${as};--bg:${bg};--surface:${sf};--surface2:${s2};--line:${ln}`; s+=`@media (prefers-color-scheme: dark){:root:not([data-theme="light"])[data-color="${k}"]{${v}}}:root[data-theme="dark"][data-color="${k}"]{${v}}`; });
+  const v=(a,as,bg,sf,s2,ln)=>`--accent:${a};--accent-soft:${as};--bg:${bg};--surface:${sf};--surface2:${s2};--line:${ln}`;
+  COLORS.forEach(([k,,...c])=>{ s+=`:root[data-color="${k}"]{${v(...c.slice(0,6))}}`; });
+  COLORS.forEach(([k,,...c])=>{ const d=v(...c.slice(6,12)); s+=`@media (prefers-color-scheme: dark){:root:not([data-theme="light"])[data-color="${k}"]{${d}}}:root[data-theme="dark"][data-color="${k}"]{${d}}`; });
   st.textContent=s; document.head.appendChild(st); })();
 const SECS = [["play","▶️ 1分で見る"],["weather","🌤️ 天気"],["three","☀️ 今日の3行"],["ten","📰 今日のニュース10"],["foryou","🎯 あなた向け"],["other","📚 そのほかのニュース"],["quiz","🧠 今日のクイズ"],["number","🔢 今日の数字"]];
 const LOOK = (()=>{ let p={}; try{ p=JSON.parse(store.get("nw-look")||"{}")||{}; }catch(_){ p={}; }
@@ -490,7 +491,7 @@ const LOOK = (()=>{ let p={}; try{ p=JSON.parse(store.get("nw-look")||"{}")||{};
 function saveLook(){ store.set("nw-look", JSON.stringify(LOOK)); }
 function applySettings(){ const t=store.get("nw-theme"); if(t==="light"||t==="dark") root.setAttribute("data-theme",t); else root.removeAttribute("data-theme");
   const s=store.get("nw-size"); if(s==="l"||s==="xl") root.setAttribute("data-size",s); else root.removeAttribute("data-size");
-  if(LOOK.color!=="blue") root.setAttribute("data-color",LOOK.color); else root.removeAttribute("data-color");
+  root.setAttribute("data-color",LOOK.color);
   if(LOOK.density!=="normal") root.setAttribute("data-density",LOOK.density); else root.removeAttribute("data-density");
   const m=document.querySelector('meta[name="theme-color"]'); if(m) m.setAttribute("content",(COLORS.find(c=>c[0]===LOOK.color)||COLORS[0])[2]); }
 applySettings();
@@ -1143,7 +1144,7 @@ function openLook(){
     <div class="wrap body">
       <div class="hint">あなた好みのニュースアプリに作りかえられます。変えるとすぐ反映され、このスマホの中だけに保存されます。</div>
       <section class="lk-sec"><h3>おまかせセット</h3><div class="presets">${PRESETS.map(p=>`<button data-preset="${p[0]}"><b>${p[1]}</b><span>${esc(p[2])}</span></button>`).join("")}</div></section>
-      <section class="lk-sec"><h3>テーマの色</h3><div class="hint">ボタンや見出しの色と、画面全体のほんのりした色が変わります。</div><div class="sw">${COLORS.map(c=>`<button data-col="${c[0]}" aria-pressed="${LOOK.color===c[0]}" aria-label="${c[1]}" title="${c[1]}" style="background:linear-gradient(135deg,${c[2]} 55%,${c[4]} 55%)"></button>`).join("")}</div>
+      <section class="lk-sec"><h3>テーマの色</h3><div class="hint">ボタンや見出しの色と、画面全体の色が変わります。</div><div class="sw">${COLORS.map(c=>`<button data-col="${c[0]}" aria-pressed="${LOOK.color===c[0]}" aria-label="${c[1]}" title="${c[1]}" style="background:linear-gradient(135deg,${c[2]} 55%,${c[4]} 55%)"></button>`).join("")}</div>
         <div class="setrow"><span style="min-width:5em">画面</span><span class="seg">${[["system","自動"],["light","明るい"],["dark","暗い"]].map(([k,l])=>`<button data-lt="${k}" aria-pressed="${th===k}">${l}</button>`).join("")}</span></div></section>
       <section class="lk-sec"><h3>文字と詰め具合</h3>
         <div class="setrow"><span style="min-width:5em">文字</span><span class="seg">${[["m","ふつう"],["l","大きめ"],["xl","特大"]].map(([k,l])=>`<button data-ls="${k}" aria-pressed="${sz===k}">${l}</button>`).join("")}</span></div>
