@@ -202,6 +202,15 @@ mark{background:#ffe066;color:#141b2d;border-radius:3px;padding:0 1px}
 .lsum b{font-size:.98rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .ask .sbox{border-width:1px}
 
+.ten li,.item{position:relative}
+.pin-btn.abs{position:absolute;top:6px;right:6px;z-index:2;border:0;background:transparent;font-size:1.15rem;width:40px;height:40px;border-radius:10px;cursor:pointer;opacity:.55}
+.pin-btn.abs[aria-pressed="true"]{opacity:1}
+.ten .row,.item{padding-right:44px}
+.pins{display:flex;flex-direction:column;gap:10px;margin-top:10px}
+.pinitem{border:1px solid var(--line);border-radius:12px;padding:10px 12px;background:var(--surface2);display:flex;flex-direction:column;gap:6px}
+.pinitem .h{font-weight:700}
+.memo{width:100%;font:inherit;font-size:.92rem;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:8px 10px;resize:vertical}
+
 /* install */
 .install{display:grid;grid-template-columns:48px 1fr auto;gap:12px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:12px 14px}
 .install img{width:48px;height:48px;border-radius:12px}
@@ -511,7 +520,7 @@ function renderToday(){
       <div class="sec-h"><h2>📰 今日のニュース10</h2><span class="sub">関心の高い順</span></div>
       <ol class="ten" style="margin-top:10px">${t.map((n,i)=>{
         const big=i<3; const link=n.ex||n.tab;
-        return `<li class="${big?'big':''}"><button class="row${link?' link':''}"${n.ex?` data-ex="${n.ex}"`:''}${n.tab?` data-tab="${n.tab}"`:''} ${link?'':'tabindex="-1"'}>
+        return `<li class="${big?'big':''}">${pinBtn({k:"t|"+n.title,h:n.title,g:n.g,d:(NEWS[0]||{}).d,ex:n.ex},"abs")}<button class="row${link?' link':''}"${n.ex?` data-ex="${n.ex}"`:''}${n.tab?` data-tab="${n.tab}"`:''} ${link?'':'tabindex="-1"'}>
           <span class="rank">${i+1}</span>
           <span>${big&&ILL[n.ill||n.ex]?`<div class="ill">${ILL[n.ill||n.ex]}</div>`:""}<span class="meta"><span class="chip ${n.g}">${GN[n.g]}</span>${n.ok?'<span class="badge-ok">✅ 複数社で確認</span>':'<span class="badge-one">⚠️ 1社のみ</span>'}</span>
           <h3>${n.icon} ${esc(n.title)}</h3>
@@ -676,7 +685,7 @@ function renderSearch(){
       ${wHits.length?`<div><div class="hint" style="margin-bottom:6px">📖 ことば</div><div class="words">${wHits.map(wordCard).join("")}</div></div>`:""}
       <div class="sec-h"><h2 style="font-size:1rem">📰 ニュース <span class="num">${list.length}</span>件</h2>${(sState.q||sState.g.size||sState.th||sState.ok||sState.onlyNew)?'<button class="fchip" id="clr">条件をリセット</button>':''}</div>
       ${histo}
-      ${list.length? `<div class="res">${Object.keys(groups).sort().reverse().map(d=>`<section class="day"><h3>${mdLabel(d)}${d.slice(0,4)!==TODAY.slice(0,4)?" "+d.slice(0,4):""}</h3><ul>${groups[d].map(n=>`<li class="item"><div class="meta"><span class="chip ${n.g}">${GN[n.g]}</span>${n.ok?'<span class="badge-ok">✅</span>':'<span class="badge-one">⚠️ 1社</span>'}${n.p?`<span class="chip">🎯 ${esc(n.p)}</span>`:""}${isNew(n)?'<span class="chip newchip">🆕</span>':''}</div><div class="h">${hl(n.h,terms)}</div><div class="s">出典: ${hl(n.s,terms)}</div></li>`).join("")}</ul></section>`).join("")}</div>`
+      ${list.length? `<div class="res">${Object.keys(groups).sort().reverse().map(d=>`<section class="day"><h3>${mdLabel(d)}${d.slice(0,4)!==TODAY.slice(0,4)?" "+d.slice(0,4):""}</h3><ul>${groups[d].map(n=>`<li class="item">${pinBtn({k:nkey(n),h:n.h,g:n.g,d:n.d},"abs")}<div class="meta"><span class="chip ${n.g}">${GN[n.g]}</span>${n.ok?'<span class="badge-ok">✅</span>':'<span class="badge-one">⚠️ 1社</span>'}${n.p?`<span class="chip">🎯 ${esc(n.p)}</span>`:""}${isNew(n)?'<span class="chip newchip">🆕</span>':''}</div><div class="h">${hl(n.h,terms)}</div><div class="s">出典: ${hl(n.s,terms)}</div></li>`).join("")}</ul></section>`).join("")}</div>`
         : `<div class="empty">見つかりませんでした。<br>ことばを短くするか、ジャンルの選択を外してみてください。</div>`}`;
     document.getElementById("sres").innerHTML=html;
     const clr=document.getElementById("clr"); if(clr) clr.onclick=()=>{sState.q="";sState.g.clear();sState.th="";sState.ok=false;sState.onlyNew=false; renderSearch();};
@@ -714,7 +723,7 @@ function openEx(k){
   if(!ME.readEx[k]) learn(e.g,2); ME.readEx[k]=TODAY; saveMe(); setTimeout(checkBadges,800);
   const rel = NEWS.filter(n=>{ const map={saudi:"サウジ・中東",tax:"消費減税",cyber:"不正アクセスとAI"}; if(map[k]) return (n.th||"").includes(map[k]); if(k==="sato") return /佐藤輝明/.test(n.h); if(k==="series") return /日本シリーズ|CS/.test(n.h); if(k==="yokohama") return /横浜市長/.test(n.h); if(k==="past") return n.d<"2026-10-04"; return false; }).slice(0,8);
   const flow = e.flow.map((f,i)=>`${i>0?`<div class="farrow">⬇️ ${f.via?`<b>${esc(f.via)}</b>`:""}</div>`:""}<div class="fstep"><span class="fi">${f.i}</span><span><b>${esc(f.t)}</b>${f.s?`<small>${esc(f.s)}</small>`:""}</span></div>`).join("");
-  sh.innerHTML=`<div class="bar"><div class="wrap"><button class="iconbtn" id="shx" aria-label="もどる">←</button><span class="ttl">${e.icon} ${esc(e.name)}</span><button class="iconbtn" id="shshare" aria-label="このページのリンクをコピー">🔗 共有</button></div></div>
+  sh.innerHTML=`<div class="bar"><div class="wrap"><button class="iconbtn" id="shx" aria-label="もどる">←</button><span class="ttl">${e.icon} ${esc(e.name)}</span>${pinBtn({k:"ex|"+k,h:"解説: "+e.name,g:e.g,d:TODAY,ex:k},"iconbtn")}<button class="iconbtn" id="shshare" aria-label="このページのリンクをコピー">🔗 共有</button></div></div>
   <div class="wrap body">
     <div class="hint">最終更新 ${esc(e.updated)} ・ ⏱️ 全部で約${e.min}分 ・ 点線のことばはタップで意味が出ます</div>
     ${PHOTOS[k]?photoBlock(k):ILL[k]?`<div><div class="ill">${ILL[k]}</div><div class="credit">イラスト: 自作(イメージ)</div></div>`:""}
@@ -933,7 +942,7 @@ document.getElementById("pop").addEventListener("click",e=>e.stopPropagation());
 
 // ===== 一人ひとりの記録(見る人のスマホの中だけに保存) =====
 const ME = (()=>{ let p={}; try{ p=JSON.parse(store.get("nw-me")||"{}")||{}; }catch(_){ p={}; }
-  p.interests=p.interests||{}; p.auto=p.auto||{}; p.days=p.days||[]; p.readEx=p.readEx||{}; p.quiz=p.quiz||{}; p.words=p.words||[]; p.votes=p.votes||{}; p.seen=p.seen||[]; p.badges=p.badges||[]; p.notified=p.notified||{};
+  p.interests=p.interests||{}; p.auto=p.auto||{}; p.days=p.days||[]; p.readEx=p.readEx||{}; p.quiz=p.quiz||{}; p.words=p.words||[]; p.votes=p.votes||{}; p.seen=p.seen||[]; p.badges=p.badges||[]; p.notified=p.notified||{}; p.pins=p.pins||{};
   return p; })();
 function saveMe(){ store.set("nw-me", JSON.stringify(ME)); }
 const nkey = n => (n.d+"|"+n.h).slice(0,80);
@@ -977,6 +986,29 @@ function newBadges(){ const got=[]; BADGES.forEach(b=>{ if(!ME.badges.includes(b
 function toast(msg){ const t=document.createElement("div"); t.className="toast"; t.setAttribute("role","status"); t.innerHTML=msg; document.body.appendChild(t); setTimeout(()=>t.classList.add("out"),2600); setTimeout(()=>t.remove(),3200); }
 function checkBadges(){ newBadges().forEach((b,i)=>setTimeout(()=>toast(`${b[1]} バッジ「${esc(b[2])}」を手に入れました`),400+i*1200)); }
 
+// ピン留めとメモ
+function pinAttrs(o){ return `data-pk="${esc(o.k)}" data-ph="${esc(o.h)}" data-pg="${esc(o.g||"")}" data-pd="${esc(o.d||"")}" data-pex="${esc(o.ex||"")}"`; }
+function pinBtn(o,extraCls){ const on=!!ME.pins[o.k]; return `<button class="pin-btn ${extraCls||""}" ${pinAttrs(o)} aria-pressed="${on}" aria-label="${on?"保存をやめる":"保存する"}" title="あとで読む・メモ">${on?"📌":"📍"}</button>`; }
+document.addEventListener("click",ev=>{ const b=ev.target.closest(".pin-btn"); if(!b) return; ev.preventDefault(); ev.stopPropagation();
+  const k=b.dataset.pk; if(ME.pins[k]){ if(ME.pins[k].memo && !b.dataset.confirm){ b.dataset.confirm="1"; toast("メモがあります。もう一度押すと保存をやめます"); setTimeout(()=>delete b.dataset.confirm,3000); return; } delete ME.pins[k]; toast("保存をやめました"); }
+  else { ME.pins[k]={h:b.dataset.ph,g:b.dataset.pg,d:b.dataset.pd,ex:b.dataset.pex,memo:"",at:new Date(Date.now()+9*3600e3).toISOString()}; learn(b.dataset.pg,1); toast("📌 保存しました。「マイ」でメモも書けます"); }
+  saveMe(); document.querySelectorAll(`.pin-btn[data-pk="${CSS.escape(k)}"]`).forEach(x=>{ const on=!!ME.pins[k]; x.setAttribute("aria-pressed",String(on)); x.textContent=on?"📌":"📍"; x.setAttribute("aria-label",on?"保存をやめる":"保存する"); });
+  if(current==="my") renderMy(); }, true);
+function pinsBlock(){
+  const P=Object.entries(ME.pins).sort((a,b)=>b[1].at.localeCompare(a[1].at));
+  return `<section class="card" id="pinsBox"><div class="sec-h"><b>📌 保存したニュースとメモ(${P.length})</b></div>
+    ${P.length?`<div class="pins">${P.map(([k,v])=>`<div class="pinitem"><div class="meta">${v.g&&GN[v.g]?`<span class="chip ${v.g}">${GN[v.g]}</span>`:""}${v.d?`<span class="hint">${mdLabel(v.d)}</span>`:""}<span class="hint">・保存 ${mdLabel(v.at.slice(0,10))}</span></div>
+      <div class="h">${esc(v.h)}</div>
+      <textarea class="memo" data-mk="${esc(k)}" rows="2" placeholder="メモを書く(思ったこと、調べたいこと、人に話したいこと…)">${esc(v.memo||"")}</textarea>
+      <div class="setrow">${v.ex&&D.explainers[v.ex]?`<button class="fchip" data-openex="${esc(v.ex)}">💡 解説を開く</button>`:""}<button class="fchip" data-unpin="${esc(k)}">保存をやめる</button></div></div>`).join("")}</div>`
+      :`<p class="hint" style="margin:6px 0 0">ニュースの 📍 を押すと、ここに保存されます。メモも書けます(このスマホの中だけに保存)。</p>`}</section>`;
+}
+function bindPins(){
+  document.querySelectorAll("textarea.memo").forEach(t=>{ let tm; t.addEventListener("input",()=>{ clearTimeout(tm); tm=setTimeout(()=>{ const k=t.dataset.mk; if(ME.pins[k]){ ME.pins[k].memo=t.value; saveMe(); } },400); }); });
+  document.querySelectorAll("[data-openex]").forEach(b=>b.onclick=()=>openEx(b.dataset.openex));
+  document.querySelectorAll("[data-unpin]").forEach(b=>b.onclick=()=>{ delete ME.pins[b.dataset.unpin]; saveMe(); renderMy(); });
+}
+
 // きょう画面に出すカード
 function personalCards(){
   const out=[]; const s=streak(); const lv=level();
@@ -1000,7 +1032,7 @@ function forYou(){
   const L=NEWS.filter(n=>days.includes(n.d) && interestScore(n.g)>0 && !topH.has(n.h)).sort((a,b)=>interestScore(b.g)-interestScore(a.g) || b.ok-a.ok || b.d.localeCompare(a.d)).slice(0,5);
   if(!L.length) return "";
   return `<section aria-label="あなた向け"><div class="sec-h"><h2>🎯 あなた向け</h2><button class="fchip" data-tab="my">関心を変える</button></div>
-    <ul class="ten" style="margin-top:10px">${L.map(n=>`<li><div class="row"><span class="rank">・</span><span><span class="meta"><span class="chip ${n.g}">${GN[n.g]}</span>${isNew(n)?'<span class="chip newchip">🆕</span>':''}${n.ok?'<span class="badge-ok">✅</span>':'<span class="badge-one">⚠️ 1社</span>'}<span class="hint">${mdLabel(n.d)}</span></span><h3>${esc(n.h)}</h3></span></div></li>`).join("")}</ul></section>`;
+    <ul class="ten" style="margin-top:10px">${L.map(n=>`<li>${pinBtn({k:nkey(n),h:n.h,g:n.g,d:n.d},"abs")}<div class="row"><span class="rank">・</span><span><span class="meta"><span class="chip ${n.g}">${GN[n.g]}</span>${isNew(n)?'<span class="chip newchip">🆕</span>':''}${n.ok?'<span class="badge-ok">✅</span>':'<span class="badge-one">⚠️ 1社</span>'}<span class="hint">${mdLabel(n.d)}</span></span><h3>${esc(n.h)}</h3></span></div></li>`).join("")}</ul></section>`;
 }
 function bindPersonal(){
   const nb=document.getElementById("newBtn"); if(nb) nb.onclick=()=>{ sState.onlyNew=true; go("search"); };
@@ -1078,6 +1110,7 @@ function renderMy(){
   const readNames=Object.keys(ME.readEx).filter(k=>D.explainers[k]).map(k=>D.explainers[k].name);
   main.innerHTML=`<div class="view">
     <div class="sec-h"><h2>⭐ わたしの記録</h2><span class="sub">このスマホの中だけに保存</span></div>
+    ${pinsBlock()}
     <section class="card lvcard"><div class="lvrow"><div class="lvbig">Lv.${lv.i+1}</div><div><b style="font-size:1.1rem">${esc(lv.name)}</b><div class="hint">${lv.pt}ポイント${lv.next?` ・ 次の「${esc(lv.next[1])}」まで あと${lv.next[0]-lv.pt}`:" ・ 最高レベル!"}</div></div></div>
       <div class="bar"><i style="width:${Math.round(lv.prog*100)}%"></i></div>
       <div class="hint" style="margin-top:6px">開いた日 +2 ・ 解説を読む +3 ・ クイズ正解 +2 ・ ことばを調べる +1 ・ 予想が当たる +5</div></section>
@@ -1108,6 +1141,7 @@ function renderMy(){
   main.querySelectorAll("[data-tab]").forEach(b=>b.onclick=()=>go(b.dataset.tab));
   main.querySelectorAll("#myInt [data-g]").forEach(b=>b.onclick=()=>{ const g=b.dataset.g; ME.interests[g]=!ME.interests[g]; b.setAttribute("aria-pressed",String(!!ME.interests[g])); saveMe(); });
   document.getElementById("weekBtn2").onclick=()=>openStory(buildWeekSlides);
+  bindPins();
   document.getElementById("resetMe").onclick=()=>{ document.getElementById("resetConfirm").innerHTML='<p>本当に消しますか? 元にはもどせません。</p><button class="fchip" id="resetYes">消す</button>'; document.getElementById("resetYes").onclick=()=>{ try{ localStorage.removeItem("nw-me"); }catch(_){} location.reload(); }; };
 }
 
