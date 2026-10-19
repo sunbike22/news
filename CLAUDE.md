@@ -6,6 +6,7 @@
 ## ファイル
 - `index.html` — 見た目と動き(HTML・CSS・JavaScript を1ファイルに)。外部ライブラリは Chart.js(jsDelivr)と Google Fonts だけ。
 - `data.js` — 中身のデータ(`window.NEWS_DATA`)。ニュースの更新では、基本的にこのファイルだけを書き換える。
+- `manifest.webmanifest`・`sw.js`・`icon-*.png`・`apple-touch-icon.png` — ホーム画面に追加してアプリのように使うための設定。`sw.js` は前回の内容をオフラインでも読めるようにする(index.html と data.js はネット優先)。
 - `robots.txt` と `<meta name="robots" content="noindex">` — 検索エンジンに出さないための設定。消さない。
 
 ## 読む人

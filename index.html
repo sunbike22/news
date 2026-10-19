@@ -5,6 +5,13 @@
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <meta name="robots" content="noindex,nofollow">
 <meta name="theme-color" content="#2747c9">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" type="image/png" sizes="192x192" href="icon-192.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="ニュース帳">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="description" content="毎日のニュースを、1分の動くスライド・検索・グラフ・解説・クイズで">
 <title>まいにちニュース帳</title>
 <meta name="claude:viewport-fit-sides" content="cover">
@@ -152,6 +159,13 @@ mark{background:#ffe066;color:#141b2d;border-radius:3px;padding:0 1px}
 .quick{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px}
 .quick button{flex:none}
 .empty{text-align:center;color:var(--muted);padding:30px 10px}
+
+/* install */
+.install{display:grid;grid-template-columns:48px 1fr auto;gap:12px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:12px 14px}
+.install img{width:48px;height:48px;border-radius:12px}
+.install b{display:block}
+.install .hint{display:block}
+.offline{background:var(--warn-soft);border-radius:10px;padding:8px 12px;font-size:.88rem}
 
 /* illustrations */
 .ill{border-radius:var(--radius);overflow:hidden;aspect-ratio:12/5;max-width:100%;border:1px solid var(--line)}
@@ -441,6 +455,8 @@ function renderToday(){
     <div class="hero">
       <button class="play" id="playBtn"><span class="pi" aria-hidden="true">▶</span><span><b>1分で見る 今日のニュース</b><span>動くスライドで自動再生。タップで止めたり進めたり</span></span></button>
     </div>
+    ${installCard()}
+    ${navigator.onLine===false?'<div class="offline">📴 いまはオフラインです。前に読み込んだ内容を表示しています。</div>':''}
     ${weatherCard()}
     <section aria-label="今日の3行">
       <div class="sec-h"><h2>☀️ 今日の3行</h2><span class="sub">時間がない日はここだけでOK</span></div>
@@ -468,6 +484,7 @@ function renderToday(){
     ${footer()}
   </div>`;
   document.getElementById("playBtn").onclick=openStory;
+  bindInstall();
   if(document.getElementById("quiz")) drawQuiz(0,[]);
   main.querySelectorAll("[data-ex]").forEach(b=>b.addEventListener("click",()=>openEx(b.dataset.ex)));
   main.querySelectorAll("[data-tab]").forEach(b=>b.addEventListener("click",()=>go(b.dataset.tab)));
@@ -490,6 +507,22 @@ function marketsMini(){
     <button class="m" data-tab="numbers" style="text-align:left;cursor:pointer"><div class="k">🛢️ NY原油</div><div class="val num">${o?o.v.toFixed(2)+"ドル":"—"}</div>${diff(o,2)} <span class="hint">${o?mdLabel(o.d):""}</span></button>
   </div>`;
 }
+
+// ===== アプリとして使う(ホーム画面に追加) =====
+let deferredPrompt=null;
+window.addEventListener("beforeinstallprompt",e=>{ e.preventDefault(); deferredPrompt=e; if(current==="today") go("today",{keepScroll:true}); });
+const isStandalone=()=>{ try{ return matchMedia("(display-mode: standalone)").matches || navigator.standalone===true; }catch(_){ return false; } };
+const isIOS=/iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform==="MacIntel" && navigator.maxTouchPoints>1);
+function installCard(){
+  if(isStandalone() || store.get("nw-install-hide")==="1") return "";
+  const how = deferredPrompt ? "ボタンを押すだけで、ホーム画面にアイコンができます。" : isIOS ? "下の共有ボタン(□に↑)→「ホーム画面に追加」で、アプリのように開けます。" : "ブラウザのメニュー(︙)→「ホーム画面に追加」または「アプリをインストール」で、アプリのように開けます。";
+  return `<div class="install" id="inst"><img src="icon-192.png" alt=""><span><b>アプリとして使う</b><span class="hint">${how}</span></span><span style="display:flex;flex-direction:column;gap:6px">${deferredPrompt?'<button class="fchip" id="instGo">追加する</button>':''}<button class="fchip" id="instX" aria-label="この案内を閉じる">閉じる</button></span></div>`;
+}
+function bindInstall(){
+  const go1=document.getElementById("instGo"); if(go1) go1.onclick=async()=>{ try{ deferredPrompt.prompt(); await deferredPrompt.userChoice; }catch(_){} deferredPrompt=null; document.getElementById("inst")?.remove(); };
+  const x=document.getElementById("instX"); if(x) x.onclick=()=>{ store.set("nw-install-hide","1"); document.getElementById("inst")?.remove(); };
+}
+if("serviceWorker" in navigator){ window.addEventListener("load",()=>{ navigator.serviceWorker.register("sw.js").catch(()=>{}); }); }
 
 // ===== クイズ =====
 function drawQuiz(i,res){
@@ -774,6 +807,7 @@ document.getElementById("pop").addEventListener("click",e=>e.stopPropagation());
 // 起動
 const h=(location.hash||"").slice(1);
 if(D.explainers[h]){ go("explain"); openEx(h); } else go(TABS.some(t=>t[0]===h)?h:"today");
+try{ if(new URLSearchParams(location.search).get("play")==="1") setTimeout(openStory,300); }catch(_){}
 })();
 </script>
 </body>

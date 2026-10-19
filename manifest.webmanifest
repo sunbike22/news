@@ -1,0 +1,21 @@
+{
+  "name": "まいにちニュース帳",
+  "short_name": "ニュース帳",
+  "description": "毎日のニュースを、1分の動くスライド・検索・グラフ・解説・クイズで",
+  "lang": "ja",
+  "start_url": "./?source=app",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#eef1f4",
+  "theme_color": "#2747c9",
+  "icons": [
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" },
+    { "src": "icon-maskable-512.png", "sizes": "512x512", "type": "image/png", "purpose": "maskable" }
+  ],
+  "shortcuts": [
+    { "name": "1分で見る", "url": "./?play=1", "icons": [{ "src": "icon-192.png", "sizes": "192x192" }] },
+    { "name": "ニュースをさがす", "url": "./#search", "icons": [{ "src": "icon-192.png", "sizes": "192x192" }] }
+  ]
+}
