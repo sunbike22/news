@@ -469,6 +469,25 @@ svg.eat{animation:petEat .7s ease both!important}
 .talk{display:flex;flex-direction:column;gap:8px;margin-top:8px}
 .tk{border-left:5px solid var(--c);background:var(--surface2);border-radius:8px;padding:8px 12px;display:flex;flex-direction:column;gap:2px}
 .tk small{color:var(--muted);font-size:.8rem}
+/* ラジオ */
+.radio{align-items:stretch;text-align:center}
+.rd-moon{font-size:4.5rem;position:relative;margin:10px auto 0;animation:petIdle 4s ease-in-out infinite}
+.rd-moon span{position:absolute;font-size:1rem;color:var(--accent);animation:twinkle 2.4s ease-in-out infinite}
+.rd-moon span:nth-child(1){left:-30px;top:10px}.rd-moon span:nth-child(2){right:-26px;top:-4px;animation-delay:.8s}.rd-moon span:nth-child(3){right:-40px;bottom:6px;animation-delay:1.6s}
+@keyframes twinkle{0%,100%{opacity:.2}50%{opacity:1}}
+.rd-now{min-height:6.5em;font-size:1.05rem;line-height:1.8;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px;text-align:left}
+.rd-bar{height:6px;background:var(--line);border-radius:3px;overflow:hidden}.rd-bar i{display:block;height:100%;width:0;background:var(--accent);transition:width .6s}
+.rd-btn{width:auto}
+/* つながり地図 */
+.web{position:relative;display:flex;flex-direction:column;gap:34px;padding:6px 0 10px}
+.web-svg{position:absolute;inset:0;pointer-events:none;overflow:visible}
+.web-line path{fill:none;stroke:var(--accent);stroke-width:2.5;stroke-dasharray:6 5;opacity:.7}.web-line circle{fill:var(--accent)}
+.wn{position:relative;z-index:1;width:72%;background:var(--surface);border:2px solid var(--line);border-radius:14px;padding:10px 12px;display:flex;flex-direction:column;gap:2px}
+.wn.l{align-self:flex-start}.wn.r{align-self:flex-end}
+.wn.center{align-self:center;width:82%;text-align:center;border-color:var(--c);background:var(--accent-soft);font-size:1.05rem}
+.wn span{font-size:1.4rem;line-height:1.2}.wn small{color:var(--muted);font-size:.8rem}
+.wlink{margin-top:4px;align-self:flex-start;border:1px solid var(--accent);background:var(--accent-soft);color:var(--ink);border-radius:999px;padding:3px 10px;font-size:.78rem;cursor:pointer}
+@media (prefers-reduced-motion: reduce){.rd-moon,.rd-moon span{animation:none}}
 /* 案内係 */
 .gd-fab{position:fixed;right:max(16px,env(safe-area-inset-right,0px));bottom:calc(84px + env(safe-area-inset-bottom,0px));z-index:24;width:54px;height:54px;border-radius:50%;border:0;background:var(--accent);color:var(--on-accent);font-size:1.5rem;box-shadow:0 6px 18px rgba(0,0,0,.22);cursor:pointer}
 @media (min-width:900px){.gd-fab{bottom:24px}}
@@ -697,6 +716,7 @@ function renderToday(){
   const S={};
   S.play=`<div class="hero">
       <button class="play" id="playBtn"><span class="pi" aria-hidden="true">▶</span><span><b>1分で見る 今日のニュース</b><span>動くスライドで自動再生。タップで止めたり進めたり</span></span></button>
+      <button class="fchip" id="radioBtn" style="justify-self:start">🌙 寝る前ラジオ(3分・耳で聞く)</button>
     </div>`;
   S.pet=petCard();
   S.weather=weatherCard();
@@ -739,7 +759,7 @@ function renderToday(){
     <button class="fchip" id="lookBtnToday" style="align-self:flex-start">🎨 この画面の並びを変える</button>
     ${footer()}
   </div>`;
-  const pb=document.getElementById("playBtn"); if(pb) pb.onclick=openStory;
+  const pb=document.getElementById("playBtn"); if(pb) pb.onclick=openStory; const rb=document.getElementById("radioBtn"); if(rb) rb.onclick=openRadio;
   const vg=document.getElementById("vsGo"); if(vg) vg.onclick=()=>{ const q=document.getElementById("quiz"); if(q) q.scrollIntoView({behavior:"smooth",block:"center"}); else toast("いまはクイズがお休みです"); };
   const sx=document.getElementById("seasonX"); if(sx) sx.onclick=()=>{ store.set("nw-season-hide",TODAY+(seasonNow()||{}).k); document.getElementById("seasonCard")?.remove(); };
   document.getElementById("lookBtnToday").onclick=openLook;
@@ -906,10 +926,12 @@ function renderExplain(){
   main.innerHTML=`<div class="view">
     <div class="sec-h"><h2>💡 くわしく解説</h2><span class="sub">1テーマ1ページ</span></div>
     <p class="hint" style="margin:0">「ひとことで」→「動く図」→「よくある疑問」の順に読むと、だいたい1分でわかります。</p>
+    <button class="lookcard" id="webBtn"><span style="font-size:1.8rem" aria-hidden="true">🕸️</span><span><b>ニュースのつながり地図</b><span class="hint" style="display:block">原油→ガソリン→暮らし…話の流れを糸でたどる</span></span></button>
     <div><h3 style="font-size:.95rem;margin-bottom:8px">🔥 いま動いている話題</h3><div class="exgrid">${E.filter(([,e])=>e.status==="live").map(([k,e])=>exCard(k,e)).join("")}</div></div>
     <div><h3 style="font-size:.95rem;margin-bottom:8px">✅ 決着した話題・まとめ</h3><div class="exgrid">${E.filter(([,e])=>e.status!=="live").map(([k,e])=>exCard(k,e)).join("")}</div></div>
     ${footer()}
   </div>`;
+  document.getElementById("webBtn").onclick=()=>openWeb();
   main.querySelectorAll("[data-ex]").forEach(b=>b.onclick=()=>openEx(b.dataset.ex)); bindFooter();
 }
 // ことばの自動リンク
@@ -1636,6 +1658,62 @@ function talkCard(){ const L=D.top10.slice(0,3); if(!L.length) return "";
     <button class="fchip" id="talkShare" style="margin-top:10px">📤 話のタネを送る</button></section>`; }
 function bindTalk(){ const b=document.getElementById("talkShare"); if(!b) return; b.onclick=async()=>{ const t="🍽️ 今日の話のタネ\n"+D.top10.slice(0,3).map(n=>`・${n.title}\n  → ${TALK[n.g]||"どう思う?"}`).join("\n")+"\n"+location.origin+location.pathname;
   try{ if(navigator.share){ await navigator.share({text:t}); return; } }catch(_){ return; } try{ await navigator.clipboard.writeText(t); toast("📋 コピーしました"); }catch(_){} }; }
+// ===== 寝る前ラジオ(読み上げ+自作のやさしい音) =====
+function radioScript(){ const h=new Date(Date.now()+9*3600e3).getUTCHours(); const w=D.weather; const L=[];
+  L.push(h>=18||h<4?`こんばんは。まいにちニュース帳の、寝る前ラジオです。${D.updatedLabel}までのニュースを、3分でふりかえります。`:`こんにちは。まいにちニュース帳のラジオです。${D.updatedLabel}までのニュースをお届けします。`);
+  D.three.forEach((x,i)=>L.push(`${["まずは","つぎは","さいごに"][i]||""}、${x.label}。${x.title}。${x.text}`));
+  const rest=D.top10.slice(3,7); if(rest.length) L.push("ほかには、こんなニュースがありました。"+rest.map(n=>n.title).join("。 ")+"。");
+  if(w) L.push(`${relDay(w.iso)}の${w.place}は、${w.sky}。最高気温${w.hi}度、最低気温${w.lo}度。${w.umbrella}。`);
+  L.push(`${petName()}も、もうおやすみの時間です。きょうも読んでくれて、ありがとう。おやすみなさい。`); return L; }
+let RADIO=null;
+function bgmStart(){ try{ const AC=window.AudioContext||window.webkitAudioContext; if(!AC) return null; const ac=new AC(); const g=ac.createGain(); g.gain.value=0; g.connect(ac.destination);
+  const chords=[[220,277.18,329.63],[196,246.94,293.66],[174.61,220,261.63],[196,246.94,329.63]]; const osc=[0,1,2].map(()=>{ const o=ac.createOscillator(); o.type="sine"; const og=ac.createGain(); og.gain.value=.33; o.connect(og).connect(g); o.start(); return o; });
+  let k=0; const step=()=>{ const c=chords[k++%chords.length]; osc.forEach((o,i)=>o.frequency.setTargetAtTime(c[i],ac.currentTime,1.2)); }; step(); const iv=setInterval(step,6000);
+  g.gain.setTargetAtTime(.035,ac.currentTime,1.5); return {ac,g,iv,stop(){ clearInterval(iv); try{ g.gain.setTargetAtTime(0,ac.currentTime,.8); setTimeout(()=>ac.close(),2500); }catch(_){} }}; }catch(_){ return null; } }
+function openRadio(){
+  const sh=document.getElementById("sheet"); const L=radioScript(); const can=!!window.speechSynthesis;
+  sh.innerHTML=`<div class="bar"><div class="wrap"><button class="iconbtn" id="rdx" aria-label="もどる">←</button><span class="ttl">🌙 寝る前ラジオ</span></div></div>
+  <div class="wrap body radio"><div class="rd-moon" aria-hidden="true">🌙<span>✦</span><span>✧</span><span>✦</span></div>
+    <div class="rd-now" id="rdNow">${can?"▶ を押すと始まります(約3分・終わると自動で止まります)":"この端末では読み上げが使えないので、文字で読めます。"}</div>
+    <div class="rd-bar"><i id="rdProg"></i></div>
+    <div style="display:flex;gap:10px;justify-content:center">${can?`<button class="play rd-btn" id="rdPlay"><span class="pi">▶</span><span><b>再生</b></span></button>`:""}<label class="fchip" style="display:flex;align-items:center;gap:6px"><input type="checkbox" id="rdBgm" checked> やさしい音</label></div>
+    <details class="faq plain"><summary>読み上げる文</summary>${L.map(t=>`<p style="margin:6px 0">${esc(t)}</p>`).join("")}</details></div>`;
+  const stop=()=>{ try{ window.speechSynthesis&&window.speechSynthesis.cancel(); }catch(_){} if(RADIO&&RADIO.bgm) RADIO.bgm.stop(); RADIO=null; const b=document.getElementById("rdPlay"); if(b) b.innerHTML='<span class="pi">▶</span><span><b>再生</b></span>'; };
+  const close=()=>{ stop(); sh.hidden=true; sh.innerHTML=""; document.body.style.overflow=""; };
+  sh.querySelector("#rdx").onclick=close;
+  const pb=sh.querySelector("#rdPlay"); if(pb) pb.onclick=()=>{ if(RADIO){ stop(); return; } RADIO={i:0,bgm:document.getElementById("rdBgm").checked?bgmStart():null}; pb.innerHTML='<span class="pi">■</span><span><b>止める</b></span>'; track("/radio","寝る前ラジオ");
+    const next=()=>{ if(!RADIO) return; const i=RADIO.i++; if(i>=L.length){ document.getElementById("rdNow").textContent="おやすみなさい 🌙"; document.getElementById("rdProg").style.width="100%"; setTimeout(stop,1500); return; }
+      document.getElementById("rdNow").textContent=L[i]; document.getElementById("rdProg").style.width=Math.round(i/L.length*100)+"%";
+      const u=new SpeechSynthesisUtterance(L[i]); u.lang="ja-JP"; u.rate=.95; u.pitch=.95; u.onend=()=>setTimeout(next,700); u.onerror=()=>setTimeout(next,300); window.speechSynthesis.speak(u); };
+    setTimeout(next,1200); };
+  sh.hidden=false; sh.scrollTop=0; document.body.style.overflow="hidden";
+}
+// ===== ニュースのつながり地図 =====
+function exText(e){ return [e.name,e.kid,(e.more||[]).join(" "),(e.flow||[]).map(f=>f.t+" "+(f.s||"")).join(" ")].join(" "); }
+function relatedEx(k,text,min){ return Object.entries(D.explainers).filter(([k2])=>k2!==k).map(([k2,e])=>{ const g=gdGrams(text).filter(x=>x.length===2&&/[\u4e00-\u9fff\u30a0-\u30ff]{2}/.test(x)&&!/日本|今年|来年|政府|問題|発表|今日|影響|心配/.test(x)); const t=gdNorm(exText(e)); return {k:k2,e,v:g.filter(x=>t.includes(x)).length}; }).filter(x=>x.v>=(min||2)).sort((a,b)=>b.v-a.v); }
+function openWeb(k){
+  const keys=Object.keys(D.explainers); if(!k) k=(Object.entries(D.explainers).find(([,e])=>e.status==="live")||[keys[0]])[0]; const e=D.explainers[k]; if(!e) return;
+  const sh=document.getElementById("sheet"); const flow=e.flow||[];
+  const rn=NEWS.map(n=>({n,v:gdScore(gdQuery(e.name+" "+(e.now||"")),n.h+" "+(n.th||""))})).filter(x=>x.v>=0.3).sort((a,b)=>b.n.d.localeCompare(a.n.d)).slice(0,3).map(x=>x.n);
+  sh.innerHTML=`<div class="bar"><div class="wrap"><button class="iconbtn" id="wbx" aria-label="もどる">←</button><span class="ttl">🕸️ ニュースのつながり</span></div></div>
+  <div class="wrap body"><div class="chips">${keys.map(x=>`<button class="fchip" data-web="${x}" aria-pressed="${x===k}">${D.explainers[x].icon} ${esc(D.explainers[x].name)}</button>`).join("")}</div>
+   <div class="web" id="web"><svg class="web-svg" id="webSvg" aria-hidden="true"></svg>
+    <div class="wn center" data-n="0" style="--c:var(--g-${e.g})"><span>${e.icon}</span><b>${esc(e.name)}</b></div>
+    ${flow.map((f,i)=>{ const rel=relatedEx(k,f.t+" "+(f.s||"")).slice(0,2); return `<div class="wn ${i%2?"r":"l"}" data-n="${i+1}"><span>${f.i}</span><b>${esc(f.t)}</b>${f.s?`<small>${esc(f.s)}</small>`:""}${rel.map(r=>`<button class="wlink" data-web="${r.k}">🔗 ${r.e.icon} ${esc(r.e.name)}へ</button>`).join("")}</div>`; }).join("")}
+   </div>
+   ${(()=>{ const R=relatedEx(k,exText(e),4).slice(0,3); return R.length?`<div class="card"><b>🔗 つながっている話題</b><div class="chips" style="margin-top:6px">${R.map(r=>`<button class="fchip" data-web="${r.k}">${r.e.icon} ${esc(r.e.name)}</button>`).join("")}</div></div>`:""; })()}
+   ${rn.length?`<div class="card"><b>📰 この話題の最近のニュース</b><ul class="us" style="margin-top:6px">${rn.map(n=>`<li>${esc(mdLabel(n.d))} ${esc(n.h)}</li>`).join("")}</ul></div>`:""}
+   <button class="fchip" id="wbOpen" style="align-self:flex-start">💡 「${esc(e.name)}」の解説を読む →</button>
+   <div class="hint">「図でわかる」の流れを糸でつなぎました。🔗は、同じことばが出てくるほかの話題です。タップするとそちらに移ります。</div></div>`;
+  const close=()=>{ sh.hidden=true; sh.innerHTML=""; document.body.style.overflow=""; window.removeEventListener("resize",draw); };
+  sh.querySelector("#wbx").onclick=close; sh.querySelector("#wbOpen").onclick=()=>{ close(); openEx(k); };
+  sh.querySelectorAll("[data-web]").forEach(b=>b.onclick=()=>{ window.removeEventListener("resize",draw); openWeb(b.dataset.web); });
+  function draw(){ const web=document.getElementById("web"), svg=document.getElementById("webSvg"); if(!web) return; const R=web.getBoundingClientRect(); svg.setAttribute("viewBox",`0 0 ${R.width} ${R.height}`); svg.setAttribute("width",R.width); svg.setAttribute("height",R.height);
+    const ns=[...web.querySelectorAll(".wn")].map(n=>{ const r=n.getBoundingClientRect(); return {x:r.left-R.left+r.width/2,top:r.top-R.top,bot:r.bottom-R.top}; });
+    let d=""; for(let i=1;i<ns.length;i++){ const a=ns[i-1],b=ns[i]; const my=(a.bot+b.top)/2; d+=`<path d="M${a.x} ${a.bot} C ${a.x} ${my}, ${b.x} ${my}, ${b.x} ${b.top}" /><circle cx="${b.x}" cy="${b.top}" r="4"/>`; }
+    svg.innerHTML=`<g class="web-line">${d}</g>`; }
+  sh.hidden=false; sh.scrollTop=0; document.body.style.overflow="hidden"; requestAnimationFrame(()=>requestAnimationFrame(draw)); window.addEventListener("resize",draw); track("/web/"+k,"つながり: "+e.name);
+}
 // ===== 使い方 =====
 const GUIDE = [
   ["🚀","まずはここから",["「きょう」の<b>▶ 1分で見る</b>を押すと、今日のニュースが動くスライドで流れます。","時間がない日は<b>☀️ 今日の3行</b>だけ読めばOK。","<b>📰 今日のニュース10</b>は、その日に関心が高かった順のランキングです。下の「記録したニュース すべて」で、ほかのニュースも見られます。"]],
@@ -1643,6 +1721,7 @@ const GUIDE = [
   ["👆","さわってみよう",["<b>点線のことば</b>をタップすると、意味がその場で出ます。調べたことばは「マイ」にたまります。","<b>📍</b>を押すと、そのニュースを保存できます。保存したものは「マイ」で見られて、メモも書けます。","「くわしい解説 →」から、<b>図・Q&A・これまでの流れ</b>つきの解説が読めます。<b>🔊 聞く</b>で読み上げもできます。"]],
   ["🧭","下のタブ",["<b>📰 きょう</b> 今日のまとめ ／ <b>🔎 さがす</b> ことばやジャンルで過去のニュースを検索 ／ <b>🗺️ 地図</b> どこで起きたかを地図で","<b>💡 解説</b> 大きな話題をやさしく ／ <b>📈 数字</b> 日経平均・円・原油のグラフ(数時間ごと〜全期間) ／ <b>📅 予定</b> これからの予定と、Claudeの予測","<b>⭐ マイ</b> あなたの記録・保存・着せかえ"]],
   ["🎯","続けるとたのしいこと",["<b>🐣 ペット</b>がニュースといっしょに育ちます。クイズに正解すると🍙ごはんがもらえて、あげると大きくなります。よく読むジャンルで小物が変わり、3日あけるとすねます。","開いた日・解説・クイズ・ことば・予想で<b>ポイント</b>がたまり、レベルとバッジが上がります。","「予定」の予測に<b>あなたも予想</b>して、答え合わせができます。Claudeと的中率くらべも。","毎日の連続記録は「マイ」のカレンダーで見られます。"]],
+  ["✨","ちょっと変わった楽しみ方",["<b>🗺️ 世の中の天気図</b>(きょう)…ジャンルごとのニュースの空気を、晴れ〜あらしで。","<b>👆 知ってた?</b>(きょう)…見出しを左右にはじくと、知らなかったジャンルを多めに出します。","<b>🍽️ 今日の話のタネ</b>(きょう)…家族や友だちと話せる問いかけ。","<b>🌙 寝る前ラジオ</b>(きょう)…3分でニュースを耳で。やさしい音つき。","<b>⚔️ クイズ対戦</b>…クイズのあとに挑戦状のリンクを送って勝負。","<b>📰 未来の新聞</b>(予定)…予測を新聞の紙面に。<b>🕸️ つながり地図</b>(解説)…話の流れを糸でたどる。","<b>🧮 もしも計算機</b>(数字)…円やガソリンが動いたら、財布はどうなる?","<b>⏳ タイムカプセル</b>(マイ)…決めた日まで開けられないメモ。"]],
   ["💬","聞いてみる",["右下の<b>💬</b>で「ニュース案内係」に質問できます。解説のQ&A・ことば辞典・ニュースの記録から、アプリの中で答えをさがします(質問はどこにも送りません)。","もっと深く知りたいときは「Claudeでもっと深く聞く」で、Claude(AI)に聞けます(アプリの外で開きます)。"]],
   ["🎨","自分好みにする",["「マイ」の<b>🎨 着せかえ</b>で、色・文字の大きさ・詰め具合・「きょう」の並び・下のタブの並びを変えられます。","右上の<b>Aa</b>でも、文字の大きさと明るさをすぐ変えられます。"]],
   ["📲","アプリとして使う",["iPhone: Safariの共有ボタン(□に↑)→「ホーム画面に追加」。","Android: Chromeのメニュー(︙)→「ホーム画面に追加」または「アプリをインストール」。","一度開いた内容は、電波がないところでも読めます。"]],
