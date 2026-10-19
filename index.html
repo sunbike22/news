@@ -392,6 +392,11 @@ details.faq p{margin:10px 0 12px}
 .lookcard{display:flex;align-items:center;gap:12px;background:linear-gradient(120deg,var(--accent-soft),var(--surface));border:1px solid var(--line);border-radius:var(--radius);padding:14px 16px;width:100%;text-align:left;cursor:pointer}
 .lookcard .pal{display:flex;flex:none}
 .lookcard .pal i{width:18px;height:18px;border-radius:50%;margin-left:-5px;border:2px solid var(--surface)}
+/* 季節 */
+.season-card{display:flex;align-items:center;gap:12px;border-radius:var(--radius);padding:12px 12px 12px 16px;background:linear-gradient(120deg,var(--accent-soft),var(--surface));border:1px solid var(--line)}
+.season-card .si{font-size:2rem;line-height:1}
+:root[data-season="halloween"] .season-card{background:linear-gradient(120deg,#2b1840,#4a2470);color:#fff;border-color:#4a2470}
+:root[data-season="halloween"] .season-card .fchip{background:transparent;color:#fff;border-color:rgba(255,255,255,.5)}
 /* 案内係 */
 .gd-fab{position:fixed;right:max(16px,env(safe-area-inset-right,0px));bottom:calc(84px + env(safe-area-inset-bottom,0px));z-index:24;width:54px;height:54px;border-radius:50%;border:0;background:var(--accent);color:var(--on-accent);font-size:1.5rem;box-shadow:0 6px 18px rgba(0,0,0,.22);cursor:pointer}
 @media (min-width:900px){.gd-fab{bottom:24px}}
@@ -481,19 +486,38 @@ const COLORS = [
   COLORS.forEach(([k,,...c])=>{ s+=`:root[data-color="${k}"]{${v(...c.slice(0,6))}}`; });
   COLORS.forEach(([k,,...c])=>{ const d=v(...c.slice(6,12)); s+=`@media (prefers-color-scheme: dark){:root:not([data-theme="light"])[data-color="${k}"]{${d}}}:root[data-theme="dark"][data-color="${k}"]{${d}}`; });
   st.textContent=s; document.head.appendChild(st); })();
+// ===== 季節の飾り(期間中だけ自動で変わる。着せかえでオフにできる) =====
+const BAT='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 16"><path d="M20 6c-1-3-3-3-3-3s0 2-1 3c-3-3-9-4-16-1 4 1 6 4 6 7 2-2 5-2 7 0 1-2 3-2 4-1 0-1 2-2 3-2s3 1 3 2c1-1 3-1 4 1 2-2 5-2 7 0 0-3 2-6 6-7-7-3-13-2-16 1-1-1-1-3-1-3s-2 0-3 3z" fill="#2b1840"/></svg>';
+const PUMP='<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 36"><path d="M19 7c0-4 2-6 5-6" stroke="#3f6b2a" stroke-width="3" fill="none" stroke-linecap="round"/><ellipse cx="12" cy="21" rx="10" ry="13" fill="#e8620c"/><ellipse cx="28" cy="21" rx="10" ry="13" fill="#e8620c"/><ellipse cx="20" cy="21" rx="10" ry="14" fill="#f97316"/><path d="M13 17l4 3-5 1zM27 17l-4 3 5 1z" fill="#3a1702"/><path d="M12 26q8 6 16 0l-3 1-2-2-3 2-2-2-3 2z" fill="#3a1702"/></svg>';
+const svgUrl=x=>`url("data:image/svg+xml,${encodeURIComponent(x)}")`;
+const SEASONS = [
+  { k:"halloween", name:"ハロウィン", icon:"🎃", from:"10-24", to:"10-31",
+    greet:"ハッピーハロウィン! 🎃 今日もニュースをどうぞ。期間中に開くと、限定バッジがもらえます。",
+    light:["#d9550a","#fde3cf","#efe4fb","#fffaf5","#f6effd","#d9c8ef"], dark:["#ff9a3c","#3d2410","#140d22","#201631","#291d40","#3d2d5e"] }
+];
+(function(){ const st=document.createElement("style"); let s="";
+  const v=(a,as,bg,sf,s2,ln)=>`--accent:${a};--accent-soft:${as};--bg:${bg};--surface:${sf};--surface2:${s2};--line:${ln}`;
+  SEASONS.forEach(z=>{ s+=`:root[data-season="${z.k}"][data-color]{${v(...z.light)}}`; const d=v(...z.dark); s+=`@media (prefers-color-scheme: dark){:root:not([data-theme="light"])[data-season="${z.k}"][data-color]{${d}}}:root[data-theme="dark"][data-season="${z.k}"][data-color]{${d}}`; });
+  const HWPAT=`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 96 22" width="96" height="22"><g transform="translate(4 2) scale(.5)">${PUMP.replace(/^<svg[^>]*>|<\/svg>$/g,"")}</g><g transform="translate(46 4) scale(.6)">${BAT.replace(/^<svg[^>]*>|<\/svg>$/g,"").replace("#2b1840","#7a5aa8")}</g><circle cx="80" cy="6" r="1.4" fill="#f5b342"/><circle cx="34" cy="16" r="1" fill="#f5b342"/></svg>`;
+  s+=`:root[data-season="halloween"] .top::after{content:"";position:absolute;left:0;right:0;top:100%;height:22px;pointer-events:none;background:${svgUrl(HWPAT)} repeat-x left center/96px 22px;opacity:.9}`;
+  st.textContent=s; document.head.appendChild(st); })();
+function mmdd(iso){ return iso.slice(5,10); }
+function seasonNow(){ if(LOOK.season==="off") return null; if(LOOK.preview){ const z=SEASONS.find(x=>x.k===LOOK.preview); if(z) return z; }
+  const t=mmdd(TODAY); return SEASONS.find(z=> z.from<=z.to ? (t>=z.from&&t<=z.to) : (t>=z.from||t<=z.to)) || null; }
+function inSeason(z,iso){ const t=mmdd(iso); return z.from<=z.to ? (t>=z.from&&t<=z.to) : (t>=z.from||t<=z.to); }
 const SECS = [["play","▶️ 1分で見る"],["weather","🌤️ 天気"],["three","☀️ 今日の3行"],["ten","📰 今日のニュース10"],["foryou","🎯 あなた向け"],["other","📚 そのほかのニュース"],["quiz","🧠 今日のクイズ"],["number","🔢 今日の数字"]];
 const LOOK = (()=>{ let p={}; try{ p=JSON.parse(store.get("nw-look")||"{}")||{}; }catch(_){ p={}; }
   const fix=(arr,all)=>{ const a=(Array.isArray(arr)?arr:[]).filter(k=>all.includes(k)); all.forEach(k=>{ if(!a.includes(k)) a.push(k); }); return a; };
   p.order=fix(p.order,SECS.map(s=>s[0])); p.off=p.off&&typeof p.off==="object"?p.off:{};
   p.tabs=fix(p.tabs,["today","search","map","explain","numbers","plan","my"]); p.tabOff=p.tabOff&&typeof p.tabOff==="object"?p.tabOff:{}; p.tabOff.my=false;
-  if(!COLORS.some(c=>c[0]===p.color)) p.color="blue"; if(!["compact","normal","roomy"].includes(p.density)) p.density="normal";
+  if(!COLORS.some(c=>c[0]===p.color)) p.color="blue"; if(p.season!=="off") p.season="auto"; if(typeof p.preview!=="string") p.preview=""; if(!["compact","normal","roomy"].includes(p.density)) p.density="normal";
   return p; })();
 function saveLook(){ store.set("nw-look", JSON.stringify(LOOK)); }
 function applySettings(){ const t=store.get("nw-theme"); if(t==="light"||t==="dark") root.setAttribute("data-theme",t); else root.removeAttribute("data-theme");
   const s=store.get("nw-size"); if(s==="l"||s==="xl") root.setAttribute("data-size",s); else root.removeAttribute("data-size");
-  root.setAttribute("data-color",LOOK.color);
+  root.setAttribute("data-color",LOOK.color); { const z=seasonNow(); if(z) root.setAttribute("data-season",z.k); else root.removeAttribute("data-season"); }
   if(LOOK.density!=="normal") root.setAttribute("data-density",LOOK.density); else root.removeAttribute("data-density");
-  const m=document.querySelector('meta[name="theme-color"]'); if(m) m.setAttribute("content",(COLORS.find(c=>c[0]===LOOK.color)||COLORS[0])[2]); }
+  const m=document.querySelector('meta[name="theme-color"]'); if(m){ const z=seasonNow(); m.setAttribute("content", z? z.light[0] : (COLORS.find(c=>c[0]===LOOK.color)||COLORS[0])[2]); } }
 applySettings();
 
 // ===== 自作イラスト(SVG) =====
@@ -593,6 +617,8 @@ function weatherCard(){
   </section>`;
 }
 function exLink(id){ return id && D.explainers[id] ? ` data-ex="${id}"` : ""; }
+function seasonCard(){ const z=seasonNow(); if(!z||store.get("nw-season-hide")===TODAY+z.k) return "";
+  return `<div class="season-card" id="seasonCard"><span class="si" aria-hidden="true">${z.icon}</span><span style="flex:1"><b>${esc(z.name)}の季節</b><span style="display:block;font-size:.88rem">${esc(z.greet)}</span></span><button class="fchip" id="seasonX" aria-label="閉じる">✕</button></div>`; }
 function renderToday(){
   const t=D.top10;
   const S={};
@@ -627,6 +653,7 @@ function renderToday(){
     </section>`;
   const body=LOOK.order.filter(k=>!LOOK.off[k]).map(k=>S[k]||"").join("");
   main.innerHTML = `<div class="view">
+    ${seasonCard()}
     ${personalCards()}
     ${installCard()}
     ${navigator.onLine===false?'<div class="offline">📴 いまはオフラインです。前に読み込んだ内容を表示しています。</div>':''}
@@ -635,6 +662,7 @@ function renderToday(){
     ${footer()}
   </div>`;
   const pb=document.getElementById("playBtn"); if(pb) pb.onclick=openStory;
+  const sx=document.getElementById("seasonX"); if(sx) sx.onclick=()=>{ store.set("nw-season-hide",TODAY+(seasonNow()||{}).k); document.getElementById("seasonCard")?.remove(); };
   document.getElementById("lookBtnToday").onclick=openLook;
   bindInstall(); bindPersonal(); checkBadges();
   if(document.getElementById("quiz")) drawQuiz(0,[]);
@@ -1146,6 +1174,9 @@ function openLook(){
       <section class="lk-sec"><h3>おまかせセット</h3><div class="presets">${PRESETS.map(p=>`<button data-preset="${p[0]}"><b>${p[1]}</b><span>${esc(p[2])}</span></button>`).join("")}</div></section>
       <section class="lk-sec"><h3>テーマの色</h3><div class="hint">ボタンや見出しの色と、画面全体の色が変わります。</div><div class="sw">${COLORS.map(c=>`<button data-col="${c[0]}" aria-pressed="${LOOK.color===c[0]}" aria-label="${c[1]}" title="${c[1]}" style="background:linear-gradient(135deg,${c[2]} 55%,${c[4]} 55%)"></button>`).join("")}</div>
         <div class="setrow"><span style="min-width:5em">画面</span><span class="seg">${[["system","自動"],["light","明るい"],["dark","暗い"]].map(([k,l])=>`<button data-lt="${k}" aria-pressed="${th===k}">${l}</button>`).join("")}</span></div></section>
+      <section class="lk-sec"><h3>季節の飾り</h3><div class="hint">ハロウィンなどの期間中は、色と飾りが自動で変わります(テーマの色より優先)。</div>
+        <div class="setrow"><span class="seg">${[["auto","自動"],["off","オフ"]].map(([k,l])=>`<button data-lsea="${k}" aria-pressed="${LOOK.season===k}">${l}</button>`).join("")}</span></div>
+        <div class="chips">${SEASONS.map(z=>`<button class="fchip" data-lprev="${z.k}" aria-pressed="${LOOK.preview===z.k}">${z.icon} ${esc(z.name)}をためしに見る</button>`).join("")}</div></section>
       <section class="lk-sec"><h3>文字と詰め具合</h3>
         <div class="setrow"><span style="min-width:5em">文字</span><span class="seg">${[["m","ふつう"],["l","大きめ"],["xl","特大"]].map(([k,l])=>`<button data-ls="${k}" aria-pressed="${sz===k}">${l}</button>`).join("")}</span></div>
         <div class="setrow"><span style="min-width:5em">詰め具合</span><span class="seg">${[["compact","ぎっしり"],["normal","ふつう"],["roomy","ゆったり"]].map(([k,l])=>`<button data-ld="${k}" aria-pressed="${LOOK.density===k}">${l}</button>`).join("")}</span></div>
@@ -1160,11 +1191,13 @@ function openLook(){
     sh.querySelectorAll("[data-col]").forEach(b=>b.onclick=()=>{ LOOK.color=b.dataset.col; saveLook(); applySettings(); redraw(); });
     sh.querySelectorAll("[data-lt]").forEach(b=>b.onclick=()=>{ store.set("nw-theme",b.dataset.lt); applySettings(); redraw(); });
     sh.querySelectorAll("[data-ls]").forEach(b=>b.onclick=()=>{ store.set("nw-size",b.dataset.ls); applySettings(); redraw(); });
+    sh.querySelectorAll("[data-lsea]").forEach(b=>b.onclick=()=>{ LOOK.season=b.dataset.lsea; if(LOOK.season==="off") LOOK.preview=""; saveLook(); applySettings(); redraw(); });
+    sh.querySelectorAll("[data-lprev]").forEach(b=>b.onclick=()=>{ LOOK.preview = LOOK.preview===b.dataset.lprev ? "" : b.dataset.lprev; if(LOOK.preview) LOOK.season="auto"; saveLook(); applySettings(); redraw(); });
     sh.querySelectorAll("[data-ld]").forEach(b=>b.onclick=()=>{ LOOK.density=b.dataset.ld; saveLook(); applySettings(); redraw(); });
     sh.querySelectorAll("[data-mv]").forEach(b=>b.onclick=()=>{ const arr=b.dataset.mv==="sec"?LOOK.order:LOOK.tabs; const i=+b.dataset.i, j=i+(+b.dataset.d); if(j<0||j>=arr.length) return; [arr[i],arr[j]]=[arr[j],arr[i]]; saveLook(); drawTabs(); redraw(`[data-mv="${b.dataset.mv}"][data-i="${j}"][data-d="${b.dataset.d}"]`); });
     sh.querySelectorAll("[data-sw]").forEach(b=>b.onclick=()=>{ const o=b.dataset.sw==="sec"?LOOK.off:LOOK.tabOff; o[b.dataset.k]=!o[b.dataset.k]; saveLook(); drawTabs(); redraw(); });
     sh.querySelectorAll("[data-preset]").forEach(b=>b.onclick=()=>{ const p=PRESETS.find(x=>x[0]===b.dataset.preset); if(!p) return; LOOK.density=p[3].density; LOOK.order=p[3].order.slice(); LOOK.off=Object.assign({},p[3].off); saveLook(); applySettings(); redraw(); toast(`「${p[1].replace(/^\S+ /,"")}」にしました`); });
-    sh.querySelector("#lkreset").onclick=()=>{ LOOK.color="blue"; LOOK.density="normal"; LOOK.order=SECS.map(s=>s[0]); LOOK.off={}; LOOK.tabs=["today","search","map","explain","numbers","plan","my"]; LOOK.tabOff={}; store.set("nw-theme","system"); store.set("nw-size","m"); saveLook(); applySettings(); drawTabs(); redraw(); };
+    sh.querySelector("#lkreset").onclick=()=>{ LOOK.color="blue"; LOOK.season="auto"; LOOK.preview=""; LOOK.density="normal"; LOOK.order=SECS.map(s=>s[0]); LOOK.off={}; LOOK.tabs=["today","search","map","explain","numbers","plan","my"]; LOOK.tabOff={}; store.set("nw-theme","system"); store.set("nw-size","m"); saveLook(); applySettings(); drawTabs(); redraw(); };
   };
   const redraw=(focusSel)=>{ const y=sh.scrollTop; draw(); sh.scrollTop=y; if(focusSel){ const f=sh.querySelector(focusSel); if(f&&!f.disabled) f.focus(); } };
   const close=()=>{ sh.hidden=true; sh.innerHTML=""; document.body.style.overflow=""; document.removeEventListener("keydown",esck); go(current||"today",{keepScroll:true}); };
@@ -1214,6 +1247,7 @@ const BADGES=[
   ["quiz","🧠","クイズ満点","今日のクイズで満点",()=>Object.values(ME.quiz).some(v=>+v>=3)],
   ["w10","📖","ことば10個","ことばの意味を10個しらべた",()=>ME.words.length>=10],
   ["vote","🎯","予想的中","自分の予想が当たった",()=>voteResults().win>=1],
+  ["halloween","🎃","ハロウィン","ハロウィンの期間(10/24〜31)に開いた",()=>ME.days.some(d=>inSeason(SEASONS[0],d))],
   ["vote5","🔮","予想名人","予想が5回当たった",()=>voteResults().win>=5]
 ];
 function newBadges(){ const got=[]; BADGES.forEach(b=>{ if(!ME.badges.includes(b[0]) && b[4]()){ ME.badges.push(b[0]); got.push(b); } }); if(got.length) saveMe(); return got; }
