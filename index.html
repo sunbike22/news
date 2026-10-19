@@ -494,6 +494,16 @@ svg.eat{animation:petEat .7s ease both!important}
 .wn span{font-size:1.4rem;line-height:1.2}.wn small{color:var(--muted);font-size:.8rem}
 .wlink{margin-top:4px;align-self:flex-start;border:1px solid var(--accent);background:var(--accent-soft);color:var(--ink);border-radius:999px;padding:3px 10px;font-size:.78rem;cursor:pointer}
 @media (prefers-reduced-motion: reduce){.rd-moon,.rd-moon span{animation:none}}
+/* 横の年表 */
+.htl-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch;padding:6px 0 4px;margin:6px 0}
+.htl{display:flex;position:relative;min-width:max-content;padding:0 6px}
+.htl::before{content:"";position:absolute;left:0;right:0;top:34px;height:3px;background:var(--accent);opacity:.5}
+.htl-i{position:relative;width:132px;flex:none;display:flex;flex-direction:column;align-items:center;text-align:center;gap:4px;padding:0 6px}
+.htl-d{font-weight:800;font-size:.85rem;height:22px;color:var(--accent)}
+.htl-dot{width:14px;height:14px;border-radius:50%;background:var(--surface);border:3px solid var(--accent);z-index:1}
+.htl-i.now .htl-dot{background:var(--accent);box-shadow:0 0 0 4px var(--accent-soft)}
+.htl-i.fut .htl-dot{border-style:dashed;border-color:var(--muted)}.htl-i.fut .htl-d{color:var(--muted)}.htl-i.fut .htl-t{color:var(--muted)}
+.htl-t{font-size:.85rem;line-height:1.45}
 /* 着せかえ・部屋・日記 */
 .wardrobe{display:grid;grid-template-columns:repeat(auto-fill,minmax(78px,1fr));gap:6px;margin:6px 0}
 .wd-i{display:flex;flex-direction:column;align-items:center;gap:2px;border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:6px 4px;cursor:pointer;color:var(--ink)}
@@ -1050,7 +1060,10 @@ function openEx(k){
     ${e.calc?calcBlock():""}
     <div class="blk"><h3>🙋 わたしたちへの影響</h3><ul class="us">${e.us.map(u=>`<li>${glossify(bold(u))}</li>`).join("")}</ul></div>
     <div class="blk"><h3>❓ よくある疑問</h3>${e.faq.map(([q,a],i)=>`<details class="faq"${i===0?" open":""}><summary>${esc(q)}</summary><p>${glossify(esc(a))}</p></details>`).join("")}</div>
-    <div class="blk"><h3>📅 これまでの流れ</h3><ol class="tl">${e.timeline.map(([d,t])=>`<li><b>${esc(d)}</b>${esc(t)}</li>`).join("")}</ol></div>
+    <div class="blk"><h3>📅 これまでの流れ</h3>
+      <div class="htl-wrap" aria-label="年表(横にスクロール)"><div class="htl">${e.timeline.map(([d,t],i)=>`<div class="htl-i${i===e.timeline.length-1?" now":""}"><span class="htl-d">${esc(d)}</span><span class="htl-dot"></span><span class="htl-t">${esc(t)}</span></div>`).join("")}${(e.next||[]).slice(0,3).map(x=>{ const t=Array.isArray(x)?x.join(" "):String(x); const m=t.match(/^(\S+)\s+(.*)$/); return `<div class="htl-i fut"><span class="htl-d">${esc(m?m[1]:"これから")}</span><span class="htl-dot"></span><span class="htl-t">${esc(m?m[2]:t)}</span></div>`; }).join("")}</div></div>
+      <div class="hint">← 横にスクロールできます。点線の先は「これからの予定」</div>
+      <details class="faq plain"><summary>リストで見る</summary><ol class="tl">${e.timeline.map(([d,t])=>`<li><b>${esc(d)}</b>${esc(t)}</li>`).join("")}</ol></details></div>
     ${e.next.length?`<div class="blk"><h3>🔭 次の山場</h3><ul class="us">${e.next.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>`:""}
     ${rel.length?`<div class="blk"><h3>🗞️ 関係するニュースの記録</h3><div class="res"><ul style="list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px">${rel.map(n=>`<li class="item"><div class="meta"><span class="hint">${mdLabel(n.d)}</span>${n.ok?'<span class="badge-ok">✅</span>':'<span class="badge-one">⚠️ 1社</span>'}</div><div class="h">${esc(n.h)}</div></li>`).join("")}</ul></div></div>`:""}
     ${askBlock(k)}
