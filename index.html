@@ -428,6 +428,10 @@ svg.eat{animation:petEat .7s ease both!important}
 .mood-c{display:flex;flex-direction:column;align-items:center;gap:2px;border:1px solid var(--line);border-top:4px solid var(--c);background:var(--cs);border-radius:12px;padding:8px 4px;cursor:pointer;color:var(--ink)}
 .mood-c .mi{font-size:1.6rem;line-height:1.2}
 .mood-c b{font-size:.82rem}.mood-c small{font-size:.72rem;color:var(--muted)}
+/* 対戦 */
+.vs-card{border:2px solid var(--accent);background:var(--accent-soft)}
+.vs-res{display:flex;flex-direction:column;align-items:center;gap:2px;margin:6px 0 10px;padding:10px;border-radius:12px;background:var(--surface2)}
+.vs-res span:first-child{font-size:2rem}
 /* 案内係 */
 .gd-fab{position:fixed;right:max(16px,env(safe-area-inset-right,0px));bottom:calc(84px + env(safe-area-inset-bottom,0px));z-index:24;width:54px;height:54px;border-radius:50%;border:0;background:var(--accent);color:var(--on-accent);font-size:1.5rem;box-shadow:0 6px 18px rgba(0,0,0,.22);cursor:pointer}
 @media (min-width:900px){.gd-fab{bottom:24px}}
@@ -687,6 +691,7 @@ function renderToday(){
     </section>`;
   const body=LOOK.order.filter(k=>!LOOK.off[k]).map(k=>S[k]||"").join("");
   main.innerHTML = `<div class="view">
+    ${vsCard()}
     ${seasonCard()}
     ${personalCards()}
     ${installCard()}
@@ -696,6 +701,7 @@ function renderToday(){
     ${footer()}
   </div>`;
   const pb=document.getElementById("playBtn"); if(pb) pb.onclick=openStory;
+  const vg=document.getElementById("vsGo"); if(vg) vg.onclick=()=>{ const q=document.getElementById("quiz"); if(q) q.scrollIntoView({behavior:"smooth",block:"center"}); else toast("いまはクイズがお休みです"); };
   const sx=document.getElementById("seasonX"); if(sx) sx.onclick=()=>{ store.set("nw-season-hide",TODAY+(seasonNow()||{}).k); document.getElementById("seasonCard")?.remove(); };
   document.getElementById("lookBtnToday").onclick=openLook;
   bindInstall(); bindPersonal(); bindPet(); checkBadges();
@@ -744,8 +750,8 @@ function drawQuiz(i,res){
   const box=document.getElementById("quiz"); if(!box) return; const Q=D.quiz;
   const dots=`<span class="dots">${Q.map((_,k)=>`<i class="${res[k]===true?'r':res[k]===false?'w':''}${k===i?' c':''}"></i>`).join("")}</span>`;
   if(i>=Q.length){ const sc=res.filter(Boolean).length; store.set("nw-quiz-"+D.updated.slice(0,10),String(sc)); ME.quiz[D.updated.slice(0,10)]=Math.max(+ME.quiz[D.updated.slice(0,10)]||0,sc); saveMe(); checkBadges();
-    box.innerHTML=`<div class="qn"><span>🧠 今日の${Q.length}問クイズ</span>${dots}</div><div class="qq" style="font-size:1.3rem">${sc}問 正解! ${sc===Q.length?"🎉 満点":sc>0?"👏":"また明日!"}</div><p class="hint" style="margin:0">答えはニュース10と解説にのっています。</p><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px"><button class="fchip" id="qre">もう一度</button><button class="fchip" id="qmore">📖 おかわりクイズ(マイ) →</button>${petInit().food>0?`<button class="fchip" data-feed="1">🍙 ×${petInit().food} ${esc(petName())}にあげる</button>`:""}</div>`;
-    document.getElementById("qre").onclick=()=>drawQuiz(0,[]); document.getElementById("qmore").onclick=()=>go("my"); box.querySelectorAll("[data-feed]").forEach(b=>b.onclick=()=>petFeed(b)); return; }
+    box.innerHTML=`<div class="qn"><span>🧠 今日の${Q.length}問クイズ</span>${dots}</div><div class="qq" style="font-size:1.3rem">${sc}問 正解! ${sc===Q.length?"🎉 満点":sc>0?"👏":"また明日!"}</div>${vsResult(sc)}<p class="hint" style="margin:0">答えはニュース10と解説にのっています。</p><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px"><button class="fchip" id="qvs">⚔️ ${VS?"結果を送り返す":"友だちに挑戦状を送る"}</button><button class="fchip" id="qre">もう一度</button><button class="fchip" id="qmore">📖 おかわりクイズ(マイ) →</button>${petInit().food>0?`<button class="fchip" data-feed="1">🍙 ×${petInit().food} ${esc(petName())}にあげる</button>`:""}</div>`;
+    document.getElementById("qvs").onclick=()=>sendChallenge(sc,Q.length); document.getElementById("qre").onclick=()=>drawQuiz(0,[]); document.getElementById("qmore").onclick=()=>go("my"); box.querySelectorAll("[data-feed]").forEach(b=>b.onclick=()=>petFeed(b)); return; }
   const q=Q[i];
   box.innerHTML=`<div class="qn"><span>🧠 今日の${Q.length}問クイズ ・ ${i+1}問目</span>${dots}</div><div class="qq">${esc(q.q)}</div><div class="opts">${q.o.map((o,k)=>`<button class="opt" data-k="${k}">${esc(o)}</button>`).join("")}</div><div id="qexp"></div>`;
   box.querySelectorAll(".opt").forEach(b=>b.onclick=()=>{ const k=+b.dataset.k; const ok=k===q.a;
@@ -1503,6 +1509,20 @@ function moodCard(){ const day=NEWS[0]&&NEWS[0].d; if(!day) return ""; const L=N
     <div class="mood-all"><span class="mi">${all.icon}</span><span><b>きょうの世の中は「${esc(all.name)}」</b><span class="hint" style="display:block">${L.length}件のニュースから</span></span></div>
     <div class="mood-grid">${rows.map(({g,m})=>`<button class="mood-c" data-mood="${g}" style="--c:var(--g-${g});--cs:var(--g-${g}-s)"><span class="mi">${m.icon}</span><b>${esc(GN[g])}</b><small>${esc(m.name)} ・ ${m.n}件</small></button>`).join("")}</div>
     <div class="hint" style="margin-top:8px">見出しのことば(「事故」「上昇」など)から自動で決めた目安です。タップでそのジャンルのニュースへ。</div></section>`; }
+// ===== クイズ対戦(点数をリンクに入れて送る。サーバーは使わない) =====
+const QID = () => (D.updated||"").slice(0,16);
+const b64e = o => btoa(unescape(encodeURIComponent(JSON.stringify(o)))).replace(/\+/g,"-").replace(/\//g,"_").replace(/=+$/,"");
+const b64d = t => { try{ return JSON.parse(decodeURIComponent(escape(atob(t.replace(/-/g,"+").replace(/_/g,"/"))))); }catch(_){ return null; } };
+const VS = (()=>{ try{ const v=new URLSearchParams(location.search).get("vs"); if(!v) return null; const o=b64d(v); if(!o||typeof o.s!=="number") return null; o.n=String(o.n||"友だち").slice(0,12); return o; }catch(_){ return null; } })();
+function vsCard(){ if(!VS) return ""; const same=VS.d===QID();
+  return `<section class="card vs-card" aria-label="クイズの挑戦状"><b>⚔️ ${esc(VS.n)}さんからの挑戦状!</b><p style="margin:4px 0 8px">${same?`今日のクイズで <b>${VS.t||3}問中 ${VS.s}問</b> 正解したそうです。勝てるかな?`:`${esc(VS.n)}さんは ${VS.t||3}問中 ${VS.s}問 正解。クイズはもう新しく入れかわっていますが、今日の問題で勝負してみよう!`}</p><button class="fchip pet-feed" id="vsGo">🧠 クイズで勝負する →</button></section>`; }
+function nick(){ let n=store.get("nw-nick")||""; if(!n){ n=(prompt("相手に表示する、あなたのニックネーム(10文字まで)","")||"").trim().slice(0,10); if(n) store.set("nw-nick",n); } return n||"ひみつの友だち"; }
+async function sendChallenge(sc,total){ const url=location.origin+location.pathname+"?vs="+b64e({d:QID(),s:sc,t:total,n:nick()})+"#today";
+  const text=`まいにちニュース帳の今日のクイズ、${total}問中${sc}問正解!勝負しよう⚔️`;
+  try{ if(navigator.share){ await navigator.share({title:"クイズの挑戦状",text,url}); return; } }catch(_){ return; }
+  try{ await navigator.clipboard.writeText(text+"\n"+url); toast("📋 挑戦状のリンクをコピーしました。LINEなどにはりつけて送ってね"); }catch(_){ prompt("このリンクをコピーして送ってね",url); } }
+function vsResult(sc){ if(!VS) return ""; const r=sc>VS.s?["🏆","あなたの勝ち!"]:sc<VS.s?["😣",`${esc(VS.n)}さんの勝ち…`]:["🤝","引き分け!"];
+  return `<div class="vs-res"><span>${r[0]}</span><b>あなた ${sc} - ${VS.s} ${esc(VS.n)}さん</b><span>${r[1]}</span></div>`; }
 // ===== 使い方 =====
 const GUIDE = [
   ["🚀","まずはここから",["「きょう」の<b>▶ 1分で見る</b>を押すと、今日のニュースが動くスライドで流れます。","時間がない日は<b>☀️ 今日の3行</b>だけ読めばOK。","<b>📰 今日のニュース10</b>は、その日に関心が高かった順のランキングです。下の「記録したニュース すべて」で、ほかのニュースも見られます。"]],
