@@ -441,18 +441,21 @@ document.getElementById("upd").innerHTML = `最終更新<br><b class="num">${esc
 // ===== 設定(テーマ・文字サイズ) =====
 const root = document.documentElement;
 // 着せかえ(見る人のスマホの中だけに保存: nw-look)
+// [キー, 名前, 明るい画面: アクセント・うすい色・背景・面2・線, 暗い画面: アクセント・うすい色・背景・面・面2・線]
 const COLORS = [
-  ["blue","あお",   "#2747c9","#e3e8fb","#8ea4ff","#232c4d"],
-  ["green","みどり","#15803d","#e2f3e8","#5fd18a","#16301f"],
-  ["teal","うみ",   "#0f766e","#dcf2ef","#5eead4","#14302d"],
-  ["orange","だいだい","#c2410c","#fdeee6","#fb923c","#3a2416"],
-  ["pink","さくら", "#be185d","#fce7f1","#f9a8d4","#3b1a2b"],
-  ["purple","むらさき","#6d28d9","#ede7fd","#c4b5fd","#2a1f45"],
-  ["mono","すみ",   "#1f2937","#e5e7eb","#e5e7eb","#2a3247"]
+  ["blue","あお",     "#2747c9","#e3e8fb","#eef1f4","#f6f8fa","#d9dee6", "#8ea4ff","#232c4d","#0e1320","#171d2c","#1d2436","#2a3247"],
+  ["red","あか",      "#c8323a","#fbe3e4","#f7eeee","#fbf5f5","#ead9da", "#ff8f94","#41191d","#150d0f","#20171a","#281c20","#3b2a2e"],
+  ["green","みどり",  "#15803d","#dff2e5","#edf3ee","#f5f9f6","#d6e3d9", "#5fd18a","#16301f","#0c1410","#141e18","#1a261f","#26372c"],
+  ["yellow","きいろ", "#a16207","#fbf0c6","#f8f4e4","#fcfaf1","#e9e1c4", "#fcd34d","#3a3015","#14120a","#1f1c12","#272317","#3a3420"],
+  ["purple","むらさき","#6d28d9","#ece4fd","#f1eef8","#f8f6fc","#ddd6ec", "#c4b5fd","#2a1f45","#110e1a","#1a1626","#211c30","#322a47"],
+  ["orange","オレンジ","#c2410c","#fde8dc","#f8f0ea","#fcf7f3","#ecdccf", "#fb923c","#3a2416","#150f0b","#201813","#281e17","#3b2c22"],
+  ["pink","ピンク",   "#be185d","#fce4ef","#f8eef3","#fcf6f9","#ecd8e2", "#f9a8d4","#3b1a2b","#150d12","#21151c","#291b23","#3d2934"],
+  ["teal","うみ",     "#0f766e","#d9f1ee","#ecf4f3","#f5faf9","#d3e4e1", "#5eead4","#14302d","#0b1514","#131f1e","#192827","#243a38"],
+  ["mono","すみ",     "#1f2937","#e5e7eb","#f0f0f0","#f7f7f7","#dcdcdc", "#e5e7eb","#2a2f3a","#111214","#1b1c20","#222328","#33353c"]
 ];
 (function(){ const st=document.createElement("style"); let s="";
-  COLORS.slice(1).forEach(([k,,a,as])=>{ s+=`:root[data-color="${k}"]{--accent:${a};--accent-soft:${as}}`; });
-  COLORS.slice(1).forEach(([k,,,,d,ds])=>{ const v=`--accent:${d};--accent-soft:${ds}`; s+=`@media (prefers-color-scheme: dark){:root:not([data-theme="light"])[data-color="${k}"]{${v}}}:root[data-theme="dark"][data-color="${k}"]{${v}}`; });
+  COLORS.filter(c=>c[0]!=="blue").forEach(([k,,a,as,bg,s2,ln])=>{ s+=`:root[data-color="${k}"]{--accent:${a};--accent-soft:${as};--bg:${bg};--surface2:${s2};--line:${ln}}`; });
+  COLORS.filter(c=>c[0]!=="blue").forEach(([k,,,,,,,a,as,bg,sf,s2,ln])=>{ const v=`--accent:${a};--accent-soft:${as};--bg:${bg};--surface:${sf};--surface2:${s2};--line:${ln}`; s+=`@media (prefers-color-scheme: dark){:root:not([data-theme="light"])[data-color="${k}"]{${v}}}:root[data-theme="dark"][data-color="${k}"]{${v}}`; });
   st.textContent=s; document.head.appendChild(st); })();
 const SECS = [["play","▶️ 1分で見る"],["weather","🌤️ 天気"],["three","☀️ 今日の3行"],["ten","📰 今日のニュース10"],["foryou","🎯 あなた向け"],["other","📚 そのほかのニュース"],["quiz","🧠 今日のクイズ"],["number","🔢 今日の数字"]];
 const LOOK = (()=>{ let p={}; try{ p=JSON.parse(store.get("nw-look")||"{}")||{}; }catch(_){ p={}; }
@@ -889,8 +892,9 @@ function longChart(){
   function draw(){
     if(lsState.r==="tick"){ drawTicks(); return; }
     loadHist().then(H=>{
-      const S=(H.series||{})[lsState.s]; if(!S||!(S.daily||S.monthly)){ document.getElementById("lsSum").innerHTML=""; if(chart){chart.destroy();chart=null;} document.getElementById("lsNote").textContent="この数字の長い期間のデータは準備中です(毎朝7時ごろに自動で取得します)。"; return; }
-      const useMonthly = lsState.r==="all" || lsState.r==="1825";
+      let S=(H.series||{})[lsState.s]; if(!S||!(S.daily||S.monthly)){ const ix={nikkei:1,yen:2,oil:3}[lsState.s]; const own=D.markets.filter(m=>m[ix]!=null).map(m=>[m[0],m[ix]]); if(own.length>=2) S={label:{nikkei:"日経平均株価(終値)",yen:"1ドルあたりの円",oil:"NY原油 WTI"}[lsState.s],unit:{nikkei:"円",yen:"円",oil:"ドル"}[lsState.s],src:"このサイトの記録(長い期間のデータは準備中)",daily:own,monthly:[]}; }
+      if(!S||!(S.daily||S.monthly)){ document.getElementById("lsSum").innerHTML=""; if(chart){chart.destroy();chart=null;} document.getElementById("lsNote").textContent="この数字の長い期間のデータは準備中です(毎朝7時ごろに自動で取得します)。"; return; }
+      const useMonthly = (lsState.r==="all" || lsState.r==="1825") && (S.monthly||[]).length>0;
       let rows = ((useMonthly ? S.monthly : S.daily)||[]).slice();
       if(lsState.r!=="all"){ const from=new Date(Date.parse(TODAY)-(+lsState.r)*864e5).toISOString().slice(0,useMonthly?7:10); rows=rows.filter(r=>r[0]>=from); }
       // このサイトで記録した最新の値もつなげる(FREDは数日遅れのため)
@@ -1031,7 +1035,7 @@ function openLook(){
     <div class="wrap body">
       <div class="hint">あなた好みのニュースアプリに作りかえられます。変えるとすぐ反映され、このスマホの中だけに保存されます。</div>
       <section class="lk-sec"><h3>おまかせセット</h3><div class="presets">${PRESETS.map(p=>`<button data-preset="${p[0]}"><b>${p[1]}</b><span>${esc(p[2])}</span></button>`).join("")}</div></section>
-      <section class="lk-sec"><h3>テーマの色</h3><div class="sw">${COLORS.map(c=>`<button data-col="${c[0]}" aria-pressed="${LOOK.color===c[0]}" aria-label="${c[1]}" title="${c[1]}" style="background:${c[2]}"></button>`).join("")}</div>
+      <section class="lk-sec"><h3>テーマの色</h3><div class="hint">ボタンや見出しの色と、画面全体のほんのりした色が変わります。</div><div class="sw">${COLORS.map(c=>`<button data-col="${c[0]}" aria-pressed="${LOOK.color===c[0]}" aria-label="${c[1]}" title="${c[1]}" style="background:linear-gradient(135deg,${c[2]} 55%,${c[4]} 55%)"></button>`).join("")}</div>
         <div class="setrow"><span style="min-width:5em">画面</span><span class="seg">${[["system","自動"],["light","明るい"],["dark","暗い"]].map(([k,l])=>`<button data-lt="${k}" aria-pressed="${th===k}">${l}</button>`).join("")}</span></div></section>
       <section class="lk-sec"><h3>文字と詰め具合</h3>
         <div class="setrow"><span style="min-width:5em">文字</span><span class="seg">${[["m","ふつう"],["l","大きめ"],["xl","特大"]].map(([k,l])=>`<button data-ls="${k}" aria-pressed="${sz===k}">${l}</button>`).join("")}</span></div>
@@ -1248,7 +1252,7 @@ function renderMy(){
   const readNames=Object.keys(ME.readEx).filter(k=>D.explainers[k]).map(k=>D.explainers[k].name);
   main.innerHTML=`<div class="view">
     <div class="sec-h"><h2>⭐ わたしの記録</h2><span class="sub">このスマホの中だけに保存</span></div>
-    <button class="lookcard" id="lookBtnMy"><span class="pal" aria-hidden="true" style="padding-left:5px">${COLORS.slice(0,5).map(c=>`<i style="background:${c[2]}"></i>`).join("")}</span><span><b>🎨 着せかえ</b><span class="hint" style="display:block">色・文字・画面の並び・タブを、わたし好みに</span></span></button>
+    <button class="lookcard" id="lookBtnMy"><span class="pal" aria-hidden="true" style="padding-left:5px">${COLORS.slice(1,6).map(c=>`<i style="background:${c[2]}"></i>`).join("")}</span><span><b>🎨 着せかえ</b><span class="hint" style="display:block">色・文字・画面の並び・タブを、わたし好みに</span></span></button>
     ${pinsBlock()}
     ${guideBlock()}
     <section class="card lvcard"><div class="lvrow"><div class="lvbig">Lv.${lv.i+1}</div><div><b style="font-size:1.1rem">${esc(lv.name)}</b><div class="hint">${lv.pt}ポイント${lv.next?` ・ 次の「${esc(lv.next[1])}」まで あと${lv.next[0]-lv.pt}`:" ・ 最高レベル!"}</div></div></div>
