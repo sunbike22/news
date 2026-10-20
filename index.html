@@ -67,7 +67,7 @@ h1,h2,h3{text-wrap:balance;line-height:1.35;margin:0}
 .brand{font-family:var(--f-display);font-size:1.15rem;letter-spacing:.02em;display:flex;align-items:center;gap:8px;white-space:nowrap}
 .brand .dot{width:12px;height:12px;border-radius:50%;background:var(--accent);box-shadow:16px 0 0 var(--g-intl),32px 0 0 var(--g-eco);margin-right:34px}
 .top .upd{font-size:.84rem;color:var(--muted);margin-left:auto;text-align:right;line-height:1.3}
-.iconbtn{border:1px solid var(--line);background:var(--surface2);border-radius:10px;min-width:40px;height:40px;cursor:pointer;font-size:.9rem;padding:0 10px}
+.iconbtn{border:1px solid var(--line);background:var(--surface2);border-radius:10px;min-width:40px;height:40px;cursor:pointer;font-size:.9rem;padding:0 10px;white-space:nowrap;flex:none}
 
 /* tabs */
 .tabs{position:fixed;left:0;right:0;bottom:0;z-index:25;background:var(--surface);border-top:1px solid var(--line);padding-bottom:env(safe-area-inset-bottom,0px)}
@@ -204,6 +204,31 @@ mark{background:#ffe066;color:#141b2d;border-radius:3px;padding:0 1px}
 .result{border-color:var(--ok);background:var(--ok-soft)}
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(92px + env(safe-area-inset-bottom,0px));z-index:90;background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:999px;font-weight:700;font-size:.9rem;box-shadow:0 8px 24px rgba(0,0,0,.25);animation:rise .4s ease both;max-width:calc(100% - 32px);text-align:center}
 .toast.out{opacity:0;transition:opacity .5s}
+/* かんたんモード: ボタンに言葉・押しやすく */
+.listen-big{display:flex;align-items:center;gap:14px;width:100%;text-align:left;border:0;cursor:pointer;border-radius:var(--radius);padding:14px 16px;background:var(--accent);color:var(--on-accent)}
+.listen-big .li{width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,.22);display:grid;place-items:center;font-size:1.5rem;flex:none}
+.listen-big b{display:block;font-size:1.15rem}.listen-big small{display:block;font-size:.88rem;opacity:.92}
+.listen-big.on{background:#c62828}
+:root[data-mode="easy"] .gd-fab{width:auto;border-radius:999px;padding:0 18px;font-size:1.05rem;font-weight:800;gap:6px}
+:root[data-mode="easy"] .gd-fab::after{content:"しつもん";font-size:1rem}
+:root[data-mode="easy"] .fchip{min-height:44px}
+:root[data-mode="easy"] .lang-seg{display:none}
+:root[data-mode="easy"] .ten .pt{display:none}
+.mode-cards{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.mode-c{display:flex;flex-direction:column;gap:4px;text-align:left;border:2px solid var(--line);border-radius:16px;padding:12px;background:var(--surface);color:var(--ink);cursor:pointer}
+.mode-c b{font-size:1.1rem}.mode-c small{font-size:.86rem;color:var(--muted);line-height:1.5}.mode-c .mi{font-size:1.8rem}
+.mode-c[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft);box-shadow:0 0 0 2px var(--accent)}
+.tabprev{display:flex;gap:2px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:6px;margin:8px 0}
+.tabprev span{flex:1;display:flex;flex-direction:column;align-items:center;font-size:.82rem;font-weight:700;padding:4px 0;border-radius:10px}
+.tabprev span i{font-style:normal;font-size:1.3rem}
+.tabpick{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+.tabpick li{display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:8px 10px}
+.tabpick li.off{opacity:.55}
+.tabpick .nm{flex:1;font-weight:700}
+.tabpick .tg{min-width:84px;min-height:40px;border-radius:999px;border:2px solid var(--accent);background:var(--accent);color:var(--on-accent);font-weight:800;cursor:pointer}
+.tabpick li.off .tg{background:var(--surface);color:var(--accent)}
+.tabpick .mv{min-width:40px;min-height:40px}
+
 .jump{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
 .jmp{display:flex;flex-direction:column;align-items:center;gap:2px;padding:10px 4px;border:1px solid var(--line);border-radius:14px;background:var(--surface);color:var(--ink);font-weight:700;font-size:.9rem;cursor:pointer}.jmp span{font-size:1.4rem}
 .more-btn{display:flex;justify-content:center;width:100%;margin-top:10px;padding:12px;font-weight:700}
@@ -625,12 +650,32 @@ svg.eat{animation:petEat .7s ease both!important}
 [lang="en"]{font-family:"Helvetica Neue",Arial,sans-serif}
 .enlist{list-style:none;margin:0;padding:0}.enlist li{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--line)}
 /* はじめての案内 */
-.ob{position:fixed;inset:0;z-index:80;background:rgba(10,14,30,.55);display:grid;place-items:center;padding:16px;animation:rise .3s ease both}
+.ob{position:fixed;inset:0;z-index:95;background:rgba(10,14,30,.55);display:grid;place-items:center;padding:16px;animation:rise .3s ease both}
 .ob-card{background:var(--surface);color:var(--ink);border-radius:20px;max-width:380px;width:100%;padding:20px;text-align:center;box-shadow:0 20px 50px rgba(0,0,0,.35)}
 .ob-pet svg{animation:petIdle 2.6s ease-in-out infinite;transform-origin:50% 90%}
 .ob-card h2{font-size:1.2rem;margin:6px 0}.ob-card p{text-align:left;margin:0 0 14px}
 .ob-dots{display:flex;gap:6px;justify-content:center}.ob-dots i{width:8px;height:8px;border-radius:50%;background:var(--line)}.ob-dots i.on{background:var(--accent)}
-.ob-bt{display:flex;justify-content:space-between}.ob-bt .fchip{padding:8px 16px;font-size:.95rem}
+.ob-bt{display:flex;justify-content:space-between}
+.ob-card{max-height:calc(100vh - 32px);overflow:auto}
+.ob-step{font-size:.85rem;color:var(--muted);font-weight:700}
+.obp{text-align:left;margin:0 0 12px;font-size:1rem;line-height:1.7}
+.ob-bt .fchip{min-height:48px;padding:8px 18px;font-size:1.02rem}.ob-next{font-weight:800}
+.ob-card .mode-c{min-height:120px}
+.obm{border:2px solid var(--line);border-radius:16px;overflow:hidden;text-align:left;font-size:.88rem;margin-bottom:10px;background:var(--bg)}
+.obm-top{display:flex;gap:6px;align-items:center;padding:6px 8px;background:var(--surface);border-bottom:1px solid var(--line);font-weight:800}.obm-top span:first-child{flex:1}
+.obm-b{border:1px solid var(--line);border-radius:6px;padding:0 6px;font-size:.82rem}
+.obm-row{display:flex;align-items:center;gap:6px;margin:6px 8px;padding:6px 8px;background:var(--surface);border:1px solid var(--line);border-radius:8px;font-weight:700}
+.obm-row.acc{background:var(--accent);color:var(--on-accent)}
+.obm-row i,.obl i,.obm-n{font-style:normal;display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;background:#e5484d;color:#fff;font-size:.82rem;font-weight:800;flex:none}
+.obm-tabs{position:relative;display:flex;gap:2px;padding:6px 8px 6px 34px;background:var(--surface);border-top:1px solid var(--line)}
+.obm-tabs .obm-n{position:absolute;left:8px;top:50%;margin-top:-11px}
+.obm-tabs span{flex:1;display:flex;flex-direction:column;align-items:center;font-size:1.05rem}.obm-tabs small{font-size:.82rem}
+.obl{list-style:none;margin:0 0 12px;padding:0;text-align:left;display:flex;flex-direction:column;gap:8px}
+.obl li{display:flex;gap:8px;align-items:flex-start;line-height:1.5}
+.obh{list-style:none;margin:0 0 10px;padding:0;text-align:left;display:flex;flex-direction:column;gap:10px}
+.obh li{display:flex;gap:10px;align-items:center;line-height:1.5}
+.obk{flex:none;min-width:84px;text-align:center;border:2px solid var(--ink);border-radius:10px;padding:6px 8px;font-weight:800;background:var(--surface)}
+
 /* 予想ノート・カード・ランキング */
 .mp-row{display:flex;flex-wrap:wrap;gap:10px;margin-top:6px;font-size:.9rem}.mp-row label{display:flex;align-items:center;gap:6px}
 .mp-row input[type=date]{font:inherit;padding:4px 6px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink)}
@@ -739,7 +784,7 @@ svg.eat{animation:petEat .7s ease both!important}
     <div class="brand"><span class="dot" aria-hidden="true"></span>まいにちニュース帳</div>
     <div class="upd" id="upd"></div>
     <button class="iconbtn bell" id="bellBtn" aria-label="お知らせ" title="お知らせ">🔔<i class="dot" id="bellDot" hidden></i></button>
-    <button class="iconbtn" id="setBtn" aria-label="表示の設定" title="表示の設定">Aa</button>
+    <button class="iconbtn" id="setBtn" aria-label="設定(文字・モード)" title="設定">設定</button>
   </div>
 </header>
 
@@ -841,26 +886,43 @@ function mmdd(iso){ return iso.slice(5,10); }
 function seasonNow(){ if(LOOK.season==="off") return null; if(LOOK.preview){ const z=SEASONS.find(x=>x.k===LOOK.preview); if(z) return z; }
   const t=mmdd(TODAY); return SEASONS.find(z=> z.from<=z.to ? (t>=z.from&&t<=z.to) : (t>=z.from||t<=z.to)) || null; }
 function inSeason(z,iso){ const t=mmdd(iso); return z.from<=z.to ? (t>=z.from&&t<=z.to) : (t>=z.from||t<=z.to); }
-const SECS = [["weather","🌤️ 天気"],["three","☀️ 今日の3行"],["ten","📰 今日のニュース10"],["pet","🐣 ペット"],["play","▶️ 1分で見る"],["foryou","🎯 あなた向け"],["quiz","🧠 今日のクイズ"],["number","🔢 今日の数字"],["fun","✨ おたのしみ"],["other","📚 そのほかのニュース"],["english","📘 今日の英単語"],["mood","🗺️ 世の中の天気図"],["know","👆 知ってた?"],["talk","🍽️ 今日の話のタネ"],["reporter","🎙️ よむまる記者"],["local","🏠 わたしの街"],["gacha","🎰 今日の1本ガチャ"]];
+const SECS = [["weather","🌤️ 天気"],["listen","🔊 ニュースを聞く"],["three","☀️ 今日の3行"],["ten","📰 今日のニュース10"],["pet","🐣 ペット"],["play","▶️ 1分で見る"],["foryou","🎯 あなた向け"],["quiz","🧠 今日のクイズ"],["number","🔢 今日の数字"],["fun","✨ おたのしみ"],["other","📚 そのほかのニュース"],["english","📘 今日の英単語"],["mood","🗺️ 世の中の天気図"],["know","👆 知ってた?"],["talk","🍽️ 今日の話のタネ"],["reporter","🎙️ よむまる記者"],["local","🏠 わたしの街"],["gacha","🎰 今日の1本ガチャ"]];
 const LOOK = (()=>{ let p={}; try{ p=JSON.parse(store.get("nw-look")||"{}")||{}; }catch(_){ p={}; }
   const fix=(arr,all)=>{ const a=(Array.isArray(arr)?arr:[]).filter(k=>all.includes(k)); all.forEach(k=>{ if(!a.includes(k)) a.push(k); }); return a; };
   const had=new Set(Array.isArray(p.order)?p.order:[]); p.order=fix(p.order,SECS.map(s=>s[0]));
   if(had.size){ SECS.forEach(([k],i)=>{ if(had.has(k)) return; p.order=p.order.filter(x=>x!==k); if(i===0){ p.order.unshift(k); return; } const prev=SECS[i-1][0]; const at=p.order.indexOf(prev); p.order.splice(at<0?p.order.length:at+1,0,k); }); } p.off=p.off&&typeof p.off==="object"?p.off:{};
-  p.tabs=fix(p.tabs,["today","search","map","explain","numbers","plan","my"]); p.tabOff=p.tabOff&&typeof p.tabOff==="object"?p.tabOff:{}; p.tabOff.my=false;
+  p.tabs=fix(p.tabs,["today","search","map","explain","numbers","plan","my","words"]); p.tabOff=p.tabOff&&typeof p.tabOff==="object"?p.tabOff:{}; p.tabOff.my=false;
   if(!p.v2){ p.v2=1; p.off=p.off&&typeof p.off==="object"?p.off:{}; ["mood","know","talk","reporter","local","gacha"].forEach(k=>p.off[k]=true); }
   if(!p.v3){ p.v3=1; p.off=p.off||{}; p.off.english=true; }
   // v4: ニュースを先に(2026-10-20 画面の整理)。並びを新しい順にそろえる(表示/非表示はそのまま)
   if(!p.v4){ p.v4=1; p.order=SECS.map(s=>s[0]); }
   // v5: 下のタブを5つに(地図・数字は「さがす」「きょう」から開く。着せかえで戻せる)
+  // v7: かんたん/ふつうモード。今までの人は「ふつう」。聞くボタンはふつうではかくす。ことばタブは最初はかくす
+  if(!p.v7){ p.v7=1; p.mode=p.mode==="easy"?"easy":"normal"; p.off=Object.assign({},p.off,{listen:true}); p.tabOff=Object.assign({words:true},p.tabOff); }
+  if(p.mode!=="easy") p.mode="normal"; if(!p.cfg||typeof p.cfg!=="object") p.cfg={};
   // v6: 天気をいちばん上に(2026-10-20)
   if(!p.v6){ p.v6=1; p.order=["weather",...p.order.filter(k=>k!=="weather")]; }
   if(!p.v5){ p.v5=1; p.tabs=["today","explain","search","plan","my","map","numbers"]; p.tabOff=Object.assign({},p.tabOff,{map:true,numbers:true}); }
   if(!COLORS.some(c=>c[0]===p.color)) p.color="blue"; if(p.season!=="off") p.season="auto"; if(typeof p.preview!=="string") p.preview=""; if(!["compact","normal","roomy"].includes(p.density)) p.density="normal";
   return p; })();
 function saveLook(){ store.set("nw-look", JSON.stringify(LOOK)); }
+// ===== かんたんモード / ふつうモード =====
+// それぞれのモードが「きょうの並び・表示」「下のタブ」「文字の大きさ」を別々に覚える。かんたんモードに、ふつうの機能を足すこともできる
+const MODE_PRESET={
+  easy:()=>{ const on=["weather","listen","three","ten","quiz"]; const order=[...on,...SECS.map(x=>x[0]).filter(k=>!on.includes(k))]; const off={}; order.forEach(k=>{ if(!on.includes(k)) off[k]=true; });
+    return {order,off,tabs:["today","explain","search","my","plan","map","numbers","words"],tabOff:{plan:true,map:true,numbers:true,words:true},size:"l"}; },
+  normal:()=>{ const off={listen:true,english:true,mood:true,know:true,talk:true,reporter:true,local:true,gacha:true};
+    return {order:SECS.map(x=>x[0]),off,tabs:["today","explain","search","plan","my","map","numbers","words"],tabOff:{map:true,numbers:true,words:true},size:"m"}; }};
+function modeSnap(){ return {order:LOOK.order.slice(),off:Object.assign({},LOOK.off),tabs:LOOK.tabs.slice(),tabOff:Object.assign({},LOOK.tabOff),size:store.get("nw-size")||"m"}; }
+function setMode(m,fresh){ if(m!=="easy") m="normal"; if(m===LOOK.mode&&!fresh) return;
+  LOOK.cfg[LOOK.mode]=modeSnap(); LOOK.mode=m; const c=(!fresh&&LOOK.cfg[m])||MODE_PRESET[m]();
+  const all=SECS.map(x=>x[0]); LOOK.order=[...c.order.filter(k=>all.includes(k)),...all.filter(k=>!c.order.includes(k))]; LOOK.off=Object.assign({},c.off);
+  LOOK.tabs=c.tabs.slice(); LOOK.tabOff=Object.assign({},c.tabOff,{my:false}); store.set("nw-size",c.size||"m");
+  saveLook(); applySettings(); try{ drawTabs(); }catch(_){} }
+function modeName(m){ return (m||LOOK.mode)==="easy"?"かんたん":"ふつう"; }
 function applySettings(){ const t=store.get("nw-theme"); if(t==="light"||t==="dark") root.setAttribute("data-theme",t); else root.removeAttribute("data-theme");
   const s=store.get("nw-size"); if(s==="l"||s==="xl") root.setAttribute("data-size",s); else root.removeAttribute("data-size");
-  root.setAttribute("data-color",LOOK.color); { const z=seasonNow(); if(z) root.setAttribute("data-season",z.k); else root.removeAttribute("data-season"); try{ snow(!!z&&z.k==="xmas"); }catch(_){} }
+  root.setAttribute("data-color",LOOK.color); root.setAttribute("data-mode",LOOK.mode); { const z=seasonNow(); if(z) root.setAttribute("data-season",z.k); else root.removeAttribute("data-season"); try{ snow(!!z&&z.k==="xmas"); }catch(_){} }
   if(LOOK.density!=="normal") root.setAttribute("data-density",LOOK.density); else root.removeAttribute("data-density");
   const m=document.querySelector('meta[name="theme-color"]'); if(m){ const z=seasonNow(); m.setAttribute("content", z? z.light[0] : (COLORS.find(c=>c[0]===LOOK.color)||COLORS[0])[2]); } }
 applySettings();
@@ -926,7 +988,7 @@ const ILL = (()=>{
 
 // ===== タブ =====
 const TABS = [
-  ["today","📰","きょう"],["search","🔎","さがす"],["map","🗺️","地図"],["explain","💡","解説"],["numbers","📈","数字"],["plan","📅","予定"],["my","⭐","マイ"],["words","📖","ことば",1]
+  ["today","📰","きょう"],["search","🔎","さがす"],["map","🗺️","地図"],["explain","💡","解説"],["numbers","📈","数字"],["plan","📅","予定"],["my","⭐","マイ"],["words","📖","ことば"]
 ];
 const tabsEl = document.getElementById("tabs");
 function drawTabs(){
@@ -935,7 +997,7 @@ function drawTabs(){
   tabsEl.innerHTML = shown.map(([k,i,l])=>`<button class="tab" role="tab" id="tab-${k}" data-k="${k}" aria-selected="${String(k===current||(k==="search"&&tabHiddenNow()))}"><span class="ti" aria-hidden="true">${i}</span>${l}</button>`).join("");
 }
 let current = null; const charts=[];
-function tabHiddenNow(){ return current==="words"||((current==="map"||current==="numbers")&&!!LOOK.tabOff[current]); }
+function tabHiddenNow(){ return (current==="words"||current==="map"||current==="numbers")&&!!LOOK.tabOff[current]; }
 drawTabs();
 tabsEl.addEventListener("click",e=>{const b=e.target.closest(".tab"); if(b) go(b.dataset.k);});
 function go(k, opts){
@@ -948,6 +1010,28 @@ function go(k, opts){
   if(!(opts&&opts.keepScroll)) window.scrollTo({top:0});
 }
 
+
+// ===== 下のボタン(タブ)を選ぶ。見たまま並べかえ・表示/かくす。2〜6こ =====
+const TAB_DESC={today:"天気・今日のニュース",explain:"ニュースのくわしい解説",search:"前のニュースをさがす",plan:"これからの予定・予想",my:"ペット・保存・設定",map:"ニュースの場所を地図で",numbers:"株・円・原油のグラフ",words:"むずかしいことばの辞典"};
+function openTabs(){ const sh=document.getElementById("sheet");
+  const draw=()=>{ const shown=LOOK.tabs.filter(k=>!LOOK.tabOff[k]);
+    sh.innerHTML=`<div class="bar"><div class="wrap"><button class="iconbtn" id="tbx" aria-label="もどる">← もどる</button><span class="ttl">🧭 下のボタンを選ぶ</span></div></div>
+    <div class="wrap body">
+      <p style="margin:0">画面のいちばん下に並ぶボタンです。よく使うページを選んでください(2〜6こ)。<b>いま(${modeName()}モード)はこう見えます:</b></p>
+      <div class="tabprev" aria-hidden="true">${shown.map(k=>{ const t=TABS.find(x=>x[0]===k); return `<span><i>${t[1]}</i>${esc(t[2])}</span>`; }).join("")}</div>
+      <ul class="tabpick">${LOOK.tabs.map((k,i)=>{ const t=TABS.find(x=>x[0]===k); if(!t) return ""; const on=!LOOK.tabOff[k]; return `<li class="${on?"":"off"}"><span style="font-size:1.4rem">${t[1]}</span><span class="nm">${esc(t[2])}<br><small class="hint">${esc(TAB_DESC[k]||"")}</small></span>
+        <button class="iconbtn mv" data-tm="${i}" data-d="-1" aria-label="${esc(t[2])}を左へ" ${i===0?"disabled":""}>↑</button>
+        ${k==="my"?`<span class="hint" style="min-width:84px;text-align:center">いつも出す</span>`:`<button class="tg" data-tt="${k}" aria-pressed="${on}">${on?"出す":"かくす"}</button>`}</li>`; }).join("")}</ul>
+      <p class="hint">↑ で左へ動きます。「マイ」には設定があるので、いつも出しておきます。</p>
+      <button class="fchip" id="tbReset">${modeName()}モードのはじめの形にもどす</button></div>`;
+    sh.querySelector("#tbx").onclick=close;
+    sh.querySelectorAll("[data-tt]").forEach(b=>b.onclick=()=>{ const k=b.dataset.tt; const n=LOOK.tabs.filter(x=>!LOOK.tabOff[x]).length;
+      if(!LOOK.tabOff[k]&&n<=2){ toast("ボタンは2こ以上いります"); return; } if(LOOK.tabOff[k]&&n>=6){ toast("ボタンは6こまでです。どれかを「かくす」にしてください"); return; }
+      LOOK.tabOff[k]=!LOOK.tabOff[k]; saveLook(); drawTabs(); draw(); });
+    sh.querySelectorAll("[data-tm]").forEach(b=>b.onclick=()=>{ const i=+b.dataset.tm, j=i-1; if(j<0) return; [LOOK.tabs[i],LOOK.tabs[j]]=[LOOK.tabs[j],LOOK.tabs[i]]; saveLook(); drawTabs(); draw(); });
+    sh.querySelector("#tbReset").onclick=()=>{ const c=MODE_PRESET[LOOK.mode](); LOOK.tabs=c.tabs; LOOK.tabOff=c.tabOff; saveLook(); drawTabs(); draw(); toast("はじめの形にもどしました"); }; };
+  const close=()=>{ sh.hidden=true; sh.innerHTML=""; document.body.style.overflow=""; go(current||"today",{keepScroll:true}); };
+  draw(); sh.hidden=false; sh.scrollTop=0; document.body.style.overflow="hidden"; }
 // ===== きょう =====
 function skyIcon(t){ t=String(t||""); return /雪/.test(t)?"❄️":/雷/.test(t)?"⛈️":/晴.*雨|雨.*晴/.test(t)?"🌦️":/雨/.test(t)?(/時々|一時|のち/.test(t)?"🌦️":"🌧️"):/晴.*(くもり|曇)|(くもり|曇).*晴/.test(t)?"⛅":/晴/.test(t)?"☀️":/くもり|曇/.test(t)?"☁️":"🌤️"; }
 function weatherCard(){
@@ -973,6 +1057,7 @@ function renderToday(){
       <button class="play sm alt" id="radioBtn"><span class="pi" aria-hidden="true">🌙</span><b>寝る前ラジオ</b></button>
     </div>`;
   S.pet=petCard();
+  S.listen=`<button class="listen-big" id="listenBtn"><span class="li" aria-hidden="true">🔊</span><span><b>今日のニュースを聞く</b><small>押すと読み上げます。もう一度押すと止まります</small></span></button>`;
   S.weather=weatherCard();
   S.three=`<section aria-label="今日の3行">
       <div class="sec-h"><h2>☀️ 今日の3行</h2>${EN?langSeg():`<span class="sub">時間がない日はここだけでOK</span>`}</div>
@@ -1015,6 +1100,9 @@ function renderToday(){
     <button class="fchip" id="lookBtnToday" style="align-self:flex-start">🎨 この画面の並びを変える</button>
     ${footer()}
   </div>`;
+  const lb=document.getElementById("listenBtn"); if(lb) lb.onclick=()=>{ if(window.speechSynthesis&&window.speechSynthesis.speaking){ stopSpeak(); lb.classList.remove("on"); lb.querySelector("b").textContent="今日のニュースを聞く"; return; }
+    const w=D.weather; const t=`${relDay(w.iso)}の${w.place}は${w.sky}。最高${w.hi}度、最低${w.lo}度。${w.umbrella}。では、今日のニュースです。`+D.three.map((x,i)=>`${i+1}つ目。${x.title}。${x.text}`).join("。")+"。ニュース10の見出しです。"+D.top10.map((n,i)=>`${i+1}位、${n.title}`).join("。")+"。以上です。";
+    speak(t); lb.classList.add("on"); lb.querySelector("b").textContent="■ 止める"; track("/listen","聞く"); };
   const pb=document.getElementById("playBtn"); if(pb) pb.onclick=openStory; const rb=document.getElementById("radioBtn"); if(rb) rb.onclick=openRadio;
   const vg=document.getElementById("vsGo"); if(vg) vg.onclick=()=>{ const q=document.getElementById("quiz"); if(q) q.scrollIntoView({behavior:"smooth",block:"center"}); else toast("いまはクイズがお休みです"); };
   const sx=document.getElementById("seasonX"); if(sx) sx.onclick=()=>{ store.set("nw-season-hide",TODAY+(seasonNow()||{}).k); document.getElementById("seasonCard")?.remove(); };
@@ -1245,7 +1333,7 @@ function openEx(k){
   if(!ME.readEx[k]) learn(e.g,2); ME.readEx[k]=TODAY; saveMe(); setTimeout(checkBadges,800);
   const rel = NEWS.filter(n=>{ const map={saudi:"サウジ・中東",tax:"消費減税",cyber:"不正アクセスとAI"}; if(map[k]) return (n.th||"").includes(map[k]); if(k==="sato") return /佐藤輝明/.test(n.h); if(k==="series") return /日本シリーズ|CS/.test(n.h); if(k==="yokohama") return /横浜市長/.test(n.h); if(k==="past") return n.d<"2026-10-04"; return false; }).slice(0,8);
   const flow = e.flow.map((f,i)=>`${i>0?`<div class="farrow">⬇️ ${f.via?`<b>${esc(f.via)}</b>`:""}</div>`:""}<div class="fstep"><span class="fi">${f.i}</span><span><b>${esc(f.t)}</b>${f.s?`<small>${esc(f.s)}</small>`:""}</span></div>`).join("");
-  sh.innerHTML=`<div class="bar"><div class="wrap"><button class="iconbtn" id="shx" aria-label="もどる">←</button><span class="ttl">${e.icon} ${esc(e.name)}</span>${pinBtn({k:"ex|"+k,h:"解説: "+e.name,g:e.g,d:TODAY,ex:k},"iconbtn")}<button class="iconbtn" id="shshare" aria-label="このページのリンクをコピー">🔗 共有</button></div></div>
+  sh.innerHTML=`<div class="bar"><div class="wrap"><button class="iconbtn" id="shx" aria-label="もどる">← もどる</button><span class="ttl">${e.icon} ${esc(e.name)}</span>${pinBtn({k:"ex|"+k,h:"解説: "+e.name,g:e.g,d:TODAY,ex:k},"iconbtn")}<button class="iconbtn" id="shshare" aria-label="このページのリンクをコピー">🔗 共有</button></div></div>
   <div class="wrap body">
     <div class="hint">最終更新 ${esc(e.updated)} ・ ⏱️ 全部で約${e.min}分 ・ 点線のことばはタップで意味が出ます</div>
     ${PHOTOS[k]?photoBlock(k):ILL[k]?`<div><div class="ill">${ILL[k]}</div><div class="credit">イラスト: 自作(イメージ)</div></div>`:""}
@@ -1464,7 +1552,7 @@ function openGuide(){
   const sh=document.getElementById("sheet");
   const sug=[...new Set([...D.top10.slice(0,3).map(n=>n.ex).filter(Boolean)].flatMap(k=>{ const e=D.explainers[k]; return e&&e.faq?e.faq.slice(0,1).map(f=>f[0]):[]; }))];
   const chips=["今日いちばんのニュースは?","明日は傘がいる?","日経平均はいくら?",...sug].slice(0,6);
-  sh.innerHTML=`<div class="bar"><div class="wrap"><button class="iconbtn" id="gdx" aria-label="もどる">←</button><span class="ttl">💬 ニュース案内係</span></div></div>
+  sh.innerHTML=`<div class="bar"><div class="wrap"><button class="iconbtn" id="gdx" aria-label="もどる">← もどる</button><span class="ttl">💬 ニュース案内係</span></div></div>
   <div class="wrap body">
     <div class="gd-msg bot"><div class="gd-a">こんにちは。このアプリの解説・ことば辞典・ニュースの記録から、答えをさがします。<span class="hint" style="display:block;margin-top:4px">質問はこのスマホの中だけで調べます(どこにも送りません)。</span></div></div>
     <div id="gdLog" style="display:flex;flex-direction:column;gap:12px"></div>
@@ -1553,13 +1641,17 @@ function footer(){ return `<footer class="foot">
 function bindFooter(){}
 document.getElementById("setBtn").onclick=()=>{
   const p=document.getElementById("pop"); const t=store.get("nw-theme")||"system"; const s=store.get("nw-size")||"m";
-  p.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><b>表示の設定</b><button class="iconbtn" id="popx" aria-label="閉じる" style="background:transparent;color:inherit;border-color:currentColor">✕</button></div>
+  p.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><b>設定</b><button class="iconbtn" id="popx" aria-label="閉じる" style="background:transparent;color:inherit;border-color:currentColor">✕</button></div>
+    <div class="setrow" style="margin-bottom:10px"><span style="min-width:5em">モード</span><span class="seg">${[["easy","かんたん"],["normal","ふつう"]].map(([k,l])=>`<button data-pmode="${k}" aria-pressed="${LOOK.mode===k}">${l}</button>`).join("")}</span></div>
     <div class="setrow" style="margin-bottom:10px"><span style="min-width:5em">文字の大きさ</span><span class="seg">${[["m","ふつう"],["l","大きめ"],["xl","特大"]].map(([k,l])=>`<button data-size="${k}" aria-pressed="${s===k}">${l}</button>`).join("")}</span></div>
     <div class="setrow"><span style="min-width:5em">画面の色</span><span class="seg">${[["system","自動"],["light","明るい"],["dark","暗い"]].map(([k,l])=>`<button data-theme="${k}" aria-pressed="${t===k}">${l}</button>`).join("")}</span></div>
-    <button id="popLook" style="margin-top:12px;border:0;background:transparent;color:inherit;text-decoration:underline;cursor:pointer;padding:0">🎨 色・並び・タブも変える(着せかえ) →</button>`;
+    <div style="display:flex;flex-direction:column;gap:8px;margin-top:12px"><button class="fchip" id="popTabs">🧭 下のボタン(ページ)を選ぶ</button><button class="fchip" id="popLook">🎨 色・画面の並びを変える</button><button class="fchip" id="popHelp">🔰 使い方を見る</button></div>`;
   p.hidden=false;
   document.getElementById("popx").onclick=()=>p.hidden=true;
   document.getElementById("popLook").onclick=()=>{ p.hidden=true; openLook(); };
+  document.getElementById("popTabs").onclick=()=>{ p.hidden=true; openTabs(); };
+  document.getElementById("popHelp").onclick=()=>{ p.hidden=true; onboard(true); };
+  p.querySelectorAll("[data-pmode]").forEach(b=>b.onclick=e=>{ e.stopPropagation(); setMode(b.dataset.pmode); p.hidden=true; go(current||"today"); toast(`${modeName()}モードにしました`); });
   p.querySelectorAll("[data-size]").forEach(b=>b.onclick=e=>{e.stopPropagation(); store.set("nw-size",b.dataset.size); applySettings(); p.querySelectorAll("[data-size]").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));});
   p.querySelectorAll("[data-theme]").forEach(b=>b.onclick=e=>{e.stopPropagation(); store.set("nw-theme",b.dataset.theme); applySettings(); p.querySelectorAll("[data-theme]").forEach(x=>x.setAttribute("aria-pressed",String(x===b))); if(current==="numbers"||current==="plan") go(current,{keepScroll:true});});
 };
@@ -1581,9 +1673,11 @@ function openLook(){
       <button class="mv" data-mv="${kind}" data-i="${i}" data-d="-1" aria-label="${esc(name)}を上へ" ${i===0?"disabled":""}>↑</button>
       <button class="mv" data-mv="${kind}" data-i="${i}" data-d="1" aria-label="${esc(name)}を下へ" ${i===arr.length-1?"disabled":""}>↓</button>
       ${locked?`<span class="lock">いつも表示</span>`:`<button class="sw2" data-sw="${kind}" data-k="${arr[i]}" aria-pressed="${on}">${on?"表示":"非表示"}</button>`}</li>`;
-    sh.innerHTML=`<div class="bar"><div class="wrap"><button class="iconbtn" id="lkx" aria-label="もどる">←</button><span class="ttl">🎨 着せかえ</span><button class="iconbtn" id="lkdone">できた</button></div></div>
+    sh.innerHTML=`<div class="bar"><div class="wrap"><button class="iconbtn" id="lkx" aria-label="もどる">← もどる</button><span class="ttl">🎨 着せかえ</span><button class="iconbtn" id="lkdone">できた</button></div></div>
     <div class="wrap body">
       <div class="hint">あなた好みのニュースアプリに作りかえられます。変えるとすぐ反映され、このスマホの中だけに保存されます。</div>
+      <section class="lk-sec"><h3>モード</h3><div class="mode-cards">${[["easy","🔰","かんたん","文字が大きく、天気・ニュース・聞くボタンだけ。あとから好きな機能を足せます"],["normal","📱","ふつう","ペット・クイズ・おたのしみなど、ぜんぶの機能"]].map(([k,i,n,d])=>`<button class="mode-c" data-lmode="${k}" aria-pressed="${LOOK.mode===k}"><span class="mi">${i}</span><b>${n}</b><small>${d}</small></button>`).join("")}</div>
+        <div class="hint" style="margin-top:6px">モードごとに、下の「きょうの並び」とボタンを別々に覚えます。かんたんモードでも、下の一覧で「表示」にすれば、ふつうの機能を足せます。</div></section>
       <section class="lk-sec"><h3>おまかせセット</h3><div class="presets">${PRESETS.map(p=>`<button data-preset="${p[0]}"><b>${p[1]}</b><span>${esc(p[2])}</span></button>`).join("")}</div></section>
       <section class="lk-sec"><h3>テーマの色</h3><div class="hint">ボタンや見出しの色と、画面全体の色が変わります。</div><div class="sw">${COLORS.map(c=>`<button data-col="${c[0]}" aria-pressed="${LOOK.color===c[0]}" aria-label="${c[1]}" title="${c[1]}" style="background:linear-gradient(135deg,${c[2]} 55%,${c[4]} 55%)"></button>`).join("")}</div>
         <div class="setrow"><span style="min-width:5em">画面</span><span class="seg">${[["system","自動"],["light","明るい"],["dark","暗い"]].map(([k,l])=>`<button data-lt="${k}" aria-pressed="${th===k}">${l}</button>`).join("")}</span></div></section>
@@ -1599,13 +1693,14 @@ function openLook(){
         <div class="setrow"><span style="min-width:5em">文字</span><span class="seg">${[["m","ふつう"],["l","大きめ"],["xl","特大"]].map(([k,l])=>`<button data-ls="${k}" aria-pressed="${sz===k}">${l}</button>`).join("")}</span></div>
         <div class="setrow"><span style="min-width:5em">詰め具合</span><span class="seg">${[["compact","ぎっしり"],["normal","ふつう"],["roomy","ゆったり"]].map(([k,l])=>`<button data-ld="${k}" aria-pressed="${LOOK.density===k}">${l}</button>`).join("")}</span></div>
         <div class="hint">「ぎっしり」は、ニュース10の4位以下を見出しだけにして、1画面にたくさん並べます。</div></section>
-      <section class="lk-sec"><h3>「きょう」の画面の並び</h3><div class="hint">↑↓で順番、右のボタンで表示/かくす。</div>
+      <section class="lk-sec"><h3>「きょう」に出すもの(足す・へらす)</h3><div class="hint">右のボタンで「表示」にすると足せます。↑↓で順番を変えられます。</div>
         <ul class="lk-list">${LOOK.order.map((k,i)=>listRow(LOOK.order,i,(SECS.find(s=>s[0]===k)||[k,k])[1],!LOOK.off[k],"sec",false)).join("")}</ul></section>
-      <section class="lk-sec"><h3>下のタブの並び</h3><div class="hint">よく使うタブを左に。使わないタブはかくせます(「マイ」はいつも表示)。</div>
-        <ul class="lk-list">${LOOK.tabs.map((k,i)=>listRow(LOOK.tabs,i,TABNAME(k),!LOOK.tabOff[k],"tab",k==="my")).join("")}</ul><div class="hint" style="margin-top:6px">地図・数字をオンにすると、前のように下のタブに出ます(7つまで)。</div></section>
+      <section class="lk-sec"><h3>下のボタン(ページ)</h3><div class="hint">画面のいちばん下のボタンを、好きなページに変えられます。</div><button class="fchip" id="lkTabs" style="margin-top:6px">🧭 下のボタンを選ぶ</button></section>
       <button class="fchip" id="lkreset" style="align-self:flex-start">はじめの見た目にもどす</button>
     </div>`;
     sh.querySelector("#lkx").onclick=close; sh.querySelector("#lkdone").onclick=close;
+    sh.querySelector("#lkTabs").onclick=()=>{ openTabs(); };
+    sh.querySelectorAll("[data-lmode]").forEach(b=>b.onclick=()=>{ setMode(b.dataset.lmode); redraw(); toast(`${modeName()}モードにしました`); });
     sh.querySelectorAll("[data-col]").forEach(b=>b.onclick=()=>{ LOOK.color=b.dataset.col; saveLook(); applySettings(); redraw(); });
     sh.querySelectorAll("[data-lt]").forEach(b=>b.onclick=()=>{ store.set("nw-theme",b.dataset.lt); applySettings(); redraw(); });
     sh.querySelectorAll("[data-ls]").forEach(b=>b.onclick=()=>{ store.set("nw-size",b.dataset.ls); applySettings(); redraw(); });
@@ -1616,8 +1711,8 @@ function openLook(){
     sh.querySelectorAll("[data-ld]").forEach(b=>b.onclick=()=>{ LOOK.density=b.dataset.ld; saveLook(); applySettings(); redraw(); });
     sh.querySelectorAll("[data-mv]").forEach(b=>b.onclick=()=>{ const arr=b.dataset.mv==="sec"?LOOK.order:LOOK.tabs; const i=+b.dataset.i, j=i+(+b.dataset.d); if(j<0||j>=arr.length) return; [arr[i],arr[j]]=[arr[j],arr[i]]; saveLook(); drawTabs(); redraw(`[data-mv="${b.dataset.mv}"][data-i="${j}"][data-d="${b.dataset.d}"]`); });
     sh.querySelectorAll("[data-sw]").forEach(b=>b.onclick=()=>{ const o=b.dataset.sw==="sec"?LOOK.off:LOOK.tabOff; o[b.dataset.k]=!o[b.dataset.k]; saveLook(); drawTabs(); redraw(); });
-    sh.querySelectorAll("[data-preset]").forEach(b=>b.onclick=()=>{ const p=PRESETS.find(x=>x[0]===b.dataset.preset); if(!p) return; LOOK.density=p[3].density; LOOK.order=p[3].order.slice(); LOOK.off=Object.assign({},p[3].off); saveLook(); applySettings(); redraw(); toast(`「${p[1].replace(/^\S+ /,"")}」にしました`); });
-    sh.querySelector("#lkreset").onclick=()=>{ LOOK.color="blue"; LOOK.season="auto"; LOOK.preview=""; LOOK.density="normal"; LOOK.order=SECS.map(s=>s[0]); LOOK.off={}; LOOK.tabs=["today","explain","search","plan","my","map","numbers"]; LOOK.tabOff={map:true,numbers:true}; store.set("nw-theme","system"); store.set("nw-size","m"); saveLook(); applySettings(); drawTabs(); redraw(); };
+    sh.querySelectorAll("[data-preset]").forEach(b=>b.onclick=()=>{ const p=PRESETS.find(x=>x[0]===b.dataset.preset); if(!p) return; LOOK.density=p[3].density; const want=["weather",...p[3].order.filter(k=>k!=="weather")]; const all=SECS.map(x=>x[0]); LOOK.order=[...want,...all.filter(k=>!want.includes(k))]; LOOK.off={}; all.forEach(k=>{ if(!want.includes(k)||p[3].off[k]) LOOK.off[k]=true; }); saveLook(); applySettings(); redraw(); toast(`「${p[1]}」にしました`); });
+    sh.querySelector("#lkreset").onclick=()=>{ LOOK.color="blue"; LOOK.season="auto"; LOOK.preview=""; LOOK.density="normal"; { const c=MODE_PRESET[LOOK.mode](); LOOK.order=c.order; LOOK.off=c.off; LOOK.tabs=c.tabs; LOOK.tabOff=c.tabOff; store.set("nw-size",c.size); } store.set("nw-theme","system"); saveLook(); applySettings(); drawTabs(); redraw(); };
   };
   const redraw=(focusSel)=>{ const y=sh.scrollTop; draw(); sh.scrollTop=y; if(focusSel){ const f=sh.querySelector(focusSel); if(f&&!f.disabled) f.focus(); } };
   const close=()=>{ sh.hidden=true; sh.innerHTML=""; document.body.style.overflow=""; document.removeEventListener("keydown",esck); go(current||"today",{keepScroll:true}); };
@@ -1676,7 +1771,7 @@ const BADGES=[
   ["vote5","🔮","予想名人","予想が5回当たった",()=>voteResults().win>=5]
 ];
 function newBadges(){ const got=[]; BADGES.forEach(b=>{ if(!ME.badges.includes(b[0]) && b[4]()){ ME.badges.push(b[0]); got.push(b); } }); if(got.length) saveMe(); return got; }
-function toast(msg){ const t=document.createElement("div"); t.className="toast"; t.setAttribute("role","status"); t.innerHTML=msg; document.body.appendChild(t); setTimeout(()=>t.classList.add("out"),2600); setTimeout(()=>t.remove(),3200); }
+function toast(msg){ if(document.querySelector(".ob")){ setTimeout(()=>toast(msg),800); return; } const t=document.createElement("div"); t.className="toast"; t.setAttribute("role","status"); t.innerHTML=msg; document.body.appendChild(t); setTimeout(()=>t.classList.add("out"),2600); setTimeout(()=>t.remove(),3200); }
 function checkBadges(){ newBadges().forEach((b,i)=>setTimeout(()=>toast(`${b[1]} バッジ「${esc(b[2])}」を手に入れました`),400+i*1200)); }
 
 // ピン留めとメモ
@@ -1964,7 +2059,7 @@ function openPaper(){
   const NOW={"🟢":"いま: 近づいている","🟡":"いま: 五分五分","⚪":"いま: まだわからない","🔴":"いま: 遠のいている"}; const ym=(last.match(/(\d{4})-(\d{2})/)||[]); const title=ym[1]?`${ym[1]}年${+ym[2]}月ごろの新聞`:"これからの新聞";
   const my=no=>{ const v=ME.votes[no]; return v?`<span class="pp-my">あなたの予想: ${v.v==="yes"?"⭕ 起きる":"❌ 起きない"}</span>`:""; };
   const art=(p,i)=>`<article class="pp-art${i===0?" top":""}"><div class="pp-kick">${esc(p.no)} ・ 確度 ${esc(p.c||"—")} ・ 判定 ${esc(p.d||"—")}</div><h3>${esc(p.t)}</h3><p>${esc([NOW[p.now]||"",p.m||""].filter(Boolean).join(" ・ "))}</p>${my(p.no)}</article>`;
-  sh.innerHTML=`<div class="bar"><div class="wrap"><button class="iconbtn" id="ppx" aria-label="もどる">←</button><span class="ttl">📰 未来の新聞(予想版)</span></div></div>
+  sh.innerHTML=`<div class="bar"><div class="wrap"><button class="iconbtn" id="ppx" aria-label="もどる">← もどる</button><span class="ttl">📰 未来の新聞(予想版)</span></div></div>
   <div class="wrap body"><div class="paper">
     <div class="pp-head"><div class="pp-name">未来新聞</div><div class="pp-sub">${esc(title)} ・ 予想版 ・ まいにちニュース帳</div></div>
     <div class="pp-note">※ これは本当の新聞ではありません。Claudeの予測(🎯)を、未来の新聞の形に並べたものです。</div>
@@ -2041,7 +2136,7 @@ function bgmStart(){ try{ const AC=window.AudioContext||window.webkitAudioContex
   g.gain.setTargetAtTime(.035,ac.currentTime,1.5); return {ac,g,iv,stop(){ clearInterval(iv); try{ g.gain.setTargetAtTime(0,ac.currentTime,.8); setTimeout(()=>ac.close(),2500); }catch(_){} }}; }catch(_){ return null; } }
 function openRadio(){
   const sh=document.getElementById("sheet"); const L=radioScript(); const can=!!window.speechSynthesis;
-  sh.innerHTML=`<div class="bar"><div class="wrap"><button class="iconbtn" id="rdx" aria-label="もどる">←</button><span class="ttl">🌙 寝る前ラジオ</span></div></div>
+  sh.innerHTML=`<div class="bar"><div class="wrap"><button class="iconbtn" id="rdx" aria-label="もどる">← もどる</button><span class="ttl">🌙 寝る前ラジオ</span></div></div>
   <div class="wrap body radio"><div class="rd-moon" aria-hidden="true">🌙<span>✦</span><span>✧</span><span>✦</span></div>
     <div class="rd-now" id="rdNow">${can?"▶ を押すと始まります(約3分・終わると自動で止まります)":"この端末では読み上げが使えないので、文字で読めます。"}</div>
     <div class="rd-bar"><i id="rdProg"></i></div>
@@ -2064,7 +2159,7 @@ function openWeb(k){
   const keys=Object.keys(D.explainers); if(!k) k=(Object.entries(D.explainers).find(([,e])=>e.status==="live")||[keys[0]])[0]; const e=D.explainers[k]; if(!e) return;
   const sh=document.getElementById("sheet"); const flow=e.flow||[];
   const rn=NEWS.map(n=>({n,v:gdScore(gdQuery(e.name+" "+(e.now||"")),n.h+" "+(n.th||""))})).filter(x=>x.v>=0.3).sort((a,b)=>b.n.d.localeCompare(a.n.d)).slice(0,3).map(x=>x.n);
-  sh.innerHTML=`<div class="bar"><div class="wrap"><button class="iconbtn" id="wbx" aria-label="もどる">←</button><span class="ttl">🕸️ ニュースのつながり</span></div></div>
+  sh.innerHTML=`<div class="bar"><div class="wrap"><button class="iconbtn" id="wbx" aria-label="もどる">← もどる</button><span class="ttl">🕸️ ニュースのつながり</span></div></div>
   <div class="wrap body"><div class="chips">${keys.map(x=>`<button class="fchip" data-web="${x}" aria-pressed="${x===k}">${D.explainers[x].icon} ${esc(D.explainers[x].name)}</button>`).join("")}</div>
    <div class="web" id="web"><svg class="web-svg" id="webSvg" aria-hidden="true"></svg>
     <div class="wn center" data-n="0" style="--c:var(--g-${e.g})"><span>${e.icon}</span><b>${esc(e.name)}</b></div>
@@ -2151,7 +2246,7 @@ function rankHTML(){ const R=ME.rivals||{}; const q=QID(); const mine=+(ME.quiz[
 function openMyPaper(){ const P=Object.entries(ME.pins||{}).sort((a,b)=>String(b[1].at).localeCompare(String(a[1].at))).slice(0,8); const sh=document.getElementById("sheet");
   if(!P.length){ toast("📍でニュースを保存すると、自分だけの新聞が作れます"); return; }
   const nm=(store.get("nw-nick")||"わたし")+"新聞";
-  sh.innerHTML=`<div class="bar"><div class="wrap"><button class="iconbtn" id="mpx" aria-label="もどる">←</button><span class="ttl">🗞️ 自分だけの新聞</span></div></div>
+  sh.innerHTML=`<div class="bar"><div class="wrap"><button class="iconbtn" id="mpx" aria-label="もどる">← もどる</button><span class="ttl">🗞️ 自分だけの新聞</span></div></div>
   <div class="wrap body"><div class="paper"><div class="pp-head"><div class="pp-name">${esc(nm)}</div><div class="pp-sub">${esc(mdLabel(TODAY))} ・ ${esc(petName())}編集長</div></div>
     <div class="pp-cols">${P.map(([k,x],i)=>`<article class="pp-art${i===0?" top":""}"><div class="pp-kick">${esc(GN[x.g]||"")} ・ ${esc(x.d?mdLabel(x.d):"")}</div><h3>${esc(x.h)}</h3>${x.memo?`<p>✍️ ${esc(x.memo)}</p>`:""}</article>`).join("")}</div></div>
     <div style="display:flex;gap:8px;flex-wrap:wrap"><button class="fchip pet-feed" id="mpImg">🖼️ 画像にして保存・送る</button><button class="fchip" id="mpName">✏️ 新聞の名前</button></div></div>`;
@@ -2168,13 +2263,34 @@ function paperImage(nm,P){ const W=1080,H=1350; const c=document.createElement("
   c.toBlob(async b=>{ const f=new File([b],"my-newspaper.png",{type:"image/png"}); try{ if(navigator.canShare&&navigator.canShare({files:[f]})){ await navigator.share({files:[f],title:nm}); return; } }catch(_){ return; } const u=URL.createObjectURL(b); const a=document.createElement("a"); a.href=u; a.download="my-newspaper.png"; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(u),4000); },"image/png"); }
 // ===== はじめての人への案内(3ステップ。ペットが案内する) =====
 function onboard(force){ if(!force && (store.get("nw-onboard")==="1" || ME.days.length>1)) return; const ov=document.createElement("div"); ov.className="ob"; ov.setAttribute("role","dialog"); ov.setAttribute("aria-label","はじめての方へ");
-  const S=[["newsboy","こんにちは! ぼくは"+petName()+"。","まいにちニュース帳へようこそ。<b>☀️ 今日の3行</b>と<b>📰 ニュース10</b>を読めば、今日のことがだいたいわかるよ。時間がない日は<b>▶ 1分で見る</b>がおすすめ。"],
-    ["detective","いっしょに育とう!","<b>🧠 クイズ</b>に正解すると、ぼくのごはん🍙になるんだ。ニュースを読むほど、ぼくは大きくなるよ。点線のことばはタップで意味が出るよ。"],
-    ["professor","きみ好みにしてね","<b>⭐ マイ</b>の🎨着せかえで、色やならびを変えられるよ。わからないことは右下の<b>💬</b>で聞いてね。新しくなったところは右上の<b>🔔</b>で!"]];
-  let i=0; const draw=()=>{ const [c,t,b]=S[i]; ov.innerHTML=`<div class="ob-card"><div class="ob-pet">${petSVG(Math.max(1,petStage().i),"happy",null,110,c)}</div><div class="ob-dots">${S.map((_,k)=>`<i class="${k===i?"on":""}"></i>`).join("")}</div><h2>${esc(t)}</h2><p>${b}</p>
-    <div class="ob-bt"><button class="fchip" id="obSkip">${i<S.length-1?"とばす":""}</button><button class="fchip pet-feed" id="obNext">${i<S.length-1?"つぎへ →":"はじめる!"}</button></div></div>`;
-    ov.querySelector("#obNext").onclick=()=>{ if(i<S.length-1){ i++; draw(); } else done(); }; const sk=ov.querySelector("#obSkip"); if(i<S.length-1) sk.onclick=done; else sk.style.visibility="hidden"; ov.querySelector("#obNext").focus(); };
-  const done=()=>{ store.set("nw-onboard","1"); ov.remove(); };
+  // 画面のミニ見本(番号つき)。いまのモードとタブに合わせて描く
+  const mock=()=>{ const tabs=LOOK.tabs.filter(k=>!LOOK.tabOff[k]).map(k=>TABS.find(t=>t[0]===k)).filter(Boolean);
+    return `<div class="obm" aria-hidden="true"><div class="obm-top"><span>まいにちニュース帳</span><span class="obm-b">🔔</span><span class="obm-b">設定</span></div>
+      <div class="obm-row"><i>1</i>🌤️ 今日の天気・傘</div>${LOOK.mode==="easy"?`<div class="obm-row acc"><i>2</i>🔊 今日のニュースを聞く</div>`:""}
+      <div class="obm-row"><i>${LOOK.mode==="easy"?3:2}</i>☀️ 今日の3行</div><div class="obm-row"><i>${LOOK.mode==="easy"?4:3}</i>📰 今日のニュース</div>
+      <div class="obm-tabs"><i class="obm-n">${LOOK.mode==="easy"?5:4}</i>${tabs.map(t=>`<span>${t[1]}<small>${esc(t[2])}</small></span>`).join("")}</div></div>`; };
+  const legend=()=>{ const e=LOOK.mode==="easy"; const L=[["🌤️ 天気","今日の天気と、傘がいるか"]]; if(e) L.push(["🔊 聞く","押すと、天気とニュースを読み上げます"]);
+    L.push(["☀️ 今日の3行","いちばん大事なニュース3つ。時間がない日はここだけでOK"],["📰 今日のニュース","見出しを押すと、くわしい説明が開きます"],["下のボタン","押すとページが変わります(好きなボタンに変えられます)"]);
+    return `<ol class="obl">${L.map(([a,b],i)=>`<li><i>${i+1}</i><span><b>${a}</b><br>${b}</span></li>`).join("")}</ol>`; };
+  const steps=[
+    {t:"ようこそ!",pet:"newsboy",h:()=>`<p class="obp">毎日のニュースを、やさしい言葉でまとめたアプリです。<br><b>使いやすい方を選んでください。</b>(あとで「設定」から変えられます)</p>
+      <div class="mode-cards">${[["easy","🔰","かんたん","文字が大きく、天気・ニュース・聞くボタンだけ"],["normal","📱","ふつう","ペットやクイズなど、ぜんぶの機能"]].map(([k,i,n,d])=>`<button class="mode-c" data-obm="${k}" aria-pressed="${LOOK.mode===k}"><span class="mi">${i}</span><b>${n}</b><small>${d}</small></button>`).join("")}</div>`},
+    {t:"画面の見かた",pet:"professor",h:()=>mock()+legend()},
+    {t:"こまったときは",pet:"detective",h:()=>`<ul class="obh">
+      <li><span class="obk">← もどる</span><span>左上のボタンで、前の画面にもどります</span></li>
+      <li><span class="obk">設定</span><span>右上。文字を大きくしたり、モードを変えたりできます</span></li>
+      <li><span class="obk">💬</span><span>右下。わからないことを聞けます</span></li>
+      <li><span class="obk">🔔</span><span>右上。アプリの新しくなったところ</span></li></ul>
+      <p class="obp hint">この案内は「設定」→「🔰 使い方を見る」で、いつでももう一度見られます。</p>`}];
+  steps.push({normalOnly:1,t:"いっしょに育とう!",pet:"newsboy",h:()=>`<p class="obp">ぼくは<b>${esc(petName())}</b>。<b>🧠 クイズ</b>に正解すると、ぼくのごはん🍙になるよ。ニュースを読むほど大きくなるんだ。点線のことばは、押すと意味が出るよ。</p>`});
+  let i=0; const draw=()=>{ const V=steps.filter(x=>!x.normalOnly||LOOK.mode!=="easy"); const st=V[i]; const last=i===V.length-1;
+    ov.innerHTML=`<div class="ob-card"><div class="ob-step">${i+1} / ${V.length}</div><div class="ob-pet">${petSVG(Math.max(1,petStage().i),"happy",null,i===1?64:88,st.pet)}</div><h2>${esc(st.t)}</h2>${st.h()}
+      <div class="ob-bt">${i>0?`<button class="fchip" id="obBack">← もどる</button>`:`<button class="fchip" id="obSkip">とばす</button>`}<button class="fchip pet-feed ob-next" id="obNext">${last?"はじめる!":"つぎへ →"}</button></div></div>`;
+    ov.querySelectorAll("[data-obm]").forEach(b=>b.onclick=()=>{ setMode(b.dataset.obm); go("today"); draw(); });
+    ov.querySelector("#obNext").onclick=()=>{ if(!last){ i++; draw(); } else done(); };
+    const bk=ov.querySelector("#obBack"); if(bk) bk.onclick=()=>{ i--; draw(); }; const sk=ov.querySelector("#obSkip"); if(sk) sk.onclick=done;
+    ov.querySelector("#obNext").focus(); };
+  const done=()=>{ store.set("nw-onboard","1"); ov.remove(); go(current||"today"); };
   document.body.appendChild(ov); draw(); }
 // ===== よむまる記者・ガチャ・わたしの街・ことばの感想・ニュースの重さ・すごろく =====
 function cardComment(w,g){ const st=petStage().i; if(st<2) return ""; const r=seeded("cc"+w); const C={pol:["国会って、むずかしいけど大事!","みんなで決めるって、たいへんだね"],eco:["お金の話は、くらしにひびくね","ぼくのごはん代にも関係ある?"],it:["パスワード、ちゃんと変えてる?","AIって、ぼくのなかま?"],intl:["世界はつながってるんだね","いつか行ってみたいな"],spo:["ぼくも走るの、すきだよ!","すごい記録だね!"],soc:["みんな気をつけてね","ニュースで知れてよかった"],ent:["見てみたいな!","わくわくするね"]}[g]||["このことば、もう覚えたよ!","また出てきたら、すぐわかるね"]; return C[Math.floor(r()*C.length)]; }
@@ -2269,7 +2385,7 @@ function bakApply(o){ const cur=bakMake(); store.set("nwbak-prev",JSON.stringify
   Object.entries(o.data).forEach(([k,v])=>store.set(k,v)); store.set("nw-bak-at",new Date().toISOString()); store.set("nw-onboard","1");
   toast("📥 記録を読み込みました"); setTimeout(()=>location.reload(),900); }
 function bakSheet(mode,code){ const sh=document.getElementById("sheet");
-  sh.innerHTML=`<div class="bar"><div class="wrap"><button class="iconbtn" id="bkx" aria-label="もどる">←</button><span class="ttl">${mode==="copy"?"📋 記録のコード":"📥 記録を読み込む"}</span></div></div><div class="wrap body">
+  sh.innerHTML=`<div class="bar"><div class="wrap"><button class="iconbtn" id="bkx" aria-label="もどる">← もどる</button><span class="ttl">${mode==="copy"?"📋 記録のコード":"📥 記録を読み込む"}</span></div></div><div class="wrap body">
    ${mode==="copy"?`<p>下のコードを全部えらんでコピーし、メモ帳などに貼って取っておいてください。</p><textarea class="bak-ta" readonly>${esc(code)}</textarea>`
    :`<p>保存したファイルを選ぶか、コードを貼り付けてください。<b>いまのこのスマホの記録は、読み込んだ記録に入れかわります。</b>(まちがえても「読み込む前の記録にもどす」で戻せます)</p>
      <button class="fchip" id="bkPick">📁 ファイルを選ぶ</button>
@@ -2338,7 +2454,7 @@ async function gdConnect(){ gdMsg("Googleのログイン画面を開いていま
     if(remote){ gdChoose(remote); return; }
     await gdUpload(); gdRepaint(); toast("☁️ Googleドライブにつなぎました"); }catch(e){ gdMsg(gdErr(e)); } }
 function gdChoose(remote){ const sh=document.getElementById("sheet"); const local=bakMake();
-  sh.innerHTML=`<div class="bar"><div class="wrap"><button class="iconbtn" id="gcx" aria-label="もどる">←</button><span class="ttl">☁️ どちらの記録を使いますか?</span></div></div><div class="wrap body">
+  sh.innerHTML=`<div class="bar"><div class="wrap"><button class="iconbtn" id="gcx" aria-label="もどる">← もどる</button><span class="ttl">☁️ どちらの記録を使いますか?</span></div></div><div class="wrap body">
    <p>Googleドライブに、前に保存した記録がありました。</p>
    <div class="exp"><b>☁️ ドライブの記録</b><br>${bakSummary(remote)}</div><button class="fchip" id="gcRemote" style="margin:8px 0 16px">📥 ドライブの記録を使う(機種変更のとき)</button>
    <div class="exp"><b>📱 このスマホの記録</b><br>${bakSummary(local)}</div><button class="fchip" id="gcLocal" style="margin-top:8px">📤 このスマホの記録で上書き</button>
@@ -2370,7 +2486,7 @@ const FUN=[["reporter","🎙️","よむまる記者",()=>reporterCard()],["gach
 function funGrid(){ const L=FUN.filter(f=>LOOK.off[f[0]]); if(!L.length) return "";
   return `<section aria-label="おたのしみ"><div class="sec-h"><h2>✨ おたのしみ</h2><span class="sub">タップで開く</span></div><div class="fun-grid">${L.map(([k,i,n])=>`<button class="fun-t" data-fun="${k}"><span>${i}</span><small>${esc(n)}</small>${k==="gacha"&&(ME.gacha||{}).d!==TODAY?'<i class="fun-dot"></i>':""}</button>`).join("")}</div></section>`; }
 function openFun(k){ const f=FUN.find(x=>x[0]===k); if(!f) return; const html=f[3](); if(!html){ toast("今日はまだありません"); return; } const sh=document.getElementById("sheet");
-  sh.innerHTML=`<div class="bar"><div class="wrap"><button class="iconbtn" id="fnx" aria-label="もどる">←</button><span class="ttl">${f[1]} ${esc(f[2])}</span></div></div><div class="wrap body">${html}</div>`;
+  sh.innerHTML=`<div class="bar"><div class="wrap"><button class="iconbtn" id="fnx" aria-label="もどる">← もどる</button><span class="ttl">${f[1]} ${esc(f[2])}</span></div></div><div class="wrap body">${html}</div>`;
   const close=()=>{ sh.hidden=true; sh.innerHTML=""; document.body.style.overflow=""; go("today",{keepScroll:true}); };
   sh.querySelector("#fnx").onclick=close; sh.hidden=false; sh.scrollTop=0; document.body.style.overflow="hidden";
   bindKnow(); bindTalk(); bindReporter(); bindGacha(); bindLocal();
@@ -2391,6 +2507,7 @@ function englishCard(){ if(!EN) return ""; const W=[]; (EN.top10||[]).forEach((e
     <ul class="enlist">${W.map(([a,b,t])=>`<li><span><b lang="en">${esc(a)}</b> = ${esc(b)}<small class="hint" style="display:block">${esc(t||"")}</small></span><button class="fchip" data-say="${esc(a)}">🔊</button></li>`).join("")}</ul></section>`; }
 // ===== お知らせ(新しくなったところ)。機能を足したら、いちばん上に1つ足す =====
 const UPDATES=[
+  {id:"2026-10-20u",d:"2026-10-20",t:"🔰 かんたんモードができました",L:["右上の「設定」で「かんたん」「ふつう」を選べます。かんたんは文字が大きく、天気・ニュース・🔊聞くボタンが中心。ほしい機能はあとから足せます","下のボタンは「設定」→「🧭 下のボタンを選ぶ」で、好きなページに変えられます。はじめての案内もわかりやすくしました"]},
   {id:"2026-10-20t",d:"2026-10-20",t:"🌤️ 天気がいちばん上に",L:["「きょう」を開くと、まず今日の天気(気温・傘・雨の確率)が見やすく出ます","4コマは、せりふを短くして、絵で伝えるようにしました"]},
   {id:"2026-10-20s",d:"2026-10-20",t:"🧹 画面を読みやすく・軽く",L:["「きょう」はニュースがいちばん上に。同じニュースの重なりや小さな札を減らし、文字も少し大きくしました","下のタブは5つに(地図・数字は「さがす」から開けます。着せかえで元の7つに戻せます)。「さがす」「予定」は短くして「もっと見る」に","開くのが速くなるよう、グラフの部品は数字のページを開いたときだけ読み込みます。4コマも横長のコマでコンパクトに"]},
   {id:"2026-10-20r",d:"2026-10-20",t:"☁️ Googleドライブに自動で保存できるように",L:["「マイ」→⚙️設定 の「Googleドライブにつなぐ」でログインすると、記録があなたのGoogleドライブに自動で保存されます","機種変更のときは、新しいスマホで同じGoogleアカウントでつなぐだけ。使うのはアプリ専用の見えない場所だけで、作った人には届きません"]},
@@ -2417,7 +2534,7 @@ function updSeen(){ return store.get("nw-upd-seen")||""; }
 function updUnread(){ const s=updSeen(); return s?UPDATES.findIndex(u=>u.id===s):UPDATES.length; }
 function markBell(){ const n=updUnread(); const d=document.getElementById("bellDot"); if(d) d.hidden=!(n>0); }
 function openUpdates(){ const sh=document.getElementById("sheet"); const n=updUnread();
-  sh.innerHTML=`<div class="bar"><div class="wrap"><button class="iconbtn" id="upx" aria-label="もどる">←</button><span class="ttl">🔔 お知らせ</span></div></div>
+  sh.innerHTML=`<div class="bar"><div class="wrap"><button class="iconbtn" id="upx" aria-label="もどる">← もどる</button><span class="ttl">🔔 お知らせ</span></div></div>
   <div class="wrap body"><div class="hint">まいにちニュース帳の、新しくなったところです。</div>
   ${UPDATES.map((u,i)=>`<section class="card upd${i<n?" new":""}"><div class="hint">${esc(mdLabel(u.d))}${i<n?' <span class="newtag">NEW</span>':""}</div><h3 style="font-size:1.05rem;margin:2px 0 6px">${esc(u.t)}</h3><ul class="us">${u.L.map(x=>`<li>${esc(x)}</li>`).join("")}</ul></section>`).join("")}</div>`;
   store.set("nw-upd-seen",UPDATES[0].id); markBell();
@@ -2738,7 +2855,7 @@ function drawAlertBand(){ const el=document.getElementById("alertBand"); if(!el)
   el.hidden=!L.length; el.innerHTML=L.map(x=>`<div class="al-band ${x.lv==="mid"?"mid":""}" role="button" tabindex="0" data-quake="1"><span class="ai" aria-hidden="true">${x.i}</span><span style="flex:1"><b>${esc(x.t)}</b><small>${esc(x.s)} ・ タップでくわしく</small></span><button class="al-x" data-alx="${esc(x.id)}" aria-label="この知らせを閉じる">✕</button></div>`).join(""); }
 function openQuake(refresh){ const sh=document.getElementById("sheet"); sh.dataset.kind="quake";
   const tsu=AL.tsunami, sp=(AL.special||[]).filter(x=>Date.now()-Date.parse(x.at)<24*36e5);
-  sh.innerHTML=`<div class="bar"><div class="wrap"><button class="iconbtn" id="qkx" aria-label="もどる">←</button><span class="ttl">🌏 地震・津波・警報</span><button class="iconbtn" id="qkr" aria-label="読み直す" style="margin-left:auto">↻</button></div></div><div class="wrap body">
+  sh.innerHTML=`<div class="bar"><div class="wrap"><button class="iconbtn" id="qkx" aria-label="もどる">← もどる</button><span class="ttl">🌏 地震・津波・警報</span><button class="iconbtn" id="qkr" aria-label="読み直す" style="margin-left:auto">↻</button></div></div><div class="wrap body">
    <p class="hint">気象庁の発表を、アプリを開いたときに直接読んでいます(ニュースの1日4回の更新を待ちません)。${AL.checked?`最後に確かめた時刻: ${qhm(AL.checked)}`:""}${AL.ok?"":" ・ <b>いま読み込めませんでした。下の公式ページで確かめてください。</b>"}</p>
    ${tsu?`<div class="al-band" style="cursor:default"><span class="ai">🌊</span><span><b>${esc(tsu.grade)}</b><small>${esc(tsu.areas.join("・"))}${tsu.count>tsu.areas.length?" ほか":""}</small></span></div>`:`<p>🌊 津波の警報・注意報は、いま出ていません。</p>`}
    ${sp.map(x=>`<div class="al-band" style="cursor:default;margin-top:8px"><span class="ai">⚠️</span><span><b>特別警報</b><small>${esc(x.who||"")} ${esc(x.text||"")}</small></span></div>`).join("")}
