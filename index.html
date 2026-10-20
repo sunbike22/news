@@ -504,7 +504,7 @@ mark{background:#ffe066;color:#141b2d;border-radius:3px;padding:0 1px}
 .sheet{position:fixed;inset:0;z-index:50;background:var(--bg);overflow-y:auto;-webkit-overflow-scrolling:touch}
 .sheet .bar{position:sticky;top:0;z-index:3;background:var(--surface);border-bottom:1px solid var(--line);padding-top:env(safe-area-inset-top,0px)}
 .sheet .bar .wrap{display:flex;align-items:center;gap:10px;padding-block:8px}
-.sheet .bar .ttl{font-weight:700;flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sheet .bar .ttl{font-weight:700;flex:1;min-width:0;font-size:.95rem;line-height:1.25;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden;overflow-wrap:anywhere}
 .sheet .body{padding-block:16px calc(40px + env(safe-area-inset-bottom,0px));display:flex;flex-direction:column;gap:18px}
 .kid{background:#fff6cc;color:#2a2410;border-radius:var(--radius);padding:16px 18px}
 .kid .l{font-size:.84rem;font-weight:700;letter-spacing:.06em;opacity:.75}
@@ -520,7 +520,7 @@ mark{background:#ffe066;color:#141b2d;border-radius:3px;padding:0 1px}
 .flow.anim .fstep,.flow.anim .farrow{opacity:.12;transform:translateY(8px)}
 .flow.anim .on{opacity:1;transform:none}
 .flow .fstep.now{border-color:var(--accent)}
-.fplay{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:4px 12px;font-size:.88rem;cursor:pointer;margin-left:auto}
+.fplay{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:9px 14px;font-size:.88rem;cursor:pointer;margin-left:auto}
 ul.us{margin:0;padding-left:1.2em;display:flex;flex-direction:column;gap:6px}
 details.faq{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:0 14px}
 details.faq+details.faq{margin-top:8px}
