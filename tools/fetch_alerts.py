@@ -163,6 +163,29 @@ def wx_fetch(prev_wx):
                      h["precipitation"][i], h["weather_code"][i], h["wind_speed_10m"][i]])
     return {"at": iso(NOW), "place": "東京", "cols": ["時刻", "気温", "湿度", "降水確率", "降水量", "天気コード", "風速"], "rows": rows}
 
+# ---------- 全国の天気(14都市・今日と明日。Open-Meteo を1回でまとめて) ----------
+CITIES = [("札幌", 43.06, 141.35), ("釧路", 42.98, 144.38), ("青森", 40.82, 140.74), ("仙台", 38.27, 140.87), ("新潟", 37.90, 139.02),
+          ("金沢", 36.59, 136.63), ("東京", 35.69, 139.69), ("名古屋", 35.18, 136.91), ("大阪", 34.69, 135.52), ("広島", 34.40, 132.46),
+          ("高知", 33.56, 133.53), ("福岡", 33.61, 130.42), ("鹿児島", 31.56, 130.56), ("那覇", 26.21, 127.68)]
+def wxmap_fetch(prev_m):
+    try:
+        if prev_m and prev_m.get("at") and prev_m["at"] >= iso(NOW - datetime.timedelta(minutes=50)):
+            return prev_m
+    except Exception:  # noqa: BLE001
+        pass
+    q = urllib.parse.urlencode({"latitude": ",".join(str(c[1]) for c in CITIES), "longitude": ",".join(str(c[2]) for c in CITIES),
+        "timezone": "Asia/Tokyo", "forecast_days": 2, "current": "temperature_2m,weather_code",
+        "daily": "weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max"})
+    L = json.loads(get("https://api.open-meteo.com/v1/forecast?" + q, timeout=25))
+    if isinstance(L, dict):
+        L = [L]
+    out = []
+    for (name, la, lo), j in zip(CITIES, L):
+        d = j["daily"]; c = j.get("current") or {}
+        days = [[d["weather_code"][i], d["temperature_2m_max"][i], d["temperature_2m_min"][i], d["precipitation_probability_max"][i]] for i in range(min(2, len(d["time"])))]
+        out.append([name, la, lo, days, c.get("temperature_2m"), c.get("weather_code")])
+    return {"at": iso(NOW), "dates": L[0]["daily"]["time"][:2], "cities": out}
+
 # ---------- 前回分と通知 ----------
 prev = {}
 try:
@@ -215,7 +238,12 @@ try:
     wx = wx_fetch(prev.get("wx"))
 except Exception as e:  # noqa: BLE001
     errors["wx"] = f"{type(e).__name__}: {e}"[:200]
-out = {"quakes": quakes, "qsrc": qsrc, "tsunami": tsunami, "special": special, "sent": sent, "wx": wx}
+wxm = prev.get("wxmap")
+try:
+    wxm = wxmap_fetch(prev.get("wxmap"))
+except Exception as e:  # noqa: BLE001
+    errors["wxmap"] = f"{type(e).__name__}: {e}"[:200]
+out = {"quakes": quakes, "qsrc": qsrc, "tsunami": tsunami, "special": special, "sent": sent, "wx": wx, "wxmap": wxm}
 same = {k: prev.get(k) for k in out} == out
 out["checked"] = iso(NOW)
 out["updated"] = prev.get("updated") if same and prev.get("updated") else iso(NOW)
