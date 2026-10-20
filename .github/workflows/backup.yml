@@ -25,8 +25,9 @@ jobs:
           TAG="backup-$D"
           # alerts ブランチ(地震・天気の最新)も一緒に入れておく
           git fetch --depth=1 origin alerts:alerts 2>/dev/null && git show alerts:alert.json > alert-snapshot.json || echo '{}' > alert-snapshot.json
+          echo "files: $(ls | wc -l)"
           N=$(node -e 'global.window={};require("./data.js");const D=window.NEWS_DATA;console.log(D.news.length+"件のニュース・"+Object.keys(D.explainers).length+"本の解説・"+D.updatedLabel)')
-          tar czf site-backup-$D.tar.gz --exclude=.git .
-          gh release create "$TAG" site-backup-$D.tar.gz --target "$GITHUB_SHA" --title "バックアップ $D" --notes "まいにちニュース帳の自動バックアップ($N)。元に戻すときは、この版の Source code (zip) か site-backup のファイルを使います。"
+          tar czf "$RUNNER_TEMP/site-backup-$D.tar.gz" --exclude=.git .
+          gh release create "$TAG" "$RUNNER_TEMP/site-backup-$D.tar.gz" --target "$GITHUB_SHA" --title "バックアップ $D" --notes "まいにちニュース帳の自動バックアップ($N)。元に戻すときは、この版の Source code (zip) か site-backup のファイルを使います。"
           # 古いバックアップは新しい8つを残して消す
           gh release list --limit 100 --json tagName --jq '.[].tagName' | grep '^backup-' | sort -r | tail -n +9 | while read t; do gh release delete "$t" --yes --cleanup-tag; done
