@@ -110,6 +110,21 @@ main{padding-block:18px 32px}
 .play span{color:inherit}
 .play span{font-size:.88rem;opacity:.9}
 
+/* 天気(いちばん上にコンパクトに) */
+.wx{display:flex;flex-direction:column;gap:8px}
+.wx-top{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center}
+.wx-ic{font-size:2.6rem;line-height:1}
+.wx-place{font-size:.88rem;color:var(--muted);font-weight:700}
+.wx-sky{font-size:1.2rem;font-weight:800;line-height:1.3}
+.wx-t{text-align:right;line-height:1.1}.wx-t b{display:block;font-size:2rem;color:#e5484d}.wx-t span{font-size:1.1rem;color:#3b82f6;font-weight:700}
+.wx-um{font-weight:700;font-size:1.02rem;background:var(--accent-soft);border-radius:10px;padding:6px 10px}
+.wx-rain{display:flex;gap:6px;flex-wrap:wrap;align-items:stretch}
+.wx-rain span{display:flex;flex-direction:column;align-items:center;background:var(--surface2);border:1px solid var(--line);border-radius:10px;padding:2px 10px;min-width:52px}
+.wx-rain small{font-size:.82rem;color:var(--muted)}.wx-rain b{font-size:1rem}
+.wx-rain .wx-wear{flex-direction:row;flex:1;min-width:0;font-size:.9rem;align-items:center}
+.wx-notes summary{cursor:pointer;font-weight:700;color:var(--ink)}
+.wx-notes .note{margin-top:6px;background:var(--warn-soft);border-radius:10px;padding:8px 10px;font-size:.92rem}
+.wx .qk-open{align-self:flex-start;margin-top:0}
 .weather{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;align-items:center}
 .weather .big{font-family:var(--f-display);font-size:2rem;line-height:1;white-space:nowrap}
 .weather .big small{font-size:.9rem;font-family:var(--f-body);color:var(--muted)}
@@ -203,11 +218,12 @@ mark{background:#ffe066;color:#141b2d;border-radius:3px;padding:0 1px}
 .mg-mark{position:absolute;top:-10px;font-size:1rem;line-height:1;font-style:normal}
 .mg-c.l .mg-mark{right:-2px}.mg-c.r .mg-mark{left:-2px}
 .mg-mid{position:relative;z-index:2;display:flex;flex-direction:column;gap:6px;padding-top:14px;align-self:center}
-.mg-b{position:relative;max-width:94%;background:#fff;border:2px solid #1d1d1f;border-radius:14px;padding:5px 10px;font-size:.95rem;line-height:1.45;font-weight:700}
+.mg-b{position:relative;max-width:94%;background:#fff;border:2px solid #1d1d1f;border-radius:14px;padding:5px 11px;font-size:1.05rem;line-height:1.4;font-weight:800}
+.mg-e{align-self:center;font-size:2.4rem;line-height:1.1;letter-spacing:.05em}
 .mg-b.l{align-self:flex-start;border-bottom-left-radius:4px}.mg-b.r{align-self:flex-end;border-bottom-right-radius:4px}
 .mg-b::after{content:"";position:absolute;bottom:4px;width:9px;height:9px;background:#fff;border:2px solid #1d1d1f;transform:rotate(45deg)}
 .mg-b.l::after{left:-6px;border-top:0;border-right:0}.mg-b.r::after{right:-6px;border-bottom:0;border-left:0}
-.mg-big{align-self:center;background:#fff;border:2px dashed #1d1d1f;border-radius:8px;padding:3px 10px;font-weight:900;font-size:.95rem;text-align:center;line-height:1.35;white-space:pre-line;box-shadow:2px 2px 0 #1d1d1f}
+.mg-big{align-self:center;background:#fff;border:2.5px solid #e5484d;color:#c62828;border-radius:8px;padding:2px 12px;font-weight:900;font-size:1.25rem;text-align:center;line-height:1.35;white-space:pre-line;box-shadow:2px 2px 0 #1d1d1f}
 .mg-cast{font-size:.84rem;color:var(--muted);margin-top:4px}
 
 
@@ -825,7 +841,7 @@ function mmdd(iso){ return iso.slice(5,10); }
 function seasonNow(){ if(LOOK.season==="off") return null; if(LOOK.preview){ const z=SEASONS.find(x=>x.k===LOOK.preview); if(z) return z; }
   const t=mmdd(TODAY); return SEASONS.find(z=> z.from<=z.to ? (t>=z.from&&t<=z.to) : (t>=z.from||t<=z.to)) || null; }
 function inSeason(z,iso){ const t=mmdd(iso); return z.from<=z.to ? (t>=z.from&&t<=z.to) : (t>=z.from||t<=z.to); }
-const SECS = [["three","☀️ 今日の3行"],["ten","📰 今日のニュース10"],["weather","🌤️ 天気"],["pet","🐣 ペット"],["play","▶️ 1分で見る"],["foryou","🎯 あなた向け"],["quiz","🧠 今日のクイズ"],["number","🔢 今日の数字"],["fun","✨ おたのしみ"],["other","📚 そのほかのニュース"],["english","📘 今日の英単語"],["mood","🗺️ 世の中の天気図"],["know","👆 知ってた?"],["talk","🍽️ 今日の話のタネ"],["reporter","🎙️ よむまる記者"],["local","🏠 わたしの街"],["gacha","🎰 今日の1本ガチャ"]];
+const SECS = [["weather","🌤️ 天気"],["three","☀️ 今日の3行"],["ten","📰 今日のニュース10"],["pet","🐣 ペット"],["play","▶️ 1分で見る"],["foryou","🎯 あなた向け"],["quiz","🧠 今日のクイズ"],["number","🔢 今日の数字"],["fun","✨ おたのしみ"],["other","📚 そのほかのニュース"],["english","📘 今日の英単語"],["mood","🗺️ 世の中の天気図"],["know","👆 知ってた?"],["talk","🍽️ 今日の話のタネ"],["reporter","🎙️ よむまる記者"],["local","🏠 わたしの街"],["gacha","🎰 今日の1本ガチャ"]];
 const LOOK = (()=>{ let p={}; try{ p=JSON.parse(store.get("nw-look")||"{}")||{}; }catch(_){ p={}; }
   const fix=(arr,all)=>{ const a=(Array.isArray(arr)?arr:[]).filter(k=>all.includes(k)); all.forEach(k=>{ if(!a.includes(k)) a.push(k); }); return a; };
   const had=new Set(Array.isArray(p.order)?p.order:[]); p.order=fix(p.order,SECS.map(s=>s[0]));
@@ -836,6 +852,8 @@ const LOOK = (()=>{ let p={}; try{ p=JSON.parse(store.get("nw-look")||"{}")||{};
   // v4: ニュースを先に(2026-10-20 画面の整理)。並びを新しい順にそろえる(表示/非表示はそのまま)
   if(!p.v4){ p.v4=1; p.order=SECS.map(s=>s[0]); }
   // v5: 下のタブを5つに(地図・数字は「さがす」「きょう」から開く。着せかえで戻せる)
+  // v6: 天気をいちばん上に(2026-10-20)
+  if(!p.v6){ p.v6=1; p.order=["weather",...p.order.filter(k=>k!=="weather")]; }
   if(!p.v5){ p.v5=1; p.tabs=["today","explain","search","plan","my","map","numbers"]; p.tabOff=Object.assign({},p.tabOff,{map:true,numbers:true}); }
   if(!COLORS.some(c=>c[0]===p.color)) p.color="blue"; if(p.season!=="off") p.season="auto"; if(typeof p.preview!=="string") p.preview=""; if(!["compact","normal","roomy"].includes(p.density)) p.density="normal";
   return p; })();
@@ -931,18 +949,17 @@ function go(k, opts){
 }
 
 // ===== きょう =====
+function skyIcon(t){ t=String(t||""); return /雪/.test(t)?"❄️":/雷/.test(t)?"⛈️":/晴.*雨|雨.*晴/.test(t)?"🌦️":/雨/.test(t)?(/時々|一時|のち/.test(t)?"🌦️":"🌧️"):/晴.*(くもり|曇)|(くもり|曇).*晴/.test(t)?"⛅":/晴/.test(t)?"☀️":/くもり|曇/.test(t)?"☁️":"🌤️"; }
 function weatherCard(){
-  const w=D.weather; const lab=relDay(w.iso);
-  return `<section class="card" aria-label="天気">
-    <div class="sec-h"><h2>🌤️ ${esc(lab)}の${esc(w.place)}</h2><span class="sub">${esc(w.date)}</span></div>
-    <div class="weather" style="margin-top:8px">
-      <div class="big num">${w.hi}°<small> / ${w.lo}°</small></div>
-      <div><b>${esc(w.sky)}</b><br><span>☔ ${esc(w.umbrella)}</span></div>
-      <div class="rainbar" style="grid-column:1/-1">${w.rain.map(([t,p])=>`<span class="rain num">${t} ${p}%</span>`).join("")}<span class="rain">👕 ${esc(w.wear)}</span></div>
-      <div class="notes">${w.notes.map(n=>`<div class="note">⚠️ ${esc(n)}</div>`).join("")}</div>
-    </div>
-    <div class="hint" style="margin-top:8px">出典: ${esc(w.source)}</div>
-    <button class="fchip qk-open" data-quake="1">🌏 最近の地震・警報を見る${qkLatestLabel()}</button>
+  const w=D.weather; const lab=relDay(w.iso); const notes=w.notes||[]; const severe=notes.some(n=>/警報|台風|大雨|暴風|大雪|猛暑|熱中症/.test(n));
+  return `<section class="card wx" aria-label="天気">
+    <div class="wx-top"><span class="wx-ic" aria-hidden="true">${skyIcon(w.sky)}</span>
+      <div class="wx-main"><div class="wx-place">${esc(lab)}の${esc(w.place)}</div><div class="wx-sky">${esc(w.sky)}</div></div>
+      <div class="wx-t num" aria-label="最高${w.hi}度 最低${w.lo}度"><b>${w.hi}°</b><span>${w.lo}°</span></div></div>
+    <div class="wx-um">☔ ${esc(w.umbrella)}</div>
+    <div class="wx-rain">${w.rain.map(([t,p])=>`<span><small>${esc(t)}</small><b class="num">${p}%</b></span>`).join("")}<span class="wx-wear">👕 ${esc(w.wear)}</span></div>
+    ${notes.length?`<details class="wx-notes"${severe?" open":""}><summary>⚠️ 気をつけること(${notes.length})</summary>${notes.map(n=>`<div class="note">${esc(n)}</div>`).join("")}<div class="hint">出典: ${esc(w.source)}</div></details>`:`<div class="hint">出典: ${esc(w.source)}</div>`}
+    <button class="fchip qk-open" data-quake="1">🌏 最近の地震・警報${qkLatestLabel()}</button>
   </section>`;
 }
 function exLink(id){ return id && D.explainers[id] ? ` data-ex="${id}"` : ""; }
@@ -1193,7 +1210,7 @@ document.addEventListener("click",e=>{ const g=e.target.closest(".gl"); if(g){ e
 
 
 // ===== 4コマでわかる。台本(data.js の解説の manga)をアプリが絵にする。絵は自作SVGだけ。実在の人は描かない =====
-// manga: {t:"題", p:[{bg:"shop|diet|home|city|sea|space|stadium|tv|school", cap:"ナレーション", big:"看板の大きな文字", y:["顔","せりふ"], m:["顔","せりふ"]}] ×4}
+// manga: {t:"題", p:[{bg:"shop|diet|home|city|sea|space|stadium|tv|school", cap:"ナレーション", e:"大きな絵文字(1〜3こ)", big:"看板(10字まで)", y:["顔","せりふ(15字まで)"], m:["顔","せりふ"]}] ×4}
 // y=あなたのペット(よむまる)、m=ホー先生。顔: q(はてな) o(びっくり) s(にっこり) t(考える) n(ふつう)
 function owlSVG(f,size){ const S=size||78; const eye=f==="o"?`<circle cx="31" cy="38" r="7" fill="#fff" stroke="#3a2a14" stroke-width="2"/><circle cx="49" cy="38" r="7" fill="#fff" stroke="#3a2a14" stroke-width="2"/><circle cx="31" cy="38" r="3" fill="#3a2a14"/><circle cx="49" cy="38" r="3" fill="#3a2a14"/>`
   : f==="s"?`<path d="M25 39q6-6 12 0M43 39q6-6 12 0" stroke="#3a2a14" stroke-width="3" fill="none" stroke-linecap="round"/>`
@@ -1218,7 +1235,7 @@ function mangaHTML(m){ if(!m||!(m.p||[]).length) return ""; const st=petStage();
       <svg class="mg-bg" viewBox="0 0 320 220" preserveAspectRatio="xMidYMid slice" aria-hidden="true">${MG_BG[p.bg]||MG_BG.home}</svg>
       <span class="mg-n">${i+1}</span>${p.cap?`<span class="mg-cap">${esc(p.cap)}</span>`:""}
       <span class="mg-c l">${petSVG(st.i,yf==="s"||yf==="o"?"happy":"hungry",null,50,wear)}${y&&MG_MARK[yf]?`<i class="mg-mark">${MG_MARK[yf]}</i>`:""}</span>
-      <div class="mg-mid">${(p.o2?[["r",o],["l",y]]:[["l",y],["r",o]]).filter(x=>x[1]).map(([sd,x])=>`<div class="mg-b ${sd}">${esc(x[1])}</div>`).join("")}${p.big?`<span class="mg-big">${esc(p.big)}</span>`:""}</div>
+      <div class="mg-mid">${(p.o2?[["r",o],["l",y]]:[["l",y],["r",o]]).filter(x=>x[1]).map(([sd,x])=>`<div class="mg-b ${sd}">${esc(x[1])}</div>`).join("")}${p.e?`<span class="mg-e" aria-hidden="true">${esc(p.e)}</span>`:""}${p.big?`<span class="mg-big">${esc(p.big)}</span>`:""}</div>
       <span class="mg-c r">${owlSVG(of,46)}${o&&MG_MARK[of]?`<i class="mg-mark">${MG_MARK[of]}</i>`:""}</span>
 </div>`; }).join("");
   return `<div class="blk"><h3>🎨 4コマでわかる${m.t?`「${esc(m.t)}」`:""}</h3><div class="manga">${P}</div><div class="mg-cast">左: ${esc(petName())}(あなたのペット)・右: 🦉ホー先生</div></div>`; }
@@ -2374,6 +2391,7 @@ function englishCard(){ if(!EN) return ""; const W=[]; (EN.top10||[]).forEach((e
     <ul class="enlist">${W.map(([a,b,t])=>`<li><span><b lang="en">${esc(a)}</b> = ${esc(b)}<small class="hint" style="display:block">${esc(t||"")}</small></span><button class="fchip" data-say="${esc(a)}">🔊</button></li>`).join("")}</ul></section>`; }
 // ===== お知らせ(新しくなったところ)。機能を足したら、いちばん上に1つ足す =====
 const UPDATES=[
+  {id:"2026-10-20t",d:"2026-10-20",t:"🌤️ 天気がいちばん上に",L:["「きょう」を開くと、まず今日の天気(気温・傘・雨の確率)が見やすく出ます","4コマは、せりふを短くして、絵で伝えるようにしました"]},
   {id:"2026-10-20s",d:"2026-10-20",t:"🧹 画面を読みやすく・軽く",L:["「きょう」はニュースがいちばん上に。同じニュースの重なりや小さな札を減らし、文字も少し大きくしました","下のタブは5つに(地図・数字は「さがす」から開けます。着せかえで元の7つに戻せます)。「さがす」「予定」は短くして「もっと見る」に","開くのが速くなるよう、グラフの部品は数字のページを開いたときだけ読み込みます。4コマも横長のコマでコンパクトに"]},
   {id:"2026-10-20r",d:"2026-10-20",t:"☁️ Googleドライブに自動で保存できるように",L:["「マイ」→⚙️設定 の「Googleドライブにつなぐ」でログインすると、記録があなたのGoogleドライブに自動で保存されます","機種変更のときは、新しいスマホで同じGoogleアカウントでつなぐだけ。使うのはアプリ専用の見えない場所だけで、作った人には届きません"]},
   {id:"2026-10-20q",d:"2026-10-20",t:"🎨 4コマでわかる(おためし)",L:["解説「消費減税」に、あなたのペットとホー先生の4コマまんがが入りました。むずかしい話を、短い会話でざっくりつかめます"]},
