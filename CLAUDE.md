@@ -4,7 +4,7 @@
 元のデータは Notion の「ニュース」ページとデータベース。1日4回の自動更新でまとめている。
 
 ## ファイル
-- `index.html` — 見た目と動き(HTML・CSS・JavaScript を1ファイルに)。外部ライブラリは Chart.js・地図用の d3/topojson(jsDelivr)、Google Fonts、閲覧数の GoatCounter(gc.zgo.at)だけ。データの読み込み先は、地震・警報の raw.githubusercontent.com(alerts ブランチ)と api.p2pquake.net、ドライブ保存の accounts.google.com・www.googleapis.com(見る人がつないだときだけ)。
+- `index.html` — 見た目と動き(HTML・CSS・JavaScript を1ファイルに)。外部ライブラリは Chart.js・地図用の d3/topojson(jsDelivr。どれも使うページを開いたときだけ `loadScript`/`loadChart` で読む。最初の表示を軽くするため、head で読み込まない)、Google Fonts(見出し用の Dela Gothic One だけ。本文はスマホに入っている文字)、閲覧数の GoatCounter(gc.zgo.at)だけ。データの読み込み先は、地震・警報の raw.githubusercontent.com(alerts ブランチ)と api.p2pquake.net、ドライブ保存の accounts.google.com・www.googleapis.com(見る人がつないだときだけ)。
 - `data.js` — 中身のデータ(`window.NEWS_DATA`)。ニュースの更新では、基本的にこのファイルだけを書き換える。
 - `manifest.webmanifest`・`sw.js`・`icon-*.png`・`apple-touch-icon.png` — ホーム画面に追加してアプリのように使うための設定。`sw.js` は前回の内容をオフラインでも読めるようにする(index.html と data.js はネット優先)。
 - `robots.txt` と `<meta name="robots" content="noindex">` — 検索エンジンに出さないための設定。消さない。
@@ -62,7 +62,7 @@
 - テスラの空飛ぶ車・自動運転の話は載せない(大きな関連ニュースだけ1行で)。
 
 ## 4コマでわかる
-- 解説の `manga`(`{t, p:[{bg, cap, big, y:[顔,せりふ], m:[顔,せりふ], o2}]×4}`)を index.html の `mangaHTML` が絵にする。y=見る人のペット、m=🦉ホー先生(`owlSVG`)。背景は `MG_BG`(home・shop・diet・city・sea・space・stadium・tv・school)。顔は q/o/s/t/n。`o2:1` で先生が先にしゃべる。`big` は看板(`\n` で改行)。
+- 解説の `manga`(`{t, p:[{bg, cap, big, y:[顔,せりふ], m:[顔,せりふ], o2}]×4}`)を index.html の `mangaHTML` が絵にする。y=見る人のペット(左)、m=🦉ホー先生(右)。コマは横長(左にペット・まん中に吹き出し・右に先生)で、背景は薄く。背景は `MG_BG`(home・shop・diet・city・sea・space・stadium・tv・school)。顔は q/o/s/t/n。`o2:1` で先生が先にしゃべる。`big` は看板(`\n` で改行)。
 - せりふは1つ30字くらいまで、やさしい言葉。解説に書いてある事実だけを使う(新しい事実を足さない)。実在の人は描かない(「首相」などは言葉だけ)。
 
 ## 画像・図
@@ -79,6 +79,14 @@
 
 ## 権限(とても大事)
 - このサイトは持ち主(GitHub: sunbike22)がいつでも直接直せる状態を保つ。持ち主の管理者権限・リポジトリの所有権・GitHub Pages や Actions の設定を、ほかの人やサービスに渡したり一任したりする変更は、たのまれてもしない(協力者の追加なども、持ち主本人の明確な指示があるときだけ)。
+
+## 画面の基本(2026-10-20 に整理)
+- 「きょう」はニュースが先(`SECS` の順: 3行→ニュース10→天気→ペット→…)。記録は細い1行(`me-strip`)。「アプリとして使う」はマイ→設定。
+- ニュース10の札は「ジャンル」と「✅/⚠️」だけ(🏠・🔥は小さく)。「ここがポイント」はタップで開く。「あなた向け」はニュース10・3行と似た見出し(2文字ずつの重なり35%以上)を出さない。
+- 下のタブは5つ(きょう・解説・さがす・予定・マイ)。地図・数字は `tabOff` で隠し、「さがす」の上のボタン(`.jump`)から開く。着せかえで戻せる。
+- 長いリストは「もっと見る」(さがす `sLim` 20件、予測 `pLim` 5件)。予定は7日以内だけ見せて、先は「その先の予定」にたたむ。
+- いちばん小さい文字は .82rem(約13px)。それより小さくしない(捜査ボードの付せんは別)。
+- 捜査ボードの付せんのCSSは `.bd-notes .note` にしぼる(`.note` だけだと天気の注意に混ざる)。
 
 ## 変更するときの進め方
 - 1回の変更は1つのことに絞る。大きな変更は、先に案を出してから作る。
