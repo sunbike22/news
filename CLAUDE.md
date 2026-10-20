@@ -4,7 +4,7 @@
 元のデータは Notion の「ニュース」ページとデータベース。1日4回の自動更新でまとめている。
 
 ## ファイル
-- `index.html` — 見た目と動き(HTML・CSS・JavaScript を1ファイルに)。外部ライブラリは Chart.js・地図用の d3/topojson(jsDelivr。どれも使うページを開いたときだけ `loadScript`/`loadChart` で読む。最初の表示を軽くするため、head で読み込まない)、Google Fonts(見出し用の Dela Gothic One だけ。本文はスマホに入っている文字)、閲覧数の GoatCounter(gc.zgo.at)だけ。データの読み込み先は、地震・警報の raw.githubusercontent.com(alerts ブランチ)と api.p2pquake.net、ドライブ保存の accounts.google.com・www.googleapis.com(見る人がつないだときだけ)。
+- `index.html` — 見た目と動き(HTML・CSS・JavaScript を1ファイルに)。外部ライブラリは Chart.js・地図用の d3/topojson(jsDelivr。どれも使うページを開いたときだけ `loadScript`/`loadChart` で読む。最初の表示を軽くするため、head で読み込まない)、Google Fonts(見出し用の Dela Gothic One だけ。本文はスマホに入っている文字)、閲覧数の GoatCounter(gc.zgo.at)だけ。データの読み込み先は、地震・警報の raw.githubusercontent.com(alerts ブランチ)と api.p2pquake.net、地域の天気の api.open-meteo.com(わたしの街が東京以外のときだけ)、ドライブ保存の accounts.google.com・www.googleapis.com(見る人がつないだときだけ)。
 - `data.js` — 中身のデータ(`window.NEWS_DATA`)。ニュースの更新では、基本的にこのファイルだけを書き換える。
 - `manifest.webmanifest`・`sw.js`・`icon-*.png`・`apple-touch-icon.png` — ホーム画面に追加してアプリのように使うための設定。`sw.js` は前回の内容をオフラインでも読めるようにする(index.html と data.js はネット優先)。
 - `robots.txt` と `<meta name="robots" content="noindex">` — 検索エンジンに出さないための設定。消さない。
@@ -22,6 +22,7 @@
 - index.html の `loadAlerts` は開いたとき・3分ごと・画面に戻ったときに、raw.githubusercontent.com の alert.json と P2P地震情報(api.p2pquake.net)を直接読む。帯は `#alertBand`(どのタブでも上に出る)、くわしくは `openQuake`(`#quake`)。震度5弱以上は24時間・震度3〜4は3時間だけ帯に出す。
 - 気象庁の発表は一次情報なので「2社で確認」の例外として「気象庁発表」と書く。sw.js はこの2つの取得先を保存しない。
 - 同じ見張りが、東京の1時間ごとの天気(Open-Meteo・キー不要・CC BY 4.0・48時間分)も `alert.json` の `wx` に入れる(50分に1回だけ取り直す)。アプリは天気カードの「次の6時間」(`wxStripHTML`)と「🕐 1時間ごとの天気」(`openWx`: 今日/明日、気温・降水確率・湿度・風、グラフ2つ)に使う。出典に Open-Meteo と「予報の目安」と書く。
+- 「わたしの街」(`ME.pref`)が東京以外なら、その県庁所在地(`PREF_LL`)の48時間分を、アプリが api.open-meteo.com から直接読む(`loadWxLocal`、55分に1回まで、`nw-wxl` に一時保存)。1時間ごとの天気のページで 📍わたしの街/🗼東京 を切り替え、街もそこで選べる。
 
 ## 聞いてみる(ニュース案内係)
 - 右下の💬と解説ページの「聞いてみる」は、まずアプリの中の案内係(`guideFind`)が `data.js` の解説・ことば辞典・ニュース・予定から答える。質問は外に送らない。
@@ -81,6 +82,11 @@
 
 ## 権限(とても大事)
 - このサイトは持ち主(GitHub: sunbike22)がいつでも直接直せる状態を保つ。持ち主の管理者権限・リポジトリの所有権・GitHub Pages や Actions の設定を、ほかの人やサービスに渡したり一任したりする変更は、たのまれてもしない(協力者の追加なども、持ち主本人の明確な指示があるときだけ)。
+
+## バッジ・キーワード・出典
+- バッジはレベル制(`TIERS`: クイズ満点の回数・読んだ解説・連続・開いた日・ことば・予想的中・保存・ペット)。しきい値ごとに 🥉→🥈→🥇→💎→👑→🌟→🌈(`MEDAL`)。いまのレベルは `ME.blv`、上がったらトースト。初めて動いたときは今の数でそっと合わせる(一度にたくさん出さない)。季節・ともだちなど1回きりは「記念バッジ」(`BADGES` から `TIER_OLD` を除いたもの)。
+- 🔖 わたしのキーワード(`kwCard`、`ME.kw` 10こまで): 7日分の記録(見出し・テーマ)にそのことばを含むニュースを集める。
+- ニュース10の各項目の下に「🕒 日付・報道機関」(`srcLine`): 4日以内の記録からいちばん似た見出し(`gdScore` 0.3以上)を探し、出典の社名を3つまで。
 
 ## かんたんモード / ふつうモード
 - `LOOK.mode`("easy"/"normal")。`setMode` で切り替え。モードごとに「きょうの並び・表示(order/off)」「下のタブ(tabs/tabOff)」「文字の大きさ」を `LOOK.cfg[mode]` に別々に覚える。はじめの形は `MODE_PRESET`。
