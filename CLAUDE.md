@@ -4,7 +4,7 @@
 元のデータは Notion の「ニュース」ページとデータベース。1日4回の自動更新でまとめている。
 
 ## ファイル
-- `index.html` — 見た目と動き(HTML・CSS・JavaScript を1ファイルに)。外部ライブラリは Chart.js・地図用の d3/topojson(jsDelivr)、Google Fonts、閲覧数の GoatCounter(gc.zgo.at)だけ。
+- `index.html` — 見た目と動き(HTML・CSS・JavaScript を1ファイルに)。外部ライブラリは Chart.js・地図用の d3/topojson(jsDelivr)、Google Fonts、閲覧数の GoatCounter(gc.zgo.at)だけ。データの読み込み先は、地震・警報の raw.githubusercontent.com(alerts ブランチ)と api.p2pquake.net だけ。
 - `data.js` — 中身のデータ(`window.NEWS_DATA`)。ニュースの更新では、基本的にこのファイルだけを書き換える。
 - `manifest.webmanifest`・`sw.js`・`icon-*.png`・`apple-touch-icon.png` — ホーム画面に追加してアプリのように使うための設定。`sw.js` は前回の内容をオフラインでも読めるようにする(index.html と data.js はネット優先)。
 - `robots.txt` と `<meta name="robots" content="noindex">` — 検索エンジンに出さないための設定。消さない。
@@ -15,6 +15,12 @@
 ## 長い期間のグラフ
 - `history.json` は GitHub Actions(`.github/workflows/history.yml` → `tools/fetch_history.py`)が毎朝自動で作る(FRED → 取れなければ 日経平均は日経の公式CSV・Yahoo・Stooq、円は Frankfurter。取れない系列は前回分を残す)。手で書き換えない。
 - `data.js` の `ticks` は1ドル(円)の数時間ごとの記録(Alpha Vantage のリアルタイムレート)。サイト更新のたびに1点足し、30日より古い点は消す。日経平均・原油の時間ごとのデータは無料の確かな取得先がないので扱わない。
+
+## 地震・津波・特別警報(気象庁発表)
+- `.github/workflows/alerts.yml` → `tools/fetch_alerts.py` が10分ごとに気象庁(bosai の地震 list.json・防災情報XML の extra)と P2P地震情報(津波)を見て、**alerts ブランチ**の `alert.json` に書く(main には書かない=ニュースの更新とぶつからない。いつも1コミットだけに上書き)。
+- 震度5弱以上・津波の警報/注意報・特別警報が新しく出たら ntfy で1通(昼夜とも。同じものは `sent` で2回送らない。初回の実行は送らない)。
+- index.html の `loadAlerts` は開いたとき・3分ごと・画面に戻ったときに、raw.githubusercontent.com の alert.json と P2P地震情報(api.p2pquake.net)を直接読む。帯は `#alertBand`(どのタブでも上に出る)、くわしくは `openQuake`(`#quake`)。震度5弱以上は24時間・震度3〜4は3時間だけ帯に出す。
+- 気象庁の発表は一次情報なので「2社で確認」の例外として「気象庁発表」と書く。sw.js はこの2つの取得先を保存しない。
 
 ## 聞いてみる(ニュース案内係)
 - 右下の💬と解説ページの「聞いてみる」は、まずアプリの中の案内係(`guideFind`)が `data.js` の解説・ことば辞典・ニュース・予定から答える。質問は外に送らない。
