@@ -144,7 +144,7 @@ try:
 except Exception as e:  # noqa: BLE001
     errors["special"] = f"{type(e).__name__}: {e}"[:200]
 
-# ---------- 都道府県ごとの警報(気象庁 防災情報XML。文は発表そのまま。注意報は数が多いので入れない) ----------
+# ---------- 都道府県ごとの気象庁のよびかけ(防災情報XML。文は発表そのまま。lv 2=特別警報 1=警戒 0=注意) ----------
 PREF_NAMES = ["北海道", "青森県", "岩手県", "宮城県", "秋田県", "山形県", "福島県", "茨城県", "栃木県", "群馬県", "埼玉県", "千葉県",
               "東京都", "神奈川県", "新潟県", "富山県", "石川県", "福井県", "山梨県", "長野県", "岐阜県", "静岡県", "愛知県", "三重県",
               "滋賀県", "京都府", "大阪府", "兵庫県", "奈良県", "和歌山県", "鳥取県", "島根県", "岡山県", "広島県", "山口県", "徳島県",
@@ -172,10 +172,19 @@ def warn_collect(root):
         body = (en.findtext("a:content", "", ATOM) or "")
         upd = en.findtext("a:updated", "", ATOM) or ""
         who = en.findtext("a:author/a:name", "", ATOM) or ""
-        if "警報" not in title or "警報" not in body:
+        if "警報" not in title and "注意報" not in title:
             continue
-        lv = 2 if "特別警報" in body else 1
-        if lv == 1 and re.search(r"警報[^。]*解除", body) and "発表" not in body:
+        # 気象庁は 特別警報=最大級の警戒 / 警報=「警戒してください」 / 注意報=「注意してください」と書き分けている。
+        # 発表そのものの言い方で分け、こちらで種類を決めつけない。
+        if "特別警報" in body:
+            lv = 2
+        elif "警戒" in body:
+            lv = 1
+        elif "注意" in body:
+            lv = 0
+        else:
+            continue
+        if re.search(r"(警報|注意報)[^。]*解除", body) and "ください" not in body:
             continue
         try:
             at = iso(datetime.datetime.fromisoformat(upd.replace("Z", "+00:00")))
@@ -195,7 +204,7 @@ def warn_collect(root):
         if w["who"] in seen:
             continue
         seen.add(w["who"]); keep.append(w)
-    return keep[:24]
+    return keep[:30]
 
 warn = []
 try:
