@@ -1,0 +1,32 @@
+name: サイトのバックアップを作る
+# 毎週日曜の朝と、手で動かしたときに、サイトのファイル一式(コード+データ)を GitHub の「リリース」として保存する。
+# リリースには GitHub が自動で zip を付けるので、何かあってもそこから元に戻せる。新しい8つだけ残す。
+# 持ち主のリポジトリの中だけで完結する(ほかの人やサービスに権限を渡さない)。
+on:
+  schedule:
+    - cron: "17 21 * * 6"   # 日本時間 日曜 6:17
+  workflow_dispatch:
+permissions:
+  contents: write
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - name: 記録を作る
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -e
+          D=$(TZ=Asia/Tokyo date +%Y-%m-%d-%H%M)
+          TAG="backup-$D"
+          # alerts ブランチ(地震・天気の最新)も一緒に入れておく
+          git fetch --depth=1 origin alerts:alerts 2>/dev/null && git show alerts:alert.json > alert-snapshot.json || echo '{}' > alert-snapshot.json
+          N=$(node -e 'global.window={};require("./data.js");const D=window.NEWS_DATA;console.log(D.news.length+"件のニュース・"+Object.keys(D.explainers).length+"本の解説・"+D.updatedLabel)')
+          tar czf site-backup-$D.tar.gz --exclude=.git .
+          gh release create "$TAG" site-backup-$D.tar.gz --target "$GITHUB_SHA" --title "バックアップ $D" --notes "まいにちニュース帳の自動バックアップ($N)。元に戻すときは、この版の Source code (zip) か site-backup のファイルを使います。"
+          # 古いバックアップは新しい8つを残して消す
+          gh release list --limit 100 --json tagName --jq '.[].tagName' | grep '^backup-' | sort -r | tail -n +9 | while read t; do gh release delete "$t" --yes --cleanup-tag; done
