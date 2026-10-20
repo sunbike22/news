@@ -116,6 +116,15 @@ main{padding-block:18px 32px}
 .wx-sum{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center}
 .wx-tg{align-self:flex-start}
 .wm-svg{display:block;width:100%;height:auto}
+/* 指で拡大縮小・移動できる入れもの */
+.zwrap{position:relative;overflow:hidden;touch-action:pan-y}
+.zwrap.zoomed{touch-action:none;cursor:grab}
+.zwrap > .zin{transform-origin:50% 50%;will-change:transform}
+.zc{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:8px 0 0}
+.zc .zt{font-size:.82rem;color:var(--muted);flex:1;min-width:120px}
+.zc button{min-width:42px;height:40px;padding:0 10px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font-size:1rem;font-weight:800;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.zc button.zre{font-size:.86rem}
+.zc button[disabled]{opacity:.4;cursor:default}
 .wx-top{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center}
 .wx-ic{font-size:2.6rem;line-height:1}
 .wx-place{font-size:.88rem;color:var(--muted);font-weight:700}
@@ -894,7 +903,7 @@ svg.eat{animation:petEat .7s ease both!important}
 .board-tools{display:flex;gap:6px;align-items:center;flex-wrap:wrap;position:sticky;top:calc(env(safe-area-inset-top,0px) + 70px);z-index:6;background:var(--surface);padding:4px 0}
 .bd-msg{font-size:.9rem;color:var(--muted)}
 .bd-msg.on{color:var(--ink);background:#fff4c2;border:1px solid #e9cf6a;border-radius:10px;padding:6px 10px;display:flex;gap:8px;align-items:center;flex-wrap:wrap;color:#3a2a00}
-.board-wrap{overflow:auto;max-height:62vh;border-radius:10px;-webkit-overflow-scrolling:touch;box-shadow:inset 0 0 0 6px #6b4a2b, inset 0 0 18px rgba(0,0,0,.45);overscroll-behavior:contain}
+.board-wrap{overflow:auto;touch-action:pan-x pan-y;max-height:62vh;border-radius:10px;-webkit-overflow-scrolling:touch;box-shadow:inset 0 0 0 6px #6b4a2b, inset 0 0 18px rgba(0,0,0,.45);overscroll-behavior:contain}
 .bd-sizer{position:relative}
 .board{position:absolute;left:0;top:0;transform-origin:0 0;background:#c49a62;background-image:radial-gradient(rgba(90,55,20,.35) 1px,transparent 1.6px),radial-gradient(rgba(255,240,210,.25) 1px,transparent 1.8px),radial-gradient(circle at 30% 20%,#d2a96f,#b88a52);background-size:9px 9px,13px 13px,100% 100%;background-position:0 0,4px 6px,0 0}
 .bd-map,.bd-str{position:absolute;inset:0;pointer-events:none}
@@ -3117,6 +3126,9 @@ function englishCard(){ if(!EN) return ""; const W=[]; (EN.top10||[]).forEach((e
     <ul class="enlist">${W.map(([a,b,t])=>`<li><span><b lang="en">${esc(a)}</b> = ${esc(b)}<small class="hint" style="display:block">${esc(t||"")}</small></span><button class="fchip" data-say="${esc(a)}">🔊</button></li>`).join("")}</ul></section>`; }
 // ===== お知らせ(新しくなったところ)。機能を足したら、いちばん上に1つ足す =====
 const UPDATES=[
+  {id:"2026-10-21g",d:"2026-10-21",t:"🔍 地図と捜査ボードを、指で大きくできます",L:[
+    "日本地図・世界地図・全国の天気・捜査ボードを、2本指でひろげると大きくなります(ダブルタップでも)",
+    "大きくしたあとは、指でなぞって見たいところへ動かせます。下の「＋ − もどす」でも変えられます"]},
   {id:"2026-10-21f",d:"2026-10-21",t:"📰「きょう」がスッキリしました",L:[
     "ニュース10は、はじめは見出しだけの「短く」になりました。見出しの右の「くわしく」でいつでも元にもどせます",
     "天気は1行にたたみました。「▼ くわしく」で、次の6時間・持ち物・グラフが開きます。わたしの街に気象庁の警報が出ている日は、はじめから開いています",
@@ -3280,6 +3292,77 @@ let WORLDP=null;
 function getWorld(){ if(WORLD) return Promise.resolve(WORLD); if(!WORLDP) WORLDP=(async()=>{ await loadScript("https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"); await loadScript("https://cdn.jsdelivr.net/npm/topojson-client@3.1.0/dist/topojson-client.min.js");
   const topo=await (await fetch("https://cdn.jsdelivr.net/npm/world-atlas@2.0.2/countries-50m.json")).json(); WORLD=topojson.feature(topo,topo.objects.countries); return WORLD; })().catch(e=>{ WORLDP=null; throw e; }); return WORLDP; }
 function newsItem(n){ return `<li class="item"><div class="meta"><span class="chip ${n.g}">${GN[n.g]}</span>${n.ok?'<span class="badge-ok">✅</span>':'<span class="badge-one">⚠️ 1社</span>'}<span class="hint">${mdLabel(n.d)}</span></div><div class="h">${esc(n.h)}</div></li>`; }
+// ===== 指で拡大・縮小・移動(地図と捜査ボードで共通に使う) =====
+// wrap=外のわく(はみ出しをかくす)、inner=中身(動かす)。
+// ・2本指でひろげる/つまむ=拡大縮小、2本指でなぞる=移動
+// ・大きくしているときだけ1本指でも移動できる(等倍のときはページをふつうにスクロールさせる)
+// ・ダブルタップで拡大、もう一度で元にもどる。＋ − ⟲ のボタンでも動かせる
+function zoomable(wrap,inner,opt){
+  if(!wrap||!inner) return null;
+  const o=opt||{}, MIN=o.min||1, MAX=o.max||6;
+  let s=1,tx=0,ty=0,moved=false,lastTap=0,ZC=null;
+  const pts=new Map(); let g0=null;
+  wrap.classList.add("zwrap"); inner.classList.add("zin");
+  const clamp=()=>{ s=Math.max(MIN,Math.min(MAX,s));
+    const w=wrap.clientWidth,h=wrap.clientHeight;
+    const mx=Math.max(0,(w*s-w)/2), my=Math.max(0,(h*s-h)/2);
+    tx=Math.max(-mx,Math.min(mx,tx)); ty=Math.max(-my,Math.min(my,ty)); };
+  const apply=()=>{ clamp(); inner.style.transform=`translate(${tx}px,${ty}px) scale(${s})`;
+    wrap.classList.toggle("zoomed",s>1.01);
+    if(ZC){ const zi=ZC.querySelector("[data-zin]"), zo=ZC.querySelector("[data-zout]");
+      if(zi) zi.disabled=s>=MAX-.001; if(zo) zo.disabled=s<=MIN+.001; } };
+  // (cx,cy)=わくの中での位置。そこを動かさずに倍率を ns にする
+  const zoomAt=(ns,cx,cy)=>{ const w=wrap.clientWidth,h=wrap.clientHeight;
+    const px=cx-w/2, py=cy-h/2, o1=s; ns=Math.max(MIN,Math.min(MAX,ns));
+    tx=px-(px-tx)*ns/o1; ty=py-(py-ty)*ns/o1; s=ns; apply(); };
+  const reset=()=>{ s=1;tx=0;ty=0;apply(); };
+  const rel=e=>{ const r=wrap.getBoundingClientRect(); return [e.clientX-r.left,e.clientY-r.top]; };
+
+  wrap.addEventListener("pointerdown",e=>{
+    if(o.skip&&o.skip(e)) return;
+    pts.set(e.pointerId,{x:e.clientX,y:e.clientY});
+    moved=false;
+    if(pts.size===1){
+      const t=Date.now(); if(t-lastTap<320){ const [cx,cy]=rel(e); s>1.01?reset():zoomAt(2.6,cx,cy); lastTap=0; e.preventDefault(); return; } lastTap=t; }
+    if(pts.size===2){ const [a,b]=[...pts.values()];
+      g0={d:Math.hypot(a.x-b.x,a.y-b.y)||1,mx:(a.x+b.x)/2,my:(a.y+b.y)/2,s,tx,ty}; }
+    try{ wrap.setPointerCapture(e.pointerId); }catch(_){}
+  });
+  wrap.addEventListener("pointermove",e=>{
+    const p=pts.get(e.pointerId); if(!p) return;
+    const px=p.x,py=p.y; p.x=e.clientX; p.y=e.clientY;
+    if(pts.size>=2&&g0){ const [a,b]=[...pts.values()];
+      const d=Math.hypot(a.x-b.x,a.y-b.y)||1, mx=(a.x+b.x)/2, my=(a.y+b.y)/2;
+      const r=wrap.getBoundingClientRect();
+      s=g0.s; tx=g0.tx+(mx-g0.mx); ty=g0.ty+(my-g0.my);
+      zoomAt(g0.s*d/g0.d, g0.mx-r.left, g0.my-r.top);
+      moved=true; e.preventDefault(); return; }
+    if(pts.size===1&&s>1.01){ tx+=e.clientX-px; ty+=e.clientY-py;
+      if(Math.abs(e.clientX-px)+Math.abs(e.clientY-py)>1) moved=true; apply(); e.preventDefault(); }
+  });
+  // 指をはなしたら「動かした」をすぐ消す(次のタップを飲みこまないように。click はこのあとに来る)
+  const up=e=>{ pts.delete(e.pointerId); if(pts.size<2) g0=null; if(!pts.size) setTimeout(()=>{ moved=false; },0); };
+  wrap.addEventListener("pointerup",up); wrap.addEventListener("pointercancel",up); wrap.addEventListener("pointerleave",up);
+  // 動かしたあとの指はなしを「押した」と数えない(＋−⟲のボタンは別)
+  wrap.addEventListener("click",e=>{ if(moved&&!e.target.closest(".zc")){ e.stopPropagation(); e.preventDefault(); } moved=false; },true);
+  // パソコン: Ctrl(⌘)+ホイールで拡大縮小。ふつうのホイールはページのスクロールのまま
+  wrap.addEventListener("wheel",e=>{ if(!e.ctrlKey&&!e.metaKey) return; e.preventDefault();
+    const [cx,cy]=rel(e); zoomAt(s*(e.deltaY<0?1.12:1/1.12),cx,cy); },{passive:false});
+
+  // ボタンは地図の「下」に出す(地図の上に置くと、沖縄などの表示にかぶるため)
+  const zc=document.createElement("div"); zc.className="zc";
+  zc.innerHTML='<span class="zt">'+(o.hint||"🔍 2本指でひろげると大きくなります")+'</span>'
+    +'<button type="button" data-zin aria-label="大きくする">＋</button>'
+    +'<button type="button" data-zout aria-label="小さくする">−</button>'
+    +'<button type="button" class="zre" data-zre aria-label="元の大きさにもどす">もどす</button>';
+  (o.into||wrap.parentNode).insertBefore(zc, o.into?null:wrap.nextSibling);
+  ZC=zc;
+  zc.querySelector("[data-zin]").onclick=()=>zoomAt(s*1.5,wrap.clientWidth/2,wrap.clientHeight/2);
+  zc.querySelector("[data-zout]").onclick=()=>zoomAt(s/1.5,wrap.clientWidth/2,wrap.clientHeight/2);
+  zc.querySelector("[data-zre]").onclick=reset;
+  apply();
+  return {reset,zoomAt,get scale(){return s;}};
+}
 function renderMap(){
   const recentDays=[...new Set(NEWS.map(n=>n.d))].slice(0,7);
   main.innerHTML=`<div class="view">
@@ -3318,6 +3401,7 @@ function renderMap(){
       const pick=()=>{ mapState.sel=c.id; svg.selectAll(".pin").classed("on",false); node.classed("on",true); drawList(); document.getElementById("mapList").scrollIntoView({behavior:"smooth",block:"start"}); };
       node.on("click",pick).on("keydown",ev=>{ if(ev.key==="Enter"||ev.key===" "){ ev.preventDefault(); pick(); } }); });
     el.innerHTML=""; el.appendChild(svg.node());
+    zoomable(el,svg.node(),{max:8,hint:"🔍 2本指でひろげると拡大(ダブルタップでも)。大きくしたら指でなぞって動かせます"});
     if(!mapState.sel && cl[0]) mapState.sel=cl[0].id;
     function drawList(){ const box=document.getElementById("mapList"); if(!box) return; const c=cl.find(x=>x.id===mapState.sel);
       const chips=`<div class="map-chips">${cl.map(x=>`<button class="fchip" data-cl="${x.id}" aria-pressed="${x.id===mapState.sel}">${esc(x.name.replace(/\(.*?\)/,""))} <b>${x.n}</b></button>`).join("")}</div>`;
@@ -3345,7 +3429,7 @@ function renderBoard(recentDays){
     <div class="board-wrap" id="bdWrap"><div class="bd-sizer" id="bdSizer"><div class="board" id="board"><div class="empty" style="padding:40px">ボードを用意しています…</div></div></div></div>
     <div class="bd-pet" id="bdPet"></div>
     <div id="bdDetail" class="bd-detail"></div>`;
-  const hint=main.querySelector(".mapbox + .hint"); if(hint) hint.textContent="赤い糸=同じテーマのニュース。黄色い糸=あなたがつないだ糸。📝のメモと黄色い糸は、このスマホの中だけに保存されます。場所とテーマは見出しのことばから自動で決めています。";
+  const hint=main.querySelector(".mapbox + .hint"); if(hint) hint.innerHTML="🔍 2本指でひろげると大きくなります。板はそのまま指でなぞって動かせます。<br>赤い糸=同じテーマのニュース。黄色い糸=あなたがつないだ糸。📝のメモと黄色い糸は、このスマホの中だけに保存されます。場所とテーマは見出しのことばから自動で決めています。";
   const ml=document.getElementById("mapList"); if(ml) ml.innerHTML="";
   const items=NEWS.filter(n=>recentDays.includes(n.d)).map(n=>({n,p:placeOf(n)})).filter(x=>x.p);
   const JP=[0,139.75,36.2,"日本"]; const G={}; const inJP=pp=>pp[1]>122&&pp[1]<147&&pp[2]>24&&pp[2]<46; const isJ=BD.area==="japan";
@@ -3378,9 +3462,28 @@ function renderBoard(recentDays){
       <div class="bd-notes"></div><svg class="bd-str" viewBox="0 0 ${BW} ${BH}" width="${BW}" height="${BH}" aria-hidden="true"></svg>`;
     bd.style.width=BW+"px"; bd.style.height=BH+"px";
     const wrap=document.getElementById("bdWrap"), sizer=document.getElementById("bdSizer"), msg=document.getElementById("bdMsg"), det=document.getElementById("bdDetail");
-    const setZ=z=>{ const cx=(wrap.scrollLeft+wrap.clientWidth/2)/BD.z, cy=(wrap.scrollTop+wrap.clientHeight/2)/BD.z; BD.z=z; bd.style.transform=`scale(${z})`; sizer.style.width=BW*z+"px"; sizer.style.height=BH*z+"px"; wrap.scrollLeft=cx*z-wrap.clientWidth/2; wrap.scrollTop=cy*z-wrap.clientHeight/2;
-      document.querySelectorAll("#bdTools [data-z]").forEach(b=>b.setAttribute("aria-pressed",String(+b.dataset.z===z))); };
+    const BZMIN=0.3, BZMAX=2.2;
+    // (ax,ay)=わくの中のどこを動かさずに大きさを変えるか。ふだんは真ん中
+    const setZ=(z,ax,ay)=>{ z=Math.max(BZMIN,Math.min(BZMAX,z));
+      if(ax==null){ ax=wrap.clientWidth/2; ay=wrap.clientHeight/2; }
+      const cx=(wrap.scrollLeft+ax)/BD.z, cy=(wrap.scrollTop+ay)/BD.z;
+      BD.z=z; bd.style.transform=`scale(${z})`; sizer.style.width=BW*z+"px"; sizer.style.height=BH*z+"px";
+      wrap.scrollLeft=cx*z-ax; wrap.scrollTop=cy*z-ay;
+      document.querySelectorAll("#bdTools [data-z]").forEach(b=>b.setAttribute("aria-pressed",String(Math.abs(+b.dataset.z-z)<.02))); };
     document.querySelectorAll("#bdTools [data-z]").forEach(b=>b.onclick=()=>setZ(+b.dataset.z));
+    // 2本指でひろげる/つまむ(メモを指で動かすのとぶつからないよう、2本指のときだけ)
+    (()=>{ const pts=new Map(); let g0=null;
+      wrap.addEventListener("pointerdown",e=>{ pts.set(e.pointerId,{x:e.clientX,y:e.clientY});
+        if(pts.size===2){ const [a,b]=[...pts.values()]; const r=wrap.getBoundingClientRect();
+          g0={d:Math.hypot(a.x-b.x,a.y-b.y)||1,z:BD.z,ax:(a.x+b.x)/2-r.left,ay:(a.y+b.y)/2-r.top}; } },{passive:true});
+      wrap.addEventListener("pointermove",e=>{ const p=pts.get(e.pointerId); if(!p) return; p.x=e.clientX; p.y=e.clientY;
+        if(pts.size>=2&&g0){ const [a,b]=[...pts.values()]; const d=Math.hypot(a.x-b.x,a.y-b.y)||1;
+          setZ(g0.z*d/g0.d,g0.ax,g0.ay); e.preventDefault(); } },{passive:false});
+      const up=e=>{ pts.delete(e.pointerId); if(pts.size<2) g0=null; };
+      wrap.addEventListener("pointerup",up); wrap.addEventListener("pointercancel",up); wrap.addEventListener("pointerleave",up);
+      wrap.addEventListener("wheel",e=>{ if(!e.ctrlKey&&!e.metaKey) return; e.preventDefault(); const r=wrap.getBoundingClientRect();
+        setZ(BD.z*(e.deltaY<0?1.12:1/1.12), e.clientX-r.left, e.clientY-r.top); },{passive:false});
+      })(); // 大きさのボタンは上の「小・中・大」がそのまま使える(ボタンを増やさない)
     const show=()=>{ drawNotes(); drawStrings(); bindNotes(); detail(); };
     function centerOn(n){ wrap.scrollTo({left:(n.x+n.w/2)*BD.z-wrap.clientWidth/2, top:(n.y+n.h/2)*BD.z-wrap.clientHeight/2, behavior:"smooth"}); }
     function detail(){ const n=BD.sel&&find(BD.sel); if(!n){ det.innerHTML=`<p class="hint" style="margin:0">${groups.length}か所 ・ 赤い糸 ${auto.filter(e=>!e.weak).length}本${auto.some(e=>e.weak)?` ・ 茶色の点線(同じジャンル) ${auto.filter(e=>e.weak).length}本`:""}${B.links.length?` ・ 黄色い糸 ${B.links.length}本`:""}。メモをタップしてね。</p>`; return; }
@@ -3400,7 +3503,7 @@ function renderBoard(recentDays){
       BD.sel = BD.sel===id ? null : id; show(); }
     function bindNotes(){ bd.querySelectorAll(".note").forEach(el=>{ const id=el.dataset.id; const u=B.notes.find(x=>x.id===id);
       if(!u){ el.onclick=()=>tapNote(id); return; }
-      let st=null; el.onpointerdown=e=>{ st={x:e.clientX,y:e.clientY,ox:u.x,oy:u.y,moved:false}; el.setPointerCapture(e.pointerId); };
+      let st=null; el.onpointerdown=e=>{ st={x:e.clientX,y:e.clientY,ox:u.x,oy:u.y,moved:false}; try{ el.setPointerCapture(e.pointerId); }catch(_){} };
       el.onpointermove=e=>{ if(!st) return; const dx=(e.clientX-st.x)/BD.z, dy=(e.clientY-st.y)/BD.z; if(Math.abs(dx)+Math.abs(dy)>6) st.moved=true; if(!st.moved) return; e.preventDefault(); u.x=Math.max(4,Math.min(BW-134,st.ox+dx)); u.y=Math.max(14,Math.min(BH-82,st.oy+dy)); el.style.left=u.x+"px"; el.style.top=u.y+"px"; drawStrings(); };
       el.onpointerup=()=>{ if(!st) return; const mv=st.moved; st=null; if(mv) saveMe(); else tapNote(id); };
       el.onkeydown=e=>{ if(e.key==="Enter") tapNote(id); }; }); }
@@ -3495,6 +3598,7 @@ function openWxMap(day){ const M=AL.wxmap; const sh=document.getElementById("she
       return `${isNaha?`<rect x="${W-82}" y="${H-80}" width="78" height="74" rx="8" class="wm-inset"/><text x="${W-43}" y="${H-64}" text-anchor="middle" class="wm-inset-n" style="font-size:9.5px;font-weight:700">沖縄</text>`:`<circle cx="${px}" cy="${py}" r="3" class="wm-dot"/>${Math.hypot(dx,dy)>20?`<line x1="${px}" y1="${py}" x2="${bx+33}" y2="${by+16}" class="wm-ln"/>`:""}`}
         <g transform="translate(${bx},${by})" class="wm-l"><rect width="66" height="36" rx="8"/><text x="33" y="13" text-anchor="middle" class="wm-n">${esc(c[0])}</text><text x="12" y="31" text-anchor="middle" class="wm-i">${wmoIcon(x[0])}</text><text x="42" y="31" text-anchor="middle" class="wm-t" textLength="38" lengthAdjust="spacingAndGlyphs"><tspan fill="${tempColor(x[1])}">${Math.round(x[1])}</tspan><tspan class="wm-s">/</tspan><tspan fill="#3b82f6">${Math.round(x[2])}</tspan></text></g>`; }).join("");
     box.innerHTML=`<svg viewBox="0 0 ${W} ${H}" class="wm-svg" preserveAspectRatio="xMidYMid meet" role="img" aria-label="全国の天気の地図">${jp.map(f=>`<path d="${path(f)}" class="wm-land"/>`).join("")}${lab}</svg>`;
+    zoomable(box,box.querySelector("svg"),{max:6});
   }).catch(()=>{ const box=document.getElementById("wxMapBox"); if(box) box.innerHTML='<div class="empty">地図を読み込めませんでした。下の一覧を見てください。</div>'; }); }
 document.addEventListener("click",ev=>{ if(ev.target.closest("[data-wxmap]")) openWxMap(0); });
 document.addEventListener("toggle",ev=>{ if(ev.target&&ev.target.id==="wxNotes") wxNotesOpen=ev.target.open; },true);
