@@ -4,7 +4,7 @@
 元のデータは Notion の「ニュース」ページとデータベース。1日4回の自動更新でまとめている。
 
 ## ファイル
-- `index.html` — 見た目と動き(HTML・CSS・JavaScript を1ファイルに)。外部ライブラリは Chart.js・地図用の d3/topojson(jsDelivr)、Google Fonts、閲覧数の GoatCounter(gc.zgo.at)だけ。データの読み込み先は、地震・警報の raw.githubusercontent.com(alerts ブランチ)と api.p2pquake.net だけ。
+- `index.html` — 見た目と動き(HTML・CSS・JavaScript を1ファイルに)。外部ライブラリは Chart.js・地図用の d3/topojson(jsDelivr)、Google Fonts、閲覧数の GoatCounter(gc.zgo.at)だけ。データの読み込み先は、地震・警報の raw.githubusercontent.com(alerts ブランチ)と api.p2pquake.net、ドライブ保存の accounts.google.com・www.googleapis.com(見る人がつないだときだけ)。
 - `data.js` — 中身のデータ(`window.NEWS_DATA`)。ニュースの更新では、基本的にこのファイルだけを書き換える。
 - `manifest.webmanifest`・`sw.js`・`icon-*.png`・`apple-touch-icon.png` — ホーム画面に追加してアプリのように使うための設定。`sw.js` は前回の内容をオフラインでも読めるようにする(index.html と data.js はネット優先)。
 - `robots.txt` と `<meta name="robots" content="noindex">` — 検索エンジンに出さないための設定。消さない。
@@ -31,6 +31,7 @@
 - 連続日数・読んだ解説・クイズ・調べたことば・予想・関心のジャンルは、見る人のブラウザの localStorage(キー `nw-me`)だけに保存する。サーバーや外部には送らない。
 - 📍で保存したニュースとメモも `nw-me` の `pins` に入る(見る人のスマホの中だけ)。
 - 記録の引っこし(マイ→設定、`backupHTML`・`bakMake`・`bakParse`): `nw-` で始まるキーを全部まとめてファイル(JSON)かコード(`NWK1:`+base64)にする。読み込む前の記録は `nwbak-prev` に残し、もどせる。最後に保存した日は `nw-bak-at`(30日たつと設定タブに赤い点)。サーバーには送らない。新しく localStorage のキーを足すときは `nw-` で始めると自動で引っこしに入る。
+- ☁️ Googleドライブに自動保存(`gdHTML`・`gdUpload`・`gdDirty`): 見る人がGoogleでログインしたときだけ、その人**自身の**Googleドライブの appDataFolder に `mainichi-kiroku.json`(`bakMake` の中身)を保存する。持ち主のサーバーには何も送らない。権限は `drive.appdata` だけ。ログイン部品 accounts.google.com/gsi/client は押したときだけ読む。クライアントIDは `GD_CLIENT`(Google Cloud のプロジェクト mainichi-news、持ち主のアカウント)。トークンは `gdrv-tok`(引っこしに入れない)、オン/最後の保存は `nw-gd`。`store.set` で `nw-` が変わると15秒後と画面を閉じたときに保存。ログインが切れたら上に「☁️ 自動保存を続ける」(`#gdBar`)。sw.js はGoogleへの通信を保存しない。
 - 例外: 閲覧数の集計(index.html の `STATS`)。2026-10-20 からオン(GoatCounter、code は `subikep22`、管理画面 https://subikep22.goatcounter.com、スクリプトは gc.zgo.at)。送るのは画面・解説・ジャンルごとの回数だけ(`track()`)。質問文・メモ・記録は送らない。オンにするときは使い方の「記録について」に自動で一文が出る。
 - ペット(`ME.pet`): 育ち(そだち)は ごはん×5+開いた日×2+読んだ解説×3+調べたことば で計算。クイズの正解1問=ごはん1こ(1日8こまで、同じ問題は1回だけ)。小物は `PET_ACC`(よく読むジャンル)、段階は `PET_STAGES`。絵は自作SVG(`petSVG`)。おかわりクイズは ことば辞典から毎日3問(`wordQuiz`)。
 - ペットの着せかえは `WEAR`(服・着られる条件)、部屋は `ROOM`(よく読むジャンルで家具)、日記は `diaryHTML`(直近7日)、ともだち(2匹目)は `friendOn`(おとな または 14日)。使った機能の目印は `ME.flags`。
