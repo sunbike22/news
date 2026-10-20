@@ -121,6 +121,30 @@ main{padding-block:18px 32px}
 .wx-kit{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:.92rem}
 .wx-kit b{font-weight:800}
 .badge-ok.tap,.badge-one.tap{cursor:pointer;text-decoration:underline dotted;text-underline-offset:2px}
+.ten.short li>button>span>p,.ten.short .srcl,.ten.short .pt,.ten.short .ill,.ten.short .enb{display:none}
+.ten.short li{padding-top:8px;padding-bottom:8px}
+.len-seg{margin-left:auto}
+.cast{list-style:none;margin:8px 0 0;padding:0;display:flex;flex-direction:column;gap:8px}
+.cast li{display:flex;gap:10px;align-items:flex-start;background:var(--surface2);border:1px solid var(--line);border-radius:12px;padding:9px 11px}
+.cast .ci{font-size:1.5rem;line-height:1.2}
+.cast b{display:block;font-size:1rem}.cast small{display:block;color:var(--muted);font-size:.9rem;line-height:1.6;margin-top:2px}
+.hard{font-weight:700}.hard.ok{color:var(--ok)}.hard.warn{color:var(--warn)}
+.htl-i.fresh .htl-t{background:var(--ok-soft);border-radius:8px}
+.tl li.fresh{background:var(--ok-soft);border-radius:8px;padding:4px 6px}
+.tl-new{font-style:normal;font-size:.9em}
+.w-say{margin-left:auto;background:transparent;border:1px solid var(--line);border-radius:999px;width:32px;height:32px;cursor:pointer;font-size:1rem;flex:0 0 auto}
+.w .wt{display:flex;align-items:center;gap:6px}
+.chat-go{align-self:flex-start;padding:9px 14px;border-radius:999px;border:1px solid var(--accent);background:var(--accent-soft);color:var(--accent);font-weight:800;cursor:pointer}
+.chat{display:flex;flex-direction:column;gap:10px;margin-top:4px}
+.cb{display:flex;gap:8px;align-items:flex-end}
+.cb.y{flex-direction:row}.cb.m{flex-direction:row-reverse}
+.cb .ca{flex:0 0 auto;width:34px;height:34px}
+.cb p{margin:0;max-width:78%;padding:10px 13px;border-radius:16px;line-height:1.75;font-size:.98rem}
+.cb.y p{background:var(--surface2);border:1px solid var(--line);border-bottom-left-radius:5px}
+.cb.m p{background:var(--accent-soft);border:1px solid var(--accent);border-bottom-right-radius:5px}
+.chat-btns{display:flex;gap:8px;align-items:center;margin-top:12px;position:sticky;bottom:8px}
+.chat{padding-bottom:6px}
+.ex-acts{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .wx-kit .kit{display:inline-flex;align-items:center;gap:3px;background:var(--surface2);border:1px solid var(--line);border-radius:999px;padding:2px 9px;font-weight:700}
 .wx-kit .kit i{font-style:normal;font-size:1.05rem}
 .wx-warn{display:flex;flex-direction:column;gap:2px;background:var(--warn-soft);border:1px solid var(--warn);border-radius:12px;padding:9px 11px;cursor:pointer}
@@ -1268,8 +1292,8 @@ function renderToday(){
       <button class="fchip" id="shareImg" style="margin-top:10px">🖼️ 画像にして送る</button>
     </section>`;
   S.ten=`<section aria-label="今日のニュース10">
-      <div class="sec-h"><h2>📰 今日のニュース10</h2><span class="sub">✅=2社以上で確認</span></div>
-      <ol class="ten" style="margin-top:10px">${t.map((n,i)=>{
+      <div class="sec-h"><h2>📰 今日のニュース10</h2><span class="seg len-seg" role="group" aria-label="長さ">${[["short","短く"],["full","くわしく"]].map(([k,l])=>`<button data-len="${k}" aria-pressed="${(LOOK.len||"full")===k}">${l}</button>`).join("")}</span></div>
+      <ol class="ten${(LOOK.len||"full")==="short"?" short":""}" style="margin-top:10px">${t.map((n,i)=>{
         const big=i<3; const link=n.ex||n.tab; const wt=newsWeight(n); const mine=isLocal(n.title+" "+(n.text||""));
         return `<li class="${big?'big':''} w${wt.lv}${mine?' mytown':''}">${pinBtn({k:"t|"+n.title,h:n.title,g:n.g,d:(NEWS[0]||{}).d,ex:n.ex},"abs")}<button class="row${link?' link':''}"${n.ex?` data-ex="${n.ex}"`:''}${n.tab?` data-tab="${n.tab}"`:''} ${link?'':'tabindex="-1"'}>
           <span class="rank">${i+1}</span>
@@ -1538,26 +1562,27 @@ function mangaHTML(m){ if(!m||!(m.p||[]).length) return ""; const st=petStage();
 function openEx(k){
   if(D.explainers[k]) track("/ex/"+k,"解説: "+D.explainers[k].name);
   const e=D.explainers[k]; if(!e) return; const sh=document.getElementById("sheet");
-  if(!ME.readEx[k]) learn(e.g,2); ME.readEx[k]=TODAY; saveMe(); setTimeout(checkBadges,800);
+  if(!ME.readEx[k]) learn(e.g,2); const seenAt=ME.readEx[k]; ME.readEx[k]=TODAY; saveMe(); setTimeout(checkBadges,800);
   const rel = NEWS.filter(n=>{ const map={saudi:"サウジ・中東",tax:"消費減税",cyber:"不正アクセスとAI"}; if(map[k]) return (n.th||"").includes(map[k]); if(k==="sato") return /佐藤輝明/.test(n.h); if(k==="series") return /日本シリーズ|CS/.test(n.h); if(k==="yokohama") return /横浜市長/.test(n.h); if(k==="past") return n.d<"2026-10-04"; return false; }).slice(0,8);
   const flow = e.flow.map((f,i)=>`${i>0?`<div class="farrow">⬇️ ${f.via?`<b>${esc(f.via)}</b>`:""}</div>`:""}<div class="fstep"><span class="fi">${f.i}</span><span><b>${esc(f.t)}</b>${f.s?`<small>${esc(f.s)}</small>`:""}</span></div>`).join("");
   sh.innerHTML=`<div class="bar"><div class="wrap"><button class="iconbtn" id="shx" aria-label="もどる">← もどる</button><span class="ttl">${e.icon} ${esc(e.name)}</span>${pinBtn({k:"ex|"+k,h:"解説: "+e.name,g:e.g,d:TODAY,ex:k},"iconbtn")}<button class="iconbtn" id="shshare" aria-label="このページのリンクをコピー">🔗 共有</button></div></div>
   <div class="wrap body">
-    <div class="hint">最終更新 ${esc(e.updated)} ・ ⏱️ 全部で約${e.min}分 ・ 点線のことばはタップで意味が出ます</div>
+    <div class="hint">最終更新 ${esc(e.updated)} ・ ⏱️ 全部で約${e.min}分 ・ ${hardChip(e)} ・ 点線のことばはタップで意味が出ます</div>
+    <div class="ex-acts"><button class="chat-go" id="exChat">💬 話しながら読む</button><button class="fchip" id="exSpeak">🔊 聞く</button></div>
     ${PHOTOS[k]?photoBlock(k):ILL[k]?`<div><div class="ill">${ILL[k]}</div><div class="credit">イラスト: 自作(イメージ)</div></div>`:""}
-    <button class="fchip" id="exSpeak" style="align-self:flex-start">🔊 聞く</button>
     <div class="kid"><div class="l">🧒 ひとことで言うと</div><h2>${esc(e.kid)}</h2>${EN&&EN.ex&&EN.ex[k]&&langMode()!=="ja"?`<p class="enx" lang="en" style="margin:6px 0 0">${esc(EN.ex[k])} <span class="ensay" role="button" tabindex="0" data-say="${esc(EN.ex[k])}">🔊</span></p>`:""}</div>
     ${mangaHTML(e.manga)}
     <div class="blk"><h3>💡 もう少しくわしく</h3><p><b>${glossify(esc(e.more[0]))}</b></p><p style="margin-top:6px">${glossify(esc(e.more[1]))}</p></div>
+    ${castBlock(e)}
     ${e.stats?`<div class="stats">${e.stats.map(([k2,v])=>`<div class="stat"><div class="v num">${esc(v)}</div><div class="k">${esc(k2)}</div></div>`).join("")}</div>`:""}
     <div class="blk"><h3>🖼️ 動く図でわかる <button class="fplay" id="fplay">▶ もう一度</button></h3><div class="flow" id="flow">${flow}</div></div>
     ${e.calc?calcBlock():""}
     <div class="blk"><h3>🙋 わたしたちへの影響</h3><ul class="us">${e.us.map(u=>`<li>${glossify(bold(u))}</li>`).join("")}</ul></div>
     <div class="blk"><h3>❓ よくある疑問</h3>${e.faq.map(([q,a],i)=>`<details class="faq"${i===0?" open":""}><summary>${esc(q)}</summary><p>${glossify(esc(a))}</p></details>`).join("")}</div>
     <div class="blk"><h3>📅 これまでの流れ</h3>
-      <div class="htl-wrap" aria-label="年表(横にスクロール)"><div class="htl">${e.timeline.map(([d,t],i)=>`<div class="htl-i${i===e.timeline.length-1?" now":""}"><span class="htl-d">${esc(d)}</span><span class="htl-dot"></span><span class="htl-t">${esc(t)}</span></div>`).join("")}${(e.next||[]).slice(0,3).map(x=>{ const t=Array.isArray(x)?x.join(" "):String(x); const m=t.match(/^(\S+)\s+(.*)$/); return `<div class="htl-i fut"><span class="htl-d">${esc(m?m[1]:"これから")}</span><span class="htl-dot"></span><span class="htl-t">${esc(m?m[2]:t)}</span></div>`; }).join("")}</div></div>
+      <div class="htl-wrap" aria-label="年表(横にスクロール)"><div class="htl">${e.timeline.map(([d,t],i)=>`<div class="htl-i${i===e.timeline.length-1?" now":""}${isNewTl(d,seenAt)?" fresh":""}"><span class="htl-d">${esc(d)}${isNewTl(d,seenAt)?' <i class="tl-new">🆕</i>':""}</span><span class="htl-dot"></span><span class="htl-t">${esc(t)}</span></div>`).join("")}${(e.next||[]).slice(0,3).map(x=>{ const t=Array.isArray(x)?x.join(" "):String(x); const m=t.match(/^(\S+)\s+(.*)$/); return `<div class="htl-i fut"><span class="htl-d">${esc(m?m[1]:"これから")}</span><span class="htl-dot"></span><span class="htl-t">${esc(m?m[2]:t)}</span></div>`; }).join("")}</div></div>
       <div class="hint">← 横にスクロールできます。点線の先は「これからの予定」</div>
-      <details class="faq plain"><summary>リストで見る</summary><ol class="tl">${e.timeline.map(([d,t])=>`<li><b>${esc(d)}</b>${esc(t)}</li>`).join("")}</ol></details></div>
+      <details class="faq plain"><summary>リストで見る</summary><ol class="tl">${e.timeline.map(([d,t])=>`<li${isNewTl(d,seenAt)?' class="fresh"':""}><b>${esc(d)}</b>${esc(t)}${isNewTl(d,seenAt)?' <i class="tl-new">🆕</i>':""}</li>`).join("")}</ol></details></div>
     ${e.next.length?`<div class="blk"><h3>🔭 次の山場</h3><ul class="us">${e.next.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>`:""}
     ${rel.length?`<div class="blk"><h3>🗞️ 関係するニュースの記録</h3><div class="res"><ul style="list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px">${rel.map(n=>`<li class="item"><div class="meta"><span class="hint">${mdLabel(n.d)}</span>${n.ok?'<span class="badge-ok">✅</span>':'<span class="badge-one">⚠️ 1社</span>'}</div><div class="h">${esc(n.h)}</div></li>`).join("")}</ul></div></div>`:""}
     ${askBlock(k)}
@@ -1576,8 +1601,51 @@ function openEx(k){
     try{ navigator.clipboard.writeText(url).then(done,()=>{prompt2(url);}); }catch(_){ prompt2(url); } };
   if(e.calc) bindCalc();
   sh.querySelector("#exSpeak").onclick=ev=>speakEx(k,ev.currentTarget);
+  const ec=sh.querySelector("#exChat"); if(ec) ec.onclick=()=>openExChat(k);
   bindAsk(k);
 }
+// ===== 👥 だれが出てくる?(解説に書いてあることだけを、名札の形にしたもの) =====
+// ===== 💬 ホー先生と話しながら読む(解説に書いてある文だけを、会話の形で順に出す) =====
+function chatScript(k){ const e=D.explainers[k]; if(!e) return []; const L=[];
+  const say=(w,t)=>{ t=String(t||"").replace(/\*\*/g,"").trim(); if(t) L.push([w,t]); };
+  say("y",`${e.name}って、どういうこと?`); say("m",e.kid);
+  say("y","もう少しくわしく教えて!"); (e.more||[]).forEach(x=>say("m",x));
+  if((e.cast||[]).length){ say("y","だれが出てくるの?"); e.cast.forEach(([i,n,r])=>say("m",`${i} ${n} … ${r}`)); }
+  say("y","わたしに関係ある?"); (e.us||[]).forEach(x=>say("m",x));
+  (e.faq||[]).forEach(([q,a])=>{ say("y",q); say("m",a); });
+  if((e.next||[]).length){ say("y","これからどうなるの?"); (e.next||[]).forEach(x=>say("m",Array.isArray(x)?x.join(" "):x)); }
+  say("y","わかった!ありがとう先生"); say("m","いつでも聞きにおいで。もっと知りたいときは、解説のページも見てみてね。");
+  return L; }
+function openExChat(k){ const e=D.explainers[k]; if(!e) return; const L=chatScript(k); let n=1; const sh=document.getElementById("sheet");
+  const bub=(w,t)=>`<div class="cb ${w}">${w==="m"?`<span class="ca" aria-hidden="true">${owlSVG("n",34)}</span>`:`<span class="ca" aria-hidden="true">${petSVG(petStage().i,"s",null,34,petWear())}</span>`}<p>${w==="m"?glossify(esc(t)):esc(t)}</p></div>`;
+  const draw=()=>{ const box=sh.querySelector("#cbox"); if(!box) return;
+    box.innerHTML=L.slice(0,n).map(([w,t])=>bub(w,t)).join("");
+    const more=sh.querySelector("#cmore"); const all=sh.querySelector("#call");
+    if(n>=L.length){ if(more) more.textContent="📖 解説のページで読む"; if(more) more.dataset.done="1"; if(all) all.hidden=true; }
+    box.lastElementChild&&box.lastElementChild.scrollIntoView({block:"nearest"}); };
+  sh.innerHTML=`<div class="bar"><div class="wrap"><button class="iconbtn" id="cbx" aria-label="もどる">← もどる</button><span class="ttl">💬 ${esc(e.name)}</span></div></div><div class="wrap body">
+    <p class="hint">ホー先生が、解説に書いてあることだけを順に話します。新しいことは足しません。</p>
+    <div class="chat" id="cbox"></div>
+    <div class="chat-btns"><button class="chat-go" id="cmore">つづき ▶</button><button class="fchip" id="call">ぜんぶ見る</button></div></div>`;
+  sh.hidden=false; sh.scrollTop=0; document.body.style.overflow="hidden"; draw();
+  const close=()=>{ sh.hidden=true; sh.innerHTML=""; document.body.style.overflow=""; };
+  sh.querySelector("#cbx").onclick=close;
+  sh.querySelector("#cmore").onclick=ev=>{ if(ev.currentTarget.dataset.done){ close(); openEx(k); return; } n=Math.min(L.length,n+1); draw(); };
+  sh.querySelector("#call").onclick=()=>{ n=L.length; draw(); };
+  track("/ex/"+k+"/chat","チャットで読む"); }
+// 年表の「前に読んだあとに増えた分」。日付は 10/20 の形なので、今年の日付に直してくらべる
+function mdIso(md){ const m=/^(\d{1,2})\/(\d{1,2})/.exec(String(md||"")); if(!m) return null;
+  const y=+TODAY.slice(0,4); const iso=`${y}-${String(+m[1]).padStart(2,"0")}-${String(+m[2]).padStart(2,"0")}`; return iso>TODAY?`${y-1}${iso.slice(4)}`:iso; }
+function isNewTl(md,seenAt){ if(!seenAt) return false; const i=mdIso(md); return !!i&&i>seenAt; }
+function castBlock(e){ if(!e.cast||!e.cast.length) return "";
+  return `<div class="blk"><h3>👥 だれが出てくる?</h3><ul class="cast">${e.cast.map(([i,n,r])=>`<li><span class="ci" aria-hidden="true">${i}</span><span><b>${esc(n)}</b><small>${esc(r)}</small></span></li>`).join("")}</ul></div>`; }
+// ===== 📏 ことばのむずかしさ(漢字の多さと、ことば辞典に入っている語の数からの目安) =====
+function hardLevel(e){ const t=[e.kid,(e.more||[]).join(""),(e.us||[]).join("")].join("");
+  if(!t) return 1; const kan=(t.match(/[\u4E00-\u9FFF]/g)||[]).length/t.length;
+  let hit=0; try{ D.glossary.forEach(w=>{ if(t.includes(w[0])) hit++; }); }catch(_){}
+  const sc=kan*10+hit*0.6; return sc<3.4?0:sc<4.6?1:2; }
+function hardChip(e){ const L=[["やさしい","ok"],["ふつう",""],["むずかしい","warn"]][hardLevel(e)];
+  return `<span class="hard ${L[1]}" title="漢字の多さと、むずかしいことばの数からの目安です">📏 ${L[0]}</span>`; }
 function animateFlow(){
   const f=document.getElementById("flow"); if(!f) return; const items=[...f.children];
   if(matchMedia("(prefers-reduced-motion: reduce)").matches){ f.classList.remove("anim"); return; }
@@ -1832,7 +1900,7 @@ function renderPlan(){ pLim=5;
 function voteRow(p){ const v=ME.votes[p.no]&&ME.votes[p.no].v; return `<span class="r vote">あなたは? <button class="fchip" data-vote="yes" data-no="${esc(p.no)}" aria-pressed="${v==="yes"}">⭕ 当たる</button><button class="fchip" data-vote="no" data-no="${esc(p.no)}" aria-pressed="${v==="no"}">❌ 外れる</button></span>`; }
 
 // ===== ことば =====
-function wordCard(w){ return `<div class="w"><div class="wt">${esc(w[0])} <span class="chip ${w[4]}">${GN[w[4]]}</span></div><div class="wy">${esc(w[1])}</div><p>${esc(w[2])}</p>${w[3]?`<div class="ex">たとえば: ${esc(w[3])}</div>`:""}</div>`; }
+function wordCard(w){ return `<div class="w"><div class="wt">${esc(w[0])} <span class="chip ${w[4]}">${GN[w[4]]}</span><button class="w-say" data-sayj="${esc(w[0]+"。"+w[1]+"。"+w[2])}" aria-label="${esc(w[0])}を読み上げる">🔊</button></div><div class="wy">${esc(w[1])}</div><p>${esc(w[2])}</p>${w[3]?`<div class="ex">たとえば: ${esc(w[3])}</div>`:""}</div>`; }
 function renderWords(){
   main.innerHTML=`<div class="view">
     <div class="sec-h"><h2>📖 ことば辞典</h2><span class="sub">${D.glossary.length}語</span></div>
@@ -2743,8 +2811,11 @@ function langMode(){ return EN?(LOOK.lang||"ja"):"ja"; }
 function enOf(kind,i){ if(!EN) return null; const L=EN[kind]; return L&&L[i]?L[i]:null; }
 function enBlock(e){ if(!e||langMode()==="ja") return ""; return `<span class="enb" lang="en"><span class="ent">${esc(e.t||"")}</span>${e.x?`<span class="enx">${esc(e.x)}</span>`:""}${(e.w||[]).length?`<span class="enw">${e.w.map(([a,b])=>`<i>📘 ${esc(a)} = ${esc(b)}</i>`).join("")}</span>`:""}<span class="ensay" role="button" tabindex="0" data-say="${esc((e.t||"")+". "+(e.x||""))}">🔊 English</span></span>`; }
 function langSeg(){ if(!EN) return ""; const m=langMode(); return `<span class="seg lang-seg" role="group" aria-label="ことば">${[["ja","日本語"],["both","日+英"],["en","English"]].map(([k,l])=>`<button data-lang="${k}" aria-pressed="${m===k}">${l}</button>`).join("")}</span>`; }
+function sayJa(t){ try{ const s=window.speechSynthesis; if(!s) return; s.cancel(); const u=new SpeechSynthesisUtterance(t); u.lang="ja-JP"; u.rate=.95; s.speak(u); }catch(_){} }
 function sayEn(t){ try{ const s=window.speechSynthesis; if(!s) return; s.cancel(); const u=new SpeechSynthesisUtterance(t); u.lang="en-US"; u.rate=.9; s.speak(u); }catch(_){} }
-document.addEventListener("click",e=>{ const b=e.target.closest("[data-say]"); if(b){ e.preventDefault(); e.stopPropagation(); sayEn(b.dataset.say); track("/en/say","英語の読み上げ"); return; }
+document.addEventListener("click",e=>{ const sj=e.target.closest("[data-sayj]"); if(sj){ e.preventDefault(); e.stopPropagation(); sayJa(sj.dataset.sayj); return; }
+  const ln=e.target.closest("[data-len]"); if(ln){ e.preventDefault(); e.stopPropagation(); LOOK.len=ln.dataset.len; saveLook(); const ol=document.querySelector("ol.ten"); if(ol){ ol.classList.toggle("short",LOOK.len==="short"); document.querySelectorAll("[data-len]").forEach(x=>x.setAttribute("aria-pressed",String(x.dataset.len===LOOK.len))); } return; }
+  const b=e.target.closest("[data-say]"); if(b){ e.preventDefault(); e.stopPropagation(); sayEn(b.dataset.say); track("/en/say","英語の読み上げ"); return; }
   const l=e.target.closest("[data-lang]"); if(l){ LOOK.lang=l.dataset.lang; saveLook(); track("/en/"+LOOK.lang,"英語"); go(current,{keepScroll:true}); } },true);
 function englishCard(){ if(!EN) return ""; const W=[]; (EN.top10||[]).forEach((e,i)=>(e.w||[]).forEach(w=>W.push([w[0],w[1],D.top10[i]&&D.top10[i].title]))); if(!W.length) return "";
   return `<section class="card" aria-label="今日の英単語"><b>📘 今日の英単語</b><div class="hint" style="margin:4px 0 8px">今日のニュースに出てきた英語。🔊で発音が聞けます。</div>
