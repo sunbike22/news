@@ -1,7 +1,7 @@
 """気象庁の公式データから、地震・津波・特別警報を見張って alert.json を作る。GitHub Actions で10分ごとに動かす。キーは不要。
 - 地震: 気象庁(bosai の list.json)→ だめなら P2P地震情報(気象庁の発表を配るサービス)
 - 津波: P2P地震情報(code 552)と、気象庁の防災情報XML(eqvol)の題名
-- 特別警報: 気象庁の防災情報XML(extra)
+- 特別警報・都道府県ごとの警報: 気象庁の防災情報XML(extra)
 大きなもの(震度5弱以上・津波の警報/注意報・特別警報)が新しく出たら ntfy で1通送る。同じものは2回送らない。
 使い方: python tools/fetch_alerts.py prev.json out/alert.json  → 中身が変わったら "CHANGED" と出す"""
 import json, re, sys, time, datetime, urllib.request, urllib.parse
@@ -144,6 +144,65 @@ try:
 except Exception as e:  # noqa: BLE001
     errors["special"] = f"{type(e).__name__}: {e}"[:200]
 
+# ---------- 都道府県ごとの警報(気象庁 防災情報XML。文は発表そのまま。注意報は数が多いので入れない) ----------
+PREF_NAMES = ["北海道", "青森県", "岩手県", "宮城県", "秋田県", "山形県", "福島県", "茨城県", "栃木県", "群馬県", "埼玉県", "千葉県",
+              "東京都", "神奈川県", "新潟県", "富山県", "石川県", "福井県", "山梨県", "長野県", "岐阜県", "静岡県", "愛知県", "三重県",
+              "滋賀県", "京都府", "大阪府", "兵庫県", "奈良県", "和歌山県", "鳥取県", "島根県", "岡山県", "広島県", "山口県", "徳島県",
+              "香川県", "愛媛県", "高知県", "福岡県", "佐賀県", "長崎県", "熊本県", "大分県", "宮崎県", "鹿児島県", "沖縄県"]
+# 気象台の名前 → 都道府県(本文に県名が出てこないときの手がかり)
+OFFICE_PREF = {"気象庁": "東京都", "札幌管区気象台": "北海道", "函館地方気象台": "北海道", "旭川地方気象台": "北海道",
+    "室蘭地方気象台": "北海道", "釧路地方気象台": "北海道", "網走地方気象台": "北海道", "稚内地方気象台": "北海道",
+    "青森地方気象台": "青森県", "盛岡地方気象台": "岩手県", "仙台管区気象台": "宮城県", "秋田地方気象台": "秋田県",
+    "山形地方気象台": "山形県", "福島地方気象台": "福島県", "水戸地方気象台": "茨城県", "宇都宮地方気象台": "栃木県",
+    "前橋地方気象台": "群馬県", "熊谷地方気象台": "埼玉県", "銚子地方気象台": "千葉県", "横浜地方気象台": "神奈川県",
+    "新潟地方気象台": "新潟県", "富山地方気象台": "富山県", "金沢地方気象台": "石川県", "福井地方気象台": "福井県",
+    "甲府地方気象台": "山梨県", "長野地方気象台": "長野県", "岐阜地方気象台": "岐阜県", "静岡地方気象台": "静岡県",
+    "名古屋地方気象台": "愛知県", "津地方気象台": "三重県", "彦根地方気象台": "滋賀県", "京都地方気象台": "京都府",
+    "大阪管区気象台": "大阪府", "神戸地方気象台": "兵庫県", "奈良地方気象台": "奈良県", "和歌山地方気象台": "和歌山県",
+    "鳥取地方気象台": "鳥取県", "松江地方気象台": "島根県", "岡山地方気象台": "岡山県", "広島地方気象台": "広島県",
+    "下関地方気象台": "山口県", "徳島地方気象台": "徳島県", "高松地方気象台": "香川県", "松山地方気象台": "愛媛県",
+    "高知地方気象台": "高知県", "福岡管区気象台": "福岡県", "佐賀地方気象台": "佐賀県", "長崎地方気象台": "長崎県",
+    "熊本地方気象台": "熊本県", "大分地方気象台": "大分県", "宮崎地方気象台": "宮崎県", "鹿児島地方気象台": "鹿児島県",
+    "沖縄気象台": "沖縄県", "宮古島地方気象台": "沖縄県", "石垣島地方気象台": "沖縄県", "南大東島地方気象台": "沖縄県"}
+
+def warn_collect(root):
+    out = []
+    for en in root.findall("a:entry", ATOM):
+        title = (en.findtext("a:title", "", ATOM) or "")
+        body = (en.findtext("a:content", "", ATOM) or "")
+        upd = en.findtext("a:updated", "", ATOM) or ""
+        who = en.findtext("a:author/a:name", "", ATOM) or ""
+        if "警報" not in title or "警報" not in body:
+            continue
+        lv = 2 if "特別警報" in body else 1
+        if lv == 1 and re.search(r"警報[^。]*解除", body) and "発表" not in body:
+            continue
+        try:
+            at = iso(datetime.datetime.fromisoformat(upd.replace("Z", "+00:00")))
+        except ValueError:
+            at = iso(NOW)
+        if at < iso(NOW - datetime.timedelta(hours=12)):
+            continue
+        prefs = [p for p in PREF_NAMES if p in body or p[:-1] in body]
+        if not prefs and who in OFFICE_PREF:
+            prefs = [OFFICE_PREF[who]]
+        if not prefs:
+            continue
+        out.append({"at": at, "who": who, "lv": lv, "pref": prefs[:3], "text": re.sub(r"\s+", " ", body).strip()[:110]})
+    # 同じ気象台の古いものは落として、新しい順に
+    seen, keep = set(), []
+    for w in sorted(out, key=lambda x: x["at"], reverse=True):
+        if w["who"] in seen:
+            continue
+        seen.add(w["who"]); keep.append(w)
+    return keep[:24]
+
+warn = []
+try:
+    warn = warn_collect(ET.fromstring(get("https://www.data.jma.go.jp/developer/xml/feed/extra.xml")))
+except Exception as e:  # noqa: BLE001
+    errors["warn"] = f"{type(e).__name__}: {e}"[:200]
+
 # ---------- 1時間ごとの天気(東京・Open-Meteo。気象庁などの予報モデル。キー不要・CC BY 4.0) ----------
 # 予報は1時間ごとに変わるので、前回から50分たっていなければ前回分を使う(むだに書きかえない)
 def wx_fetch(prev_wx):
@@ -153,15 +212,16 @@ def wx_fetch(prev_wx):
     except Exception:  # noqa: BLE001
         pass
     q = urllib.parse.urlencode({"latitude": 35.6895, "longitude": 139.6917, "timezone": "Asia/Tokyo", "forecast_days": 2,
-        "hourly": "temperature_2m,relative_humidity_2m,precipitation_probability,precipitation,weather_code,wind_speed_10m"})
+        "hourly": "temperature_2m,relative_humidity_2m,precipitation_probability,precipitation,weather_code,wind_speed_10m,uv_index"})
     j = json.loads(get("https://api.open-meteo.com/v1/forecast?" + q, timeout=20))
     h = j["hourly"]
     rows = []
     for i, t in enumerate(h["time"]):
         rows.append([t[5:16].replace("-", "/").replace("T", " "),
                      h["temperature_2m"][i], h["relative_humidity_2m"][i], h["precipitation_probability"][i],
-                     h["precipitation"][i], h["weather_code"][i], h["wind_speed_10m"][i]])
-    return {"at": iso(NOW), "place": "東京", "cols": ["時刻", "気温", "湿度", "降水確率", "降水量", "天気コード", "風速"], "rows": rows}
+                     h["precipitation"][i], h["weather_code"][i], h["wind_speed_10m"][i],
+                     (h.get("uv_index") or [None] * len(h["time"]))[i]])
+    return {"at": iso(NOW), "place": "東京", "cols": ["時刻", "気温", "湿度", "降水確率", "降水量", "天気コード", "風速", "紫外線"], "rows": rows}
 
 # ---------- 全国の天気(14都市・今日と明日。Open-Meteo を1回でまとめて) ----------
 CITIES = [("札幌", 43.06, 141.35), ("釧路", 42.98, 144.38), ("青森", 40.82, 140.74), ("仙台", 38.27, 140.87), ("新潟", 37.90, 139.02),
@@ -243,7 +303,7 @@ try:
     wxm = wxmap_fetch(prev.get("wxmap"))
 except Exception as e:  # noqa: BLE001
     errors["wxmap"] = f"{type(e).__name__}: {e}"[:200]
-out = {"quakes": quakes, "qsrc": qsrc, "tsunami": tsunami, "special": special, "sent": sent, "wx": wx, "wxmap": wxm}
+out = {"quakes": quakes, "qsrc": qsrc, "tsunami": tsunami, "special": special, "warn": warn, "sent": sent, "wx": wx, "wxmap": wxm}
 same = {k: prev.get(k) for k in out} == out
 out["checked"] = iso(NOW)
 out["updated"] = prev.get("updated") if same and prev.get("updated") else iso(NOW)
@@ -251,7 +311,9 @@ if errors:
     out["errors"] = errors
 with open(sys.argv[2], "w", encoding="utf-8") as f:
     json.dump(out, f, ensure_ascii=False, separators=(",", ":"))
-print("quakes", len(quakes), qsrc, "tsunami", bool(tsunami), "special", len(special), "errors", errors)
+print("quakes", len(quakes), qsrc, "tsunami", bool(tsunami), "special", len(special), "warn", len(warn), "errors", errors)
+for w in warn[:6]:
+    print("  warn", w["lv"], w["pref"], w["who"], w["text"][:50])
 for q in quakes[:3]:
     print(" ", q)
 # 30分に1回は checked を更新するため、変わっていなくても書き出す(見張りが動いている証拠)
