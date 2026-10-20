@@ -266,6 +266,7 @@ mark{background:#ffe066;color:#141b2d;border-radius:3px;padding:0 1px}
 .kw-add input{flex:1;min-width:0;border:1px solid var(--line);border-radius:999px;padding:8px 14px;background:var(--surface);color:var(--ink);font-size:1rem}
 .kw-edit{margin-top:8px}
 .pk-tabs{margin-top:6px}
+.pk-ed{margin-top:8px;padding-top:8px;border-top:1px dashed var(--line);display:flex;flex-direction:column;gap:6px}
 .pk-ttl{font-size:1rem;margin:10px 0 0}
 .pk-list{list-style:none;margin:6px 0 0;padding:0;display:flex;flex-direction:column;gap:8px}
 .pk-list li{background:var(--surface2);border:1px solid var(--line);border-radius:12px;padding:10px 12px;line-height:1.5}
@@ -959,6 +960,8 @@ const LOOK = (()=>{ let p={}; try{ p=JSON.parse(store.get("nw-look")||"{}")||{};
   if(!p.v4){ p.v4=1; p.order=SECS.map(s=>s[0]); }
   // v5: 下のタブを5つに(地図・数字は「さがす」「きょう」から開く。着せかえで戻せる)
   // v7: かんたん/ふつうモード。今までの人は「ふつう」。聞くボタンはふつうではかくす。ことばタブは最初はかくす
+  // v9: おすすめは「おたのしみ」の中へ
+  if(!p.v9){ p.v9=1; p.off=Object.assign({},p.off,{picks:true}); if(p.cfg) Object.values(p.cfg).forEach(c=>{ if(c&&c.off) c.off.picks=true; }); }
   // v8: 1分まとめはふつうモードではかくす(かんたんモードでは出す)
   if(!p.v8){ p.v8=1; if(p.mode!=="easy"){ p.off=Object.assign({},p.off,{quick:true}); } }
   if(!p.v7){ p.v7=1; p.mode=p.mode==="easy"?"easy":"normal"; p.off=Object.assign({},p.off,{listen:true}); p.tabOff=Object.assign({words:true},p.tabOff); }
@@ -974,7 +977,7 @@ function saveLook(){ store.set("nw-look", JSON.stringify(LOOK)); }
 const MODE_PRESET={
   easy:()=>{ const on=["weather","quick","cont","listen","three","ten","quiz","goal"]; const order=[...on,...SECS.map(x=>x[0]).filter(k=>!on.includes(k))]; const off={}; order.forEach(k=>{ if(!on.includes(k)) off[k]=true; });
     return {order,off,tabs:["today","explain","search","my","plan","map","numbers","words"],tabOff:{plan:true,map:true,numbers:true,words:true},size:"l"}; },
-  normal:()=>{ const off={listen:true,quick:true,english:true,mood:true,know:true,talk:true,reporter:true,local:true,gacha:true};
+  normal:()=>{ const off={listen:true,quick:true,picks:true,english:true,mood:true,know:true,talk:true,reporter:true,local:true,gacha:true};
     return {order:SECS.map(x=>x[0]),off,tabs:["today","explain","search","plan","my","map","numbers","words"],tabOff:{map:true,numbers:true,words:true},size:"m"}; }};
 function modeSnap(){ return {order:LOOK.order.slice(),off:Object.assign({},LOOK.off),tabs:LOOK.tabs.slice(),tabOff:Object.assign({},LOOK.tabOff),size:store.get("nw-size")||"m"}; }
 function setMode(m,fresh){ if(m!=="easy") m="normal"; if(m===LOOK.mode&&!fresh) return;
@@ -1128,22 +1131,26 @@ function bindKw(){ const card=document.querySelector(".kw"); if(!card) return; c
 // ===== 🎁 ジャンル別おすすめ。picks.js(週2回、自動で作り直す)から、関心のあるジャンルの分を出す =====
 const PK=window.NEWS_PICKS||null;
 function pickGenres(){ if(!PK||!PK.g) return []; const has=Object.keys(PK.g).filter(g=>(PK.g[g].items||[]).length);
-  const mine=GORDER.filter(g=>has.includes(g)&&(ME.interests[g]||interestScore(g)>0)).sort((a,b)=>interestScore(b)-interestScore(a));
+  const picked=GORDER.filter(g=>ME.interests[g]); const base=picked.length?picked:GORDER.filter(g=>interestScore(g)>0);
+  const mine=base.filter(g=>has.includes(g)).sort((a,b)=>interestScore(b)-interestScore(a));
   return mine; }
 function picksCard(){ if(!PK||!PK.g) return ""; const all=GORDER.filter(g=>PK.g[g]&&(PK.g[g].items||[]).length); if(!all.length) return "";
   const mine=pickGenres(); const sel=ME.pickSel&&all.includes(ME.pickSel)?ME.pickSel:(mine[0]||all[0]); const G=PK.g[sel];
   const tabs=(mine.length?mine:all).concat(ME.pickAll?all.filter(g=>!mine.includes(g)):[]);
   return `<section class="card picks" aria-label="ジャンル別おすすめ"><div class="sec-h"><h2>🎁 ジャンル別おすすめ</h2><span class="sub">週2回更新</span></div>
-    ${mine.length?"":`<p class="hint" style="margin:4px 0 6px">気になるジャンルを選ぶと、そのジャンルのおすすめがここに並びます。</p>`}
+    ${mine.length?"":`<p class="hint" style="margin:4px 0 6px">下の「✏️ 気になるジャンルを選ぶ」で選ぶと、そのジャンルのおすすめが並びます。</p>`}
     <div class="chips pk-tabs">${[...new Set(tabs)].map(g=>`<button class="fchip" data-pk="${g}" aria-pressed="${g===sel}"><span class="c" style="background:var(--g-${g})"></span>${GN[g]}</button>`).join("")}${!ME.pickAll&&all.some(g=>!mine.includes(g))&&mine.length?`<button class="fchip" id="pkAll">＋ ほかのジャンル</button>`:""}</div>
     <h3 class="pk-ttl">${esc(G.ttl||GN[sel])}</h3>
     <ul class="pk-list">${G.items.map(x=>`<li><span class="pk-k chip ${sel}">${esc(x.k)}</span><b class="pk-n">${esc(x.n)}</b>${x.d?`<span class="pk-d">🗓️ ${esc(x.d)}</span>`:""}<p>${esc(x.t)}</p>${x.src?`<small class="hint">出典: ${esc(x.src)}</small>`:""}</li>`).join("")}</ul>
     <div class="hint" style="margin-top:6px">次の更新: ${esc(PK.next||"")}。広告ではありません。複数の情報で日付などを確かめています。</div>
-    ${mine.length?"":`<button class="fchip" data-tab="my" style="margin-top:8px">🎯 気になるジャンルを選ぶ</button>`}</section>`; }
-function bindPicks(){ const c=document.querySelector(".picks"); if(!c) return; const re=()=>{ const x=document.querySelector(".picks"); if(x){ x.outerHTML=picksCard(); bindPicks(); } };
+    <button class="fchip" id="pkEdit" style="margin-top:8px">${ME.pkEdit?"✓ できた":"✏️ 気になるジャンルを選ぶ"}</button>
+    ${ME.pkEdit?`<div class="pk-ed"><div class="hint">押すと「気になる」に入ったり外れたりします(マイ→⚙️設定 からも変えられます)。</div><div class="chips">${GORDER.map(g=>`<button class="fchip" data-pki="${g}" aria-pressed="${!!ME.interests[g]}"><span class="c" style="background:var(--g-${g})"></span>${GN[g]}</button>`).join("")}</div></div>`:""}</section>`; }
+function bindPicks(inSheet){ const c=document.querySelector(".picks"); if(!c) return; const re=()=>{ const x=document.querySelector(".picks"); if(x){ x.outerHTML=picksCard(); bindPicks(inSheet); } };
+  const ed=c.querySelector("#pkEdit"); if(ed) ed.onclick=()=>{ ME.pkEdit=!ME.pkEdit; saveMe(); re(); };
+  c.querySelectorAll("[data-pki]").forEach(b=>b.onclick=()=>{ const g=b.dataset.pki; ME.interests[g]=!ME.interests[g]; if(ME.interests[g]) ME.pickSel=g; saveMe(); toast(ME.interests[g]?`🎯「${GN[g]}」を気になるジャンルに入れました`:`「${GN[g]}」を外しました`); re(); });
   c.querySelectorAll("[data-pk]").forEach(b=>b.onclick=()=>{ ME.pickSel=b.dataset.pk; saveMe(); learn(b.dataset.pk,0.3); track("/picks/"+b.dataset.pk,"おすすめ: "+GN[b.dataset.pk]); re(); });
   const a=c.querySelector("#pkAll"); if(a) a.onclick=()=>{ ME.pickAll=1; saveMe(); re(); };
-  c.querySelectorAll("[data-tab]").forEach(b=>b.onclick=()=>go(b.dataset.tab)); }
+  c.querySelectorAll("[data-tab]").forEach(b=>b.onclick=()=>{ if(inSheet){ const sh=document.getElementById("sheet"); sh.hidden=true; sh.innerHTML=""; document.body.style.overflow=""; } go(b.dataset.tab); }); }
 
 // ===== 週の目標・ペットの手紙・つづき・1分まとめ =====
 function weekStart(iso){ const d=new Date(Date.parse(iso)); const w=(d.getUTCDay()+6)%7; return new Date(d.getTime()-w*864e5).toISOString().slice(0,10); }
@@ -2661,14 +2668,14 @@ gdPaint();
 // ブラウザに「この記録は消さないで」とお願いする(Safariなどが使っていないサイトのデータを自動で消すのを防ぐ)
 try{ if(navigator.storage&&navigator.storage.persist) navigator.storage.persisted().then(p=>{ if(!p) navigator.storage.persist(); }).catch(()=>{}); }catch(_){}
 // ===== おたのしみ(きょうの画面をすっきりさせるため、小さな遊びはここにまとめる) =====
-const FUN=[["reporter","🎙️","よむまる記者",()=>reporterCard()],["gacha","🎰","今日の1本ガチャ",()=>gachaCard()],["mood","🗺️","世の中の天気図",()=>moodCard()],["know","👆","知ってた?",()=>knowCard()],["talk","🍽️","話のタネ",()=>talkCard()],["local","🏠","わたしの街",()=>localCard()],["english","📘","今日の英単語",()=>englishCard()]];
+const FUN=[["picks","🎁","ジャンル別おすすめ",()=>picksCard()],["reporter","🎙️","よむまる記者",()=>reporterCard()],["gacha","🎰","今日の1本ガチャ",()=>gachaCard()],["mood","🗺️","世の中の天気図",()=>moodCard()],["know","👆","知ってた?",()=>knowCard()],["talk","🍽️","話のタネ",()=>talkCard()],["local","🏠","わたしの街",()=>localCard()],["english","📘","今日の英単語",()=>englishCard()]];
 function funGrid(){ const L=FUN.filter(f=>LOOK.off[f[0]]); if(!L.length) return "";
-  return `<section aria-label="おたのしみ"><div class="sec-h"><h2>✨ おたのしみ</h2><span class="sub">タップで開く</span></div><div class="fun-grid">${L.map(([k,i,n])=>`<button class="fun-t" data-fun="${k}"><span>${i}</span><small>${esc(n)}</small>${k==="gacha"&&(ME.gacha||{}).d!==TODAY?'<i class="fun-dot"></i>':""}</button>`).join("")}</div></section>`; }
+  return `<section aria-label="おたのしみ"><div class="sec-h"><h2>✨ おたのしみ</h2><span class="sub">タップで開く</span></div><div class="fun-grid">${L.map(([k,i,n])=>`<button class="fun-t" data-fun="${k}"><span>${i}</span><small>${esc(n)}</small>${(k==="gacha"&&(ME.gacha||{}).d!==TODAY)||(k==="picks"&&PK&&ME.pickSeen!==PK.updated)?'<i class="fun-dot"></i>':""}</button>`).join("")}</div></section>`; }
 function openFun(k){ const f=FUN.find(x=>x[0]===k); if(!f) return; const html=f[3](); if(!html){ toast("今日はまだありません"); return; } const sh=document.getElementById("sheet");
   sh.innerHTML=`<div class="bar"><div class="wrap"><button class="iconbtn" id="fnx" aria-label="もどる">← もどる</button><span class="ttl">${f[1]} ${esc(f[2])}</span></div></div><div class="wrap body">${html}</div>`;
   const close=()=>{ sh.hidden=true; sh.innerHTML=""; document.body.style.overflow=""; go("today",{keepScroll:true}); };
   sh.querySelector("#fnx").onclick=close; sh.hidden=false; sh.scrollTop=0; document.body.style.overflow="hidden";
-  bindKnow(); bindTalk(); bindReporter(); bindGacha(); bindLocal();
+  bindKnow(); bindTalk(); bindReporter(); bindGacha(); bindLocal(); if(k==="picks"&&PK){ ME.pickSeen=PK.updated; saveMe(); bindPicks(true); }
   sh.querySelectorAll("[data-ex]").forEach(b=>b.onclick=()=>{ sh.hidden=true; openEx(b.dataset.ex); });
   sh.querySelectorAll("[data-mood]").forEach(b=>b.onclick=()=>{ close(); sState.q=""; sState.th=""; sState.ok=false; sState.onlyNew=false; sState.g=new Set([b.dataset.mood]); go("search"); });
   track("/fun/"+k,"おたのしみ"); }
@@ -2686,6 +2693,7 @@ function englishCard(){ if(!EN) return ""; const W=[]; (EN.top10||[]).forEach((e
     <ul class="enlist">${W.map(([a,b,t])=>`<li><span><b lang="en">${esc(a)}</b> = ${esc(b)}<small class="hint" style="display:block">${esc(t||"")}</small></span><button class="fchip" data-say="${esc(a)}">🔊</button></li>`).join("")}</ul></section>`; }
 // ===== お知らせ(新しくなったところ)。機能を足したら、いちばん上に1つ足す =====
 const UPDATES=[
+  {id:"2026-10-21c",d:"2026-10-21",t:"🗺️ 地図が読み込めない不具合を直しました",L:["地図(全国の天気・地図タブ)が出なかったのを直しました。開き直すと出ます","🎁 ジャンル別おすすめは「✨ おたのしみ」の中に移しました。「✏️ 気になるジャンルを選ぶ」で、いつでも足したり外したりできます"]},
   {id:"2026-10-21b",d:"2026-10-21",t:"🎁 ジャンル別おすすめ・🗾 全国の天気",L:["気になるジャンルに合わせて、映画・小説・マンガのイチオシや、今週のスポーツの大会などを週2回おすすめします","天気の「🗾 全国の天気」で、日本地図の上に各地の天気と気温が出ます。今週の目標・ペットからの手紙・「つづきがあります」も始まりました"]},
   {id:"2026-10-21a",d:"2026-10-21",t:"🏅 バッジがレベルアップするように",L:["クイズ満点の回数や読んだ解説の数などで、バッジが 🥉→🥈→🥇→💎→👑 と上がっていきます(マイ→記録)","🔖「わたしのキーワード」を登録すると、そのことばのニュースが自動で集まります。ニュース10には、いつ・どこが伝えたかを出しました","「わたしの街」を選ぶと、1時間ごとの天気がその地域になります"]},
   {id:"2026-10-20v",d:"2026-10-20",t:"🕐 1時間ごとの天気",L:["天気の下に、これから6時間の天気・気温・降水確率が並びます","「🕐 1時間ごとの天気」を押すと、今日と明日の気温・降水確率・湿度・風の変化をグラフで見られます"]},
@@ -2793,7 +2801,7 @@ function renderMy(){
     ${backupHTML()}
     <button class="lookcard" id="lookBtnMy"><span class="pal" aria-hidden="true" style="padding-left:5px">${COLORS.slice(1,6).map(c=>`<i style="background:${c[2]}"></i>`).join("")}</span><span><b>🎨 着せかえ</b><span class="hint" style="display:block">色・文字・画面の並び・タブを、わたし好みに</span></span></button>
     ${notifyHTML()}
-    <section class="card"><b>🎯 気になるジャンル</b><div class="hint" style="margin:4px 0 8px">選んだジャンルが「あなた向け」に並びます。読んだ解説からも少しずつ学びます。</div>
+    <section class="card" id="myIntCard"><b>🎯 気になるジャンル</b><div class="hint" style="margin:4px 0 8px">押すと入ったり外れたりします。「あなた向け」と「🎁 ジャンル別おすすめ」に使います。</div>
       <div class="chips" id="myInt">${GORDER.map(g=>`<button class="fchip" data-g="${g}" aria-pressed="${!!ME.interests[g]}"><span class="c" style="background:var(--g-${g})"></span>${GN[g]}</button>`).join("")}</div></section>
     ${guideBlock()}
     <button class="fchip" id="obAgain" style="align-self:flex-start">🐣 はじめての案内をもう一度見る</button>

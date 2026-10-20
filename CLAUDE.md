@@ -6,7 +6,7 @@
 ## ファイル
 - `index.html` — 見た目と動き(HTML・CSS・JavaScript を1ファイルに)。外部ライブラリは Chart.js・地図用の d3/topojson(jsDelivr。どれも使うページを開いたときだけ `loadScript`/`loadChart` で読む。最初の表示を軽くするため、head で読み込まない)、Google Fonts(見出し用の Dela Gothic One だけ。本文はスマホに入っている文字)、閲覧数の GoatCounter(gc.zgo.at)だけ。データの読み込み先は、地震・警報の raw.githubusercontent.com(alerts ブランチ)と api.p2pquake.net、地域の天気の api.open-meteo.com(わたしの街が東京以外のときだけ)、ドライブ保存の accounts.google.com・www.googleapis.com(見る人がつないだときだけ)。
 - `data.js` — 中身のデータ(`window.NEWS_DATA`)。ニュースの更新では、基本的にこのファイルだけを書き換える。
-- `picks.js` — 🎁 ジャンル別おすすめ(`window.NEWS_PICKS = {updated,label,next,g:{ジャンル:{ttl,items:[{k,n,d,t,src}]}}}`)。定期タスク「ジャンル別おすすめの更新(週2回)」(月・木 5:47)だけが書き換える。ent=映画・小説・マンガのイチオシ、spo=今週の大会(人気順)など12ジャンル。ひとことは40字くらい・ネタバレなし・広告の言い方をしない・出典つき。アプリは関心のあるジャンル(`interestScore`)だけ出す(`picksCard`)。
+- `picks.js` — 🎁 ジャンル別おすすめ(`window.NEWS_PICKS = {updated,label,next,g:{ジャンル:{ttl,items:[{k,n,d,t,src}]}}}`)。定期タスク「ジャンル別おすすめの更新(週2回)」(月・木 5:47)だけが書き換える。ent=映画・小説・マンガのイチオシ、spo=今週の大会(人気順)など12ジャンル。ひとことは40字くらい・ネタバレなし・広告の言い方をしない・出典つき。アプリは「✨ おたのしみ」の中の「🎁 ジャンル別おすすめ」に出す(`FUN`・新しい更新があると赤い点 `ME.pickSeen`)。出すのは気になるジャンル(`ME.interests`。1つも選んでいなければ よく読むジャンル)。カードの「✏️ 気になるジャンルを選ぶ」とマイ→⚙️設定で、いつでも足したり外したりできる。
 - `.github/workflows/backup.yml` — 毎週日曜 6:17 にサイト一式を GitHub の「リリース」(backup-日付)として保存。新しい8つを残す。手で動かすこともできる。元に戻すときはリリースの zip を使う。
 - `manifest.webmanifest`・`sw.js`・`icon-*.png`・`apple-touch-icon.png` — ホーム画面に追加してアプリのように使うための設定。`sw.js` は前回の内容をオフラインでも読めるようにする(index.html と data.js はネット優先)。
 - `robots.txt` と `<meta name="robots" content="noindex">` — 検索エンジンに出さないための設定。消さない。
@@ -96,7 +96,7 @@
 - 💌 ペットからの手紙(`letterCard`): 週のはじめ(月〜水)に、先週の記録だけから書く。「読んだ」で `ME.letterSeen`。
 - 🔔 つづきがあります(`contCard`): 前に開いたあとの新しいニュース(`NEW_KEYS`)のうち、キーワードや保存したニュースに関係するもの。
 - ⏱️ 1分まとめ(`quickCard`): 天気・3行・キーワードの新着・今週の目標を1枚に。🔊で読み上げ。かんたんモードだけ最初から出す。
-- 📴 オフラインの準備: 開いて6秒後に、解説の写真・グラフや地図の部品を sw.js に保存してもらう(`warm`。データ節約モードではしない)。
+- 📴 オフラインの準備: 開いて6秒後に、解説の写真・グラフや地図の部品を sw.js に保存してもらう(`warm`。データ節約モードではしない)。**中身を読む部品(地図のJSONなど)は cors で保存する。opaque で保存すると地図が読めなくなる**(2026-10-21 に起きた不具合)。sw.js は cors の通信に opaque の保存分を返さない。
 
 ## かんたんモード / ふつうモード
 - `LOOK.mode`("easy"/"normal")。`setMode` で切り替え。モードごとに「きょうの並び・表示(order/off)」「下のタブ(tabs/tabOff)」「文字の大きさ」を `LOOK.cfg[mode]` に別々に覚える。はじめの形は `MODE_PRESET`。
