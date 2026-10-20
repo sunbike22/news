@@ -118,6 +118,14 @@ main{padding-block:18px 32px}
 .wx-sky{font-size:1.2rem;font-weight:800;line-height:1.3}
 .wx-t{text-align:right;line-height:1.1}.wx-t b{display:block;font-size:2rem;color:#e5484d}.wx-t span{font-size:1.1rem;color:#3b82f6;font-weight:700}
 .wx-um{font-weight:700;font-size:1.02rem;background:var(--accent-soft);border-radius:10px;padding:6px 10px}
+.wx-kit{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:.92rem}
+.wx-kit b{font-weight:800}
+.badge-ok.tap,.badge-one.tap{cursor:pointer;text-decoration:underline dotted;text-underline-offset:2px}
+.wx-kit .kit{display:inline-flex;align-items:center;gap:3px;background:var(--surface2);border:1px solid var(--line);border-radius:999px;padding:2px 9px;font-weight:700}
+.wx-kit .kit i{font-style:normal;font-size:1.05rem}
+.wx-warn{display:flex;flex-direction:column;gap:2px;background:var(--warn-soft);border:1px solid var(--warn);border-radius:12px;padding:9px 11px;cursor:pointer}
+.wx-warn.sp{background:var(--g-intl-s);border-color:var(--g-intl)}
+.wx-warn b{font-size:1rem}.wx-warn small{font-size:.86rem;line-height:1.5}
 .wx-rain{display:flex;gap:6px;flex-wrap:wrap;align-items:stretch}
 .wx-rain span{display:flex;flex-direction:column;align-items:center;background:var(--surface2);border:1px solid var(--line);border-radius:10px;padding:2px 10px;min-width:52px}
 .wx-rain small{font-size:.82rem;color:var(--muted)}.wx-rain b{font-size:1rem}
@@ -308,6 +316,11 @@ mark{background:#ffe066;color:#141b2d;border-radius:3px;padding:0 1px}
 
 /* 地震・津波・特別警報(気象庁発表)の帯 */
 #alertBand{padding-top:10px}
+.sos-go{width:100%;margin-top:8px;padding:12px;border-radius:14px;border:2px solid var(--g-intl);background:var(--g-intl-s);color:var(--g-intl);font-weight:800;font-size:1.02rem;cursor:pointer}
+.sos .sos-b{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:10px 12px;margin-top:10px}
+.sos .sos-b>summary{cursor:pointer;font-weight:800;font-size:1.06rem;display:flex;gap:8px;align-items:center}
+.sos .sos-b p{margin:8px 0 0;line-height:1.75}
+.sos .sos-b a{display:block;margin-top:8px;font-weight:700}
 .al-band{display:flex;align-items:center;gap:10px;width:100%;text-align:left;border:0;border-radius:14px;padding:12px 14px;cursor:pointer;color:#fff;background:#c62828;box-shadow:0 4px 14px rgba(198,40,40,.3);font-size:1rem;line-height:1.45}
 .al-band.mid{background:#fff4d6;color:#5a3d00;box-shadow:none;border:1px solid #f0c75e}
 .al-band .ai{font-size:1.5rem}
@@ -1181,9 +1194,12 @@ function letterCard(){ const L=letterData(); if(!L) return ""; const wd=(new Dat
 function contItems(){ if(!NEW_KEYS.size) return []; const nw=NEWS.filter(n=>NEW_KEYS.has(nkey(n))); const out=[];
   kwList().forEach(w=>{ const h=nw.filter(n=>(n.h+" "+(n.th||"")).includes(w)); if(h.length) out.push({i:"🔖",t:`「${w}」の新しいニュース ${h.length}件`,q:w,h:h[0].h}); });
   Object.values(ME.pins||{}).slice(-15).forEach(p=>{ if(!p||!p.h) return; const q=gdQuery(p.h.replace(/^解説: /,"")); const h=nw.filter(n=>gdScore(q,n.h)>=0.35); if(h.length&&!out.some(o=>o.h===h[0].h)) out.push({i:"📌",t:`保存した「${p.h.slice(0,18)}${p.h.length>18?"…":""}」につづき`,q:null,h:h[0].h,ex:p.ex}); });
-  return out.slice(0,4); }
-function contCard(){ const L=contItems(); if(!L.length) return "";
-  return `<section class="card cont" aria-label="つづきがあります"><b>🔔 つづきがあります</b><ul class="ct">${L.map((x,i)=>`<li><button class="ct-b" data-ct="${i}"><span>${x.i} ${esc(x.t)}</span><small>${esc(x.h)}</small></button></li>`).join("")}</ul></section>`; }
+  return out.slice(0,3); }
+function corrRecent(){ try{ const C=D.corrections||[]; const seen=store.get("nw-corr")||""; const y=TODAY.slice(0,4);
+    return C.map(c=>({k:c[0]+"|"+String(c[1]).slice(0,12),d:y+"-"+String(c[0]).replace("/","-").split("-").map(x=>String(x).padStart(2,"0")).join("-"),t:c[1]}))
+      .filter(c=>c.d>=new Date(Date.parse(TODAY)-4*864e5).toISOString().slice(0,10)&&!seen.includes(c.k)); }catch(_){ return []; } }
+function contCard(){ const L=contItems(); const C=corrRecent(); if(!L.length&&!C.length) return "";
+  return `<section class="card cont" aria-label="つづきがあります"><b>🔔 つづきがあります</b><ul class="ct">${L.map((x,i)=>`<li><button class="ct-b" data-ct="${i}"><span>${x.i} ${esc(x.t)}</span><small>${esc(x.h)}</small></button></li>`).join("")}${C.slice(0,2).map(c=>`<li><button class="ct-b" data-corr="${esc(c.k)}"><span>✏️ 前の記録を直しました</span><small>${esc(c.t)}</small></button></li>`).join("")}</ul></section>`; }
 function quickCard(){ const w=D.weather; const kwN=kwList().reduce((a,k)=>a+NEWS.filter(n=>NEW_KEYS.has(nkey(n))&&(n.h+" "+(n.th||"")).includes(k)).length,0);
   const ws=weekStart(TODAY); const gl=GOALS.filter(g=>g[5](ws)<g[3]).length;
   return `<section class="card quick" aria-label="1分まとめ"><div class="sec-h"><h2>⏱️ 1分まとめ</h2><button class="fchip" id="qkSay">🔊 聞く</button></div>
@@ -1194,16 +1210,39 @@ function quickCard(){ const w=D.weather; const kwN=kwList().reduce((a,k)=>a+NEWS
       <li><span>🗓️</span><b>${gl?`今週の目標は あと${gl}つ`:"今週の目標はぜんぶ達成!"}</b></li></ol></section>`; }
 function bindQuick(){ const b=document.getElementById("qkSay"); if(b) b.onclick=()=>{ if(window.speechSynthesis&&window.speechSynthesis.speaking){ stopSpeak(); b.textContent="🔊 聞く"; return; } speak([...document.querySelectorAll(".qk b")].map(x=>x.textContent).join("。")); b.textContent="■ 止める"; };
   const lo=document.getElementById("ltOk"); if(lo) lo.onclick=()=>{ const L=letterData(); if(L){ ME.letterSeen=L.ws; saveMe(); } lo.closest("section").remove(); };
+  document.querySelectorAll("[data-corr]").forEach(b=>b.onclick=()=>{ const s0=(store.get("nw-corr")||"")+","+b.dataset.corr; store.set("nw-corr",s0.split(",").filter(Boolean).slice(-40).join(",")); b.closest("li").remove(); toast("✏️ 読んだことにしました"); });
   const L=contItems(); document.querySelectorAll("[data-ct]").forEach(b=>b.onclick=()=>{ const x=L[+b.dataset.ct]; if(!x) return; if(x.ex&&D.explainers[x.ex]){ openEx(x.ex); return; } sState.q=x.q||x.h.slice(0,8); sState.g.clear(); sState.th=""; sState.ok=false; sState.onlyNew=false; go("search"); }); }
 // ===== きょう =====
 function skyIcon(t){ t=String(t||""); return /雪/.test(t)?"❄️":/雷/.test(t)?"⛈️":/晴.*雨|雨.*晴/.test(t)?"🌦️":/雨/.test(t)?(/時々|一時|のち/.test(t)?"🌦️":"🌧️"):/晴.*(くもり|曇)|(くもり|曇).*晴/.test(t)?"⛅":/晴/.test(t)?"☀️":/くもり|曇/.test(t)?"☁️":"🌤️"; }
+// ===== 🎒 きょうの持ち物(いまの天気の数字から目安を出す。新しい事実は足さない) =====
+function wxPeak(key,hours){ try{ const R=wxRows(); if(!R.length) return null; const i=wxNowIdx(R); const v=R.slice(i,i+(hours||10)).map(r=>r[key]).filter(x=>typeof x==="number"); return v.length?Math.max.apply(null,v):null; }catch(_){ return null; } }
+function kitItems(){ const w=D.weather||{}; const out=[]; const pmax=Math.max(0,...(w.rain||[]).map(r=>+r[1]||0));
+  if(pmax>=50||/いり|いる|持っ|必要|手ばなせ/.test(w.umbrella||"")) out.push(["☂️","傘"]);
+  else if(pmax>=30) out.push(["🌂","おりたたみ傘"]);
+  if(/雪/.test(w.sky||"")) out.push(["👟","すべらない靴"]);
+  if(+w.lo<=15||(+w.hi-+w.lo)>=10) out.push(["🧥","はおるもの"]);
+  if(+w.hi>=28) out.push(["🥤","水分"]);
+  const uv=wxPeak("uv",9); if(uv!=null&&uv>=6) out.push(["🧴","日やけ止め"]);
+  const wd=wxPeak("wind",9); if(wd!=null&&wd>=10) out.push(["💨","風に注意"]);
+  return out.slice(0,3); }
+function kitLine(){ const L=kitItems();
+  return `<div class="wx-kit"><b>🎒 ${L.length?"きょうは":"とくに持ち物の注意はなさそうです"}</b>${L.map(([i,t])=>`<span class="kit"><i aria-hidden="true">${i}</i>${esc(t)}</span>`).join("")}</div>`; }
+// ===== ⚠️ わたしの街の警報(気象庁の発表そのまま。alert.json の warn から) =====
+function prefNow(){ return ME.pref||"東京都"; }
+function prefShort(x){ return String(x||"").replace(/[都道府県]$/,""); }
+function myWarn(){ try{ const me=prefShort(prefNow()); return (AL.warn||[]).filter(w=>(w.pref||[]).some(p=>prefShort(p)===me)); }catch(_){ return []; } }
+const WARN_LV=[["ℹ️","注意のよびかけ"],["⚠️","警戒のよびかけ"],["🚨","特別警報"]];
+function warnLine(){ const L=myWarn().filter(w=>w.lv>=1); if(!L.length) return `<div id="wxWarn"></div>`; const top=L.slice().sort((a,b)=>b.lv-a.lv)[0]; const [ic,nm]=WARN_LV[top.lv]||WARN_LV[1];
+  return `<div id="wxWarn"><div class="wx-warn ${top.lv>=2?"sp":""}" role="button" tabindex="0" data-quake="1"><b>${ic} ${esc(prefNow())}に${esc(nm)}が出ています</b><small>${esc(top.text||"")}</small><small class="hint">気象庁発表 ・ タップでくわしく</small></div></div>`; }
 function weatherCard(){
   const w=D.weather; const lab=relDay(w.iso); const notes=w.notes||[]; const severe=notes.some(n=>/警報|台風|大雨|暴風|大雪|猛暑|熱中症/.test(n));
   return `<section class="card wx" aria-label="天気">
     <div class="wx-top"><span class="wx-ic" aria-hidden="true">${skyIcon(w.sky)}</span>
       <div class="wx-main"><div class="wx-place">${esc(lab)}の${esc(w.place)}</div><div class="wx-sky">${esc(w.sky)}</div></div>
       <div class="wx-t num" aria-label="最高${w.hi}度 最低${w.lo}度"><b>${w.hi}°</b><span>${w.lo}°</span></div></div>
+    ${warnLine()}
     <div class="wx-um">☔ ${esc(w.umbrella)}</div>
+    ${kitLine()}
     <div class="wx-rain">${w.rain.map(([t,p])=>`<span><small>${esc(t)}</small><b class="num">${p}%</b></span>`).join("")}<span class="wx-wear">👕 ${esc(w.wear)}</span></div>
     ${notes.length?`<details class="wx-notes"${severe?" open":""}><summary>⚠️ 気をつけること(${notes.length})</summary>${notes.map(n=>`<div class="note">${esc(n)}</div>`).join("")}<div class="hint">出典: ${esc(w.source)}</div></details>`:`<div class="hint">出典: ${esc(w.source)}</div>`}
     <div class="wx-strip" id="wxStrip" role="button" tabindex="0" data-wxh="1" aria-label="1時間ごとの天気を開く">${wxStripHTML()}</div>
@@ -1234,7 +1273,7 @@ function renderToday(){
         const big=i<3; const link=n.ex||n.tab; const wt=newsWeight(n); const mine=isLocal(n.title+" "+(n.text||""));
         return `<li class="${big?'big':''} w${wt.lv}${mine?' mytown':''}">${pinBtn({k:"t|"+n.title,h:n.title,g:n.g,d:(NEWS[0]||{}).d,ex:n.ex},"abs")}<button class="row${link?' link':''}"${n.ex?` data-ex="${n.ex}"`:''}${n.tab?` data-tab="${n.tab}"`:''} ${link?'':'tabindex="-1"'}>
           <span class="rank">${i+1}</span>
-          <span>${big&&ILL[n.ill||n.ex]?`<div class="ill">${ILL[n.ill||n.ex]}</div>`:""}<span class="meta"><span class="chip ${n.g}">${GN[n.g]}</span>${n.ok?'<span class="badge-ok" title="2社以上で確認">✅</span>':'<span class="badge-one" title="1社だけで確認">⚠️ 1社</span>'}${mine?'<span class="heat town">🏠 あなたの街</span>':""}${wt.lv>=2?`<span class="heat" title="この3日で関連ニュース${wt.n}件">🔥</span>`:""}</span>
+          <span>${big&&ILL[n.ill||n.ex]?`<div class="ill">${ILL[n.ill||n.ex]}</div>`:""}<span class="meta"><span class="chip ${n.g}">${GN[n.g]}</span>${n.ok?`<span class="badge-ok tap" role="button" tabindex="0" data-trust="${esc(n.title)}" data-ok="1" title="タップで出典">✅</span>`:`<span class="badge-one tap" role="button" tabindex="0" data-trust="${esc(n.title)}" data-ok="0" title="タップでわけ">⚠️ 1社</span>`}${mine?'<span class="heat town">🏠 あなたの街</span>':""}${wt.lv>=2?`<span class="heat" title="この3日で関連ニュース${wt.n}件">🔥</span>`:""}</span>
           ${(()=>{ const e=enOf("top10",i); if(langMode()==="en"&&e) return `<h3 lang="en">${n.icon} ${esc(e.t)}</h3>${e.x?`<p lang="en">${esc(e.x)}</p>`:""}<p class="jsub">${esc(n.title)}</p>${(e.w||[]).length?`<span class="enw">${e.w.map(([a,b])=>`<i>📘 ${esc(a)} = ${esc(b)}</i>`).join("")}</span>`:""}<span class="ensay" role="button" tabindex="0" data-say="${esc(e.t+". "+(e.x||""))}">🔊 English</span>`; return `<h3>${n.icon} ${esc(n.title)}</h3>${n.text?`<p>${esc(n.text)}</p>`:""}${enBlock(e)}`; })()}
           ${srcLine(n)}${link?`<span class="more">${n.ex?'くわしい解説 →':'グラフを見る →'}</span>`:''}</span></button>${n.point?`<details class="pt"><summary>💭 ここがポイント</summary>${esc(n.point)}</details>`:""}</li>`;}).join("")}</ol>
     </section>`;
@@ -1552,6 +1591,16 @@ function calcBlock(){ return `<div class="blk card calc"><h3>🧮 わが家だ�
   <p class="hint" style="margin-top:8px">税こみの金額から本体価格を出し、税率が8%→1%になったときの差を計算しています。法案が成立した場合の目安で、お店の値づけによって変わります。外食やお酒は対象外です。</p></div>`; }
 function bindCalc(){ const r=document.getElementById("spend"); const f=()=>{ const v=+r.value; const base=v/1.08; const m=Math.round(base*0.07); document.getElementById("spendV").textContent=v.toLocaleString("ja-JP"); document.getElementById("mOut").textContent=m.toLocaleString("ja-JP")+"円"; document.getElementById("yOut").textContent=(m*12).toLocaleString("ja-JP")+"円"; }; r.addEventListener("input",f); f(); }
 
+// ===== 🔎 信頼の目安(✅/⚠️ をタップすると、どこが伝えたかとその意味が出る) =====
+function trustPop(title,ok){ const n=D.top10.find(x=>x.title===title); const r=n?srcOf(n):null; const outs=(r&&r.outs)||[]; const off=outs.some(o=>/気象庁|庁|省|警察|裁判所|日銀|日本銀行/.test(o));
+  const p=document.getElementById("pop");
+  p.innerHTML=`<b>${ok?"✅ 2社以上で確かめました":"⚠️ まだ1社だけです"}</b>
+    <p style="margin:6px 0 0;line-height:1.7">${ok?"別々の報道機関が2社以上、同じ内容を伝えています。数字や日付は記事どうしをつき合わせています。":"いまのところ1社だけ、または見出しだけで確かめたニュースです。ほかの社でも確かめられたら ✅ に変わります。「今日の3行」や「今日の数字」には使いません。"}</p>
+    ${outs.length?`<p style="margin:8px 0 0"><b>伝えたところ</b><br>${esc(outs.join("・"))}${r&&r.d?` <span class="hint">(${esc(mdLabel(r.d))})</span>`:""}</p>`:""}
+    ${off?`<p class="hint" style="margin:8px 0 0">役所や気象庁などの発表は「一次情報」です。発表そのものは、2社でなくてもそのまま使います。</p>`:""}
+    <button class="iconbtn" id="popx" style="margin-top:10px;background:transparent;color:inherit;border-color:currentColor">閉じる</button>`;
+  p.hidden=false; document.getElementById("popx").onclick=()=>p.hidden=true; }
+document.addEventListener("click",ev=>{ const b=ev.target.closest("[data-trust]"); if(b){ ev.preventDefault(); ev.stopPropagation(); trustPop(b.dataset.trust,b.dataset.ok==="1"); } },true);
 function prompt2(url){ const p=document.getElementById("pop"); p.innerHTML=`<b>このリンクを送ってください</b><p style="margin:6px 0 0;word-break:break-all;user-select:all">${esc(url)}</p><button class="iconbtn" id="popx" style="margin-top:8px;background:transparent;color:inherit;border-color:currentColor">閉じる</button>`; p.hidden=false; document.getElementById("popx").onclick=()=>p.hidden=true; }
 
 // ===== 数字 =====
@@ -3036,7 +3085,7 @@ async function loadWxLocal(force){ const pf=wxPlace(); if(!pf) return null; cons
 function wmoIcon(c){ c=+c; return c===0?"☀️":c===1?"🌤️":c===2?"⛅":c===3?"☁️":c===45||c===48?"🌫️":c>=51&&c<=57?"🌦️":c>=61&&c<=67?"🌧️":c>=71&&c<=77?"❄️":c>=80&&c<=82?"🌦️":c>=85&&c<=86?"🌨️":c>=95?"⛈️":"🌤️"; }
 let WXSRC="auto"; // auto=わたしの街があればそこ、tokyo=東京
 function wxSrc(){ return WXSRC==="tokyo"||!wxPlace()||!(AL.wxl&&AL.wxl.pf===wxPlace())?"tokyo":"local"; }
-function wxRows(){ const w=AL&&(wxSrc()==="local"?AL.wxl:AL.wx); if(!w||!(w.rows||[]).length) return []; const yr=TODAY.slice(0,4); return w.rows.map(r=>({t:r[0],iso:yr+"-"+r[0].slice(0,5).replace("/","-"),h:+r[0].slice(6,8),temp:r[1],hum:r[2],pop:r[3],mm:r[4],code:r[5],wind:r[6]})); }
+function wxRows(){ const w=AL&&(wxSrc()==="local"?AL.wxl:AL.wx); if(!w||!(w.rows||[]).length) return []; const yr=TODAY.slice(0,4); return w.rows.map(r=>({t:r[0],iso:yr+"-"+r[0].slice(0,5).replace("/","-"),h:+r[0].slice(6,8),temp:r[1],hum:r[2],pop:r[3],mm:r[4],code:r[5],wind:r[6],uv:r[7]})); }
 function wxNowIdx(R){ const n=new Date(Date.now()+9*36e5); const key=n.toISOString().slice(0,10)+"T"+String(n.getUTCHours()).padStart(2,"0"); return Math.max(0,R.findIndex(r=>r.iso+"T"+String(r.h).padStart(2,"0")===key)); }
 function whCell(r,now){ return `<span class="wh${now?" now":""}"><small>${now?"いま":r.h+"時"}</small><span aria-hidden="true">${wmoIcon(r.code)}</span><b class="num">${Math.round(r.temp)}°</b><span class="r num">☔${r.pop==null?"-":r.pop}%</span></span>`; }
 function wxStripHTML(){ let R=[]; try{ R=wxRows(); }catch(_){ return ""; } if(!R.length) return ""; const i=wxNowIdx(R); const loc=wxSrc()==="local"; return `${loc?`<span class="wh wh-pl"><small>📍</small><b>${esc(AL.wxl.place)}</b></span>`:""}`+R.slice(i,i+6).map((r,k)=>whCell(r,k===0)).join(""); }
@@ -3107,7 +3156,7 @@ async function loadAlerts(){
     tmo(fetch(P2P_URL,{cache:"no-store"}).then(r=>r.ok?r.json():null),8000).catch(()=>null)];
   const [a,p]=await Promise.all(jobs);
   const qs=[]; let ts=null, special=[];
-  if(a){ (a.quakes||[]).forEach(q=>qs.push(q)); ts=a.tsunami||null; special=a.special||[]; AL.checked=a.checked||null; if(a.wx) AL.wx=a.wx; if(a.wxmap) AL.wxmap=a.wxmap; }
+  if(a){ (a.quakes||[]).forEach(q=>qs.push(q)); ts=a.tsunami||null; special=a.special||[]; AL.checked=a.checked||null; if(a.wx) AL.wx=a.wx; if(a.wxmap) AL.wxmap=a.wxmap; AL.warn=a.warn||[]; }
   if(Array.isArray(p)){ p.forEach(r=>{
     if(r.code===551){ const e=r.earthquake||{}, h=e.hypocenter||{}; if((r.issue||{}).type==="Foreign") return; const at=p2pTime(e.time); if(!at) return;
       qs.push({id:"p"+at,at,place:h.name||"調査中",mag:h.magnitude>0?String(h.magnitude):null,depth:h.depth>0?h.depth:null,maxi:P2PS[e.maxScale]||null}); }
@@ -3119,7 +3168,9 @@ async function loadAlerts(){
   qs.forEach(q=>{ const t=Date.parse(q.at); if(isNaN(t)) return; const m=merged.find(o=>Math.abs(Date.parse(o.at)-t)<150000&&(o.place===q.place||o.place==="調査中"||q.place==="調査中"));
     if(!m) merged.push(Object.assign({},q)); else { if(qr(q.maxi)>qr(m.maxi)) m.maxi=q.maxi; if(!m.mag&&q.mag) m.mag=q.mag; if(m.place==="調査中"&&q.place!=="調査中") m.place=q.place; if(m.depth==null&&q.depth!=null) m.depth=q.depth; } });
   AL.quakes=merged.filter(q=>Date.now()-Date.parse(q.at)<3*864e5).slice(0,15); AL.tsunami=ts; AL.special=special; AL.ok=!!(a||p);
-  drawAlertBand(); if(wxPlace()) await loadWxLocal(); const wsx=document.getElementById("wxStrip"); if(wsx) wsx.innerHTML=wxStripHTML(); const b=document.querySelector("[data-quake] .qk-last"); if(b) b.outerHTML=qkLatestLabel();
+  drawAlertBand(); if(wxPlace()) await loadWxLocal(); const wsx=document.getElementById("wxStrip"); if(wsx) wsx.innerHTML=wxStripHTML();
+  const wwn=document.getElementById("wxWarn"); if(wwn) wwn.outerHTML=warnLine();
+  const wkt=document.querySelector(".wx-kit"); if(wkt) wkt.outerHTML=kitLine(); const b=document.querySelector("[data-quake] .qk-last"); if(b) b.outerHTML=qkLatestLabel();
   const sh=document.getElementById("sheet"); if(sh&&!sh.hidden&&document.getElementById("qkx")) openQuake(true); }
 function qhm(at){ const d=new Date(Date.parse(at)+9*36e5); return `${d.getUTCMonth()+1}/${d.getUTCDate()} ${d.getUTCHours()}:${String(d.getUTCMinutes()).padStart(2,"0")}`; }
 function qago(at){ const m=Math.round((Date.now()-Date.parse(at))/6e4); return m<1?"いま":m<60?`${m}分前`:m<24*60?`${Math.floor(m/60)}時間前`:`${Math.floor(m/1440)}日前`; }
@@ -3127,18 +3178,40 @@ function qkLatestLabel(){ let q=null; try{ q=AL.quakes[0]; }catch(_){ return '<s
 function alertItems(){ const L=[]; const hid=(store.get("nw-alert-hide")||"").split(",");
   if(AL.tsunami) L.push({id:AL.tsunami.id,lv:"high",i:"🌊",t:`${AL.tsunami.grade}が出ています`,s:`${AL.tsunami.areas.join("・")}${AL.tsunami.count>AL.tsunami.areas.length?" ほか":""} ・ 海や川から離れてください`});
   (AL.special||[]).filter(x=>Date.now()-Date.parse(x.at)<24*36e5).slice(0,2).forEach(x=>L.push({id:x.id,lv:"high",i:"⚠️",t:"特別警報が出ています",s:`${x.who||""} ${x.text||""}`.slice(0,70)}));
+  try{ const mw=myWarn().filter(w=>w.lv>=2&&Date.now()-Date.parse(w.at)<12*36e5).sort((a,b)=>b.lv-a.lv)[0];
+    if(mw&&!(AL.special||[]).length) L.push({id:"w"+mw.at+mw.who,lv:"high",i:"🚨",t:`${prefNow()}に特別警報が出ています`,s:`${(mw.text||"").slice(0,60)} ・ 気象庁発表`}); }catch(_){}
   AL.quakes.forEach(q=>{ const age=Date.now()-Date.parse(q.at); const r=qr(q.maxi);
     if(r>=qr("5-")&&age<24*36e5) L.push({id:"q"+q.at,lv:"high",i:"🔴",t:`地震 最大震度${QN[q.maxi]} ${q.place}`,s:`${qhm(q.at)}ごろ(${qago(q.at)})${q.mag?` ・ M${q.mag}`:""} ・ 気象庁発表`});
     else if(r>=qr("3")&&age<3*36e5) L.push({id:"q"+q.at,lv:"mid",i:"🟡",t:`地震 最大震度${QN[q.maxi]} ${q.place}`,s:`${qhm(q.at)}ごろ(${qago(q.at)})${q.mag?` ・ M${q.mag}`:""} ・ 気象庁発表`}); });
   return L.filter(x=>!hid.includes(x.id)).slice(0,3); }
 function drawAlertBand(){ const el=document.getElementById("alertBand"); if(!el) return; const L=alertItems();
-  el.hidden=!L.length; el.innerHTML=L.map(x=>`<div class="al-band ${x.lv==="mid"?"mid":""}" role="button" tabindex="0" data-quake="1"><span class="ai" aria-hidden="true">${x.i}</span><span style="flex:1"><b>${esc(x.t)}</b><small>${esc(x.s)} ・ タップでくわしく</small></span><button class="al-x" data-alx="${esc(x.id)}" aria-label="この知らせを閉じる">✕</button></div>`).join(""); }
+  el.hidden=!L.length; el.innerHTML=L.map(x=>`<div class="al-band ${x.lv==="mid"?"mid":""}" role="button" tabindex="0" data-quake="1"><span class="ai" aria-hidden="true">${x.i}</span><span style="flex:1"><b>${esc(x.t)}</b><small>${esc(x.s)} ・ タップでくわしく</small></span><button class="al-x" data-alx="${esc(x.id)}" aria-label="この知らせを閉じる">✕</button></div>`).join("")
+    + (L.some(x=>x.lv==="high")?`<button class="sos-go" data-sos="1">🆘 こまったときは(まずすること)</button>`:""); }
+// ===== 🆘 こまったときは(大きな災害のとき、まず見る画面。文字を大きく・ボタンを4つだけ) =====
+const SOS=[["🛡️","まず身を守る","地震のときは頭を守り、机の下へ。ゆれがおさまってから火を消し、ドアを開けて出口をつくる。津波の注意が出たら、海や川から離れて高いところへ。暴風のときは建物の中にいる。",[["気象庁 キキクル(危ないところの地図)","https://www.jma.go.jp/bosai/risk/"]]],
+  ["🏃","避難する","自治体の「避難指示」が出たら、すぐに安全なところへ。夜や大雨で外が危ないときは、家の2階など少しでも高いところへ。",[["気象庁 警報・注意報","https://www.jma.go.jp/bosai/warning/"],["NHK 防災・災害情報","https://www.nhk.or.jp/kishou-saigai/"]]],
+  ["🔌","停電・断水のとき","ブレーカーを落としてから避難する(電気が戻ったときの火事をふせぐ)。水はお風呂にためておくと手洗いやトイレに使える。",[["政府 防災情報のページ","https://www.bousai.go.jp/"]]],
+  ["📞","家族に知らせる","電話はつながりにくくなります。災害用伝言ダイヤル「171」や、メッセージアプリのほうがつながりやすいです。",[["災害用伝言ダイヤル171(NTT東日本)","https://www.ntt-east.co.jp/saigai/voice171/"],["web171(インターネットの伝言板)","https://www.web171.jp/"]]]];
+function openSOS(){ const sh=document.getElementById("sheet");
+  sh.innerHTML=`<div class="bar"><div class="wrap"><button class="iconbtn" id="sosx" aria-label="もどる">← もどる</button><span class="ttl">🆘 こまったときは</span></div></div><div class="wrap body sos">
+    <p class="hint">大きな地震や警報が出たときに、まずすることをまとめています。いちばん新しい情報は、下の公式のページとテレビ・ラジオで確かめてください。</p>
+    ${SOS.map(([i,t,x,links],n)=>`<details class="sos-b"${n===0?" open":""}><summary><span aria-hidden="true">${i}</span>${esc(t)}</summary><p>${esc(x)}</p>${links.map(([a,u])=>`<a href="${u}" target="_blank" rel="noopener">${esc(a)} →</a>`).join("")}</details>`).join("")}
+    <div class="exp" style="margin-top:12px">📣 ゆれる前の<b>緊急地震速報</b>は、スマホの緊急速報(エリアメール)で受け取ってください。このアプリは「起きたこと」をわかりやすく伝える役です。</div>
+    <button class="iconbtn" id="sosx2" style="align-self:flex-start;margin-top:10px">← もどる</button></div>`;
+  sh.hidden=false; sh.scrollTop=0; document.body.style.overflow="hidden";
+  const close=()=>{ sh.hidden=true; sh.innerHTML=""; document.body.style.overflow=""; };
+  sh.querySelector("#sosx").onclick=close; sh.querySelector("#sosx2").onclick=close; track("/sos","こまったときは"); }
+document.addEventListener("click",ev=>{ if(ev.target.closest("[data-sos]")){ ev.stopPropagation(); openSOS(); } },true);
 function openQuake(refresh){ const sh=document.getElementById("sheet"); sh.dataset.kind="quake";
   const tsu=AL.tsunami, sp=(AL.special||[]).filter(x=>Date.now()-Date.parse(x.at)<24*36e5);
   sh.innerHTML=`<div class="bar"><div class="wrap"><button class="iconbtn" id="qkx" aria-label="もどる">← もどる</button><span class="ttl">🌏 地震・津波・警報</span><button class="iconbtn" id="qkr" aria-label="読み直す" style="margin-left:auto">↻</button></div></div><div class="wrap body">
    <p class="hint">気象庁の発表を、アプリを開いたときに直接読んでいます(ニュースの1日4回の更新を待ちません)。${AL.checked?`最後に確かめた時刻: ${qhm(AL.checked)}`:""}${AL.ok?"":" ・ <b>いま読み込めませんでした。下の公式ページで確かめてください。</b>"}</p>
    ${tsu?`<div class="al-band" style="cursor:default"><span class="ai">🌊</span><span><b>${esc(tsu.grade)}</b><small>${esc(tsu.areas.join("・"))}${tsu.count>tsu.areas.length?" ほか":""}</small></span></div>`:`<p>🌊 津波の警報・注意報は、いま出ていません。</p>`}
    ${sp.map(x=>`<div class="al-band" style="cursor:default;margin-top:8px"><span class="ai">⚠️</span><span><b>特別警報</b><small>${esc(x.who||"")} ${esc(x.text||"")}</small></span></div>`).join("")}
+   <h3 style="margin:18px 0 6px">⚠️ ${esc(prefNow())}への気象庁のよびかけ</h3>
+   ${(()=>{ const L=myWarn().slice().sort((a,b)=>b.lv-a.lv); if(!L.length) return `<p class="hint">いま、${esc(prefNow())}へのよびかけは届いていません。下の気象庁のページでも確かめられます。</p>`;
+     return L.slice(0,4).map(w=>{ const [ic,nm]=WARN_LV[w.lv]||WARN_LV[0]; return `<div class="al-band ${w.lv>=2?"":"mid"}" style="cursor:default;margin-bottom:8px"><span class="ai">${ic}</span><span><b>${esc(nm)}</b><small>${esc(w.text||"")}</small><small class="hint">${esc(w.who||"")} ・ ${qhm(w.at)}</small></span></div>`; }).join(""); })()}
+   <div class="hint">気象庁の発表の文をそのまま出しています。「わたしの街」はマイ→🏠で変えられます。</div>
    <h3 style="margin:18px 0 0">最近の地震(3日以内)</h3>
    ${AL.quakes.length?`<ul class="qk-list">${AL.quakes.map(q=>{ const r=qr(q.maxi); const c=r>=8?"l7":r>=6?"l6":r>=4?"l5":r===3?"l4":r===2?"l3":""; return `<li><span class="qk-s ${c}"><span><small>震度</small>${esc(QN[q.maxi]||"?")}</span></span><span><b>${esc(q.place)}</b><br><span class="hint">${qhm(q.at)}ごろ(${qago(q.at)})${q.mag?` ・ M${esc(q.mag)}`:""}${q.depth!=null?` ・ 深さ${q.depth===0?"ごく浅い":esc(q.depth)+"km"}`:""}</span></span></li>`; }).join("")}</ul>`:`<p class="hint" style="margin-top:8px">${AL.ok?"3日以内に震度のある地震の情報はありません。":"読み込み中か、つながりませんでした。"}</p>`}
    <h3 style="margin:20px 0 0">公式ページで確かめる</h3>
@@ -3149,6 +3222,7 @@ function openQuake(refresh){ const sh=document.getElementById("sheet"); sh.datas
      <a href="https://www.jma.go.jp/bosai/risk/" target="_blank" rel="noopener">🗺️ キキクル(危険度分布)<small>土砂災害・浸水・洪水の危ないところ</small></a>
      <a href="https://www3.nhk.or.jp/news/" target="_blank" rel="noopener">📺 NHK ニュース<small>テレビ・ネットの最新ニュース</small></a>
    </div>
+   <button class="sos-go" data-sos="1" style="margin-top:14px">🆘 こまったときは(まずすること)</button>
    <div class="exp" style="margin-top:14px">📣 このアプリは「起きたことをわかりやすく」がお仕事です。<b>揺れる前の緊急地震速報</b>は、スマホの緊急速報(エリアメール)や防災アプリで受け取ってください。震度5弱以上・津波・特別警報は、ntfyの通知(マイ→設定)でもお知らせします。</div>
    <p class="hint" style="margin-top:10px">出典: 気象庁(P2P地震情報 経由をふくむ)</p></div>`;
   if(!refresh){ sh.hidden=false; document.body.style.overflow="hidden"; }
