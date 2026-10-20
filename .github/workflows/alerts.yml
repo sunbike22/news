@@ -1,0 +1,39 @@
+name: 地震・津波・特別警報を見張る
+# 気象庁の公式データを10分ごとに見て、alerts ブランチの alert.json に書く(main には書かないので、ニュースの更新とぶつからない)。
+# 大きなもの(震度5弱以上・津波・特別警報)が出たら ntfy で知らせる。
+on:
+  schedule:
+    - cron: "3,13,23,33,43,53 * * * *"
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: alerts
+  cancel-in-progress: false
+jobs:
+  watch:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - name: 前回の alert.json を読む
+        run: |
+          git fetch --depth=1 origin alerts:alerts 2>/dev/null && git show alerts:alert.json > /tmp/prev.json || echo '{}' > /tmp/prev.json
+      - name: 気象庁のデータを見る
+        id: run
+        run: |
+          mkdir -p /tmp/out
+          python3 tools/fetch_alerts.py /tmp/prev.json /tmp/out/alert.json | tee /tmp/log.txt
+          if grep -q '^CHANGED' /tmp/log.txt; then echo "changed=1" >> "$GITHUB_OUTPUT"; fi
+      - name: alerts ブランチに書く(いつも1コミットだけ)
+        if: steps.run.outputs.changed == '1'
+        run: |
+          cd /tmp/out
+          git init -q -b alerts
+          git config user.name "alert-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add alert.json
+          git commit -qm "地震・津波・特別警報の最新"
+          git push -qf "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" alerts
