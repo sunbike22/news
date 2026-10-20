@@ -538,6 +538,15 @@ svg.eat{animation:petEat .7s ease both!important}
 .fun-t{position:relative;display:flex;flex-direction:column;align-items:center;gap:4px;border:1px solid var(--line);background:var(--surface);border-radius:14px;padding:12px 4px;cursor:pointer;color:var(--ink)}
 .fun-t span{font-size:1.6rem;line-height:1}.fun-t small{font-size:.75rem;font-weight:700}
 .fun-dot{position:absolute;top:8px;right:10px;width:8px;height:8px;border-radius:50%;background:#e5484d}
+/* 英語 */
+.lang-seg button{padding:4px 9px;font-size:.78rem}
+.enb{display:flex;flex-direction:column;gap:3px;margin-top:6px;padding-top:6px;border-top:1px dashed var(--line)}
+.ent{font-weight:700;font-size:.92rem;font-family:"Helvetica Neue",Arial,sans-serif}.enx{font-size:.86rem;color:var(--muted);font-family:"Helvetica Neue",Arial,sans-serif}
+.enw{display:flex;flex-wrap:wrap;gap:4px;margin-top:2px}.enw i{font-style:normal;font-size:.74rem;background:var(--accent-soft);border-radius:999px;padding:1px 8px}
+.ensay{align-self:flex-start;display:inline-block;margin-top:4px;font-size:.75rem;font-weight:700;color:var(--accent);border:1px solid var(--accent);border-radius:999px;padding:1px 8px;cursor:pointer}
+.jsub{font-size:.8rem;color:var(--muted);margin:2px 0 0}
+[lang="en"]{font-family:"Helvetica Neue",Arial,sans-serif}
+.enlist{list-style:none;margin:0;padding:0}.enlist li{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--line)}
 /* はじめての案内 */
 .ob{position:fixed;inset:0;z-index:80;background:rgba(10,14,30,.55);display:grid;place-items:center;padding:16px;animation:rise .3s ease both}
 .ob-card{background:var(--surface);color:var(--ink);border-radius:20px;max-width:380px;width:100%;padding:20px;text-align:center;box-shadow:0 20px 50px rgba(0,0,0,.35)}
@@ -755,13 +764,14 @@ function mmdd(iso){ return iso.slice(5,10); }
 function seasonNow(){ if(LOOK.season==="off") return null; if(LOOK.preview){ const z=SEASONS.find(x=>x.k===LOOK.preview); if(z) return z; }
   const t=mmdd(TODAY); return SEASONS.find(z=> z.from<=z.to ? (t>=z.from&&t<=z.to) : (t>=z.from||t<=z.to)) || null; }
 function inSeason(z,iso){ const t=mmdd(iso); return z.from<=z.to ? (t>=z.from&&t<=z.to) : (t>=z.from||t<=z.to); }
-const SECS = [["pet","🐣 ペット"],["play","▶️ 1分で見る"],["weather","🌤️ 天気"],["three","☀️ 今日の3行"],["ten","📰 今日のニュース10"],["fun","✨ おたのしみ"],["mood","🗺️ 世の中の天気図"],["know","👆 知ってた?"],["talk","🍽️ 今日の話のタネ"],["reporter","🎙️ よむまる記者"],["local","🏠 わたしの街"],["gacha","🎰 今日の1本ガチャ"],["foryou","🎯 あなた向け"],["other","📚 そのほかのニュース"],["quiz","🧠 今日のクイズ"],["number","🔢 今日の数字"]];
+const SECS = [["pet","🐣 ペット"],["play","▶️ 1分で見る"],["weather","🌤️ 天気"],["three","☀️ 今日の3行"],["ten","📰 今日のニュース10"],["fun","✨ おたのしみ"],["english","📘 今日の英単語"],["mood","🗺️ 世の中の天気図"],["know","👆 知ってた?"],["talk","🍽️ 今日の話のタネ"],["reporter","🎙️ よむまる記者"],["local","🏠 わたしの街"],["gacha","🎰 今日の1本ガチャ"],["foryou","🎯 あなた向け"],["other","📚 そのほかのニュース"],["quiz","🧠 今日のクイズ"],["number","🔢 今日の数字"]];
 const LOOK = (()=>{ let p={}; try{ p=JSON.parse(store.get("nw-look")||"{}")||{}; }catch(_){ p={}; }
   const fix=(arr,all)=>{ const a=(Array.isArray(arr)?arr:[]).filter(k=>all.includes(k)); all.forEach(k=>{ if(!a.includes(k)) a.push(k); }); return a; };
   const had=new Set(Array.isArray(p.order)?p.order:[]); p.order=fix(p.order,SECS.map(s=>s[0]));
   if(had.size){ SECS.forEach(([k],i)=>{ if(had.has(k)) return; p.order=p.order.filter(x=>x!==k); if(i===0){ p.order.unshift(k); return; } const prev=SECS[i-1][0]; const at=p.order.indexOf(prev); p.order.splice(at<0?p.order.length:at+1,0,k); }); } p.off=p.off&&typeof p.off==="object"?p.off:{};
   p.tabs=fix(p.tabs,["today","search","map","explain","numbers","plan","my"]); p.tabOff=p.tabOff&&typeof p.tabOff==="object"?p.tabOff:{}; p.tabOff.my=false;
   if(!p.v2){ p.v2=1; p.off=p.off&&typeof p.off==="object"?p.off:{}; ["mood","know","talk","reporter","local","gacha"].forEach(k=>p.off[k]=true); }
+  if(!p.v3){ p.v3=1; p.off=p.off||{}; p.off.english=true; }
   if(!COLORS.some(c=>c[0]===p.color)) p.color="blue"; if(p.season!=="off") p.season="auto"; if(typeof p.preview!=="string") p.preview=""; if(!["compact","normal","roomy"].includes(p.density)) p.density="normal";
   return p; })();
 function saveLook(){ store.set("nw-look", JSON.stringify(LOOK)); }
@@ -881,8 +891,8 @@ function renderToday(){
   S.pet=petCard();
   S.weather=weatherCard();
   S.three=`<section aria-label="今日の3行">
-      <div class="sec-h"><h2>☀️ 今日の3行</h2><span class="sub">時間がない日はここだけでOK</span></div>
-      <div class="three" style="margin-top:10px">${D.three.map(x=>`<button class="t ${x.tone}"${exLink(x.ex)}><span class="lab">${esc(x.label)}</span><h3>${esc(x.title)}</h3><p>${esc(x.text)}</p>${x.ex?'<span class="more">くわしく →</span>':''}</button>`).join("")}</div>
+      <div class="sec-h"><h2>☀️ 今日の3行</h2>${EN?langSeg():`<span class="sub">時間がない日はここだけでOK</span>`}</div>
+      <div class="three" style="margin-top:10px">${D.three.map((x,i)=>{ const e=enOf("three",i); const en1=langMode()==="en"&&e; return `<button class="t ${x.tone}"${exLink(x.ex)}><span class="lab">${esc(x.label)}</span>${en1?`<h3 lang="en">${esc(e.t)}</h3><p lang="en">${esc(e.x||"")}</p><p class="jsub">${esc(x.title)}</p>`:`<h3>${esc(x.title)}</h3><p>${esc(x.text)}</p>${enBlock(e)}`}${en1?`<span class="ensay" role="button" tabindex="0" data-say="${esc(e.t+". "+(e.x||""))}">🔊 English</span>`:""}${x.ex?'<span class="more">くわしく →</span>':''}</button>`; }).join("")}</div>
       <button class="fchip" id="shareImg" style="margin-top:10px">🖼️ 画像にして送る</button>
     </section>`;
   S.ten=`<section aria-label="今日のニュース10">
@@ -892,13 +902,13 @@ function renderToday(){
         return `<li class="${big?'big':''} w${wt.lv}${mine?' mytown':''}">${pinBtn({k:"t|"+n.title,h:n.title,g:n.g,d:(NEWS[0]||{}).d,ex:n.ex},"abs")}<button class="row${link?' link':''}"${n.ex?` data-ex="${n.ex}"`:''}${n.tab?` data-tab="${n.tab}"`:''} ${link?'':'tabindex="-1"'}>
           <span class="rank">${i+1}</span>
           <span>${big&&ILL[n.ill||n.ex]?`<div class="ill">${ILL[n.ill||n.ex]}</div>`:""}<span class="meta"><span class="chip ${n.g}">${GN[n.g]}</span>${wt.n>=2?`<span class="heat" title="この3日の関連ニュース">${"🔥".repeat(wt.lv)} 関連${wt.n}件</span>`:""}${mine?'<span class="heat town">🏠 あなたの街</span>':""}${n.ok?'<span class="badge-ok">✅ 複数社で確認</span>':'<span class="badge-one">⚠️ 1社のみ</span>'}</span>
-          <h3>${n.icon} ${esc(n.title)}</h3>
-          ${n.text?`<p>${esc(n.text)}</p>`:""}
+          ${(()=>{ const e=enOf("top10",i); if(langMode()==="en"&&e) return `<h3 lang="en">${n.icon} ${esc(e.t)}</h3>${e.x?`<p lang="en">${esc(e.x)}</p>`:""}<p class="jsub">${esc(n.title)}</p>${(e.w||[]).length?`<span class="enw">${e.w.map(([a,b])=>`<i>📘 ${esc(a)} = ${esc(b)}</i>`).join("")}</span>`:""}<span class="ensay" role="button" tabindex="0" data-say="${esc(e.t+". "+(e.x||""))}">🔊 English</span>`; return `<h3>${n.icon} ${esc(n.title)}</h3>${n.text?`<p>${esc(n.text)}</p>`:""}${enBlock(e)}`; })()}
           ${n.point?`<div class="pt">💭 <b>ここがポイント</b> ${esc(n.point)}</div>`:""}
           ${link?`<span class="more">${n.ex?'くわしい解説 →':'グラフを見る →'}</span>`:''}</span></button></li>`;}).join("")}</ol>
     </section>`;
   S.mood=moodCard();
   S.know=knowCard();
+  S.english=englishCard();
   S.fun=funGrid();
   S.talk=talkCard();
   S.reporter=reporterCard();
@@ -1124,7 +1134,7 @@ function openEx(k){
     <div class="hint">最終更新 ${esc(e.updated)} ・ ⏱️ 全部で約${e.min}分 ・ 点線のことばはタップで意味が出ます</div>
     ${PHOTOS[k]?photoBlock(k):ILL[k]?`<div><div class="ill">${ILL[k]}</div><div class="credit">イラスト: 自作(イメージ)</div></div>`:""}
     <button class="fchip" id="exSpeak" style="align-self:flex-start">🔊 聞く</button>
-    <div class="kid"><div class="l">🧒 ひとことで言うと</div><h2>${esc(e.kid)}</h2></div>
+    <div class="kid"><div class="l">🧒 ひとことで言うと</div><h2>${esc(e.kid)}</h2>${EN&&EN.ex&&EN.ex[k]&&langMode()!=="ja"?`<p class="enx" lang="en" style="margin:6px 0 0">${esc(EN.ex[k])} <span class="ensay" role="button" tabindex="0" data-say="${esc(EN.ex[k])}">🔊</span></p>`:""}</div>
     <div class="blk"><h3>💡 もう少しくわしく</h3><p><b>${glossify(esc(e.more[0]))}</b></p><p style="margin-top:6px">${glossify(esc(e.more[1]))}</p></div>
     ${e.stats?`<div class="stats">${e.stats.map(([k2,v])=>`<div class="stat"><div class="v num">${esc(v)}</div><div class="k">${esc(k2)}</div></div>`).join("")}</div>`:""}
     <div class="blk"><h3>🖼️ 動く図でわかる <button class="fplay" id="fplay">▶ もう一度</button></h3><div class="flow" id="flow">${flow}</div></div>
@@ -1457,6 +1467,7 @@ function openLook(){
       <section class="lk-sec"><h3>季節の飾り</h3><div class="hint">ハロウィンなどの期間中は、色と飾りが自動で変わります(テーマの色より優先)。</div>
         <div class="setrow"><span class="seg">${[["auto","自動"],["off","オフ"]].map(([k,l])=>`<button data-lsea="${k}" aria-pressed="${LOOK.season===k}">${l}</button>`).join("")}</span></div>
         <div class="chips">${SEASONS.map(z=>`<button class="fchip" data-lprev="${z.k}" aria-pressed="${LOOK.preview===z.k}">${z.icon} ${esc(z.name)}をためしに見る</button>`).join("")}</div></section>
+      ${EN?`<section class="lk-sec"><h3>ニュースのことば</h3><div class="hint">英語にすると、英語の勉強にも使えます(大事な英単語と発音つき)。</div><div class="setrow">${langSeg()}</div></section>`:""}
       <section class="lk-sec"><h3>空の演出</h3><div class="hint">朝・昼・夕方・夜で画面の上のほうの色が変わり、雨の日は少しくもり空の色になります。</div>
         <div class="setrow"><span class="seg">${[["on","出す"],["off","出さない"]].map(([k,l])=>`<button data-lsky="${k}" aria-pressed="${(LOOK.sky!==false)===(k==="on")}">${l}</button>`).join("")}</span></div></section>
       <section class="lk-sec"><h3>ページのペット</h3><div class="hint">各ページに、そのページに合ったコスプレをしたペットが出ます。</div>
@@ -2089,7 +2100,7 @@ function notifyHTML(){ const url="https://ntfy.sh/"+NTFY_TOPIC;
     <div class="hint" style="margin-top:6px">やめたいときは、ntfyアプリでこのトピックを消すだけです。</div></section>`; }
 function bindNotify(){ const b=document.getElementById("ntfyCopy"); if(b) b.onclick=async()=>{ try{ await navigator.clipboard.writeText(NTFY_TOPIC); toast("📋 コピーしました"); }catch(_){ prompt("トピック名",NTFY_TOPIC); } }; }
 // ===== おたのしみ(きょうの画面をすっきりさせるため、小さな遊びはここにまとめる) =====
-const FUN=[["reporter","🎙️","よむまる記者",()=>reporterCard()],["gacha","🎰","今日の1本ガチャ",()=>gachaCard()],["mood","🗺️","世の中の天気図",()=>moodCard()],["know","👆","知ってた?",()=>knowCard()],["talk","🍽️","話のタネ",()=>talkCard()],["local","🏠","わたしの街",()=>localCard()]];
+const FUN=[["reporter","🎙️","よむまる記者",()=>reporterCard()],["gacha","🎰","今日の1本ガチャ",()=>gachaCard()],["mood","🗺️","世の中の天気図",()=>moodCard()],["know","👆","知ってた?",()=>knowCard()],["talk","🍽️","話のタネ",()=>talkCard()],["local","🏠","わたしの街",()=>localCard()],["english","📘","今日の英単語",()=>englishCard()]];
 function funGrid(){ const L=FUN.filter(f=>LOOK.off[f[0]]); if(!L.length) return "";
   return `<section aria-label="おたのしみ"><div class="sec-h"><h2>✨ おたのしみ</h2><span class="sub">タップで開く</span></div><div class="fun-grid">${L.map(([k,i,n])=>`<button class="fun-t" data-fun="${k}"><span>${i}</span><small>${esc(n)}</small>${k==="gacha"&&(ME.gacha||{}).d!==TODAY?'<i class="fun-dot"></i>':""}</button>`).join("")}</div></section>`; }
 function openFun(k){ const f=FUN.find(x=>x[0]===k); if(!f) return; const html=f[3](); if(!html){ toast("今日はまだありません"); return; } const sh=document.getElementById("sheet");
@@ -2100,8 +2111,21 @@ function openFun(k){ const f=FUN.find(x=>x[0]===k); if(!f) return; const html=f[
   sh.querySelectorAll("[data-ex]").forEach(b=>b.onclick=()=>{ sh.hidden=true; openEx(b.dataset.ex); });
   sh.querySelectorAll("[data-mood]").forEach(b=>b.onclick=()=>{ close(); sState.q=""; sState.th=""; sState.ok=false; sState.onlyNew=false; sState.g=new Set([b.dataset.mood]); go("search"); });
   track("/fun/"+k,"おたのしみ"); }
+// ===== 英語で読む(英語の勉強に。data.js の en を使う) =====
+const EN=(D.en&&typeof D.en==="object")?D.en:null;
+function langMode(){ return EN?(LOOK.lang||"ja"):"ja"; }
+function enOf(kind,i){ if(!EN) return null; const L=EN[kind]; return L&&L[i]?L[i]:null; }
+function enBlock(e){ if(!e||langMode()==="ja") return ""; return `<span class="enb" lang="en"><span class="ent">${esc(e.t||"")}</span>${e.x?`<span class="enx">${esc(e.x)}</span>`:""}${(e.w||[]).length?`<span class="enw">${e.w.map(([a,b])=>`<i>📘 ${esc(a)} = ${esc(b)}</i>`).join("")}</span>`:""}<span class="ensay" role="button" tabindex="0" data-say="${esc((e.t||"")+". "+(e.x||""))}">🔊 English</span></span>`; }
+function langSeg(){ if(!EN) return ""; const m=langMode(); return `<span class="seg lang-seg" role="group" aria-label="ことば">${[["ja","日本語"],["both","日+英"],["en","English"]].map(([k,l])=>`<button data-lang="${k}" aria-pressed="${m===k}">${l}</button>`).join("")}</span>`; }
+function sayEn(t){ try{ const s=window.speechSynthesis; if(!s) return; s.cancel(); const u=new SpeechSynthesisUtterance(t); u.lang="en-US"; u.rate=.9; s.speak(u); }catch(_){} }
+document.addEventListener("click",e=>{ const b=e.target.closest("[data-say]"); if(b){ e.preventDefault(); e.stopPropagation(); sayEn(b.dataset.say); track("/en/say","英語の読み上げ"); return; }
+  const l=e.target.closest("[data-lang]"); if(l){ LOOK.lang=l.dataset.lang; saveLook(); track("/en/"+LOOK.lang,"英語"); go(current,{keepScroll:true}); } },true);
+function englishCard(){ if(!EN) return ""; const W=[]; (EN.top10||[]).forEach((e,i)=>(e.w||[]).forEach(w=>W.push([w[0],w[1],D.top10[i]&&D.top10[i].title]))); if(!W.length) return "";
+  return `<section class="card" aria-label="今日の英単語"><b>📘 今日の英単語</b><div class="hint" style="margin:4px 0 8px">今日のニュースに出てきた英語。🔊で発音が聞けます。</div>
+    <ul class="enlist">${W.map(([a,b,t])=>`<li><span><b lang="en">${esc(a)}</b> = ${esc(b)}<small class="hint" style="display:block">${esc(t||"")}</small></span><button class="fchip" data-say="${esc(a)}">🔊</button></li>`).join("")}</ul></section>`; }
 // ===== お知らせ(新しくなったところ)。機能を足したら、いちばん上に1つ足す =====
 const UPDATES=[
+  {id:"2026-10-20n",d:"2026-10-20",t:"🇬🇧 ニュースを英語で読めるように & 画面をすっきり",L:["「今日の3行」の右上で「日+英」「English」を選ぶと、3行・ニュース10・解説が英語でも読めます(大事な英単語と🔊発音つき)","小さな遊びは「✨ おたのしみ」にまとめ、マイは「ペット・保存・記録・設定」に分けました","地図に場所の名前を出し、近い場所はまとめて見やすくしました"]},
   {id:"2026-10-20m",d:"2026-10-20",t:"🔔 朝と夕方に通知が届くように",L:["「マイ」の「通知を受け取る」から登録すると、更新のたびに上位3つのニュースと天気がスマホに届きます(1日2回・無料)"]},
   {id:"2026-10-20l",d:"2026-10-20",t:"🎙️ よむまる記者・🎰 ガチャ・🏠 わたしの街・🎲 すごろく",L:["ペットが記者になって、よく読むジャンルの1本を伝えてくれます(読み上げも)","1日1回の「今日の1本ガチャ」、住んでいる都道府県のニュースに🏠の印","1週間のニュースすごろく(ゴールでレアな服)、ペットが見た夢の話、ことばカードにペットの感想","時間と天気で画面の空気が変わり、関連ニュースが多い話題は🔥で大きく表示"]},
   {id:"2026-10-20k",d:"2026-10-20",t:"📊 よく読まれている話題を数えはじめました",L:["どの画面・解説・ジャンルが何回開かれたかだけを数えます(GoatCounter・だれが見たかはわかりません)","質問の文章・メモ・あなたの記録は送りません。くわしくは「マイ」の使い方の「記録について」へ"]},

@@ -9,6 +9,9 @@
 - `manifest.webmanifest`・`sw.js`・`icon-*.png`・`apple-touch-icon.png` — ホーム画面に追加してアプリのように使うための設定。`sw.js` は前回の内容をオフラインでも読めるようにする(index.html と data.js はネット優先)。
 - `robots.txt` と `<meta name="robots" content="noindex">` — 検索エンジンに出さないための設定。消さない。
 
+## 英語版
+- `data.js` の最後の `window.NEWS_DATA.en = {three:[{t,x}], top10:[{t,x,w:[[英語,日本語]]}], ex:{キー:英語}}`。three・top10 は同じ順番・同じ数。サイト更新のたびに Claude が日本語から英語にする(やさしい英語、新しい事実は足さない)。`en` がなければ英語ボタンは出ない。
+
 ## 長い期間のグラフ
 - `history.json` は GitHub Actions(`.github/workflows/history.yml` → `tools/fetch_history.py`)が毎朝自動で作る(FRED → 取れなければ 日経平均は日経の公式CSV・Yahoo・Stooq、円は Frankfurter。取れない系列は前回分を残す)。手で書き換えない。
 - `data.js` の `ticks` は1ドル(円)の数時間ごとの記録(Alpha Vantage のリアルタイムレート)。サイト更新のたびに1点足し、30日より古い点は消す。日経平均・原油の時間ごとのデータは無料の確かな取得先がないので扱わない。
