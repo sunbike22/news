@@ -180,6 +180,26 @@ mark{background:#ffe066;color:#141b2d;border-radius:3px;padding:0 1px}
 .result{border-color:var(--ok);background:var(--ok-soft)}
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(92px + env(safe-area-inset-bottom,0px));z-index:90;background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:999px;font-weight:700;font-size:.9rem;box-shadow:0 8px 24px rgba(0,0,0,.25);animation:rise .4s ease both;max-width:calc(100% - 32px);text-align:center}
 .toast.out{opacity:0;transition:opacity .5s}
+/* 地震・津波・特別警報(気象庁発表)の帯 */
+#alertBand{padding-top:10px}
+.al-band{display:flex;align-items:center;gap:10px;width:100%;text-align:left;border:0;border-radius:14px;padding:12px 14px;cursor:pointer;color:#fff;background:#c62828;box-shadow:0 4px 14px rgba(198,40,40,.3);font-size:1rem;line-height:1.45}
+.al-band.mid{background:#fff4d6;color:#5a3d00;box-shadow:none;border:1px solid #f0c75e}
+.al-band .ai{font-size:1.5rem}
+.al-band small{display:block;opacity:.9;font-size:.85rem}
+.al-band + .al-band{margin-top:8px}
+.al-x{background:none;border:0;color:inherit;font-size:1.1rem;padding:6px;cursor:pointer}
+:root[data-theme="dark"] .al-band.mid{background:#3a2e10;color:#ffe3a3;border-color:#7a5d1a}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .al-band.mid{background:#3a2e10;color:#ffe3a3;border-color:#7a5d1a}}
+.qk-list{list-style:none;margin:8px 0 0;padding:0}
+.qk-list li{display:grid;grid-template-columns:56px 1fr;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
+.qk-s{display:grid;place-items:center;width:52px;height:52px;border-radius:12px;font-weight:800;font-size:1.25rem;background:var(--surface2);color:var(--ink)}
+.qk-s small{font-size:.65rem;font-weight:700;display:block;margin-bottom:-6px}
+.qk-s.l3{background:#e3f2fd;color:#0d47a1}.qk-s.l4{background:#fff3c4;color:#6b4e00}.qk-s.l5{background:#ffcc80;color:#5d2a00}.qk-s.l6{background:#e53935;color:#fff}.qk-s.l7{background:#7b1fa2;color:#fff}
+.qk-links{display:grid;gap:8px;margin-top:10px}
+.qk-links a{display:block;padding:12px 14px;border:1px solid var(--line);border-radius:12px;background:var(--surface);color:var(--ink);text-decoration:none;font-weight:700}
+.qk-links a small{display:block;font-weight:400;color:var(--muted)}
+.qk-open{margin-top:8px}
+
 .bak.warn{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-soft)}
 .bak-st{font-size:.92rem;color:var(--muted)}
 .mytabs button{position:relative}
@@ -674,6 +694,7 @@ svg.eat{animation:petEat .7s ease both!important}
   <div class="wrap" role="tablist" id="tabs"></div>
 </nav>
 
+<div id="alertBand" class="wrap" hidden></div>
 <main class="wrap" id="main"></main>
 
 <div id="sheet" class="sheet" hidden></div>
@@ -880,6 +901,7 @@ function weatherCard(){
       <div class="notes">${w.notes.map(n=>`<div class="note">⚠️ ${esc(n)}</div>`).join("")}</div>
     </div>
     <div class="hint" style="margin-top:8px">出典: ${esc(w.source)}</div>
+    <button class="fchip qk-open" data-quake="1">🌏 最近の地震・警報を見る${qkLatestLabel()}</button>
   </section>`;
 }
 function exLink(id){ return id && D.explainers[id] ? ` data-ex="${id}"` : ""; }
@@ -2490,8 +2512,77 @@ setTimeout(()=>{ try{ onboard(); }catch(_){} },600);
 try{ saveRival(); }catch(_){}
 document.getElementById("bellBtn").onclick=openUpdates; markBell();
 document.getElementById("gdFab").onclick=openGuide;
+
+// ===== 地震・津波・特別警報(気象庁発表)。1日4回の更新を待たずに、開いたときに直接読む =====
+// alert.json は GitHub Actions が10分ごとに気象庁から作る(alerts ブランチ)。地震は P2P地震情報からも直接読み、早い方を使う。
+const ALERT_URL="https://raw.githubusercontent.com/sunbike22/news/alerts/alert.json";
+const P2P_URL="https://api.p2pquake.net/v2/history?codes=551&codes=552&limit=12";
+const QS=["1","2","3","4","5-","5+","6-","6+","7"], QN={"1":"1","2":"2","3":"3","4":"4","5-":"5弱","5+":"5強","6-":"6弱","6+":"6強","7":"7"};
+const P2PS={10:"1",20:"2",30:"3",40:"4",45:"5-",46:"5-",50:"5+",55:"6-",60:"6+",70:"7"};
+const AL={quakes:[],tsunami:null,special:[],checked:null,ok:false};
+const qr=s=>QS.indexOf(s);
+function tmo(p,ms){ return Promise.race([p,new Promise((_,r)=>setTimeout(()=>r(new Error("timeout")),ms))]); }
+function p2pTime(t){ const m=/^(\d+)\/(\d+)\/(\d+) (\d+):(\d+)/.exec(t||""); return m?`${m[1]}-${m[2].padStart(2,"0")}-${m[3].padStart(2,"0")}T${m[4].padStart(2,"0")}:${m[5]}:00+09:00`:null; }
+async function loadAlerts(){
+  const jobs=[
+    tmo(fetch(ALERT_URL+"?t="+Math.floor(Date.now()/60000),{cache:"no-store"}).then(r=>r.ok?r.json():null),8000).catch(()=>null),
+    tmo(fetch(P2P_URL,{cache:"no-store"}).then(r=>r.ok?r.json():null),8000).catch(()=>null)];
+  const [a,p]=await Promise.all(jobs);
+  const qs=[]; let ts=null, special=[];
+  if(a){ (a.quakes||[]).forEach(q=>qs.push(q)); ts=a.tsunami||null; special=a.special||[]; AL.checked=a.checked||null; }
+  if(Array.isArray(p)){ p.forEach(r=>{
+    if(r.code===551){ const e=r.earthquake||{}, h=e.hypocenter||{}; if((r.issue||{}).type==="Foreign") return; const at=p2pTime(e.time); if(!at) return;
+      qs.push({id:"p"+at,at,place:h.name||"調査中",mag:h.magnitude>0?String(h.magnitude):null,depth:h.depth>0?h.depth:null,maxi:P2PS[e.maxScale]||null}); }
+    else if(r.code===552&&!ts){ const ar=r.areas||[]; const g=["MajorWarning","Warning","Watch"].find(x=>ar.some(y=>y.grade===x)); const at=p2pTime(r.time);
+      if(!r.cancelled&&g&&at&&Date.now()-Date.parse(at)<24*36e5) ts={id:"t"+at,at,grade:{MajorWarning:"大津波警報",Warning:"津波警報",Watch:"津波注意報"}[g],areas:ar.filter(y=>y.grade===g).slice(0,8).map(y=>y.name),count:ar.length}; } });
+    AL.checked=new Date().toISOString(); }
+  // 同じ地震(2分以内・同じ場所)をまとめる。くわしい方(震度・規模がある方)を残す
+  qs.sort((x,y)=>Date.parse(y.at)-Date.parse(x.at)); const merged=[];
+  qs.forEach(q=>{ const t=Date.parse(q.at); if(isNaN(t)) return; const m=merged.find(o=>Math.abs(Date.parse(o.at)-t)<150000&&(o.place===q.place||o.place==="調査中"||q.place==="調査中"));
+    if(!m) merged.push(Object.assign({},q)); else { if(qr(q.maxi)>qr(m.maxi)) m.maxi=q.maxi; if(!m.mag&&q.mag) m.mag=q.mag; if(m.place==="調査中"&&q.place!=="調査中") m.place=q.place; if(m.depth==null&&q.depth!=null) m.depth=q.depth; } });
+  AL.quakes=merged.filter(q=>Date.now()-Date.parse(q.at)<3*864e5).slice(0,15); AL.tsunami=ts; AL.special=special; AL.ok=!!(a||p);
+  drawAlertBand(); const b=document.querySelector("[data-quake] .qk-last"); if(b) b.outerHTML=qkLatestLabel();
+  const sh=document.getElementById("sheet"); if(sh&&!sh.hidden&&document.getElementById("qkx")) openQuake(true); }
+function qhm(at){ const d=new Date(Date.parse(at)+9*36e5); return `${d.getUTCMonth()+1}/${d.getUTCDate()} ${d.getUTCHours()}:${String(d.getUTCMinutes()).padStart(2,"0")}`; }
+function qago(at){ const m=Math.round((Date.now()-Date.parse(at))/6e4); return m<1?"いま":m<60?`${m}分前`:m<24*60?`${Math.floor(m/60)}時間前`:`${Math.floor(m/1440)}日前`; }
+function qkLatestLabel(){ let q=null; try{ q=AL.quakes[0]; }catch(_){ return '<span class="qk-last"></span>'; } return q?`<span class="qk-last hint" style="margin-left:4px">(最新: ${qago(q.at)} 震度${QN[q.maxi]||"?"})</span>`:'<span class="qk-last"></span>'; }
+function alertItems(){ const L=[]; const hid=(store.get("nw-alert-hide")||"").split(",");
+  if(AL.tsunami) L.push({id:AL.tsunami.id,lv:"high",i:"🌊",t:`${AL.tsunami.grade}が出ています`,s:`${AL.tsunami.areas.join("・")}${AL.tsunami.count>AL.tsunami.areas.length?" ほか":""} ・ 海や川から離れてください`});
+  (AL.special||[]).filter(x=>Date.now()-Date.parse(x.at)<24*36e5).slice(0,2).forEach(x=>L.push({id:x.id,lv:"high",i:"⚠️",t:"特別警報が出ています",s:`${x.who||""} ${x.text||""}`.slice(0,70)}));
+  AL.quakes.forEach(q=>{ const age=Date.now()-Date.parse(q.at); const r=qr(q.maxi);
+    if(r>=qr("5-")&&age<24*36e5) L.push({id:"q"+q.at,lv:"high",i:"🔴",t:`地震 最大震度${QN[q.maxi]} ${q.place}`,s:`${qhm(q.at)}ごろ(${qago(q.at)})${q.mag?` ・ M${q.mag}`:""} ・ 気象庁発表`});
+    else if(r>=qr("3")&&age<3*36e5) L.push({id:"q"+q.at,lv:"mid",i:"🟡",t:`地震 最大震度${QN[q.maxi]} ${q.place}`,s:`${qhm(q.at)}ごろ(${qago(q.at)})${q.mag?` ・ M${q.mag}`:""} ・ 気象庁発表`}); });
+  return L.filter(x=>!hid.includes(x.id)).slice(0,3); }
+function drawAlertBand(){ const el=document.getElementById("alertBand"); if(!el) return; const L=alertItems();
+  el.hidden=!L.length; el.innerHTML=L.map(x=>`<div class="al-band ${x.lv==="mid"?"mid":""}" role="button" tabindex="0" data-quake="1"><span class="ai" aria-hidden="true">${x.i}</span><span style="flex:1"><b>${esc(x.t)}</b><small>${esc(x.s)} ・ タップでくわしく</small></span><button class="al-x" data-alx="${esc(x.id)}" aria-label="この知らせを閉じる">✕</button></div>`).join(""); }
+function openQuake(refresh){ const sh=document.getElementById("sheet"); sh.dataset.kind="quake";
+  const tsu=AL.tsunami, sp=(AL.special||[]).filter(x=>Date.now()-Date.parse(x.at)<24*36e5);
+  sh.innerHTML=`<div class="bar"><div class="wrap"><button class="iconbtn" id="qkx" aria-label="もどる">←</button><span class="ttl">🌏 地震・津波・警報</span><button class="iconbtn" id="qkr" aria-label="読み直す" style="margin-left:auto">↻</button></div></div><div class="wrap body">
+   <p class="hint">気象庁の発表を、アプリを開いたときに直接読んでいます(ニュースの1日4回の更新を待ちません)。${AL.checked?`最後に確かめた時刻: ${qhm(AL.checked)}`:""}${AL.ok?"":" ・ <b>いま読み込めませんでした。下の公式ページで確かめてください。</b>"}</p>
+   ${tsu?`<div class="al-band" style="cursor:default"><span class="ai">🌊</span><span><b>${esc(tsu.grade)}</b><small>${esc(tsu.areas.join("・"))}${tsu.count>tsu.areas.length?" ほか":""}</small></span></div>`:`<p>🌊 津波の警報・注意報は、いま出ていません。</p>`}
+   ${sp.map(x=>`<div class="al-band" style="cursor:default;margin-top:8px"><span class="ai">⚠️</span><span><b>特別警報</b><small>${esc(x.who||"")} ${esc(x.text||"")}</small></span></div>`).join("")}
+   <h3 style="margin:18px 0 0">最近の地震(3日以内)</h3>
+   ${AL.quakes.length?`<ul class="qk-list">${AL.quakes.map(q=>{ const r=qr(q.maxi); const c=r>=8?"l7":r>=6?"l6":r>=4?"l5":r===3?"l4":r===2?"l3":""; return `<li><span class="qk-s ${c}"><span><small>震度</small>${esc(QN[q.maxi]||"?")}</span></span><span><b>${esc(q.place)}</b><br><span class="hint">${qhm(q.at)}ごろ(${qago(q.at)})${q.mag?` ・ M${esc(q.mag)}`:""}${q.depth!=null?` ・ 深さ${q.depth===0?"ごく浅い":esc(q.depth)+"km"}`:""}</span></span></li>`; }).join("")}</ul>`:`<p class="hint" style="margin-top:8px">${AL.ok?"3日以内に震度のある地震の情報はありません。":"読み込み中か、つながりませんでした。"}</p>`}
+   <h3 style="margin:20px 0 0">公式ページで確かめる</h3>
+   <div class="qk-links">
+     <a href="https://www.jma.go.jp/bosai/map.html#contents=earthquake_map" target="_blank" rel="noopener">📍 気象庁 地震情報<small>震度の地図・くわしい発表</small></a>
+     <a href="https://www.jma.go.jp/bosai/map.html#contents=tsunami" target="_blank" rel="noopener">🌊 気象庁 津波警報・注意報</a>
+     <a href="https://www.jma.go.jp/bosai/warning/" target="_blank" rel="noopener">⚠️ 気象庁 警報・注意報<small>大雨・台風・大雪など</small></a>
+     <a href="https://www.jma.go.jp/bosai/risk/" target="_blank" rel="noopener">🗺️ キキクル(危険度分布)<small>土砂災害・浸水・洪水の危ないところ</small></a>
+     <a href="https://www3.nhk.or.jp/news/" target="_blank" rel="noopener">📺 NHK ニュース<small>テレビ・ネットの最新ニュース</small></a>
+   </div>
+   <div class="exp" style="margin-top:14px">📣 このアプリは「起きたことをわかりやすく」がお仕事です。<b>揺れる前の緊急地震速報</b>は、スマホの緊急速報(エリアメール)や防災アプリで受け取ってください。震度5弱以上・津波・特別警報は、ntfyの通知(マイ→設定)でもお知らせします。</div>
+   <p class="hint" style="margin-top:10px">出典: 気象庁(P2P地震情報 経由をふくむ)</p></div>`;
+  if(!refresh){ sh.hidden=false; document.body.style.overflow="hidden"; }
+  document.getElementById("qkx").onclick=()=>{ sh.hidden=true; delete sh.dataset.kind; document.body.style.overflow=""; try{ history.replaceState(null,"","#"+(current||"today")); }catch(_){} };
+  document.getElementById("qkr").onclick=()=>{ toast("読み直しています…"); loadAlerts(); };
+  track("/quake","地震・警報"); }
+document.addEventListener("click",ev=>{ const x=ev.target.closest("[data-alx]"); if(x){ ev.stopPropagation(); const h=(store.get("nw-alert-hide")||"").split(",").filter(Boolean); h.push(x.dataset.alx); store.set("nw-alert-hide",h.slice(-30).join(",")); drawAlertBand(); return; }
+  const q=ev.target.closest("[data-quake]"); if(q){ openQuake(); } });
+document.addEventListener("keydown",ev=>{ if((ev.key==="Enter"||ev.key===" ")&&ev.target.matches&&ev.target.matches(".al-band[data-quake]")){ ev.preventDefault(); openQuake(); } });
+try{ loadAlerts(); setInterval(()=>{ if(document.visibilityState==="visible") loadAlerts(); },3*60*1000); document.addEventListener("visibilitychange",()=>{ if(document.visibilityState==="visible") loadAlerts(); }); }catch(_){}
 const h=(location.hash||"").slice(1);
-if(D.explainers[h]){ go("explain"); openEx(h); } else go(TABS.some(t=>t[0]===h)?h:"today");
+if(h==="quake"){ go("today"); setTimeout(openQuake,50); } else if(D.explainers[h]){ go("explain"); openEx(h); } else go(TABS.some(t=>t[0]===h)?h:"today");
 try{ if(new URLSearchParams(location.search).get("play")==="1") setTimeout(openStory,300); }catch(_){}
 })();
 </script>

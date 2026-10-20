@@ -126,9 +126,8 @@ try:
         body = (en.findtext("a:content", "", ATOM) or "")
         upd = en.findtext("a:updated", "", ATOM) or ""
         who = en.findtext("a:author/a:name", "", ATOM) or ""
-        if "特別警報" not in title + body:
-            continue
-        if "警報" not in title:
+        # 題名は「気象特別警報・警報・注意報」なので、本文に「特別警報」があるものだけ(ふつうの警報・注意報は除く)
+        if "警報" not in title or "特別警報" not in body:
             continue
         # 「特別警報を解除」だけのものは出さない
         if re.search(r"特別警報[^。]*解除", body) and not re.search(r"特別警報を発表", body):

@@ -1,5 +1,5 @@
 // まいにちニュース帳 — オフラインでも前回の内容を読めるようにする
-const CACHE = "nw-v1";
+const CACHE = "nw-v2";
 const SHELL = ["./", "./index.html", "./data.js", "./manifest.webmanifest", "./icon-192.png", "./icon-512.png", "./apple-touch-icon.png"];
 self.addEventListener("install", e => { e.waitUntil(caches.open(CACHE).then(c => c.addAll(SHELL)).then(() => self.skipWaiting())); });
 self.addEventListener("activate", e => { e.waitUntil(caches.keys().then(ks => Promise.all(ks.filter(k => k !== CACHE).map(k => caches.delete(k)))).then(() => self.clients.claim())); });
@@ -7,6 +7,8 @@ self.addEventListener("fetch", e => {
   const req = e.request; if (req.method !== "GET") return;
   const url = new URL(req.url);
   const same = url.origin === location.origin;
+  // 地震・警報は新しさがすべて: 保存分を使わず、そのままネットへ
+  if (url.hostname === "raw.githubusercontent.com" || url.hostname === "api.p2pquake.net") return;
   const fresh = same && (url.pathname.endsWith("/") || url.pathname.endsWith(".html") || url.pathname.endsWith("data.js"));
   if (fresh) {
     // ニュースは新しさが大事: まずネット、だめなら保存分
