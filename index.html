@@ -194,6 +194,8 @@ main{padding-block:18px 32px}
 .wx-warn{display:flex;flex-direction:column;gap:2px;background:var(--warn-soft);border:1px solid var(--warn);border-radius:12px;padding:9px 11px;cursor:pointer}
 .wx-warn.sp{background:var(--g-intl-s);border-color:var(--g-intl)}
 .wx-warn b{font-size:1rem}.wx-warn small{font-size:.86rem;line-height:1.5}
+.wx-info{font-size:.9rem;line-height:1.65;color:var(--muted);background:var(--surface2);border:1px solid var(--line);border-radius:10px;padding:7px 10px;cursor:pointer}
+.wx-info b{color:var(--ink)}
 .wx-rain{display:flex;gap:6px;flex-wrap:wrap;align-items:stretch}
 .wx-rain span{display:flex;flex-direction:column;align-items:center;background:var(--surface2);border:1px solid var(--line);border-radius:10px;padding:2px 10px;min-width:52px}
 .wx-rain small{font-size:.82rem;color:var(--muted)}.wx-rain b{font-size:1rem}
@@ -1302,8 +1304,11 @@ function prefNow(){ return ME.pref||"東京都"; }
 function prefShort(x){ return String(x||"").replace(/[都道府県]$/,""); }
 function myWarn(){ try{ const me=prefShort(prefNow()); return (AL.warn||[]).filter(w=>(w.pref||[]).some(p=>prefShort(p)===me)); }catch(_){ return []; } }
 const WARN_LV=[["ℹ️","注意のよびかけ"],["⚠️","警戒のよびかけ"],["🚨","特別警報"]];
-function warnLine(){ const L=myWarn().filter(w=>w.lv>=1); if(!L.length) return `<div id="wxWarn"></div>`; const top=L.slice().sort((a,b)=>b.lv-a.lv)[0]; const [ic,nm]=WARN_LV[top.lv]||WARN_LV[1];
-  return `<div id="wxWarn"><div class="wx-warn ${top.lv>=2?"sp":""}" role="button" tabindex="0" data-quake="1"><b>${ic} ${esc(prefNow())}に${esc(nm)}が出ています</b><small>${esc(top.text||"")}</small><small class="hint">気象庁発表 ・ タップでくわしく</small></div></div>`; }
+function warnLine(){ const A=myWarn(); if(!A.length) return `<div id="wxWarn"></div>`;
+  const top=A.slice().sort((a,b)=>b.lv-a.lv)[0]; const [ic,nm]=WARN_LV[top.lv]||WARN_LV[0];
+  const txt=String(top.text||"").replace(/^【[^】]*】/,"");
+  if(top.lv===0) return `<div id="wxWarn"><div class="wx-info" role="button" tabindex="0" data-quake="1">${ic} <b>${esc(prefNow())}に${esc(nm)}</b> ${esc(txt)} <span class="hint">気象庁発表</span></div></div>`;
+  return `<div id="wxWarn"><div class="wx-warn ${top.lv>=2?"sp":""}" role="button" tabindex="0" data-quake="1"><b>${ic} ${esc(prefNow())}に${esc(nm)}が出ています</b><small>${esc(txt)}</small><small class="hint">気象庁発表 ・ タップでくわしく</small></div></div>`; }
 function weatherCard(){
   const w=D.weather; const lab=relDay(w.iso); const notes=w.notes||[]; const severe=notes.some(n=>/警報|台風|大雨|暴風|大雪|猛暑|熱中症/.test(n));
   return `<section class="card wx" aria-label="天気">
@@ -3538,7 +3543,7 @@ function openQuake(refresh){ const sh=document.getElementById("sheet"); sh.datas
    ${sp.map(x=>`<div class="al-band" style="cursor:default;margin-top:8px"><span class="ai">⚠️</span><span><b>特別警報</b><small>${esc(x.who||"")} ${esc(x.text||"")}</small></span></div>`).join("")}
    <h3 style="margin:18px 0 6px">⚠️ ${esc(prefNow())}への気象庁のよびかけ</h3>
    ${(()=>{ const L=myWarn().slice().sort((a,b)=>b.lv-a.lv); if(!L.length) return `<p class="hint">いま、${esc(prefNow())}へのよびかけは届いていません。下の気象庁のページでも確かめられます。</p>`;
-     return L.slice(0,4).map(w=>{ const [ic,nm]=WARN_LV[w.lv]||WARN_LV[0]; return `<div class="al-band ${w.lv>=2?"":"mid"}" style="cursor:default;margin-bottom:8px"><span class="ai">${ic}</span><span><b>${esc(nm)}</b><small>${esc(w.text||"")}</small><small class="hint">${esc(w.who||"")} ・ ${qhm(w.at)}</small></span></div>`; }).join(""); })()}
+     return L.slice(0,4).map(w=>{ const [ic,nm]=WARN_LV[w.lv]||WARN_LV[0]; return `<div class="al-band ${w.lv>=2?"":"mid"}" style="cursor:default;margin-bottom:8px"><span class="ai">${ic}</span><span><b>${esc(nm)}</b><small>${esc(String(w.text||"").replace(/^【[^】]*】/,""))}</small><small class="hint">${esc(w.who||"")} ・ ${qhm(w.at)}</small></span></div>`; }).join(""); })()}
    <div class="hint">気象庁の発表の文をそのまま出しています。「わたしの街」はマイ→🏠で変えられます。</div>
    <h3 style="margin:18px 0 0">最近の地震(3日以内)</h3>
    ${AL.quakes.length?`<ul class="qk-list">${AL.quakes.map(q=>{ const r=qr(q.maxi); const c=r>=8?"l7":r>=6?"l6":r>=4?"l5":r===3?"l4":r===2?"l3":""; return `<li><span class="qk-s ${c}"><span><small>震度</small>${esc(QN[q.maxi]||"?")}</span></span><span><b>${esc(q.place)}</b><br><span class="hint">${qhm(q.at)}ごろ(${qago(q.at)})${q.mag?` ・ M${esc(q.mag)}`:""}${q.depth!=null?` ・ 深さ${q.depth===0?"ごく浅い":esc(q.depth)+"km"}`:""}</span></span></li>`; }).join("")}</ul>`:`<p class="hint" style="margin-top:8px">${AL.ok?"3日以内に震度のある地震の情報はありません。":"読み込み中か、つながりませんでした。"}</p>`}
