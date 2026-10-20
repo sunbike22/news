@@ -124,7 +124,18 @@ main{padding-block:18px 32px}
 .wx-rain .wx-wear{flex-direction:row;flex:1;min-width:0;font-size:.9rem;align-items:center}
 .wx-notes summary{cursor:pointer;font-weight:700;color:var(--ink)}
 .wx-notes .note{margin-top:6px;background:var(--warn-soft);border-radius:10px;padding:8px 10px;font-size:.92rem}
-.wx .qk-open{align-self:flex-start;margin-top:0}
+.wx .qk-open{margin-top:0}
+.wx-btns{display:flex;gap:6px;flex-wrap:wrap}
+.wx-strip{display:flex;gap:4px;overflow-x:auto;padding:2px 0 4px;cursor:pointer;scrollbar-width:none}.wx-strip::-webkit-scrollbar{display:none}
+.wx-strip:empty{display:none}
+.wh{flex:1 0 50px;display:flex;flex-direction:column;align-items:center;gap:1px;background:var(--surface2);border:1px solid var(--line);border-radius:10px;padding:4px 2px;font-size:.84rem;line-height:1.25}
+.wh b{font-size:1rem}.wh .r{color:#2f6fd6;font-weight:700}.wh.now{border-color:var(--accent);box-shadow:0 0 0 1px var(--accent)}
+:root[data-theme="dark"] .wh .r{color:#8ab4ff}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .wh .r{color:#8ab4ff}}
+.wxs-day{display:flex;gap:6px;margin:4px 0 8px}
+.wxs-list{display:flex;gap:6px;overflow-x:auto;padding-bottom:6px}
+.wxs-list .wh{flex:0 0 64px;padding:6px 2px;font-size:.88rem}
+.wxs-chart{position:relative;height:200px;margin-top:6px}
 .weather{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;align-items:center}
 .weather .big{font-family:var(--f-display);font-size:2rem;line-height:1;white-space:nowrap}
 .weather .big small{font-size:.9rem;font-family:var(--f-body);color:var(--muted)}
@@ -1043,7 +1054,8 @@ function weatherCard(){
     <div class="wx-um">☔ ${esc(w.umbrella)}</div>
     <div class="wx-rain">${w.rain.map(([t,p])=>`<span><small>${esc(t)}</small><b class="num">${p}%</b></span>`).join("")}<span class="wx-wear">👕 ${esc(w.wear)}</span></div>
     ${notes.length?`<details class="wx-notes"${severe?" open":""}><summary>⚠️ 気をつけること(${notes.length})</summary>${notes.map(n=>`<div class="note">${esc(n)}</div>`).join("")}<div class="hint">出典: ${esc(w.source)}</div></details>`:`<div class="hint">出典: ${esc(w.source)}</div>`}
-    <button class="fchip qk-open" data-quake="1">🌏 最近の地震・警報${qkLatestLabel()}</button>
+    <div class="wx-strip" id="wxStrip" role="button" tabindex="0" data-wxh="1" aria-label="1時間ごとの天気を開く">${wxStripHTML()}</div>
+    <div class="wx-btns"><button class="fchip" data-wxh="1">🕐 1時間ごとの天気</button><button class="fchip qk-open" data-quake="1">🌏 地震・警報${qkLatestLabel()}</button></div>
   </section>`;
 }
 function exLink(id){ return id && D.explainers[id] ? ` data-ex="${id}"` : ""; }
@@ -2507,6 +2519,7 @@ function englishCard(){ if(!EN) return ""; const W=[]; (EN.top10||[]).forEach((e
     <ul class="enlist">${W.map(([a,b,t])=>`<li><span><b lang="en">${esc(a)}</b> = ${esc(b)}<small class="hint" style="display:block">${esc(t||"")}</small></span><button class="fchip" data-say="${esc(a)}">🔊</button></li>`).join("")}</ul></section>`; }
 // ===== お知らせ(新しくなったところ)。機能を足したら、いちばん上に1つ足す =====
 const UPDATES=[
+  {id:"2026-10-20v",d:"2026-10-20",t:"🕐 1時間ごとの天気",L:["天気の下に、これから6時間の天気・気温・降水確率が並びます","「🕐 1時間ごとの天気」を押すと、今日と明日の気温・降水確率・湿度・風の変化をグラフで見られます"]},
   {id:"2026-10-20u",d:"2026-10-20",t:"🔰 かんたんモードができました",L:["右上の「設定」で「かんたん」「ふつう」を選べます。かんたんは文字が大きく、天気・ニュース・🔊聞くボタンが中心。ほしい機能はあとから足せます","下のボタンは「設定」→「🧭 下のボタンを選ぶ」で、好きなページに変えられます。はじめての案内もわかりやすくしました"]},
   {id:"2026-10-20t",d:"2026-10-20",t:"🌤️ 天気がいちばん上に",L:["「きょう」を開くと、まず今日の天気(気温・傘・雨の確率)が見やすく出ます","4コマは、せりふを短くして、絵で伝えるようにしました"]},
   {id:"2026-10-20s",d:"2026-10-20",t:"🧹 画面を読みやすく・軽く",L:["「きょう」はニュースがいちばん上に。同じニュースの重なりや小さな札を減らし、文字も少し大きくしました","下のタブは5つに(地図・数字は「さがす」から開けます。着せかえで元の7つに戻せます)。「さがす」「予定」は短くして「もっと見る」に","開くのが速くなるよう、グラフの部品は数字のページを開いたときだけ読み込みます。4コマも横長のコマでコンパクトに"]},
@@ -2811,6 +2824,7 @@ try{ saveRival(); }catch(_){}
 document.getElementById("bellBtn").onclick=openUpdates; markBell();
 document.getElementById("gdFab").onclick=openGuide;
 
+// (1時間ごとの天気は下の loadAlerts のあとに)
 // ===== 地震・津波・特別警報(気象庁発表)。1日4回の更新を待たずに、開いたときに直接読む =====
 // alert.json は GitHub Actions が10分ごとに気象庁から作る(alerts ブランチ)。地震は P2P地震情報からも直接読み、早い方を使う。
 const ALERT_URL="https://raw.githubusercontent.com/sunbike22/news/alerts/alert.json";
@@ -2819,6 +2833,40 @@ const QS=["1","2","3","4","5-","5+","6-","6+","7"], QN={"1":"1","2":"2","3":"3",
 const P2PS={10:"1",20:"2",30:"3",40:"4",45:"5-",46:"5-",50:"5+",55:"6-",60:"6+",70:"7"};
 const AL={quakes:[],tsunami:null,special:[],checked:null,ok:false};
 const qr=s=>QS.indexOf(s);
+// ===== 1時間ごとの天気(東京)。alert.json の wx(Open-Meteo、GitHub Actions が取る)を使う =====
+function wmoIcon(c){ c=+c; return c===0?"☀️":c===1?"🌤️":c===2?"⛅":c===3?"☁️":c===45||c===48?"🌫️":c>=51&&c<=57?"🌦️":c>=61&&c<=67?"🌧️":c>=71&&c<=77?"❄️":c>=80&&c<=82?"🌦️":c>=85&&c<=86?"🌨️":c>=95?"⛈️":"🌤️"; }
+function wxRows(){ const w=AL&&AL.wx; if(!w||!(w.rows||[]).length) return []; const yr=TODAY.slice(0,4); return w.rows.map(r=>({t:r[0],iso:yr+"-"+r[0].slice(0,5).replace("/","-"),h:+r[0].slice(6,8),temp:r[1],hum:r[2],pop:r[3],mm:r[4],code:r[5],wind:r[6]})); }
+function wxNowIdx(R){ const n=new Date(Date.now()+9*36e5); const key=n.toISOString().slice(0,10)+"T"+String(n.getUTCHours()).padStart(2,"0"); return Math.max(0,R.findIndex(r=>r.iso+"T"+String(r.h).padStart(2,"0")===key)); }
+function whCell(r,now){ return `<span class="wh${now?" now":""}"><small>${now?"いま":r.h+"時"}</small><span aria-hidden="true">${wmoIcon(r.code)}</span><b class="num">${Math.round(r.temp)}°</b><span class="r num">☔${r.pop==null?"-":r.pop}%</span></span>`; }
+function wxStripHTML(){ let R=[]; try{ R=wxRows(); }catch(_){ return ""; } if(!R.length) return ""; const i=wxNowIdx(R); return R.slice(i,i+6).map((r,k)=>whCell(r,k===0)).join(""); }
+function openWx(day){ const R=wxRows(); const sh=document.getElementById("sheet");
+  const days=[...new Set(R.map(r=>r.iso))]; const d=day||days[0]||TODAY; const L=R.filter(r=>r.iso===d); const ni=wxNowIdx(R); const nowR=R[ni];
+  const mx=L.length?L.reduce((a,b)=>b.temp>a.temp?b:a):null, mn=L.length?L.reduce((a,b)=>b.temp<a.temp?b:a):null; const rainy=L.filter(r=>(r.pop||0)>=50);
+  sh.innerHTML=`<div class="bar"><div class="wrap"><button class="iconbtn" id="wxx" aria-label="もどる">← もどる</button><span class="ttl">🕐 1時間ごとの天気(東京)</span></div></div><div class="wrap body">
+   ${!R.length?`<div class="empty">いま読み込めませんでした。少しして開き直してください。</div>`:`
+   <div class="wxs-day">${days.map(x=>`<button class="fchip" data-wxd="${x}" aria-pressed="${x===d}">${relDay(x)} ${mdLabel(x)}</button>`).join("")}</div>
+   ${L.length?`<div class="card" style="padding:12px 14px"><b>${relDay(d)}のようす</b><ul class="us" style="margin:6px 0 0">
+     <li>🌡️ いちばん暑いのは <b>${mx.h}時ごろ ${Math.round(mx.temp)}°</b>、いちばん寒いのは <b>${mn.h}時ごろ ${Math.round(mn.temp)}°</b></li>
+     <li>☔ ${rainy.length?`雨が降りやすいのは <b>${rainy[0].h}時〜${rainy[rainy.length-1].h+1}時ごろ</b>(降水確率50%以上)`:"降水確率が50%をこえる時間はありません"}</li>
+     <li>💧 湿度は ${Math.min(...L.map(r=>r.hum))}〜${Math.max(...L.map(r=>r.hum))}%</li></ul></div>`:""}
+   <h3 style="margin:14px 0 4px;font-size:1rem">1時間ごと(横にスクロール)</h3>
+   <div class="wxs-list">${L.map(r=>`<span class="wh${r===nowR?" now":""}"><small>${r===nowR?"いま":r.h+"時"}</small><span aria-hidden="true" style="font-size:1.3rem">${wmoIcon(r.code)}</span><b class="num">${Math.round(r.temp)}°</b><span class="r num">☔${r.pop==null?"-":r.pop}%</span><small class="num">💧${r.hum}%</small><small class="num">💨${Math.round((r.wind||0)/3.6)}m</small></span>`).join("")}</div>
+   <h3 style="margin:14px 0 0;font-size:1rem">🌡️ 気温の変化</h3><div class="wxs-chart"><canvas id="wxc1" aria-label="気温のグラフ"></canvas></div>
+   <h3 style="margin:14px 0 0;font-size:1rem">☔ 降水確率と💧湿度</h3><div class="wxs-chart"><canvas id="wxc2" aria-label="降水確率と湿度のグラフ"></canvas></div>
+   <p class="hint" style="margin-top:10px">☔=降水確率 💧=湿度 💨=風の強さ(1秒に進むメートル)。数字は予報の目安で、上の天気(tenki.jp など)と少しちがうことがあります。<br>出典: <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo</a>(気象庁などの予報モデル・${AL.wx&&AL.wx.at?qhm(AL.wx.at)+"に取得":""})</p>`}</div>`;
+  sh.hidden=false; sh.scrollTop=0; document.body.style.overflow="hidden";
+  const close=()=>{ charts.splice(0).forEach(c=>{try{c.destroy()}catch(_){}}); sh.hidden=true; sh.innerHTML=""; document.body.style.overflow=""; };
+  sh.querySelector("#wxx").onclick=()=>{ close(); go(current||"today",{keepScroll:true}); };
+  sh.querySelectorAll("[data-wxd]").forEach(b=>b.onclick=()=>{ charts.splice(0).forEach(c=>{try{c.destroy()}catch(_){}}); openWx(b.dataset.wxd); });
+  const nl=sh.querySelector(".wxs-list .now"); if(nl) nl.scrollIntoView({inline:"center",block:"nearest"});
+  if(!L.length) return; track("/weather/hourly","1時間ごとの天気");
+  const draw=()=>{ if(!document.getElementById("wxc1")) return; const muted=css("--muted"), line=css("--line"); Chart.defaults.font.family=css("--f-body"); Chart.defaults.color=muted;
+    const labels=L.map(r=>r.h+"時"); const base={responsive:true,maintainAspectRatio:false,animation:false,plugins:{legend:{display:false},tooltip:{intersect:false,mode:"index"}},scales:{x:{grid:{display:false},ticks:{maxRotation:0,autoSkip:true,maxTicksLimit:8}}}};
+    charts.push(new Chart(document.getElementById("wxc1"),{type:"line",data:{labels,datasets:[{data:L.map(r=>r.temp),borderColor:"#e5484d",backgroundColor:"rgba(229,72,77,.12)",fill:true,tension:.35,pointRadius:0,borderWidth:2.5}]},options:Object.assign({},base,{scales:Object.assign({},base.scales,{y:{grid:{color:line},ticks:{callback:v=>v+"°"}}})})}));
+    charts.push(new Chart(document.getElementById("wxc2"),{type:"bar",data:{labels,datasets:[{type:"bar",label:"降水確率",data:L.map(r=>r.pop),backgroundColor:"rgba(47,111,214,.55)",borderRadius:3},{type:"line",label:"湿度",data:L.map(r=>r.hum),borderColor:"#14a37f",borderWidth:2,pointRadius:0,tension:.35}]},options:Object.assign({},base,{plugins:{legend:{display:true,position:"bottom"},tooltip:{intersect:false,mode:"index"}},scales:Object.assign({},base.scales,{y:{min:0,max:100,grid:{color:line},ticks:{callback:v=>v+"%"}}})})})); };
+  if(window.Chart) draw(); else loadChart().then(draw).catch(e=>console.warn("wxchart",e)); }
+document.addEventListener("click",ev=>{ const w=ev.target.closest("[data-wxh]"); if(w&&!ev.target.closest("[data-quake]")) openWx(); });
+
 function tmo(p,ms){ return Promise.race([p,new Promise((_,r)=>setTimeout(()=>r(new Error("timeout")),ms))]); }
 function p2pTime(t){ const m=/^(\d+)\/(\d+)\/(\d+) (\d+):(\d+)/.exec(t||""); return m?`${m[1]}-${m[2].padStart(2,"0")}-${m[3].padStart(2,"0")}T${m[4].padStart(2,"0")}:${m[5]}:00+09:00`:null; }
 async function loadAlerts(){
@@ -2827,7 +2875,7 @@ async function loadAlerts(){
     tmo(fetch(P2P_URL,{cache:"no-store"}).then(r=>r.ok?r.json():null),8000).catch(()=>null)];
   const [a,p]=await Promise.all(jobs);
   const qs=[]; let ts=null, special=[];
-  if(a){ (a.quakes||[]).forEach(q=>qs.push(q)); ts=a.tsunami||null; special=a.special||[]; AL.checked=a.checked||null; }
+  if(a){ (a.quakes||[]).forEach(q=>qs.push(q)); ts=a.tsunami||null; special=a.special||[]; AL.checked=a.checked||null; if(a.wx) AL.wx=a.wx; }
   if(Array.isArray(p)){ p.forEach(r=>{
     if(r.code===551){ const e=r.earthquake||{}, h=e.hypocenter||{}; if((r.issue||{}).type==="Foreign") return; const at=p2pTime(e.time); if(!at) return;
       qs.push({id:"p"+at,at,place:h.name||"調査中",mag:h.magnitude>0?String(h.magnitude):null,depth:h.depth>0?h.depth:null,maxi:P2PS[e.maxScale]||null}); }
@@ -2839,7 +2887,7 @@ async function loadAlerts(){
   qs.forEach(q=>{ const t=Date.parse(q.at); if(isNaN(t)) return; const m=merged.find(o=>Math.abs(Date.parse(o.at)-t)<150000&&(o.place===q.place||o.place==="調査中"||q.place==="調査中"));
     if(!m) merged.push(Object.assign({},q)); else { if(qr(q.maxi)>qr(m.maxi)) m.maxi=q.maxi; if(!m.mag&&q.mag) m.mag=q.mag; if(m.place==="調査中"&&q.place!=="調査中") m.place=q.place; if(m.depth==null&&q.depth!=null) m.depth=q.depth; } });
   AL.quakes=merged.filter(q=>Date.now()-Date.parse(q.at)<3*864e5).slice(0,15); AL.tsunami=ts; AL.special=special; AL.ok=!!(a||p);
-  drawAlertBand(); const b=document.querySelector("[data-quake] .qk-last"); if(b) b.outerHTML=qkLatestLabel();
+  drawAlertBand(); const wsx=document.getElementById("wxStrip"); if(wsx) wsx.innerHTML=wxStripHTML(); const b=document.querySelector("[data-quake] .qk-last"); if(b) b.outerHTML=qkLatestLabel();
   const sh=document.getElementById("sheet"); if(sh&&!sh.hidden&&document.getElementById("qkx")) openQuake(true); }
 function qhm(at){ const d=new Date(Date.parse(at)+9*36e5); return `${d.getUTCMonth()+1}/${d.getUTCDate()} ${d.getUTCHours()}:${String(d.getUTCMinutes()).padStart(2,"0")}`; }
 function qago(at){ const m=Math.round((Date.now()-Date.parse(at))/6e4); return m<1?"いま":m<60?`${m}分前`:m<24*60?`${Math.floor(m/60)}時間前`:`${Math.floor(m/1440)}日前`; }
