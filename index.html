@@ -170,6 +170,8 @@ main{padding-block:18px 32px}
 .pz .pi{font-size:1.4rem;line-height:1.2}
 .pz b{font-size:1.02rem}.pz small{display:block;font-size:.86rem;color:var(--muted);line-height:1.6}
 .pz-up{color:var(--warn);font-weight:800}.pz-dn{color:var(--ok);font-weight:800}
+#funSec .fun-t.xtra{display:none}
+#funSec.open .fun-t.xtra{display:flex}
 .dwc{width:100%;height:auto;aspect-ratio:2/1;border:1px solid var(--line);border-radius:12px;background:#fff;touch-action:none;cursor:crosshair}
 .dw-col{width:34px;height:34px;border-radius:50%;border:2px solid var(--line);cursor:pointer}
 .dw-col.on{border-color:var(--ink);box-shadow:0 0 0 2px var(--surface),0 0 0 4px var(--ink)}
@@ -1381,6 +1383,7 @@ function renderToday(){
   const sx=document.getElementById("seasonX"); if(sx) sx.onclick=()=>{ store.set("nw-season-hide",TODAY+(seasonNow()||{}).k); document.getElementById("seasonCard")?.remove(); };
   document.getElementById("lookBtnToday").onclick=openLook;
   bindKw(); bindPicks(); bindQuick(); bindInstall(); bindPersonal(); bindPet(); bindKnow(); bindTalk(); bindReporter(); bindGacha(); bindLocal(); checkBadges();
+  const fm=document.getElementById("funMore"); if(fm) fm.onclick=()=>{ const sec=document.getElementById("funSec"); sec.classList.add("open"); fm.remove(); };
   main.querySelectorAll("[data-fun]").forEach(b=>b.onclick=()=>openFun(b.dataset.fun));
   main.querySelectorAll("[data-mood]").forEach(b=>b.onclick=()=>{ sState.q=""; sState.th=""; sState.ok=false; sState.onlyNew=false; sState.g=new Set([b.dataset.mood]); go("search"); });
   if(document.getElementById("quiz")) drawQuiz(0,[]);
@@ -3032,8 +3035,14 @@ function kurashiCard(){ const P=priceRows(); const R=rulesSoon();
     <button class="sos-go" data-sos="1" style="margin-top:10px">🆘 こまったときは(災害のとき)</button>
     <div class="hint" style="margin-top:8px">リンク先は、それぞれの会社・役所の公式ページです。くわしい最新の情報は、リンク先で確かめてください。</div></section>`; }
 const FUN=[["picks","🎁","ジャンル別おすすめ",()=>picksCard()],["reporter","🎙️","よむまる記者",()=>reporterCard()],["gacha","🎰","今日の1本ガチャ",()=>gachaCard()],["mood","🗺️","世の中の天気図",()=>moodCard()],["know","👆","知ってた?",()=>knowCard()],["talk","🍽️","話のタネ",()=>talkCard()],["local","🏠","わたしの街",()=>localCard()],["english","📘","今日の英単語",()=>englishCard()],["thermo","🌡️","ニュースの温度計",()=>thermoCard()],["trip2","🗺️","ペットの旅",()=>travelCard()],["assoc","🔗","ニュース連想",()=>assocCard()],["back","📅","あのとき何してた?",()=>backCard()],["bingo","🎲","ニュースビンゴ",()=>bingoCard()],["battle","⚔️","予想くらべ",()=>battleCard()],["kurashi","🧰","くらしの便利",()=>kurashiCard()]];
+const FUN_SHOW=6;
 function funGrid(){ const L=FUN.filter(f=>LOOK.off[f[0]]); if(!L.length) return "";
-  return `<section aria-label="おたのしみ"><div class="sec-h"><h2>✨ おたのしみ</h2><span class="sub">タップで開く</span></div><div class="fun-grid">${L.map(([k,i,n])=>`<button class="fun-t" data-fun="${k}"><span>${i}</span><small>${esc(n)}</small>${(k==="gacha"&&(ME.gacha||{}).d!==TODAY)||(k==="picks"&&PK&&ME.pickSeen!==PK.updated)?'<i class="fun-dot"></i>':""}</button>`).join("")}</div></section>`; }
+  const dot=k=>(k==="gacha"&&(ME.gacha||{}).d!==TODAY)||(k==="picks"&&PK&&ME.pickSeen!==PK.updated);
+  const S2=L.slice().sort((a,b)=>(dot(b[0])?1:0)-(dot(a[0])?1:0)); const hid=Math.max(0,S2.length-FUN_SHOW);
+  const t=([k,i,n],x)=>`<button class="fun-t${x?" xtra":""}" data-fun="${k}"><span>${i}</span><small>${esc(n)}</small>${dot(k)?'<i class="fun-dot"></i>':""}</button>`;
+  return `<section aria-label="おたのしみ" id="funSec"><div class="sec-h"><h2>✨ おたのしみ</h2><span class="sub">タップで開く</span></div>
+    <div class="fun-grid">${S2.slice(0,FUN_SHOW).map(f=>t(f,false)).join("")}${S2.slice(FUN_SHOW).map(f=>t(f,true)).join("")}</div>
+    ${hid?`<button class="fchip" id="funMore" style="margin-top:8px">… ほか ${hid}こ を見る</button>`:""}</section>`; }
 function openFun(k){ const f=FUN.find(x=>x[0]===k); if(!f) return; const html=f[3](); if(!html){ toast("今日はまだありません"); return; } const sh=document.getElementById("sheet");
   sh.innerHTML=`<div class="bar"><div class="wrap"><button class="iconbtn" id="fnx" aria-label="もどる">← もどる</button><span class="ttl">${f[1]} ${esc(f[2])}</span></div></div><div class="wrap body">${html}</div>`;
   const close=()=>{ sh.hidden=true; sh.innerHTML=""; document.body.style.overflow=""; go("today",{keepScroll:true}); };
@@ -3059,6 +3068,13 @@ function englishCard(){ if(!EN) return ""; const W=[]; (EN.top10||[]).forEach((e
     <ul class="enlist">${W.map(([a,b,t])=>`<li><span><b lang="en">${esc(a)}</b> = ${esc(b)}<small class="hint" style="display:block">${esc(t||"")}</small></span><button class="fchip" data-say="${esc(a)}">🔊</button></li>`).join("")}</ul></section>`; }
 // ===== お知らせ(新しくなったところ)。機能を足したら、いちばん上に1つ足す =====
 const UPDATES=[
+  {id:"2026-10-21e",d:"2026-10-21",t:"🎒 持ち物・⚠️わたしの街の警報・💬話しながら読む など",L:[
+    "天気に「🎒 きょうの持ち物」(傘・はおるもの・水分など)と、「⚠️ わたしの街への気象庁のよびかけ」が出るようになりました",
+    "大きな地震や警報のときは「🆘 こまったときは」(まずすること・公式リンク)が開けます",
+    "ニュース10に「短く / くわしく」の切り替え。✅や⚠️をタップすると、どこが伝えたかが見られます",
+    "解説に「👥 だれが出てくる?」「📏 むずかしさ」「💬 ホー先生と話しながら読む」を足しました",
+    "おたのしみに 🌡️温度計・🗺️ペットの旅・🔗ニュース連想・📅あのとき何してた?・🎲きょうのビンゴ・⚔️予想くらべ・🧰くらしの便利 を足しました(多くなったので「… ほか○こ」でたたんでいます)",
+    "マイ→⚙️設定に「⏱️ 読んだ時間」と「🔊 読み上げの速さ(🐢ゆっくり)」。自分だけの新聞に「🖍️ 手書きのメモ」がはれます"]},
   {id:"2026-10-21d",d:"2026-10-21",t:"🔬 ジャンルを見直しました",L:["「スポーツ・科学」を「⚽ スポーツ」(国内と海外)と「🔬 科学・健康」(宇宙・医療・研究)に分けました。スポーツを選んでいた人は、科学・健康も自動で入っています","マイ→⚙️設定 の「✨ おすすめの組み合わせにする」で、気になるジャンルを1回でそろえられます。これまでの記事の分け方のずれも直しました"]},
   {id:"2026-10-21c",d:"2026-10-21",t:"🗺️ 地図が読み込めない不具合を直しました",L:["地図(全国の天気・地図タブ)が出なかったのを直しました。開き直すと出ます","🎁 ジャンル別おすすめは「✨ おたのしみ」の中に移しました。「✏️ 気になるジャンルを選ぶ」で、いつでも足したり外したりできます"]},
   {id:"2026-10-21b",d:"2026-10-21",t:"🎁 ジャンル別おすすめ・🗾 全国の天気",L:["気になるジャンルに合わせて、映画・小説・マンガのイチオシや、今週のスポーツの大会などを週2回おすすめします","天気の「🗾 全国の天気」で、日本地図の上に各地の天気と気温が出ます。今週の目標・ペットからの手紙・「つづきがあります」も始まりました"]},
