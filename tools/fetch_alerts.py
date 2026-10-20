@@ -144,6 +144,25 @@ try:
 except Exception as e:  # noqa: BLE001
     errors["special"] = f"{type(e).__name__}: {e}"[:200]
 
+# ---------- 1時間ごとの天気(東京・Open-Meteo。気象庁などの予報モデル。キー不要・CC BY 4.0) ----------
+# 予報は1時間ごとに変わるので、前回から50分たっていなければ前回分を使う(むだに書きかえない)
+def wx_fetch(prev_wx):
+    try:
+        if prev_wx and prev_wx.get("at") and prev_wx["at"] >= iso(NOW - datetime.timedelta(minutes=50)):
+            return prev_wx
+    except Exception:  # noqa: BLE001
+        pass
+    q = urllib.parse.urlencode({"latitude": 35.6895, "longitude": 139.6917, "timezone": "Asia/Tokyo", "forecast_days": 2,
+        "hourly": "temperature_2m,relative_humidity_2m,precipitation_probability,precipitation,weather_code,wind_speed_10m"})
+    j = json.loads(get("https://api.open-meteo.com/v1/forecast?" + q, timeout=20))
+    h = j["hourly"]
+    rows = []
+    for i, t in enumerate(h["time"]):
+        rows.append([t[5:16].replace("-", "/").replace("T", " "),
+                     h["temperature_2m"][i], h["relative_humidity_2m"][i], h["precipitation_probability"][i],
+                     h["precipitation"][i], h["weather_code"][i], h["wind_speed_10m"][i]])
+    return {"at": iso(NOW), "place": "東京", "cols": ["時刻", "気温", "湿度", "降水確率", "降水量", "天気コード", "風速"], "rows": rows}
+
 # ---------- 前回分と通知 ----------
 prev = {}
 try:
@@ -191,7 +210,12 @@ for key, title, msg, prio, tags in todo:
         errors["ntfy"] = f"{type(e).__name__}: {e}"[:200]
 sent = sent[-60:]
 
-out = {"quakes": quakes, "qsrc": qsrc, "tsunami": tsunami, "special": special, "sent": sent}
+wx = prev.get("wx")
+try:
+    wx = wx_fetch(prev.get("wx"))
+except Exception as e:  # noqa: BLE001
+    errors["wx"] = f"{type(e).__name__}: {e}"[:200]
+out = {"quakes": quakes, "qsrc": qsrc, "tsunami": tsunami, "special": special, "sent": sent, "wx": wx}
 same = {k: prev.get(k) for k in out} == out
 out["checked"] = iso(NOW)
 out["updated"] = prev.get("updated") if same and prev.get("updated") else iso(NOW)
