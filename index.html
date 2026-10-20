@@ -136,6 +136,19 @@ main{padding-block:18px 32px}
 .wxs-list{display:flex;gap:6px;overflow-x:auto;padding-bottom:6px}
 .wxs-list .wh{flex:0 0 64px;padding:6px 2px;font-size:.88rem}
 .wh-pl{flex:0 0 auto;justify-content:center;padding:4px 8px;background:var(--accent-soft)}
+.wxmap{background:linear-gradient(180deg,#d7ecff,#eaf5ff);border:1px solid var(--line);border-radius:14px;overflow:hidden;min-height:200px}
+:root[data-theme="dark"] .wxmap{background:linear-gradient(180deg,#0f2238,#132a44)}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .wxmap{background:linear-gradient(180deg,#0f2238,#132a44)}}
+.wm-land{fill:#cfe6c4;stroke:#8fb58a;stroke-width:.8}
+:root[data-theme="dark"] .wm-land{fill:#2f4a3a;stroke:#5f8a6e}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .wm-land{fill:#2f4a3a;stroke:#5f8a6e}}
+.wm-dot{fill:#1d1d1f}.wm-ln{stroke:#1d1d1f;stroke-width:1;opacity:.5}
+.wm-l rect{fill:#fff;stroke:#1d1d1f;stroke-width:1;opacity:.95}
+.wm-n{font-size:10.5px;font-weight:800;fill:#1d1d1f}.wm-i{font-size:15px}.wm-t{font-size:13px;font-weight:800}.wm-s{fill:#888;font-size:11px}
+.wm-inset{fill:none;stroke:#1d1d1f;stroke-dasharray:4 3;opacity:.4}
+.wml{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:1fr;gap:4px}
+.wml li{display:grid;grid-template-columns:4em 2em 1fr auto;gap:4px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:6px 8px;font-size:.9rem}
+.wml .r{color:#2f6fd6;font-weight:700;font-size:.84rem}
 .wxs-chart{position:relative;height:200px;margin-top:6px}
 .weather{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;align-items:center}
 .weather .big{font-family:var(--f-display);font-size:2rem;line-height:1;white-space:nowrap}
@@ -1102,7 +1115,7 @@ function weatherCard(){
     <div class="wx-rain">${w.rain.map(([t,p])=>`<span><small>${esc(t)}</small><b class="num">${p}%</b></span>`).join("")}<span class="wx-wear">👕 ${esc(w.wear)}</span></div>
     ${notes.length?`<details class="wx-notes"${severe?" open":""}><summary>⚠️ 気をつけること(${notes.length})</summary>${notes.map(n=>`<div class="note">${esc(n)}</div>`).join("")}<div class="hint">出典: ${esc(w.source)}</div></details>`:`<div class="hint">出典: ${esc(w.source)}</div>`}
     <div class="wx-strip" id="wxStrip" role="button" tabindex="0" data-wxh="1" aria-label="1時間ごとの天気を開く">${wxStripHTML()}</div>
-    <div class="wx-btns"><button class="fchip" data-wxh="1">🕐 1時間ごとの天気</button><button class="fchip qk-open" data-quake="1">🌏 地震・警報${qkLatestLabel()}</button></div>
+    <div class="wx-btns"><button class="fchip" data-wxh="1">🕐 1時間ごと</button><button class="fchip" data-wxmap="1">🗾 全国の天気</button><button class="fchip qk-open" data-quake="1">🌏 地震・警報${qkLatestLabel()}</button></div>
   </section>`;
 }
 function exLink(id){ return id && D.explainers[id] ? ` data-ex="${id}"` : ""; }
@@ -2920,6 +2933,33 @@ function wxRows(){ const w=AL&&(wxSrc()==="local"?AL.wxl:AL.wx); if(!w||!(w.rows
 function wxNowIdx(R){ const n=new Date(Date.now()+9*36e5); const key=n.toISOString().slice(0,10)+"T"+String(n.getUTCHours()).padStart(2,"0"); return Math.max(0,R.findIndex(r=>r.iso+"T"+String(r.h).padStart(2,"0")===key)); }
 function whCell(r,now){ return `<span class="wh${now?" now":""}"><small>${now?"いま":r.h+"時"}</small><span aria-hidden="true">${wmoIcon(r.code)}</span><b class="num">${Math.round(r.temp)}°</b><span class="r num">☔${r.pop==null?"-":r.pop}%</span></span>`; }
 function wxStripHTML(){ let R=[]; try{ R=wxRows(); }catch(_){ return ""; } if(!R.length) return ""; const i=wxNowIdx(R); const loc=wxSrc()==="local"; return `${loc?`<span class="wh wh-pl"><small>📍</small><b>${esc(AL.wxl.place)}</b></span>`:""}`+R.slice(i,i+6).map((r,k)=>whCell(r,k===0)).join(""); }
+
+// ===== 🗾 全国の天気(14都市・今日/明日)。alert.json の wxmap を、地図タブと同じ日本の形の上に出す =====
+// ラベルの位置(点からのずれ)は重ならないよう手で決めている。都市を足すときはここも足す
+const WXM_OFF={札幌:[10,-30],釧路:[-30,8],青森:[10,-14],仙台:[12,-6],新潟:[-60,-44],金沢:[-70,-30],東京:[14,6],名古屋:[10,27],大阪:[-22,30],広島:[-46,-92],高知:null,福岡:[-20,-62],鹿児島:[14,4],那覇:[0,0]};
+function tempColor(t){ return t>=30?"#d93025":t>=25?"#f06a1d":t>=20?"#e8a400":t>=15?"#3aa856":t>=10?"#1f8fd6":"#3b5bd9"; }
+function openWxMap(day){ const M=AL.wxmap; const sh=document.getElementById("sheet"); const di=day||0;
+  sh.innerHTML=`<div class="bar"><div class="wrap"><button class="iconbtn" id="wmx" aria-label="もどる">← もどる</button><span class="ttl">🗾 全国の天気</span></div></div><div class="wrap body">
+    ${!M?`<div class="empty">いま読み込めませんでした。少しして開き直してください。</div>`:`
+    <div class="wxs-day">${M.dates.map((d,i)=>`<button class="fchip" data-wmd="${i}" aria-pressed="${i===di}">${i===0?"今日":"明日"} ${mdLabel(d)}</button>`).join("")}</div>
+    <div class="wxmap" id="wxMapBox"><div class="empty">地図を読み込んでいます…</div></div>
+    <p class="hint" style="margin:4px 0 0">🔴赤〜黄色の数字=最高気温 🔵青い数字=最低気温。地図にない街(高知など)は下の一覧に。</p>
+    <h3 style="margin:14px 0 4px;font-size:1rem">一覧で見る</h3>
+    <ul class="wml">${M.cities.map(c=>{ const x=c[3][di]; if(!x) return ""; return `<li><b>${esc(c[0])}</b><span aria-hidden="true" style="font-size:1.3rem">${wmoIcon(x[0])}</span><span class="num"><b style="color:${tempColor(x[1])}">${Math.round(x[1])}°</b> / <span style="color:#3b82f6">${Math.round(x[2])}°</span></span><span class="num r">☔${x[3]==null?"-":x[3]}%</span></li>`; }).join("")}</ul>
+    <p class="hint" style="margin-top:10px">各地の県庁所在地などの予報の目安です。出典: <a href="https://open-meteo.com/" target="_blank" rel="noopener">Open-Meteo</a>(気象庁などの予報モデル・${qhm(M.at)}に取得)</p>`}</div>`;
+  sh.hidden=false; sh.scrollTop=0; document.body.style.overflow="hidden";
+  sh.querySelector("#wmx").onclick=()=>{ sh.hidden=true; sh.innerHTML=""; document.body.style.overflow=""; };
+  sh.querySelectorAll("[data-wmd]").forEach(b=>b.onclick=()=>openWxMap(+b.dataset.wmd));
+  if(!M) return; track("/weather/map","全国の天気");
+  getWorld().then(world=>{ const box=document.getElementById("wxMapBox"); if(!box) return; const jp=world.features.filter(f=>f.id==="392"||+f.id===392);
+    const W=box.clientWidth||358, H=Math.round(W*1.12); const proj=d3.geoMercator().fitExtent([[6,6],[W-6,H-6]],{type:"MultiPoint",coordinates:[[129.2,30.9],[146.0,45.6]]}); const path=d3.geoPath(proj);
+    const lab=M.cities.map(c=>{ const x=c[3][di]; if(!x||WXM_OFF[c[0]]===null) return ""; const isNaha=c[0]==="那覇"; let px,py; if(isNaha){ px=W-72; py=H-58; } else { [px,py]=proj([c[2],c[1]]); }
+      const [dx,dy]=WXM_OFF[c[0]]||[8,-10]; const bx=isNaha?px:Math.max(4,Math.min(W-62,px+dx)), by=isNaha?py:Math.max(4,Math.min(H-40,py+dy));
+      return `${isNaha?`<rect x="${W-80}" y="${H-80}" width="74" height="74" rx="8" class="wm-inset"/><text x="${W-43}" y="${H-64}" text-anchor="middle" class="wm-n" style="font-size:9.5px">沖縄</text>`:`<circle cx="${px}" cy="${py}" r="3" class="wm-dot"/>${Math.hypot(dx,dy)>20?`<line x1="${px}" y1="${py}" x2="${bx+28}" y2="${by+16}" class="wm-ln"/>`:""}`}
+        <g transform="translate(${bx},${by})" class="wm-l"><rect width="58" height="36" rx="8"/><text x="29" y="13" text-anchor="middle" class="wm-n">${esc(c[0])}</text><text x="11" y="31" text-anchor="middle" class="wm-i">${wmoIcon(x[0])}</text><text x="23" y="31" class="wm-t"><tspan fill="${tempColor(x[1])}">${Math.round(x[1])}</tspan><tspan class="wm-s">/</tspan><tspan fill="#3b82f6">${Math.round(x[2])}</tspan></text></g>`; }).join("");
+    box.innerHTML=`<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="全国の天気の地図">${jp.map(f=>`<path d="${path(f)}" class="wm-land"/>`).join("")}${lab}</svg>`;
+  }).catch(()=>{ const box=document.getElementById("wxMapBox"); if(box) box.innerHTML='<div class="empty">地図を読み込めませんでした。下の一覧を見てください。</div>'; }); }
+document.addEventListener("click",ev=>{ if(ev.target.closest("[data-wxmap]")) openWxMap(0); });
 function openWx(day){ const R=wxRows(); const sh=document.getElementById("sheet");
   const ni0=R.length?wxNowIdx(R):0; const days=[...new Set(R.slice(ni0).map(r=>r.iso))]; const d=day||(R[ni0]&&R[ni0].iso)||days[0]||TODAY; const L=R.filter(r=>r.iso===d); const ni=wxNowIdx(R); const nowR=R[ni];
   const mx=L.length?L.reduce((a,b)=>b.temp>a.temp?b:a):null, mn=L.length?L.reduce((a,b)=>b.temp<a.temp?b:a):null; const rainy=L.filter(r=>(r.pop||0)>=50);
@@ -2960,7 +3000,7 @@ async function loadAlerts(){
     tmo(fetch(P2P_URL,{cache:"no-store"}).then(r=>r.ok?r.json():null),8000).catch(()=>null)];
   const [a,p]=await Promise.all(jobs);
   const qs=[]; let ts=null, special=[];
-  if(a){ (a.quakes||[]).forEach(q=>qs.push(q)); ts=a.tsunami||null; special=a.special||[]; AL.checked=a.checked||null; if(a.wx) AL.wx=a.wx; }
+  if(a){ (a.quakes||[]).forEach(q=>qs.push(q)); ts=a.tsunami||null; special=a.special||[]; AL.checked=a.checked||null; if(a.wx) AL.wx=a.wx; if(a.wxmap) AL.wxmap=a.wxmap; }
   if(Array.isArray(p)){ p.forEach(r=>{
     if(r.code===551){ const e=r.earthquake||{}, h=e.hypocenter||{}; if((r.issue||{}).type==="Foreign") return; const at=p2pTime(e.time); if(!at) return;
       qs.push({id:"p"+at,at,place:h.name||"調査中",mag:h.magnitude>0?String(h.magnitude):null,depth:h.depth>0?h.depth:null,maxi:P2PS[e.maxScale]||null}); }
