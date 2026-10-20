@@ -75,7 +75,7 @@ h1,h2,h3{text-wrap:balance;line-height:1.35;margin:0}
 .tab{border:0;background:none;display:flex;flex-direction:column;align-items:center;gap:1px;padding:6px 0;border-radius:10px;cursor:pointer;color:var(--muted);font-size:.82rem;min-width:0}
 .tab .ti{font-size:1.25rem;line-height:1}
 .tabs .wrap[data-n="5"] .tab,.tabs .wrap[data-n="4"] .tab,.tabs .wrap[data-n="3"] .tab{font-size:.88rem;font-weight:700;padding:7px 0}.tabs .wrap[data-n="5"] .tab .ti,.tabs .wrap[data-n="4"] .tab .ti{font-size:1.45rem}
-.tab[aria-selected="true"]{color:var(--accent);background:var(--accent-soft);font-weight:700}
+.tab[aria-selected="true"]{color:var(--accent-ink,var(--accent));background:var(--accent-soft);font-weight:700}
 @media (min-width:900px){
   body{padding-bottom:0}
   .tabs{position:sticky;top:calc(env(safe-area-inset-top,0px) + 61px);bottom:auto;border-top:0;border-bottom:1px solid var(--line);z-index:19}
@@ -92,10 +92,10 @@ main{padding-block:18px 32px}
 .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:16px}
 
 /* chips */
-.chip{display:inline-flex;align-items:center;gap:4px;font-size:.82rem;font-weight:700;padding:2px 9px;border-radius:999px;white-space:nowrap;background:var(--g-pred-s);color:var(--g-pred)}
-.chip.pol{background:var(--g-pol-s);color:var(--g-pol)} .chip.eco{background:var(--g-eco-s);color:var(--g-eco)} .chip.soc{background:var(--g-soc-s);color:var(--g-soc)}
-.chip.it{background:var(--g-it-s);color:var(--g-it)} .chip.intl{background:var(--g-intl-s);color:var(--g-intl)} .chip.spo{background:var(--g-spo-s);color:var(--g-spo)} .chip.ent{background:var(--g-ent-s);color:var(--g-ent)}
-.chip.fas{background:var(--g-fas-s);color:var(--g-fas)} .chip.sci{background:var(--g-sci-s);color:var(--g-sci)} .chip.home{background:var(--g-home-s);color:var(--g-home)} .chip.food{background:var(--g-food-s);color:var(--g-food)} .chip.life{background:var(--g-life-s);color:var(--g-life)} .chip.trip{background:var(--g-trip-s);color:var(--g-trip)}
+.chip{display:inline-flex;align-items:center;gap:4px;font-size:.82rem;font-weight:700;padding:2px 9px;border-radius:999px;white-space:nowrap;background:var(--g-pred-s);color:var(--g-pred-t,var(--g-pred))}
+.chip.pol{background:var(--g-pol-s);color:var(--g-pol-t,var(--g-pol))} .chip.eco{background:var(--g-eco-s);color:var(--g-eco-t,var(--g-eco))} .chip.soc{background:var(--g-soc-s);color:var(--g-soc-t,var(--g-soc))}
+.chip.it{background:var(--g-it-s);color:var(--g-it-t,var(--g-it))} .chip.intl{background:var(--g-intl-s);color:var(--g-intl-t,var(--g-intl))} .chip.spo{background:var(--g-spo-s);color:var(--g-spo-t,var(--g-spo))} .chip.ent{background:var(--g-ent-s);color:var(--g-ent-t,var(--g-ent))}
+.chip.fas{background:var(--g-fas-s);color:var(--g-fas-t,var(--g-fas))} .chip.sci{background:var(--g-sci-s);color:var(--g-sci-t,var(--g-sci))} .chip.home{background:var(--g-home-s);color:var(--g-home-t,var(--g-home))} .chip.food{background:var(--g-food-s);color:var(--g-food-t,var(--g-food))} .chip.life{background:var(--g-life-s);color:var(--g-life-t,var(--g-life))} .chip.trip{background:var(--g-trip-s);color:var(--g-trip-t,var(--g-trip))}
 .badge-ok{color:var(--ok);font-size:.84rem;font-weight:700;white-space:nowrap}
 .badge-one{color:var(--warn);font-size:.84rem;font-weight:700;white-space:nowrap}
 
@@ -104,7 +104,7 @@ main{padding-block:18px 32px}
 .hero2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .play.sm{padding:10px 12px;gap:10px}.play.sm .pi{width:34px;height:34px;font-size:1rem}.play.sm b{font-size:1rem}
 .play.alt{background:var(--surface);color:var(--ink);border:1px solid var(--line)}.play.alt .pi{background:var(--accent-soft)}
-.play{display:flex;align-items:center;gap:14px;width:100%;text-align:left;border:0;cursor:pointer;border-radius:var(--radius);padding:16px 18px;background:var(--accent);color:var(--on-accent)}
+.play{display:flex;align-items:center;gap:14px;width:100%;text-align:left;border:0;cursor:pointer;border-radius:var(--radius);padding:16px 18px;background:var(--accent-btn,var(--accent));color:var(--on-accent)}
 .play .pi{width:46px;height:46px;border-radius:50%;background:rgba(255,255,255,.22);display:grid;place-items:center;font-size:1.2rem;flex:none}
 .play b{display:block;font-size:1.08rem;color:inherit}
 .play span{color:inherit}
@@ -147,7 +147,7 @@ main{padding-block:18px 32px}
 .tl-new{font-style:normal;font-size:.9em}
 .w-say{margin-left:auto;background:transparent;border:1px solid var(--line);border-radius:999px;width:32px;height:32px;cursor:pointer;font-size:1rem;flex:0 0 auto}
 .w .wt{display:flex;align-items:center;gap:6px}
-.chat-go{align-self:flex-start;padding:9px 14px;border-radius:999px;border:1px solid var(--accent);background:var(--accent-soft);color:var(--accent);font-weight:800;cursor:pointer}
+.chat-go{align-self:flex-start;padding:9px 14px;border-radius:999px;border:1px solid var(--accent);background:var(--accent-soft);color:var(--accent-ink,var(--accent));font-weight:800;cursor:pointer}
 .chat{display:flex;flex-direction:column;gap:10px;margin-top:4px}
 .cb{display:flex;gap:8px;align-items:flex-end}
 .cb.y{flex-direction:row}.cb.m{flex-direction:row-reverse}
@@ -293,6 +293,7 @@ main{padding-block:18px 32px}
 .chips{display:flex;gap:6px;flex-wrap:wrap}
 .fchip{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:5px 12px;font-size:.88rem;cursor:pointer}
 .fchip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.fchip[aria-pressed="true"] b,.fchip[aria-pressed="true"] .num,.fchip[aria-pressed="true"] small,.fchip[aria-pressed="true"] i{color:inherit}
 .fchip .c{display:inline-block;width:9px;height:9px;border-radius:50%;margin-right:6px;vertical-align:middle}
 .hist{display:flex;align-items:flex-end;gap:2px;height:46px;padding-top:4px}
 .hist i{flex:1;background:var(--accent);opacity:.75;border-radius:3px 3px 0 0;min-height:2px}
@@ -318,12 +319,12 @@ mark{background:#ffe066;color:#141b2d;border-radius:3px;padding:0 1px}
 .ms b{font-size:.95rem}
 .ms .mi{font-size:1.35rem}
 .ms.new{border-color:var(--accent);background:var(--accent-soft)}
-.newchip{background:var(--accent-soft);color:var(--accent)}
+.newchip{background:var(--accent-soft);color:var(--accent-ink,var(--accent))}
 .result{border-color:var(--ok);background:var(--ok-soft)}
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(92px + env(safe-area-inset-bottom,0px));z-index:90;background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:999px;font-weight:700;font-size:.9rem;box-shadow:0 8px 24px rgba(0,0,0,.25);animation:rise .4s ease both;max-width:calc(100% - 32px);text-align:center}
 .toast.out{opacity:0;transition:opacity .5s}
 /* かんたんモード: ボタンに言葉・押しやすく */
-.listen-big{display:flex;align-items:center;gap:14px;width:100%;text-align:left;border:0;cursor:pointer;border-radius:var(--radius);padding:14px 16px;background:var(--accent);color:var(--on-accent)}
+.listen-big{display:flex;align-items:center;gap:14px;width:100%;text-align:left;border:0;cursor:pointer;border-radius:var(--radius);padding:14px 16px;background:var(--accent-btn,var(--accent));color:var(--on-accent)}
 .listen-big .li{width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,.22);display:grid;place-items:center;font-size:1.5rem;flex:none}
 .listen-big b{display:block;font-size:1.15rem}.listen-big small{display:block;font-size:.88rem;opacity:.92}
 .listen-big.on{background:#c62828}
@@ -343,7 +344,7 @@ mark{background:#ffe066;color:#141b2d;border-radius:3px;padding:0 1px}
 .tabpick li{display:flex;align-items:center;gap:8px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:8px 10px}
 .tabpick li.off{opacity:.55}
 .tabpick .nm{flex:1;font-weight:700}
-.tabpick .tg{min-width:84px;min-height:40px;border-radius:999px;border:2px solid var(--accent);background:var(--accent);color:var(--on-accent);font-weight:800;cursor:pointer}
+.tabpick .tg{min-width:84px;min-height:40px;border-radius:999px;border:2px solid var(--accent);background:var(--accent-btn,var(--accent));color:var(--on-accent);font-weight:800;cursor:pointer}
 .tabpick li.off .tg{background:var(--surface);color:var(--accent)}
 .tabpick .mv{min-width:40px;min-height:40px}
 
@@ -425,7 +426,7 @@ mark{background:#ffe066;color:#141b2d;border-radius:3px;padding:0 1px}
 .qk-open{margin-top:8px}
 
 .gd-box{margin-top:14px;padding-top:12px;border-top:1px dashed var(--line)}
-.gd-on{display:inline-block;margin-left:6px;font-size:.84rem;background:var(--accent);color:#fff;border-radius:999px;padding:1px 8px;vertical-align:middle}
+.gd-on{display:inline-block;margin-left:6px;font-size:.84rem;background:var(--accent-btn,var(--accent));color:#fff;border-radius:999px;padding:1px 8px;vertical-align:middle}
 .gd-resume{border-color:var(--accent);font-weight:700}
 .gd-bar{display:flex;align-items:center;gap:6px;padding-top:10px}
 .gd-bar .gd-resume{flex:1;justify-content:center}
@@ -449,7 +450,7 @@ mark{background:#ffe066;color:#141b2d;border-radius:3px;padding:0 1px}
 .tier:not(.got) .tm{opacity:.5}
 .tier .tb{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}
 .tier .tb b{font-size:.98rem}.tier small{font-size:.84rem;color:var(--muted)}
-.tlv{display:inline-block;background:var(--accent);color:var(--on-accent);border-radius:999px;padding:0 8px;font-size:.82rem;margin-left:2px}
+.tlv{display:inline-block;background:var(--accent-btn,var(--accent));color:var(--on-accent);border-radius:999px;padding:0 8px;font-size:.82rem;margin-left:2px}
 .tp{display:block;height:6px;border-radius:999px;background:var(--line);overflow:hidden}.tp i{display:block;height:100%;background:var(--accent);border-radius:999px}
 .badges{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin-top:10px}
 .bd{display:flex;flex-direction:column;align-items:center;gap:2px;padding:10px 4px;border-radius:12px;background:var(--surface2);filter:grayscale(1);opacity:.45;text-align:center}
@@ -458,7 +459,8 @@ mark{background:#ffe066;color:#141b2d;border-radius:3px;padding:0 1px}
 .vote{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-top:4px}
 .ics{margin-top:6px;font-size:.84rem;padding:3px 10px}
 .mapbox{padding:8px}
-.mapsvg svg{display:block;border-radius:10px}
+.mapsvg{max-width:430px;margin:0 auto}
+.mapsvg svg{display:block;border-radius:10px;width:100%;height:auto}
 .pin .pulse{animation:pulse 2.2s ease-in-out infinite;transform-box:fill-box;transform-origin:center}
 @keyframes pulse{0%,100%{transform:scale(1);opacity:.25}50%{transform:scale(1.35);opacity:.05}}
 .photo{margin:0}
@@ -652,7 +654,7 @@ details.faq p{margin:10px 0 12px}
 .lk-list .mv{width:40px;height:40px;border:1px solid var(--line);background:var(--surface2);border-radius:10px;cursor:pointer;font-size:1rem}
 .lk-list .mv:disabled{opacity:.3;cursor:default}
 .lk-list .sw2{min-width:64px;height:40px;border-radius:999px;border:1px solid var(--line);background:var(--surface2);cursor:pointer;font-size:.88rem;font-weight:700}
-.lk-list .sw2[aria-pressed="true"]{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+.lk-list .sw2[aria-pressed="true"]{background:var(--accent-btn,var(--accent));color:var(--on-accent);border-color:var(--accent-btn,var(--accent))}
 .lk-list .lock{min-width:64px;text-align:center;font-size:.84rem;color:var(--muted)}
 .presets{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}
 .presets button{text-align:left;border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:10px 12px;cursor:pointer}
@@ -677,7 +679,7 @@ details.faq p{margin:10px 0 12px}
 .pet-av{border:0;background:none;padding:0;cursor:pointer;flex:none}
 .pet-tx{display:flex;flex-direction:column;gap:4px;min-width:0;font-size:.9rem}
 .pet-bt{display:flex;gap:6px;flex-wrap:wrap;margin-top:2px}
-.pet-feed{background:var(--accent);color:var(--on-accent);border-color:var(--accent);font-weight:700}
+.pet-feed{background:var(--accent-btn,var(--accent));color:var(--on-accent);border-color:var(--accent-btn,var(--accent));font-weight:700}
 .pet-feed:disabled{opacity:.45}
 .pet-big{display:flex;justify-content:center}
 .pet-card svg,.pet-big svg{animation:petIdle 2.6s ease-in-out infinite;transform-origin:50% 90%}
@@ -825,7 +827,7 @@ svg.eat{animation:petEat .7s ease both!important}
 .obm-top{display:flex;gap:6px;align-items:center;padding:6px 8px;background:var(--surface);border-bottom:1px solid var(--line);font-weight:800}.obm-top span:first-child{flex:1}
 .obm-b{border:1px solid var(--line);border-radius:6px;padding:0 6px;font-size:.82rem}
 .obm-row{display:flex;align-items:center;gap:6px;margin:6px 8px;padding:6px 8px;background:var(--surface);border:1px solid var(--line);border-radius:8px;font-weight:700}
-.obm-row.acc{background:var(--accent);color:var(--on-accent)}
+.obm-row.acc{background:var(--accent-btn,var(--accent));color:var(--on-accent)}
 .obm-row i,.obl i,.obm-n{font-style:normal;display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;background:#e5484d;color:#fff;font-size:.82rem;font-weight:800;flex:none}
 .obm-tabs{position:relative;display:flex;gap:2px;padding:6px 8px 6px 34px;background:var(--surface);border-top:1px solid var(--line)}
 .obm-tabs .obm-n{position:absolute;left:8px;top:50%;margin-top:-11px}
@@ -936,7 +938,7 @@ svg.eat{animation:petEat .7s ease both!important}
 .gd-a{background:var(--surface);border:1px solid var(--line);padding:10px 14px;border-radius:4px 16px 16px 16px;max-width:100%}
 .gd-out{display:flex;flex-direction:column;gap:8px;margin-top:10px}
 .gd-out:empty{display:none}
-.gd-lk{border:0;background:none;color:var(--accent);font-weight:700;cursor:pointer;padding:0 2px;font-size:.88rem}
+.gd-lk{border:0;background:none;color:var(--accent-on-surface,var(--accent));font-weight:700;cursor:pointer;padding:0 2px;font-size:.88rem}
 .gd-deep{align-self:flex-start}
 .gd-in{position:sticky;bottom:calc(8px + env(safe-area-inset-bottom,0px));box-shadow:0 4px 16px rgba(0,0,0,.12)}
 </style>
@@ -1050,7 +1052,7 @@ function mmdd(iso){ return iso.slice(5,10); }
 function seasonNow(){ if(LOOK.season==="off") return null; if(LOOK.preview){ const z=SEASONS.find(x=>x.k===LOOK.preview); if(z) return z; }
   const t=mmdd(TODAY); return SEASONS.find(z=> z.from<=z.to ? (t>=z.from&&t<=z.to) : (t>=z.from||t<=z.to)) || null; }
 function inSeason(z,iso){ const t=mmdd(iso); return z.from<=z.to ? (t>=z.from&&t<=z.to) : (t>=z.from||t<=z.to); }
-const SECS = [["weather","🌤️ 天気"],["quick","⏱️ 1分まとめ"],["cont","🔔 つづきがあります"],["letter","💌 ペットからの手紙"],["listen","🔊 ニュースを聞く"],["three","☀️ 今日の3行"],["ten","📰 今日のニュース10"],["pet","🐣 ペット"],["goal","🗓️ 今週の目標"],["play","▶️ 1分で見る"],["foryou","🎯 あなた向け"],["picks","🎁 ジャンル別おすすめ"],["kw","🔖 わたしのキーワード"],["quiz","🧠 今日のクイズ"],["number","🔢 今日の数字"],["fun","✨ おたのしみ"],["other","📚 そのほかのニュース"],["english","📘 今日の英単語"],["mood","🗺️ 世の中の天気図"],["know","👆 知ってた?"],["talk","🍽️ 今日の話のタネ"],["reporter","🎙️ よむまる記者"],["local","🏠 わたしの街"],["gacha","🎰 今日の1本ガチャ"],["thermo","🌡️ ニュースの温度計"],["trip2","🗺️ ペットの旅"],["assoc","🔗 ニュース連想"],["back","📅 あのとき何してた?"],["bingo","🎲 ニュースビンゴ"],["battle","⚔️ 予想くらべ"],["kurashi","🧰 くらしの便利"]];
+const SECS = [["weather","🌤️ 天気"],["quick","⏱️ 1分まとめ"],["cont","🔔 つづきがあります"],["letter","💌 ペットからの手紙"],["listen","🔊 ニュースを聞く"],["three","☀️ 今日の3行"],["ten","📰 今日のニュース10"],["pet","🐣 ペット"],["goal","🗓️ 今週の目標"],["play","▶️ 1分で見る"],["foryou","🎯 あなた向け"],["picks","🎁 ジャンル別おすすめ"],["kw","🔖 わたしのキーワード"],["quiz","🧠 今日のクイズ"],["number","🔢 今日の数字"],["fun","✨ おたのしみ"],["other","📚 そのほかのニュース"],["mood","🗺️ 世の中の天気図"],["know","👆 知ってた?"],["talk","🍽️ 今日の話のタネ"],["reporter","🎙️ よむまる記者"],["local","🏠 わたしの街"],["gacha","🎰 今日の1本ガチャ"],["thermo","🌡️ ニュースの温度計"],["trip2","🗺️ ペットの旅"],["assoc","🔗 ニュース連想"],["back","📅 あのとき何してた?"],["bingo","🎲 ニュースビンゴ"],["battle","⚔️ 予想くらべ"]];
 const LOOK = (()=>{ let p={}; try{ p=JSON.parse(store.get("nw-look")||"{}")||{}; }catch(_){ p={}; }
   const fix=(arr,all)=>{ const a=(Array.isArray(arr)?arr:[]).filter(k=>all.includes(k)); all.forEach(k=>{ if(!a.includes(k)) a.push(k); }); return a; };
   const had=new Set(Array.isArray(p.order)?p.order:[]); p.order=fix(p.order,SECS.map(s=>s[0]));
@@ -1064,6 +1066,10 @@ const LOOK = (()=>{ let p={}; try{ p=JSON.parse(store.get("nw-look")||"{}")||{};
   // v7: かんたん/ふつうモード。今までの人は「ふつう」。聞くボタンはふつうではかくす。ことばタブは最初はかくす
   // v9: おすすめは「おたのしみ」の中へ
   // v10: 新しいおたのしみ(温度計・旅・連想・あのとき・ビンゴ・予想くらべ)は「おたのしみ」の中に入れる
+  // v12: 英単語をやめ、くらしの便利は「数字」タブへ。おたのしみは「今日のひとつ」「世の中の空気」にまとめた
+  if(!p.v12){ p.v12=1; p.off=p.off||{}; delete p.off.english; delete p.off.kurashi;
+    if(p.cfg) Object.values(p.cfg).forEach(c=>{ if(c&&c.off){ delete c.off.english; delete c.off.kurashi; } });
+    if(Array.isArray(p.order)) p.order=p.order.filter(k=>k!=="english"&&k!=="kurashi"); }
   // v11: ニュース10は最初「短く」・天気カードは1行にたたむ(2026-10-21)
   if(!p.v11){ p.v11=1; p.len="short"; p.wxOpen=false; }
   if(!p.v10){ p.v10=1; const K={thermo:true,trip2:true,assoc:true,back:true,bingo:true,battle:true,kurashi:true}; p.off=Object.assign({},p.off,K); if(p.cfg) Object.values(p.cfg).forEach(c=>{ if(c&&c.off) Object.assign(c.off,K); }); }
@@ -1083,7 +1089,7 @@ function saveLook(){ store.set("nw-look", JSON.stringify(LOOK)); }
 const MODE_PRESET={
   easy:()=>{ const on=["weather","quick","cont","listen","three","ten","quiz","goal"]; const order=[...on,...SECS.map(x=>x[0]).filter(k=>!on.includes(k))]; const off={}; order.forEach(k=>{ if(!on.includes(k)) off[k]=true; });
     return {order,off,tabs:["today","explain","search","my","plan","map","numbers","words"],tabOff:{plan:true,map:true,numbers:true,words:true},size:"l"}; },
-  normal:()=>{ const off={listen:true,quick:true,picks:true,english:true,mood:true,know:true,talk:true,reporter:true,local:true,gacha:true};
+  normal:()=>{ const off={listen:true,quick:true,picks:true,mood:true,know:true,talk:true,reporter:true,local:true,gacha:true};
     return {order:SECS.map(x=>x[0]),off,tabs:["today","explain","search","plan","my","map","numbers","words"],tabOff:{map:true,numbers:true,words:true},size:"m"}; }};
 function modeSnap(){ return {order:LOOK.order.slice(),off:Object.assign({},LOOK.off),tabs:LOOK.tabs.slice(),tabOff:Object.assign({},LOOK.tabOff),size:store.get("nw-size")||"m"}; }
 function setMode(m,fresh){ if(m!=="easy") m="normal"; if(m===LOOK.mode&&!fresh) return;
@@ -1096,7 +1102,56 @@ function applySettings(){ const t=store.get("nw-theme"); if(t==="light"||t==="da
   const s=store.get("nw-size"); if(s==="l"||s==="xl") root.setAttribute("data-size",s); else root.removeAttribute("data-size");
   root.setAttribute("data-color",LOOK.color); root.setAttribute("data-mode",LOOK.mode); { const z=seasonNow(); if(z) root.setAttribute("data-season",z.k); else root.removeAttribute("data-season"); try{ snow(!!z&&z.k==="xmas"); }catch(_){} }
   if(LOOK.density!=="normal") root.setAttribute("data-density",LOOK.density); else root.removeAttribute("data-density");
-  const m=document.querySelector('meta[name="theme-color"]'); if(m){ const z=seasonNow(); m.setAttribute("content", z? z.light[0] : (COLORS.find(c=>c[0]===LOOK.color)||COLORS[0])[2]); } }
+  const m=document.querySelector('meta[name="theme-color"]'); if(m){ const z=seasonNow(); m.setAttribute("content", z? z.light[0] : (COLORS.find(c=>c[0]===LOOK.color)||COLORS[0])[2]); }
+  fixInk(); }
+
+// ===== 読みやすさの自動調整(色あいはそのまま、明るさだけ動かす) =====
+// 着せかえの色や明るい/暗い画面によっては、文字と背景が近すぎて読みにくくなることがある。
+// ここでは「色相・あざやかさ」はいっさい変えず、明るさ(L)だけを少しずつ動かして、
+// 文字がはっきり読める濃さ(コントラスト比 4.5)になる最小の変化を自動で計算する。
+const INK_G=["pol","eco","soc","it","intl","spo","ent","pred","fas","home","food","life","trip","sci"];
+function _rgb(v){ v=String(v||"").trim();
+  let m=/^#([0-9a-f]{3}|[0-9a-f]{6})$/i.exec(v);
+  if(m){ let h=m[1]; if(h.length===3) h=h[0]+h[0]+h[1]+h[1]+h[2]+h[2];
+    return [parseInt(h.slice(0,2),16),parseInt(h.slice(2,4),16),parseInt(h.slice(4,6),16)]; }
+  m=/rgba?\(([^)]+)\)/.exec(v); if(m){ const a=m[1].split(",").map(parseFloat); return [a[0],a[1],a[2]]; }
+  return null; }
+function _lum(c){ const f=v=>{ v/=255; return v<=0.03928?v/12.92:Math.pow((v+0.055)/1.055,2.4); };
+  return 0.2126*f(c[0])+0.7152*f(c[1])+0.0722*f(c[2]); }
+function _cr(a,b){ const l1=_lum(a),l2=_lum(b); return (Math.max(l1,l2)+0.05)/(Math.min(l1,l2)+0.05); }
+function _toHsl(c){ const r=c[0]/255,g=c[1]/255,b=c[2]/255, mx=Math.max(r,g,b), mn=Math.min(r,g,b), d=mx-mn;
+  let h=0; if(d){ h = mx===r?((g-b)/d+(g<b?6:0)) : mx===g?((b-r)/d+2) : ((r-g)/d+4); h*=60; }
+  const l=(mx+mn)/2, sa=d?d/(1-Math.abs(2*l-1)):0; return [h,sa,l]; }
+function _toRgb(h,s,l){ const c=(1-Math.abs(2*l-1))*s, x=c*(1-Math.abs(((h/60)%2)-1)), m=l-c/2;
+  let r=0,g=0,b=0; const i=Math.floor(h/60)%6;
+  if(i===0){r=c;g=x;} else if(i===1){r=x;g=c;} else if(i===2){g=c;b=x;} else if(i===3){g=x;b=c;} else if(i===4){r=x;b=c;} else {r=c;b=x;}
+  return [Math.round((r+m)*255),Math.round((g+m)*255),Math.round((b+m)*255)]; }
+function _hex(c){ return "#"+c.map(v=>Math.max(0,Math.min(255,Math.round(v))).toString(16).padStart(2,"0")).join(""); }
+// fg の明るさだけを動かして、bg の上で need の読みやすさになる色を返す(足りなければ行けるところまで)
+function inkOn(fg,bg,need){ const F=_rgb(fg), B=_rgb(bg); if(!F||!B) return null;
+  if(_cr(F,B)>=need) return _hex(F);
+  const [h,sa,l0]=_toHsl(F); const dark=_lum(B)>0.4; // 背景が明るいなら文字を濃く、暗いなら薄く
+  let best=F, bestCr=_cr(F,B);
+  for(let i=1;i<=100;i++){ const l=Math.max(0,Math.min(1, l0 + (dark?-1:1)*i/100));
+    const c=_toRgb(h,sa,l), cr=_cr(c,B);
+    if(cr>bestCr){ best=c; bestCr=cr; }
+    if(cr>=need) return _hex(c);
+    if(l<=0||l>=1) break; }
+  return _hex(best); }
+function fixInk(){ try{
+  const st=getComputedStyle(root), set=(k,v)=>{ if(v) root.style.setProperty(k,v); };
+  const soft=st.getPropertyValue("--accent-soft"), acc=st.getPropertyValue("--accent"),
+        onAcc=st.getPropertyValue("--on-accent"), surf=st.getPropertyValue("--surface");
+  // ① うすい色の上に置く文字(下のタブの選択中など)
+  set("--accent-ink", inkOn(acc, soft, 4.5));
+  // ② カードの上に置く文字(リンクなど)
+  set("--accent-on-surface", inkOn(acc, surf, 4.5));
+  // ③ ぬりつぶしボタン。文字の色は変えず、下の色の明るさだけ動かす
+  const btn=inkOn(acc, onAcc, 4.5); set("--accent-btn", btn||acc);
+  // ④ ジャンルの札
+  INK_G.forEach(g=>{ const c=st.getPropertyValue("--g-"+g), b=st.getPropertyValue("--g-"+g+"-s");
+    set("--g-"+g+"-t", inkOn(c,b,4.5)); });
+  }catch(_){} }
 applySettings();
 
 // ===== 自作イラスト(SVG) =====
@@ -1391,7 +1446,6 @@ function renderToday(){
     </section>`;
   S.mood=moodCard();
   S.know=knowCard();
-  S.english=englishCard();
   S.fun=funGrid();
   S.talk=talkCard();
   S.reporter=reporterCard();
@@ -1780,6 +1834,7 @@ function renderNumbers(){
     <div class="sec-h"><h2>📈 株・円・原油の動き</h2><span class="sub">点をタップで値が出ます</span></div>
     ${mascot("numbers")}
     ${marketsMini()}
+    ${kurashiCard()}
     ${ifCalc()}
     <section class="card" id="longBox"><h3 style="font-size:1rem">🕰️ 長い期間で見る</h3>
       <div class="chips" style="margin-top:8px" id="lsSer"><button class="fchip" data-s="nikkei" aria-pressed="true">📈 日経平均</button><button class="fchip" data-s="yen" aria-pressed="false">💴 1ドル</button><button class="fchip" data-s="oil" aria-pressed="false">🛢️ 原油</button></div>
@@ -2248,7 +2303,7 @@ function personalCards(){
 
   return out.join("");
 }
-function intPickHTML(){ if(hasInterests()||store.get("nw-int-hide")==="1") return ""; return `<section class="card" aria-label="関心を選ぶ"><b>🎯 気になるジャンルを選んでください</b><p class="hint" style="margin:4px 0 10px">選ぶと「あなた向け」に並びます。読んだ解説からも少しずつ学びます。記録はこのスマホの中だけに残ります。</p><div class="chips" id="intPick">${GORDER.map(g=>`<button class="fchip" data-g="${g}" aria-pressed="false"><span class="c" style="background:var(--g-${g})"></span>${GN[g]}</button>`).join("")}</div><div style="display:flex;gap:8px;margin-top:10px"><button class="fchip" id="intSave" style="background:var(--accent);color:var(--on-accent);border-color:var(--accent)">決める</button><button class="fchip" id="intLater">あとで</button></div></section>`; }
+function intPickHTML(){ if(hasInterests()||store.get("nw-int-hide")==="1") return ""; return `<section class="card" aria-label="関心を選ぶ"><b>🎯 気になるジャンルを選んでください</b><p class="hint" style="margin:4px 0 10px">選ぶと「あなた向け」に並びます。読んだ解説からも少しずつ学びます。記録はこのスマホの中だけに残ります。</p><div class="chips" id="intPick">${GORDER.map(g=>`<button class="fchip" data-g="${g}" aria-pressed="false"><span class="c" style="background:var(--g-${g})"></span>${GN[g]}</button>`).join("")}</div><div style="display:flex;gap:8px;margin-top:10px"><button class="fchip" id="intSave" style="background:var(--accent-btn,var(--accent));color:var(--on-accent);border-color:var(--accent-btn,var(--accent))">決める</button><button class="fchip" id="intLater">あとで</button></div></section>`; }
 function forYou(){
   const any=GORDER.some(g=>interestScore(g)>0); if(!any) return intPickHTML();
   const days=[...new Set(NEWS.map(n=>n.d))].slice(0,2); const topH=new Set(D.top10.map(t=>t.title));
@@ -3092,40 +3147,33 @@ function kurashiCard(){ const P=priceRows(); const R=rulesSoon();
     <div class="qk-links" style="margin-top:4px">${LIFE_LINKS.map(([t,u])=>`<a href="${u}" target="_blank" rel="noopener">${esc(t)}</a>`).join("")}</div>
     <button class="sos-go" data-sos="1" style="margin-top:10px">🆘 こまったときは(災害のとき)</button>
     <div class="hint" style="margin-top:8px">リンク先は、それぞれの会社・役所の公式ページです。くわしい最新の情報は、リンク先で確かめてください。</div></section>`; }
-const FUN=[["picks","🎁","ジャンル別おすすめ",()=>picksCard()],["reporter","🎙️","よむまる記者",()=>reporterCard()],["gacha","🎰","今日の1本ガチャ",()=>gachaCard()],["mood","🗺️","世の中の天気図",()=>moodCard()],["know","👆","知ってた?",()=>knowCard()],["talk","🍽️","話のタネ",()=>talkCard()],["local","🏠","わたしの街",()=>localCard()],["english","📘","今日の英単語",()=>englishCard()],["thermo","🌡️","ニュースの温度計",()=>thermoCard()],["trip2","🗺️","ペットの旅",()=>travelCard()],["assoc","🔗","ニュース連想",()=>assocCard()],["back","📅","あのとき何してた?",()=>backCard()],["bingo","🎲","ニュースビンゴ",()=>bingoCard()],["battle","⚔️","予想くらべ",()=>battleCard()],["kurashi","🧰","くらしの便利",()=>kurashiCard()]];
+// いくつかのカードは1つの入口にまとめる(中身はぜんぶ残して、中で切りかえる)
+const FUN_SET={
+  pick:[["gacha","🎰 1本ガチャ",()=>gachaCard()],["reporter","🎙️ よむまる記者",()=>reporterCard()],
+        ["know","👆 知ってた?",()=>knowCard()],["talk","🍽️ 話のタネ",()=>talkCard()]],
+  air:[["mood","🗺️ 今日をジャンル別に",()=>moodCard()],["thermo","🌡️ 7日の動き",()=>thermoCard()]]
+};
+let FUN_SEL={};
+function funSetHTML(key){ const L=FUN_SET[key]; if(!L) return "";
+  const sel=FUN_SEL[key]||L[0][0]; const cur=L.find(x=>x[0]===sel)||L[0];
+  const body=cur[2]()||`<div class="empty">今日はまだありません。</div>`;
+  return `<div class="seg fun-seg" role="group" aria-label="見るもの">${L.map(([k,n])=>`<button data-funsel="${key}:${k}" aria-pressed="${k===cur[0]}">${esc(n)}</button>`).join("")}</div>
+    <div id="funSetBody" style="margin-top:10px">${body}</div>`; }
+const FUN=[["picks","🎁","ジャンル別おすすめ",()=>picksCard()],["pick","🎰","今日のひとつ",()=>funSetHTML("pick")],["air","🌡️","世の中の空気",()=>funSetHTML("air")],["local","🏠","わたしの街",()=>localCard()],["trip2","🗺️","ペットの旅",()=>travelCard()],["assoc","🔗","ニュース連想",()=>assocCard()],["back","📅","あのとき何してた?",()=>backCard()],["bingo","🎲","ニュースビンゴ",()=>bingoCard()],["battle","⚔️","予想くらべ",()=>battleCard()]];
 const FUN_SHOW=6; let funOpen=false;
-function funGrid(){ const L=FUN.filter(f=>LOOK.off[f[0]]); if(!L.length) return "";
+function funGrid(){ const L=FUN.filter(f=>FUN_SET[f[0]]?true:LOOK.off[f[0]]); if(!L.length) return "";
   const dot=k=>(k==="gacha"&&(ME.gacha||{}).d!==TODAY)||(k==="picks"&&PK&&ME.pickSeen!==PK.updated);
   const S2=L.slice().sort((a,b)=>(dot(b[0])?1:0)-(dot(a[0])?1:0)); const hid=Math.max(0,S2.length-FUN_SHOW);
   const t=([k,i,n],x)=>`<button class="fun-t${x?" xtra":""}" data-fun="${k}"><span>${i}</span><small>${esc(n)}</small>${dot(k)?'<i class="fun-dot"></i>':""}</button>`;
   return `<section aria-label="おたのしみ" id="funSec"${funOpen?' class="open"':''}><div class="sec-h"><h2>✨ おたのしみ</h2><span class="sub">タップで開く</span></div>
     <div class="fun-grid">${S2.slice(0,FUN_SHOW).map(f=>t(f,false)).join("")}${S2.slice(FUN_SHOW).map(f=>t(f,true)).join("")}</div>
     ${hid?`<button class="fchip" id="funMore" data-hid="${hid}" aria-expanded="${funOpen?"true":"false"}" style="margin-top:8px">${funOpen?"▲ とじる":`… ほか ${hid}こ を見る`}</button>`:""}</section>`; }
-function openFun(k){ const f=FUN.find(x=>x[0]===k); if(!f) return; const html=f[3](); if(!html){ toast("今日はまだありません"); return; } const sh=document.getElementById("sheet");
-  sh.innerHTML=`<div class="bar"><div class="wrap"><button class="iconbtn" id="fnx" aria-label="もどる">← もどる</button><span class="ttl">${f[1]} ${esc(f[2])}</span></div></div><div class="wrap body">${html}</div>`;
-  const close=()=>{ sh.hidden=true; sh.innerHTML=""; document.body.style.overflow=""; go("today",{keepScroll:true}); };
-  sh.querySelector("#fnx").onclick=close; sh.hidden=false; sh.scrollTop=0; document.body.style.overflow="hidden";
-  bindKnow(); bindTalk(); bindReporter(); bindGacha(); bindLocal(); bindAssoc(); bindBattle(); if(k==="picks"&&PK){ ME.pickSeen=PK.updated; saveMe(); bindPicks(true); }
-  sh.querySelectorAll("[data-ex]").forEach(b=>b.onclick=()=>{ sh.hidden=true; openEx(b.dataset.ex); });
-  sh.querySelectorAll("[data-mood]").forEach(b=>b.onclick=()=>{ close(); sState.q=""; sState.th=""; sState.ok=false; sState.onlyNew=false; sState.g=new Set([b.dataset.mood]); go("search"); });
-  track("/fun/"+k,"おたのしみ"); }
-// ===== 英語で読む(英語の勉強に。data.js の en を使う) =====
-const EN=(D.en&&typeof D.en==="object")?D.en:null;
-function langMode(){ return EN?(LOOK.lang||"ja"):"ja"; }
-function enOf(kind,i){ if(!EN) return null; const L=EN[kind]; return L&&L[i]?L[i]:null; }
-function enBlock(e){ if(!e||langMode()==="ja") return ""; return `<span class="enb" lang="en"><span class="ent">${esc(e.t||"")}</span>${e.x?`<span class="enx">${esc(e.x)}</span>`:""}${(e.w||[]).length?`<span class="enw">${e.w.map(([a,b])=>`<i>📘 ${esc(a)} = ${esc(b)}</i>`).join("")}</span>`:""}<span class="ensay" role="button" tabindex="0" data-say="${esc((e.t||"")+". "+(e.x||""))}">🔊 English</span></span>`; }
-function langSeg(){ if(!EN) return ""; const m=langMode(); return `<span class="seg lang-seg" role="group" aria-label="ことば">${[["ja","日本語"],["both","日+英"],["en","English"]].map(([k,l])=>`<button data-lang="${k}" aria-pressed="${m===k}">${l}</button>`).join("")}</span>`; }
-function sayJa(t){ try{ const s=window.speechSynthesis; if(!s) return; s.cancel(); const u=new SpeechSynthesisUtterance(t); u.lang="ja-JP"; u.rate=.95*sayRate(); s.speak(u); }catch(_){} }
-function sayEn(t){ try{ const s=window.speechSynthesis; if(!s) return; s.cancel(); const u=new SpeechSynthesisUtterance(t); u.lang="en-US"; u.rate=.9; s.speak(u); }catch(_){} }
-document.addEventListener("click",e=>{ const sj=e.target.closest("[data-sayj]"); if(sj){ e.preventDefault(); e.stopPropagation(); sayJa(sj.dataset.sayj); return; }
-  const ln=e.target.closest("[data-len]"); if(ln){ e.preventDefault(); e.stopPropagation(); LOOK.len=ln.dataset.len; saveLook(); const ol=document.querySelector("ol.ten"); if(ol){ ol.classList.toggle("short",LOOK.len==="short"); document.querySelectorAll("[data-len]").forEach(x=>x.setAttribute("aria-pressed",String(x.dataset.len===LOOK.len))); } return; }
-  const b=e.target.closest("[data-say]"); if(b){ e.preventDefault(); e.stopPropagation(); sayEn(b.dataset.say); track("/en/say","英語の読み上げ"); return; }
-  const l=e.target.closest("[data-lang]"); if(l){ LOOK.lang=l.dataset.lang; saveLook(); track("/en/"+LOOK.lang,"英語"); go(current,{keepScroll:true}); } },true);
-function englishCard(){ if(!EN) return ""; const W=[]; (EN.top10||[]).forEach((e,i)=>(e.w||[]).forEach(w=>W.push([w[0],w[1],D.top10[i]&&D.top10[i].title]))); if(!W.length) return "";
-  return `<section class="card" aria-label="今日の英単語"><b>📘 今日の英単語</b><div class="hint" style="margin:4px 0 8px">今日のニュースに出てきた英語。🔊で発音が聞けます。</div>
-    <ul class="enlist">${W.map(([a,b,t])=>`<li><span><b lang="en">${esc(a)}</b> = ${esc(b)}<small class="hint" style="display:block">${esc(t||"")}</small></span><button class="fchip" data-say="${esc(a)}">🔊</button></li>`).join("")}</ul></section>`; }
 // ===== お知らせ(新しくなったところ)。機能を足したら、いちばん上に1つ足す =====
 const UPDATES=[
+  {id:"2026-10-21h",d:"2026-10-21",t:"🎨 文字が読みやすくなりました・おたのしみの整理",L:[
+    "着せかえの色によって、下のタブやジャンルの札の文字がうすく見えることがありました。色あいはそのままに、読める濃さへ自動でそろえるようにしました(9色すべて・明るい画面と暗い画面の両方で確認)",
+    "✨ おたのしみを 15こ → 9こ に。1本ガチャ・よむまる記者・知ってた?・話のタネは「🎰 今日のひとつ」、天気図と温度計は「🌡️ 世の中の空気」にまとめました(中身はそのまま、中で切りかえ)",
+    "🧰 くらしの便利は「📈 数字」のページへ移りました。📘 今日の英単語はおしまいにしました(英語はニュース10の切りかえで読めます)"]},
   {id:"2026-10-21g",d:"2026-10-21",t:"🔍 地図と捜査ボードを、指で大きくできます",L:[
     "日本地図・世界地図・全国の天気・捜査ボードを、2本指でひろげると大きくなります(ダブルタップでも)",
     "大きくしたあとは、指でなぞって見たいところへ動かせます。下の「＋ − もどす」でも変えられます"]},
@@ -3168,6 +3216,27 @@ const UPDATES=[
   {id:"2026-10-20a",d:"2026-10-20",t:"📈 長い期間のグラフを直しました",L:["円と原油は1か月〜全期間のグラフが見られます(日経平均は準備中)"]},
   {id:"2026-10-19",d:"2026-10-19",t:"📌 保存とメモ",L:["ニュースの📍で保存して、メモを書けるように"]}
 ];
+function openFun(k){ const f=FUN.find(x=>x[0]===k); if(!f) return; const html=f[3](); if(!html){ toast("今日はまだありません"); return; } const sh=document.getElementById("sheet");
+  sh.innerHTML=`<div class="bar"><div class="wrap"><button class="iconbtn" id="fnx" aria-label="もどる">← もどる</button><span class="ttl">${f[1]} ${esc(f[2])}</span></div></div><div class="wrap body">${html}</div>`;
+  const close=()=>{ sh.hidden=true; sh.innerHTML=""; document.body.style.overflow=""; go("today",{keepScroll:true}); };
+  sh.querySelector("#fnx").onclick=close; sh.hidden=false; sh.scrollTop=0; document.body.style.overflow="hidden";
+  bindKnow(); bindTalk(); bindReporter(); bindGacha(); bindLocal(); bindAssoc(); bindBattle(); if(k==="picks"&&PK){ ME.pickSeen=PK.updated; saveMe(); bindPicks(true); }
+  sh.querySelectorAll("[data-ex]").forEach(b=>b.onclick=()=>{ sh.hidden=true; openEx(b.dataset.ex); });
+  sh.querySelectorAll("[data-mood]").forEach(b=>b.onclick=()=>{ close(); sState.q=""; sState.th=""; sState.ok=false; sState.onlyNew=false; sState.g=new Set([b.dataset.mood]); go("search"); });
+  sh.querySelectorAll("[data-funsel]").forEach(b=>b.onclick=()=>{ const [set,sub]=b.dataset.funsel.split(":"); FUN_SEL[set]=sub; openFun(set); });
+  track("/fun/"+k,"おたのしみ"); }
+// ===== 英語で読む(英語の勉強に。data.js の en を使う) =====
+const EN=(D.en&&typeof D.en==="object")?D.en:null;
+function langMode(){ return EN?(LOOK.lang||"ja"):"ja"; }
+function enOf(kind,i){ if(!EN) return null; const L=EN[kind]; return L&&L[i]?L[i]:null; }
+function enBlock(e){ if(!e||langMode()==="ja") return ""; return `<span class="enb" lang="en"><span class="ent">${esc(e.t||"")}</span>${e.x?`<span class="enx">${esc(e.x)}</span>`:""}${(e.w||[]).length?`<span class="enw">${e.w.map(([a,b])=>`<i>📘 ${esc(a)} = ${esc(b)}</i>`).join("")}</span>`:""}<span class="ensay" role="button" tabindex="0" data-say="${esc((e.t||"")+". "+(e.x||""))}">🔊 English</span></span>`; }
+function langSeg(){ if(!EN) return ""; const m=langMode(); return `<span class="seg lang-seg" role="group" aria-label="ことば">${[["ja","日本語"],["both","日+英"],["en","English"]].map(([k,l])=>`<button data-lang="${k}" aria-pressed="${m===k}">${l}</button>`).join("")}</span>`; }
+function sayJa(t){ try{ const s=window.speechSynthesis; if(!s) return; s.cancel(); const u=new SpeechSynthesisUtterance(t); u.lang="ja-JP"; u.rate=.95*sayRate(); s.speak(u); }catch(_){} }
+function sayEn(t){ try{ const s=window.speechSynthesis; if(!s) return; s.cancel(); const u=new SpeechSynthesisUtterance(t); u.lang="en-US"; u.rate=.9; s.speak(u); }catch(_){} }
+document.addEventListener("click",e=>{ const sj=e.target.closest("[data-sayj]"); if(sj){ e.preventDefault(); e.stopPropagation(); sayJa(sj.dataset.sayj); return; }
+  const ln=e.target.closest("[data-len]"); if(ln){ e.preventDefault(); e.stopPropagation(); LOOK.len=ln.dataset.len; saveLook(); const ol=document.querySelector("ol.ten"); if(ol){ ol.classList.toggle("short",LOOK.len==="short"); document.querySelectorAll("[data-len]").forEach(x=>x.setAttribute("aria-pressed",String(x.dataset.len===LOOK.len))); } return; }
+  const b=e.target.closest("[data-say]"); if(b){ e.preventDefault(); e.stopPropagation(); sayEn(b.dataset.say); track("/en/say","英語の読み上げ"); return; }
+  const l=e.target.closest("[data-lang]"); if(l){ LOOK.lang=l.dataset.lang; saveLook(); track("/en/"+LOOK.lang,"英語"); go(current,{keepScroll:true}); } },true);
 function updSeen(){ return store.get("nw-upd-seen")||""; }
 function updUnread(){ const s=updSeen(); return s?UPDATES.findIndex(u=>u.id===s):UPDATES.length; }
 function markBell(){ const n=updUnread(); const d=document.getElementById("bellDot"); if(d) d.hidden=!(n>0); }
