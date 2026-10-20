@@ -2454,7 +2454,7 @@ function renderMy(){
       <div class="chips" id="myInt">${GORDER.map(g=>`<button class="fchip" data-g="${g}" aria-pressed="${!!ME.interests[g]}"><span class="c" style="background:var(--g-${g})"></span>${GN[g]}</button>`).join("")}</div></section>
     ${guideBlock()}
     <button class="fchip" id="obAgain" style="align-self:flex-start">🐣 はじめての案内をもう一度見る</button>
-    <details class="faq plain"><summary>記録について</summary><p>記録は、あなたのスマホ(ブラウザ)の中だけに保存されます。ほかの人や作った人には見えません。ブラウザのデータを消すと記録も消えるので、上の「📦 記録の引っこし」でときどき保存しておくと安心です。Googleドライブにつないだときは、記録はあなた自身のGoogleドライブ(アプリ専用の見えない場所)にだけ保存されます。</p><button class="fchip" id="resetMe" style="margin-bottom:12px">記録をすべて消す</button><div id="resetConfirm"></div></details>
+    <details class="faq plain"><summary>記録について</summary><p>記録は、あなたのスマホ(ブラウザ)の中だけに保存されます。ほかの人や作った人には見えません。ブラウザのデータを消すと記録も消えるので、上の「📦 記録の引っこし」でときどき保存しておくと安心です。Googleドライブにつないだときは、記録はあなた自身のGoogleドライブ(アプリ専用の見えない場所)にだけ保存されます。 <a href="privacy.html" target="_blank" rel="noopener">プライバシーについて</a></p><button class="fchip" id="resetMe" style="margin-bottom:12px">記録をすべて消す</button><div id="resetConfirm"></div></details>
     </div>
     ${footer()}
   </div>`;
