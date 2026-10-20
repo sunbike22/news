@@ -143,7 +143,8 @@ main{padding-block:18px 32px}
 .cb.y p{background:var(--surface2);border:1px solid var(--line);border-bottom-left-radius:5px}
 .cb.m p{background:var(--accent-soft);border:1px solid var(--accent);border-bottom-right-radius:5px}
 .chat-btns{display:flex;gap:8px;align-items:center;margin-top:12px;position:sticky;bottom:8px}
-.chat{padding-bottom:6px}
+.chat{padding-bottom:58px}
+.cb.cont .ca{visibility:hidden}
 .ex-acts{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
 .thermo{display:flex;gap:12px;align-items:stretch;margin-top:4px}
 .thermo .tb{position:relative;width:16px;border-radius:999px;background:linear-gradient(180deg,var(--ok),var(--surface2),var(--warn));border:1px solid var(--line);min-height:84px}
@@ -214,7 +215,7 @@ main{padding-block:18px 32px}
 .wxs-list{display:flex;gap:6px;overflow-x:auto;padding-bottom:6px}
 .wxs-list .wh{flex:0 0 64px;padding:6px 2px;font-size:.88rem}
 .wh-pl{flex:0 0 auto;justify-content:center;padding:4px 8px;background:var(--accent-soft)}
-.wxmap{background:linear-gradient(180deg,#d7ecff,#eaf5ff);border:1px solid var(--line);border-radius:14px;overflow:hidden;min-height:200px}
+.wxmap{background:linear-gradient(180deg,#d7ecff,#eaf5ff);border:1px solid var(--line);border-radius:14px;overflow:hidden;min-height:200px;width:100%;max-width:430px;margin:0 auto;align-self:center}
 :root[data-theme="dark"] .wxmap{background:linear-gradient(180deg,#0f2238,#132a44)}
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .wxmap{background:linear-gradient(180deg,#0f2238,#132a44)}}
 .wm-land{fill:#cfe6c4;stroke:#8fb58a;stroke-width:.8}
@@ -268,7 +269,8 @@ main{padding-block:18px 32px}
 .mk{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
 .mk .m{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 12px;min-width:0}
 .mk .m .k{font-size:.82rem;color:var(--muted)}
-.mk .m .val{font-weight:700;font-size:1.05rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mk .m .val{font-weight:700;font-size:1rem;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mk .m .val u{font-size:.8rem;font-weight:700;text-decoration:none;margin-left:1px}
 .dn{color:var(--g-intl);font-size:.86rem} .up{color:var(--g-eco);font-size:.86rem}
 
 /* search */
@@ -1306,7 +1308,7 @@ function myWarn(){ try{ const me=prefShort(prefNow()); return (AL.warn||[]).filt
 const WARN_LV=[["ℹ️","注意のよびかけ"],["⚠️","警戒のよびかけ"],["🚨","特別警報"]];
 function warnLine(){ const A=myWarn(); if(!A.length) return `<div id="wxWarn"></div>`;
   const top=A.slice().sort((a,b)=>b.lv-a.lv)[0]; const [ic,nm]=WARN_LV[top.lv]||WARN_LV[0];
-  const txt=String(top.text||"").replace(/^【[^】]*】/,"");
+  const pf=prefNow(); const txt=String(top.text||"").replace(/^【[^】]*】/,"").replace(new RegExp("^"+pf+"(では|地方では)、?"),"").replace(new RegExp("^"+prefShort(pf)+"(県|都|府|地方)?(では)?、?"),"");
   if(top.lv===0) return `<div id="wxWarn"><div class="wx-info" role="button" tabindex="0" data-quake="1">${ic} <b>${esc(prefNow())}に${esc(nm)}</b> ${esc(txt)} <span class="hint">気象庁発表</span></div></div>`;
   return `<div id="wxWarn"><div class="wx-warn ${top.lv>=2?"sp":""}" role="button" tabindex="0" data-quake="1"><b>${ic} ${esc(prefNow())}に${esc(nm)}が出ています</b><small>${esc(txt)}</small><small class="hint">気象庁発表 ・ タップでくわしく</small></div></div>`; }
 function weatherCard(){
@@ -1388,7 +1390,7 @@ function renderToday(){
   const sx=document.getElementById("seasonX"); if(sx) sx.onclick=()=>{ store.set("nw-season-hide",TODAY+(seasonNow()||{}).k); document.getElementById("seasonCard")?.remove(); };
   document.getElementById("lookBtnToday").onclick=openLook;
   bindKw(); bindPicks(); bindQuick(); bindInstall(); bindPersonal(); bindPet(); bindKnow(); bindTalk(); bindReporter(); bindGacha(); bindLocal(); checkBadges();
-  const fm=document.getElementById("funMore"); if(fm) fm.onclick=()=>{ const sec=document.getElementById("funSec"); sec.classList.add("open"); fm.remove(); };
+  const fm=document.getElementById("funMore"); if(fm) fm.onclick=()=>{ funOpen=true; const sec=document.getElementById("funSec"); sec.classList.add("open"); fm.remove(); };
   main.querySelectorAll("[data-fun]").forEach(b=>b.onclick=()=>openFun(b.dataset.fun));
   main.querySelectorAll("[data-mood]").forEach(b=>b.onclick=()=>{ sState.q=""; sState.th=""; sState.ok=false; sState.onlyNew=false; sState.g=new Set([b.dataset.mood]); go("search"); });
   if(document.getElementById("quiz")) drawQuiz(0,[]);
@@ -1416,9 +1418,9 @@ function marketsMini(){
   const n=lastVal(1), y=lastVal(2), o=lastVal(3);
   const diff=(a,dec)=>{ if(!a||a.prev==null) return ""; const d=a.v-a.prev; const s=(d>=0?"▲":"▼")+Math.abs(d).toLocaleString("ja-JP",{maximumFractionDigits:dec}); return `<span class="${d>=0?'up':'dn'}">${s}</span>`; };
   return `<div class="mk" style="margin-top:12px">
-    <button class="m" data-tab="numbers" style="text-align:left;cursor:pointer"><div class="k">📈 日経平均</div><div class="val num">${n?n.v.toLocaleString("ja-JP")+"円":"—"}</div>${diff(n,0)} <span class="hint">${n?mdLabel(n.d):""}</span></button>
-    <button class="m" data-tab="numbers" style="text-align:left;cursor:pointer"><div class="k">💴 1ドル</div><div class="val num">${y?y.v.toFixed(2)+"円":"—"}</div><span class="hint">${y?mdLabel(y.d):""}</span></button>
-    <button class="m" data-tab="numbers" style="text-align:left;cursor:pointer"><div class="k">🛢️ NY原油</div><div class="val num">${o?o.v.toFixed(2)+"ドル":"—"}</div>${diff(o,2)} <span class="hint">${o?mdLabel(o.d):""}</span></button>
+    <button class="m" data-tab="numbers" style="text-align:left;cursor:pointer"><div class="k">📈 日経平均</div><div class="val num">${n?n.v.toLocaleString("ja-JP")+"<u>円</u>":"—"}</div>${diff(n,0)} <span class="hint">${n?mdLabel(n.d):""}</span></button>
+    <button class="m" data-tab="numbers" style="text-align:left;cursor:pointer"><div class="k">💴 1ドル</div><div class="val num">${y?y.v.toFixed(2)+"<u>円</u>":"—"}</div><span class="hint">${y?mdLabel(y.d):""}</span></button>
+    <button class="m" data-tab="numbers" style="text-align:left;cursor:pointer"><div class="k">🛢️ NY原油</div><div class="val num">${o?o.v.toFixed(2)+"<u>ドル</u>":"—"}</div>${diff(o,2)} <span class="hint">${o?mdLabel(o.d):""}</span></button>
   </div>`;
 }
 
@@ -1518,7 +1520,7 @@ function renderSearch(){ sLim=20;
     <div class="sec-h"><h2>🔎 ニュースをさがす</h2><span class="sub">${NEWS.length}件の記録から</span></div>
     ${mascot("search")}
     <div class="jump"><button class="jmp" data-tab="map"><span>🗺️</span>地図で見る</button><button class="jmp" data-tab="numbers"><span>📈</span>株・円・原油</button><button class="jmp" id="toWords2"><span>📖</span>ことば辞典</button></div>
-    <label class="sbox" for="q"><span aria-hidden="true">🔎</span><input id="q" type="search" placeholder="会社名・人名・ことばを入れる(例: 台風、原油、阪神)" autocomplete="off" value="${esc(sState.q)}"><button class="iconbtn" id="qx" aria-label="入力を消す">✕</button></label>
+    <label class="sbox" for="q"><span aria-hidden="true">🔎</span><input id="q" type="search" placeholder="ことばで探す(例: 台風、原油)" autocomplete="off" value="${esc(sState.q)}"><button class="iconbtn" id="qx" aria-label="入力を消す">✕</button></label>
     <div class="quick" aria-label="よく探されることば">${["台風","原油","消費税","不正アクセス","北朝鮮","日経平均","阪神","AI"].map(w=>`<button class="fchip" data-w="${w}">${w}</button>`).join("")}</div>
     <div><div class="hint" style="margin-bottom:6px">ジャンル(いくつでも選べる)</div><div class="chips" id="gf">${GORDER.map(g=>`<button class="fchip" data-g="${g}" aria-pressed="${sState.g.has(g)}"><span class="c" style="background:var(--g-${g})"></span>${GN[g]}</button>`).join("")}</div></div>
     <div class="setrow"><label class="hint" for="th">テーマ</label><select id="th" class="fchip" style="padding:6px 10px"><option value="">すべて</option>${THEMES.map(t=>`<option ${sState.th===t?"selected":""}>${esc(t)}</option>`).join("")}</select>
@@ -1612,7 +1614,7 @@ function mangaHTML(m){ if(!m||!(m.p||[]).length) return ""; const st=petStage();
   const P=m.p.slice(0,4).map((p,i)=>{ const y=p.y, o=p.m;
     const yf=y?y[0]:"n", of=o?o[0]:"n";
     return `<div class="mg-p" role="img" aria-label="${i+1}コマ目: ${esc([y&&petName()+"「"+y[1]+"」",o&&"ホー先生「"+o[1]+"」",p.big].filter(Boolean).join(" "))}">
-      <svg class="mg-bg" viewBox="0 0 320 220" preserveAspectRatio="xMidYMid slice" aria-hidden="true">${MG_BG[p.bg]||MG_BG.home}</svg>
+      <svg class="mg-bg" viewBox="0 0 320 220" preserveAspectRatio="none" aria-hidden="true">${MG_BG[p.bg]||MG_BG.home}</svg>
       <span class="mg-n">${i+1}</span>${p.cap?`<span class="mg-cap">${esc(p.cap)}</span>`:""}
       <span class="mg-c l">${petSVG(st.i,yf==="s"||yf==="o"?"happy":"hungry",null,50,wear)}${y&&MG_MARK[yf]?`<i class="mg-mark">${MG_MARK[yf]}</i>`:""}</span>
       <div class="mg-mid">${(p.o2?[["r",o],["l",y]]:[["l",y],["r",o]]).filter(x=>x[1]).map(([sd,x])=>`<div class="mg-b ${sd}">${esc(x[1])}</div>`).join("")}${p.e?`<span class="mg-e" aria-hidden="true">${esc(p.e)}</span>`:""}${p.big?`<span class="mg-big">${esc(p.big)}</span>`:""}</div>
@@ -1668,7 +1670,10 @@ function openEx(k){
 // ===== 👥 だれが出てくる?(解説に書いてあることだけを、名札の形にしたもの) =====
 // ===== 💬 ホー先生と話しながら読む(解説に書いてある文だけを、会話の形で順に出す) =====
 function chatScript(k){ const e=D.explainers[k]; if(!e) return []; const L=[];
-  const say=(w,t)=>{ t=String(t||"").replace(/\*\*/g,"").trim(); if(t) L.push([w,t]); };
+  const say=(w,t)=>{ t=String(t||"").replace(/\*\*/g,"").trim(); if(!t) return;
+    const last=L[L.length-1]; if(last&&last[0]===w&&last[1]===t) return;      // 同じことばの重複をふせぐ
+    if(w==="y"&&L.some(x=>x[0]==="y"&&x[1]===t)) return;                      // 同じ質問は1回だけ
+    L.push([w,t]); };
   say("y",`${e.name}って、どういうこと?`); say("m",e.kid);
   say("y","もう少しくわしく教えて!"); (e.more||[]).forEach(x=>say("m",x));
   if((e.cast||[]).length){ say("y","だれが出てくるの?"); e.cast.forEach(([i,n,r])=>say("m",`${i} ${n} … ${r}`)); }
@@ -1678,9 +1683,9 @@ function chatScript(k){ const e=D.explainers[k]; if(!e) return []; const L=[];
   say("y","わかった!ありがとう先生"); say("m","いつでも聞きにおいで。もっと知りたいときは、解説のページも見てみてね。");
   return L; }
 function openExChat(k){ const e=D.explainers[k]; if(!e) return; const L=chatScript(k); let n=1; const sh=document.getElementById("sheet");
-  const bub=(w,t)=>`<div class="cb ${w}">${w==="m"?`<span class="ca" aria-hidden="true">${owlSVG("n",34)}</span>`:`<span class="ca" aria-hidden="true">${petSVG(petStage().i,"s",null,34,petWear())}</span>`}<p>${w==="m"?glossify(esc(t)):esc(t)}</p></div>`;
+  const bub=(w,t,same)=>`<div class="cb ${w}${same?" cont":""}"><span class="ca" aria-hidden="true">${same?"":(w==="m"?owlSVG("n",34):petSVG(petStage().i,"s",null,34,petWear()))}</span><p>${w==="m"?glossify(esc(t)):esc(t)}</p></div>`;
   const draw=()=>{ const box=sh.querySelector("#cbox"); if(!box) return;
-    box.innerHTML=L.slice(0,n).map(([w,t])=>bub(w,t)).join("");
+    box.innerHTML=L.slice(0,n).map(([w,t],i,a)=>bub(w,t,i>0&&a[i-1][0]===w)).join("");
     const more=sh.querySelector("#cmore"); const all=sh.querySelector("#call");
     if(n>=L.length){ if(more) more.textContent="📖 解説のページで読む"; if(more) more.dataset.done="1"; if(all) all.hidden=true; }
     box.lastElementChild&&box.lastElementChild.scrollIntoView({block:"nearest"}); };
@@ -3040,14 +3045,14 @@ function kurashiCard(){ const P=priceRows(); const R=rulesSoon();
     <button class="sos-go" data-sos="1" style="margin-top:10px">🆘 こまったときは(災害のとき)</button>
     <div class="hint" style="margin-top:8px">リンク先は、それぞれの会社・役所の公式ページです。くわしい最新の情報は、リンク先で確かめてください。</div></section>`; }
 const FUN=[["picks","🎁","ジャンル別おすすめ",()=>picksCard()],["reporter","🎙️","よむまる記者",()=>reporterCard()],["gacha","🎰","今日の1本ガチャ",()=>gachaCard()],["mood","🗺️","世の中の天気図",()=>moodCard()],["know","👆","知ってた?",()=>knowCard()],["talk","🍽️","話のタネ",()=>talkCard()],["local","🏠","わたしの街",()=>localCard()],["english","📘","今日の英単語",()=>englishCard()],["thermo","🌡️","ニュースの温度計",()=>thermoCard()],["trip2","🗺️","ペットの旅",()=>travelCard()],["assoc","🔗","ニュース連想",()=>assocCard()],["back","📅","あのとき何してた?",()=>backCard()],["bingo","🎲","ニュースビンゴ",()=>bingoCard()],["battle","⚔️","予想くらべ",()=>battleCard()],["kurashi","🧰","くらしの便利",()=>kurashiCard()]];
-const FUN_SHOW=6;
+const FUN_SHOW=6; let funOpen=false;
 function funGrid(){ const L=FUN.filter(f=>LOOK.off[f[0]]); if(!L.length) return "";
   const dot=k=>(k==="gacha"&&(ME.gacha||{}).d!==TODAY)||(k==="picks"&&PK&&ME.pickSeen!==PK.updated);
   const S2=L.slice().sort((a,b)=>(dot(b[0])?1:0)-(dot(a[0])?1:0)); const hid=Math.max(0,S2.length-FUN_SHOW);
   const t=([k,i,n],x)=>`<button class="fun-t${x?" xtra":""}" data-fun="${k}"><span>${i}</span><small>${esc(n)}</small>${dot(k)?'<i class="fun-dot"></i>':""}</button>`;
-  return `<section aria-label="おたのしみ" id="funSec"><div class="sec-h"><h2>✨ おたのしみ</h2><span class="sub">タップで開く</span></div>
+  return `<section aria-label="おたのしみ" id="funSec"${funOpen?' class="open"':''}><div class="sec-h"><h2>✨ おたのしみ</h2><span class="sub">タップで開く</span></div>
     <div class="fun-grid">${S2.slice(0,FUN_SHOW).map(f=>t(f,false)).join("")}${S2.slice(FUN_SHOW).map(f=>t(f,true)).join("")}</div>
-    ${hid?`<button class="fchip" id="funMore" style="margin-top:8px">… ほか ${hid}こ を見る</button>`:""}</section>`; }
+    ${hid&&!funOpen?`<button class="fchip" id="funMore" style="margin-top:8px">… ほか ${hid}こ を見る</button>`:""}</section>`; }
 function openFun(k){ const f=FUN.find(x=>x[0]===k); if(!f) return; const html=f[3](); if(!html){ toast("今日はまだありません"); return; } const sh=document.getElementById("sheet");
   sh.innerHTML=`<div class="bar"><div class="wrap"><button class="iconbtn" id="fnx" aria-label="もどる">← もどる</button><span class="ttl">${f[1]} ${esc(f[2])}</span></div></div><div class="wrap body">${html}</div>`;
   const close=()=>{ sh.hidden=true; sh.innerHTML=""; document.body.style.overflow=""; go("today",{keepScroll:true}); };
@@ -3441,12 +3446,12 @@ function openWxMap(day){ const M=AL.wxmap; const sh=document.getElementById("she
   sh.querySelectorAll("[data-wmd]").forEach(b=>b.onclick=()=>openWxMap(+b.dataset.wmd));
   if(!M) return; track("/weather/map","全国の天気");
   getWorld().then(world=>{ const box=document.getElementById("wxMapBox"); if(!box) return; const jp=world.features.filter(f=>f.id==="392"||+f.id===392);
-    const W=box.clientWidth||358, H=Math.round(W*1.12); const proj=d3.geoMercator().fitExtent([[6,6],[W-6,H-6]],{type:"MultiPoint",coordinates:[[129.2,30.9],[146.0,45.6]]}); const path=d3.geoPath(proj);
+    const W=358, H=Math.round(W*1.12); const proj=d3.geoMercator().fitExtent([[6,6],[W-6,H-6]],{type:"MultiPoint",coordinates:[[129.2,30.9],[146.0,45.6]]}); const path=d3.geoPath(proj);
     const lab=M.cities.map(c=>{ const x=c[3][di]; if(!x||WXM_OFF[c[0]]===null) return ""; const isNaha=c[0]==="那覇"; let px,py; if(isNaha){ px=W-76; py=H-58; } else { [px,py]=proj([c[2],c[1]]); }
       const [dx,dy]=WXM_OFF[c[0]]||[8,-10]; const bx=isNaha?px:Math.max(4,Math.min(W-70,px+dx)), by=isNaha?py:Math.max(4,Math.min(H-40,py+dy));
       return `${isNaha?`<rect x="${W-82}" y="${H-80}" width="78" height="74" rx="8" class="wm-inset"/><text x="${W-43}" y="${H-64}" text-anchor="middle" class="wm-inset-n" style="font-size:9.5px;font-weight:700">沖縄</text>`:`<circle cx="${px}" cy="${py}" r="3" class="wm-dot"/>${Math.hypot(dx,dy)>20?`<line x1="${px}" y1="${py}" x2="${bx+33}" y2="${by+16}" class="wm-ln"/>`:""}`}
         <g transform="translate(${bx},${by})" class="wm-l"><rect width="66" height="36" rx="8"/><text x="33" y="13" text-anchor="middle" class="wm-n">${esc(c[0])}</text><text x="12" y="31" text-anchor="middle" class="wm-i">${wmoIcon(x[0])}</text><text x="42" y="31" text-anchor="middle" class="wm-t" textLength="38" lengthAdjust="spacingAndGlyphs"><tspan fill="${tempColor(x[1])}">${Math.round(x[1])}</tspan><tspan class="wm-s">/</tspan><tspan fill="#3b82f6">${Math.round(x[2])}</tspan></text></g>`; }).join("");
-    box.innerHTML=`<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="全国の天気の地図">${jp.map(f=>`<path d="${path(f)}" class="wm-land"/>`).join("")}${lab}</svg>`;
+    box.innerHTML=`<svg viewBox="0 0 ${W} ${H}" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" role="img" aria-label="全国の天気の地図">${jp.map(f=>`<path d="${path(f)}" class="wm-land"/>`).join("")}${lab}</svg>`;
   }).catch(()=>{ const box=document.getElementById("wxMapBox"); if(box) box.innerHTML='<div class="empty">地図を読み込めませんでした。下の一覧を見てください。</div>'; }); }
 document.addEventListener("click",ev=>{ if(ev.target.closest("[data-wxmap]")) openWxMap(0); });
 function openWx(day){ const R=wxRows(); const sh=document.getElementById("sheet");
