@@ -1,0 +1,24 @@
+name: 朝と夕方の通知を送る
+on:
+  push:
+    branches: [main]
+    paths: ["data.js"]
+  workflow_dispatch:
+    inputs:
+      force:
+        description: "時間に関係なく送る(テスト)"
+        default: "1"
+permissions:
+  contents: read
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+      - run: node tools/notify.js
+        env:
+          FORCE: ${{ github.event.inputs.force }}

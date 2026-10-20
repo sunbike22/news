@@ -55,6 +55,9 @@
 - ニュースサイトや公式サイトの写真・ロゴ・キャラクターは使わない。
 - mermaid の図は使わない(スマホで小さくて読めないため)。
 
+## 通知
+- 朝と夕方の通知は ntfy(https://ntfy.sh、トピック `mainichi-news-sb22-q7k4`)。`data.js` が更新されて main に入ると `.github/workflows/notify.yml` → `tools/notify.js` が、日本時間6〜10時・17〜21時のときだけ1通送る(上位3つと天気、個人の情報なし)。テストは Actions の「朝と夕方の通知を送る」を手動で実行。
+
 ## お知らせ
 - 見る人にわかる機能を足したり変えたりしたら、index.html の `UPDATES` のいちばん上に1つ足す(id は日付+文字、やさしい言葉で2〜3行)。右上の🔔に赤い点が出る。Notionが使えるときは、Notionの「🔔 アプリのお知らせ」ページ(https://app.notion.com/p/3fe9c3db715c815dbaf1c180db648a1e)のいちばん上の日付にも1行足す。
 - ページごとのペットのコスプレは `MASCOT`(ページ→コスプレ・ひとこと)と `costumeSVG`。

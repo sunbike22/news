@@ -2062,8 +2062,17 @@ function applySky(){ let el=document.getElementById("sky"); if(LOOK.sky===false)
   root.setAttribute("data-tod",skyTOD()); const w=D.weather; const rain=w&&relDay(w.iso)==="今日"&&/雨/.test(w.sky); const reduce=(()=>{ try{ return matchMedia("(prefers-reduced-motion: reduce)").matches; }catch(_){ return false; } })();
   if(!el){ el=document.createElement("div"); el.id="sky"; el.setAttribute("aria-hidden","true"); document.body.prepend(el); }
   el.innerHTML=(root.dataset.tod==="night"?Array.from({length:24},(_,i)=>`<i class="star" style="left:${(i*41)%100}%;top:${(i*23)%55}%;animation-delay:${(i%6)*.5}s"></i>`).join(""):"")+(rain&&!reduce?Array.from({length:26},(_,i)=>`<b class="drop" style="left:${(i*37)%100}%;animation-delay:${(i%9)*.23}s;animation-duration:${.9+(i%4)*.2}s"></b>`).join(""):""); }
+// ===== 通知(ntfy という無料の通知サービスで、朝と夕方に1通ずつ) =====
+const NTFY_TOPIC="mainichi-news-sb22-q7k4";
+function notifyHTML(){ const url="https://ntfy.sh/"+NTFY_TOPIC;
+  return `<section class="card notif"><b>🔔 朝と夕方に通知を受け取る</b><div class="hint" style="margin:4px 0 8px">更新されたら、今日のニュース上位3つと天気がスマホに届きます(1日2回)。無料の通知サービス「ntfy」を使います。あなたの情報は送られません。</div>
+    <details class="faq plain" open><summary>📱 iPhone・Android(おすすめ)</summary><ol class="us"><li>App Store / Google Play で「<b>ntfy</b>」というアプリを入れる(無料)</li><li>アプリの「＋」を押して、トピック名に <b class="ntfy-t">${NTFY_TOPIC}</b> を入れて登録</li><li>これで朝と夕方に通知が届きます</li></ol><button class="fchip" id="ntfyCopy">📋 トピック名をコピー</button></details>
+    <details class="faq plain"><summary>💻 パソコン・Androidのブラウザ</summary><p style="margin:4px 0">下のページを開いて「Subscribe」→ 通知を許可すると、ブラウザに届きます。</p><a class="fchip" href="${url}" target="_blank" rel="noopener">🔔 通知のページを開く</a></details>
+    <div class="hint" style="margin-top:6px">やめたいときは、ntfyアプリでこのトピックを消すだけです。</div></section>`; }
+function bindNotify(){ const b=document.getElementById("ntfyCopy"); if(b) b.onclick=async()=>{ try{ await navigator.clipboard.writeText(NTFY_TOPIC); toast("📋 コピーしました"); }catch(_){ prompt("トピック名",NTFY_TOPIC); } }; }
 // ===== お知らせ(新しくなったところ)。機能を足したら、いちばん上に1つ足す =====
 const UPDATES=[
+  {id:"2026-10-20m",d:"2026-10-20",t:"🔔 朝と夕方に通知が届くように",L:["「マイ」の「通知を受け取る」から登録すると、更新のたびに上位3つのニュースと天気がスマホに届きます(1日2回・無料)"]},
   {id:"2026-10-20l",d:"2026-10-20",t:"🎙️ よむまる記者・🎰 ガチャ・🏠 わたしの街・🎲 すごろく",L:["ペットが記者になって、よく読むジャンルの1本を伝えてくれます(読み上げも)","1日1回の「今日の1本ガチャ」、住んでいる都道府県のニュースに🏠の印","1週間のニュースすごろく(ゴールでレアな服)、ペットが見た夢の話、ことばカードにペットの感想","時間と天気で画面の空気が変わり、関連ニュースが多い話題は🔥で大きく表示"]},
   {id:"2026-10-20k",d:"2026-10-20",t:"📊 よく読まれている話題を数えはじめました",L:["どの画面・解説・ジャンルが何回開かれたかだけを数えます(GoatCounter・だれが見たかはわかりません)","質問の文章・メモ・あなたの記録は送りません。くわしくは「マイ」の使い方の「記録について」へ"]},
   {id:"2026-10-20j",d:"2026-10-20",t:"🐣 はじめての人への案内 & 📈 日経平均の長期グラフ",L:["はじめて開いた人に、ペットが3ステップで使い方を案内します(マイからもう一度見られます)","日経平均の長い期間のグラフが見られるようになりました(日経の公式データ)"]},
@@ -2117,6 +2126,7 @@ function renderMy(){
   main.innerHTML=`<div class="view">
     <div class="sec-h"><h2>⭐ わたしの記録</h2><span class="sub">このスマホの中だけに保存</span></div>
     ${updCard()}
+    ${notifyHTML()}
     <button class="lookcard" id="lookBtnMy"><span class="pal" aria-hidden="true" style="padding-left:5px">${COLORS.slice(1,6).map(c=>`<i style="background:${c[2]}"></i>`).join("")}</span><span><b>🎨 着せかえ</b><span class="hint" style="display:block">色・文字・画面の並び・タブを、わたし好みに</span></span></button>
     ${petBig()}
     ${sugoHTML()}
@@ -2157,7 +2167,7 @@ function renderMy(){
   main.querySelectorAll("[data-tab]").forEach(b=>b.onclick=()=>go(b.dataset.tab));
   main.querySelectorAll("#myInt [data-g]").forEach(b=>b.onclick=()=>{ const g=b.dataset.g; ME.interests[g]=!ME.interests[g]; b.setAttribute("aria-pressed",String(!!ME.interests[g])); saveMe(); });
   document.getElementById("weekBtn2").onclick=()=>openStory(buildWeekSlides);
-  document.getElementById("lookBtnMy").onclick=openLook; bindPet(); bindCaps(); document.getElementById("myPaperBtn").onclick=openMyPaper; document.getElementById("obAgain").onclick=()=>onboard(true); main.querySelectorAll("[data-flip]").forEach(b=>b.onclick=()=>b.classList.toggle("flip")); document.getElementById("updBtn").onclick=openUpdates;
+  document.getElementById("lookBtnMy").onclick=openLook; bindPet(); bindCaps(); bindNotify(); document.getElementById("myPaperBtn").onclick=openMyPaper; document.getElementById("obAgain").onclick=()=>onboard(true); main.querySelectorAll("[data-flip]").forEach(b=>b.onclick=()=>b.classList.toggle("flip")); document.getElementById("updBtn").onclick=openUpdates;
   bindPins();
   document.getElementById("resetMe").onclick=()=>{ document.getElementById("resetConfirm").innerHTML='<p>本当に消しますか? 元にはもどせません。</p><button class="fchip" id="resetYes">消す</button>'; document.getElementById("resetYes").onclick=()=>{ try{ localStorage.removeItem("nw-me"); }catch(_){} location.reload(); }; };
 }
