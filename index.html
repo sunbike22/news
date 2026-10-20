@@ -188,6 +188,7 @@ mark{background:#ffe066;color:#141b2d;border-radius:3px;padding:0 1px}
 .result{border-color:var(--ok);background:var(--ok-soft)}
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(92px + env(safe-area-inset-bottom,0px));z-index:90;background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:999px;font-weight:700;font-size:.9rem;box-shadow:0 8px 24px rgba(0,0,0,.25);animation:rise .4s ease both;max-width:calc(100% - 32px);text-align:center}
 .toast.out{opacity:0;transition:opacity .5s}
+.more-btn{display:flex;justify-content:center;width:100%;margin-top:10px;padding:12px;font-weight:700}
 /* 4コマでわかる(自作SVG・吹き出しはふつうの文字) */
 .manga{display:grid;gap:10px;margin-top:10px}
 .mg-p{position:relative;min-height:210px;border:3px solid #1d1d1f;border-radius:6px;overflow:hidden;background:#fffdf7;color:#1d1d1f;display:flex;flex-direction:column;justify-content:space-between;padding:30px 10px 4px}
@@ -1109,7 +1110,8 @@ function closeStory(){ if(st) cancelAnimationFrame(st.raf); st=null; stopSpeak()
 const NEWS = D.news.map(r=>({d:r[0],g:r[1],ok:r[2],h:r[3],s:r[4],th:r[5],p:r[6]})).sort((a,b)=>b.d.localeCompare(a.d));
 const THEMES = [...new Set(NEWS.flatMap(n=>n.th?n.th.split(/[、,]/):[]).filter(Boolean))];
 const sState={q:"",g:new Set(),th:"",ok:false,onlyNew:false};
-function renderSearch(){
+let sLim=20;
+function renderSearch(){ sLim=20;
   main.innerHTML=`<div class="view">
     <div class="sec-h"><h2>🔎 ニュースをさがす</h2><span class="sub">${NEWS.length}件の記録から</span></div>
     ${mascot("search")}
@@ -1121,7 +1123,7 @@ function renderSearch(){
     <div id="sres"></div>
   </div>`;
   const q=document.getElementById("q");
-  q.addEventListener("input",()=>{sState.q=q.value; draw();});
+  q.addEventListener("input",()=>{sState.q=q.value; sLim=20; draw();});
   document.getElementById("qx").onclick=e=>{e.preventDefault(); sState.q=""; q.value=""; q.focus(); draw();};
   main.querySelectorAll("[data-w]").forEach(b=>b.onclick=()=>{sState.q=b.dataset.w; q.value=b.dataset.w; draw();});
   main.querySelectorAll("[data-g]").forEach(b=>b.onclick=()=>{const g=b.dataset.g; sState.g.has(g)?sState.g.delete(g):sState.g.add(g); b.setAttribute("aria-pressed",String(sState.g.has(g))); draw();});
@@ -1140,15 +1142,16 @@ function renderSearch(){
     const byDay={}; list.forEach(n=>byDay[n.d]=(byDay[n.d]||0)+1);
     const days=Object.keys(byDay).sort(); const max=Math.max(1,...Object.values(byDay));
     const histo = days.length>1? `<div class="card"><div class="hint">見つかった${list.length}件の日付の分布</div><div class="hist" aria-hidden="true">${days.map(d=>`<i style="height:${Math.max(6,byDay[d]/max*100)}%" title="${mdLabel(d)} ${byDay[d]}件"></i>`).join("")}</div><div class="hist-l"><span>${mdLabel(days[0])}</span><span>${mdLabel(days[days.length-1])}</span></div></div>`:"";
-    const groups={}; list.forEach(n=>(groups[n.d]=groups[n.d]||[]).push(n));
+    const ordered=list.slice().sort((a,b)=>b.d.localeCompare(a.d)); const shown=ordered.slice(0,sLim); const groups={}; shown.forEach(n=>(groups[n.d]=groups[n.d]||[]).push(n));
     const html = `
       ${exHits.length?`<div><div class="hint" style="margin-bottom:6px">💡 解説ページ</div><div class="exgrid">${exHits.map(([k,e])=>exCard(k,e)).join("")}</div></div>`:""}
       ${wHits.length?`<div><div class="hint" style="margin-bottom:6px">📖 ことば</div><div class="words">${wHits.map(wordCard).join("")}</div></div>`:""}
       <div class="sec-h"><h2 style="font-size:1rem">📰 ニュース <span class="num">${list.length}</span>件</h2>${(sState.q||sState.g.size||sState.th||sState.ok||sState.onlyNew)?'<button class="fchip" id="clr">条件をリセット</button>':''}</div>
       ${histo}
-      ${list.length? `<div class="res">${Object.keys(groups).sort().reverse().map(d=>`<section class="day"><h3>${mdLabel(d)}${d.slice(0,4)!==TODAY.slice(0,4)?" "+d.slice(0,4):""}</h3><ul>${groups[d].map(n=>`<li class="item">${pinBtn({k:nkey(n),h:n.h,g:n.g,d:n.d},"abs")}<div class="meta"><span class="chip ${n.g}">${GN[n.g]}</span>${n.ok?'<span class="badge-ok">✅</span>':'<span class="badge-one">⚠️ 1社</span>'}${n.p?`<span class="chip">🎯 ${esc(n.p)}</span>`:""}${isNew(n)?'<span class="chip newchip">🆕</span>':''}</div><div class="h">${hl(n.h,terms)}</div><div class="s">出典: ${hl(n.s,terms)}</div></li>`).join("")}</ul></section>`).join("")}</div>`
+      ${list.length? `<div class="res">${Object.keys(groups).sort().reverse().map(d=>`<section class="day"><h3>${mdLabel(d)}${d.slice(0,4)!==TODAY.slice(0,4)?" "+d.slice(0,4):""}</h3><ul>${groups[d].map(n=>`<li class="item">${pinBtn({k:nkey(n),h:n.h,g:n.g,d:n.d},"abs")}<div class="meta"><span class="chip ${n.g}">${GN[n.g]}</span>${n.ok?'<span class="badge-ok">✅</span>':'<span class="badge-one">⚠️ 1社</span>'}${n.p?`<span class="chip">🎯 ${esc(n.p)}</span>`:""}${isNew(n)?'<span class="chip newchip">🆕</span>':''}</div><div class="h">${hl(n.h,terms)}</div><div class="s">出典: ${hl(n.s,terms)}</div></li>`).join("")}</ul></section>`).join("")}</div>${ordered.length>sLim?`<button class="fchip more-btn" id="sMore">もっと見る(あと${ordered.length-sLim}件)</button>`:""}`
         : `<div class="empty">見つかりませんでした。<br>ことばを短くするか、ジャンルの選択を外してみてください。</div>`}`;
     document.getElementById("sres").innerHTML=html;
+    const sm=document.getElementById("sMore"); if(sm) sm.onclick=()=>{ sLim+=30; const y=window.scrollY; draw(); window.scrollTo({top:y}); };
     const clr=document.getElementById("clr"); if(clr) clr.onclick=()=>{sState.q="";sState.g.clear();sState.th="";sState.ok=false;sState.onlyNew=false; renderSearch();};
     document.querySelectorAll("#sres [data-ex]").forEach(b=>b.onclick=()=>openEx(b.dataset.ex));
   }
@@ -1461,16 +1464,20 @@ function openGuide(){
 // ===== 予定・予測 =====
 const PRED = D.predictions.map(r=>({no:r[0],t:r[1],c:r[2],d:r[3],r:r[4],now:r[5],m:r[6]}));
 const RL={hit:["✅ 当たり","res-hit"],miss:["❌ 外れ","res-miss"],part:["🔶 一部当たり","res-part"],wait:["⏳ 判定待ち","res-wait"]};
-function renderPlan(){
+function planLi(s){ const dd=daysFrom(s[0]); const x=md(s[0]); const left= dd<=0? (s[1]&&s[1]>=TODAY?"いま":"今日") : dd===1?"明日":`あと${dd}日`;
+      return `<li><div class="d"><div class="md num">${x.m}/${x.d}</div><div class="wd">${x.w}曜${s[1]?"〜":""}</div></div><div><span class="left">${left}</span> <span class="chip ${s[2]}">${GN[s[2]]||""}</span>${s[4]?` <span class="chip">🎯 ${esc(s[4])}</span>`:""}<div class="tx">${esc(s[3])}</div>${s[5]?`<div class="mm">${esc(s[5])}</div>`:""}<button class="fchip ics" data-i="${D.schedule.indexOf(s)}">📅 カレンダーに追加</button></div></li>`; }
+let pLim=5;
+function renderPlan(){ pLim=5;
   const up=D.schedule.filter(s=>(s[1]||s[0])>=TODAY).sort((a,b)=>a[0].localeCompare(b[0]));
   const past=D.schedule.filter(s=>(s[1]||s[0])<TODAY);
+  const near=up.filter(s=>daysFrom(s[0])<=7); const upNear=near.length>=3?near:up.slice(0,Math.min(up.length,5)); const upFar=up.slice(upNear.length);
   const n={hit:0,miss:0,part:0,wait:0}; PRED.forEach(p=>n[p.r]++);
   const judged=n.hit+n.miss+n.part; const rate=judged?Math.round((n.hit*100+n.part*50)/judged):0;
   main.innerHTML=`<div class="view">
     <div class="sec-h"><h2>📅 これからの予定</h2><span class="sub">近い順</span></div>
     ${mascot("plan")}
-    <ul class="plan">${up.map(s=>{ const dd=daysFrom(s[0]); const x=md(s[0]); const left= dd<=0? (s[1]&&s[1]>=TODAY?"いま":"今日") : dd===1?"明日":`あと${dd}日`;
-      return `<li><div class="d"><div class="md num">${x.m}/${x.d}</div><div class="wd">${x.w}曜${s[1]?"〜":""}</div></div><div><span class="left">${left}</span> <span class="chip ${s[2]}">${GN[s[2]]||""}</span>${s[4]?` <span class="chip">🎯 ${esc(s[4])}</span>`:""}<div class="tx">${esc(s[3])}</div>${s[5]?`<div class="mm">${esc(s[5])}</div>`:""}<button class="fchip ics" data-i="${D.schedule.indexOf(s)}">📅 カレンダーに追加</button></div></li>`; }).join("") || '<li><div></div><div class="hint">登録された予定はありません</div></li>'}</ul>
+    <ul class="plan">${upNear.map(planLi).join("") || '<li><div></div><div class="hint">登録された予定はありません</div></li>'}</ul>
+    ${upFar.length?`<details class="faq"><summary>その先の予定(${upFar.length}件)</summary><ul class="plan" style="margin:10px 0 12px">${upFar.map(planLi).join("")}</ul></details>`:""}
     ${past.length?`<details class="faq"><summary>終わった予定(${past.length}件)</summary><ul class="us" style="margin:10px 0 12px">${past.map(s=>`<li>${mdLabel(s[0])} ${esc(s[3])}</li>`).join("")}</ul></details>`:""}
     <button class="lookcard" id="paperBtn"><span style="font-size:1.8rem" aria-hidden="true">📰</span><span><b>未来の新聞(予想版)</b><span class="hint" style="display:block">Claudeの予測とあなたの予想を、未来の新聞の紙面に</span></span></button>
     ${myPredHTML()}
@@ -1486,8 +1493,8 @@ function renderPlan(){
   document.getElementById("paperBtn").onclick=openPaper; bindMyPred();
   bindFooter();
   const drawP=f=>{ const L=PRED.filter(p=>f==="wait"?p.r==="wait":p.r!=="wait").sort((a,b)=>(a.d||"9").localeCompare(b.d||"9"));
-    document.getElementById("plist").innerHTML=L.map(p=>`<div class="pr"><span class="no">${esc(p.no)}</span><span><b>${esc(p.t)}</b></span>${p.r==="wait"?voteRow(p):ME.votes[p.no]?`<span class="r">あなたの予想: ${ME.votes[p.no].v==="yes"?"当たる":"外れる"}</span>`:""}<span class="r"><span class="${RL[p.r][1]}">${RL[p.r][0]}</span> ・ 確度: ${esc(p.c)} ・ 判定日: ${p.d?mdLabel(p.d)+(p.r==="wait"&&daysFrom(p.d)>=0?`(あと${daysFrom(p.d)}日)`:""):"次の発表時"}${p.now?" ・ いま "+esc(p.now):""}${p.m?`<br>${esc(p.m)}`:""}</span></div>`).join(""); };
-  main.querySelectorAll("#pf [data-f]").forEach(b=>b.onclick=()=>{ main.querySelectorAll("#pf [data-f]").forEach(x=>x.setAttribute("aria-pressed",String(x===b))); drawP(b.dataset.f); });
+    document.getElementById("plist").innerHTML=L.slice(0,pLim).map(p=>`<div class="pr"><span class="no">${esc(p.no)}</span><span><b>${esc(p.t)}</b></span>${p.r==="wait"?voteRow(p):ME.votes[p.no]?`<span class="r">あなたの予想: ${ME.votes[p.no].v==="yes"?"当たる":"外れる"}</span>`:""}<span class="r"><span class="${RL[p.r][1]}">${RL[p.r][0]}</span> ・ 確度: ${esc(p.c)} ・ 判定日: ${p.d?mdLabel(p.d)+(p.r==="wait"&&daysFrom(p.d)>=0?`(あと${daysFrom(p.d)}日)`:""):"次の発表時"}${p.now?" ・ いま "+esc(p.now):""}${p.m?`<br>${esc(p.m)}`:""}</span></div>`).join("")+(L.length>pLim?`<button class="fchip more-btn" id="pMore">もっと見る(あと${L.length-pLim}件)</button>`:""); const pm=document.getElementById("pMore"); if(pm) pm.onclick=()=>{ pLim+=10; drawP(f); }; };
+  main.querySelectorAll("#pf [data-f]").forEach(b=>b.onclick=()=>{ pLim=5; main.querySelectorAll("#pf [data-f]").forEach(x=>x.setAttribute("aria-pressed",String(x===b))); drawP(b.dataset.f); });
   drawP("wait");
   if(window.Chart){ charts.push(new Chart(document.getElementById("dn"),{type:"doughnut",data:{labels:["当たり","外れ","一部","判定待ち"],datasets:[{data:[n.hit,n.miss,n.part,n.wait],backgroundColor:[css("--ok"),css("--g-intl"),css("--warn"),css("--line")],borderWidth:0}]},options:{cutout:"70%",responsive:false,plugins:{legend:{display:false}}}})); }
 }
