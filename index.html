@@ -142,10 +142,10 @@ main{padding-block:18px 32px}
 .wm-land{fill:#cfe6c4;stroke:#8fb58a;stroke-width:.8}
 :root[data-theme="dark"] .wm-land{fill:#2f4a3a;stroke:#5f8a6e}
 @media (prefers-color-scheme: dark){:root:not([data-theme="light"]) .wm-land{fill:#2f4a3a;stroke:#5f8a6e}}
-.wm-dot{fill:#1d1d1f}.wm-ln{stroke:#1d1d1f;stroke-width:1;opacity:.5}
+.wm-dot{fill:currentColor}.wm-ln{stroke:currentColor;stroke-width:1;opacity:.55}
 .wm-l rect{fill:#fff;stroke:#1d1d1f;stroke-width:1;opacity:.95}
 .wm-n{font-size:10.5px;font-weight:800;fill:#1d1d1f}.wm-i{font-size:15px}.wm-t{font-size:13px;font-weight:800}.wm-s{fill:#888;font-size:11px}
-.wm-inset{fill:none;stroke:#1d1d1f;stroke-dasharray:4 3;opacity:.4}
+.wm-inset{fill:none;stroke:currentColor;stroke-dasharray:4 3;opacity:.5}.wm-inset-n{fill:currentColor;opacity:.7}
 .wml{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:1fr;gap:4px}
 .wml li{display:grid;grid-template-columns:4em 2em 1fr auto;gap:4px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:6px 8px;font-size:.9rem}
 .wml .r{color:#2f6fd6;font-weight:700;font-size:.84rem}
@@ -3043,7 +3043,7 @@ function wxStripHTML(){ let R=[]; try{ R=wxRows(); }catch(_){ return ""; } if(!R
 
 // ===== 🗾 全国の天気(14都市・今日/明日)。alert.json の wxmap を、地図タブと同じ日本の形の上に出す =====
 // ラベルの位置(点からのずれ)は重ならないよう手で決めている。都市を足すときはここも足す
-const WXM_OFF={札幌:[10,-30],釧路:[-30,8],青森:[10,-14],仙台:[12,-6],新潟:[-60,-44],金沢:[-70,-30],東京:[14,6],名古屋:[10,27],大阪:[-22,30],広島:[-46,-92],高知:null,福岡:[-20,-62],鹿児島:[14,4],那覇:[0,0]};
+const WXM_OFF={札幌:[2,-36],釧路:[-4,20],青森:[-74,-16],仙台:[12,-6],新潟:[-62,-48],金沢:[-72,-20],東京:[18,-2],名古屋:[16,32],大阪:[-44,26],広島:[-56,-104],高知:null,福岡:[-20,-62],鹿児島:[-10,28],那覇:[0,0]};
 function tempColor(t){ return t>=30?"#d93025":t>=25?"#f06a1d":t>=20?"#e8a400":t>=15?"#3aa856":t>=10?"#1f8fd6":"#3b5bd9"; }
 function openWxMap(day){ const M=AL.wxmap; const sh=document.getElementById("sheet"); const di=day||0;
   sh.innerHTML=`<div class="bar"><div class="wrap"><button class="iconbtn" id="wmx" aria-label="もどる">← もどる</button><span class="ttl">🗾 全国の天気</span></div></div><div class="wrap body">
@@ -3060,10 +3060,10 @@ function openWxMap(day){ const M=AL.wxmap; const sh=document.getElementById("she
   if(!M) return; track("/weather/map","全国の天気");
   getWorld().then(world=>{ const box=document.getElementById("wxMapBox"); if(!box) return; const jp=world.features.filter(f=>f.id==="392"||+f.id===392);
     const W=box.clientWidth||358, H=Math.round(W*1.12); const proj=d3.geoMercator().fitExtent([[6,6],[W-6,H-6]],{type:"MultiPoint",coordinates:[[129.2,30.9],[146.0,45.6]]}); const path=d3.geoPath(proj);
-    const lab=M.cities.map(c=>{ const x=c[3][di]; if(!x||WXM_OFF[c[0]]===null) return ""; const isNaha=c[0]==="那覇"; let px,py; if(isNaha){ px=W-72; py=H-58; } else { [px,py]=proj([c[2],c[1]]); }
-      const [dx,dy]=WXM_OFF[c[0]]||[8,-10]; const bx=isNaha?px:Math.max(4,Math.min(W-62,px+dx)), by=isNaha?py:Math.max(4,Math.min(H-40,py+dy));
-      return `${isNaha?`<rect x="${W-80}" y="${H-80}" width="74" height="74" rx="8" class="wm-inset"/><text x="${W-43}" y="${H-64}" text-anchor="middle" class="wm-n" style="font-size:9.5px">沖縄</text>`:`<circle cx="${px}" cy="${py}" r="3" class="wm-dot"/>${Math.hypot(dx,dy)>20?`<line x1="${px}" y1="${py}" x2="${bx+28}" y2="${by+16}" class="wm-ln"/>`:""}`}
-        <g transform="translate(${bx},${by})" class="wm-l"><rect width="58" height="36" rx="8"/><text x="29" y="13" text-anchor="middle" class="wm-n">${esc(c[0])}</text><text x="11" y="31" text-anchor="middle" class="wm-i">${wmoIcon(x[0])}</text><text x="23" y="31" class="wm-t"><tspan fill="${tempColor(x[1])}">${Math.round(x[1])}</tspan><tspan class="wm-s">/</tspan><tspan fill="#3b82f6">${Math.round(x[2])}</tspan></text></g>`; }).join("");
+    const lab=M.cities.map(c=>{ const x=c[3][di]; if(!x||WXM_OFF[c[0]]===null) return ""; const isNaha=c[0]==="那覇"; let px,py; if(isNaha){ px=W-76; py=H-58; } else { [px,py]=proj([c[2],c[1]]); }
+      const [dx,dy]=WXM_OFF[c[0]]||[8,-10]; const bx=isNaha?px:Math.max(4,Math.min(W-70,px+dx)), by=isNaha?py:Math.max(4,Math.min(H-40,py+dy));
+      return `${isNaha?`<rect x="${W-82}" y="${H-80}" width="78" height="74" rx="8" class="wm-inset"/><text x="${W-43}" y="${H-64}" text-anchor="middle" class="wm-inset-n" style="font-size:9.5px;font-weight:700">沖縄</text>`:`<circle cx="${px}" cy="${py}" r="3" class="wm-dot"/>${Math.hypot(dx,dy)>20?`<line x1="${px}" y1="${py}" x2="${bx+33}" y2="${by+16}" class="wm-ln"/>`:""}`}
+        <g transform="translate(${bx},${by})" class="wm-l"><rect width="66" height="36" rx="8"/><text x="33" y="13" text-anchor="middle" class="wm-n">${esc(c[0])}</text><text x="12" y="31" text-anchor="middle" class="wm-i">${wmoIcon(x[0])}</text><text x="42" y="31" text-anchor="middle" class="wm-t" textLength="38" lengthAdjust="spacingAndGlyphs"><tspan fill="${tempColor(x[1])}">${Math.round(x[1])}</tspan><tspan class="wm-s">/</tspan><tspan fill="#3b82f6">${Math.round(x[2])}</tspan></text></g>`; }).join("");
     box.innerHTML=`<svg viewBox="0 0 ${W} ${H}" width="100%" role="img" aria-label="全国の天気の地図">${jp.map(f=>`<path d="${path(f)}" class="wm-land"/>`).join("")}${lab}</svg>`;
   }).catch(()=>{ const box=document.getElementById("wxMapBox"); if(box) box.innerHTML='<div class="empty">地図を読み込めませんでした。下の一覧を見てください。</div>'; }); }
 document.addEventListener("click",ev=>{ if(ev.target.closest("[data-wxmap]")) openWxMap(0); });
