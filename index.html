@@ -494,6 +494,35 @@ svg.eat{animation:petEat .7s ease both!important}
 .wn span{font-size:1.4rem;line-height:1.2}.wn small{color:var(--muted);font-size:.8rem}
 .wlink{margin-top:4px;align-self:flex-start;border:1px solid var(--accent);background:var(--accent-soft);color:var(--ink);border-radius:999px;padding:3px 10px;font-size:.78rem;cursor:pointer}
 @media (prefers-reduced-motion: reduce){.rd-moon,.rd-moon span{animation:none}}
+/* 空・記者・ガチャ・街・重さ・すごろく */
+#sky{position:fixed;inset:0;z-index:-1;pointer-events:none;overflow:hidden}
+:root[data-tod="morning"] #sky{background:linear-gradient(180deg,rgba(255,196,150,.35),transparent 45%)}
+:root[data-tod="evening"] #sky{background:linear-gradient(180deg,rgba(255,140,90,.28),rgba(160,90,200,.10) 40%,transparent 70%)}
+:root[data-tod="night"] #sky{background:linear-gradient(180deg,rgba(30,40,110,.22),transparent 60%)}
+#sky .star{position:absolute;width:3px;height:3px;border-radius:50%;background:#fff;box-shadow:0 0 4px #fff;opacity:.6;animation:twinkle 3s ease-in-out infinite}
+:root:not([data-theme="dark"]) #sky .star{background:#9aa8ff;box-shadow:none}
+@media (prefers-color-scheme: light){:root:not([data-theme="dark"]) #sky .star{background:#8f9ce6}}
+#sky .drop{position:absolute;top:-10vh;width:1.5px;height:9vh;background:linear-gradient(transparent,rgba(110,150,210,.32));animation:rainfall linear infinite}
+@keyframes rainfall{to{transform:translateY(120vh)}}
+.reporter .rp-h{display:flex;align-items:center;gap:10px}.reporter .rp-h b{display:block}.rp-t{margin:8px 0}
+.reporter{border-left:5px solid var(--accent)}
+.ga-m{display:flex;flex-direction:column;align-items:center;gap:8px;text-align:center;padding:6px 0}
+.ga-ball{width:64px;height:64px;border-radius:50%;background:conic-gradient(#e5484d 0 25%,#f5c400 0 50%,#2563c9 0 75%,#17803f 0);box-shadow:inset 0 -6px 0 rgba(0,0,0,.15),0 4px 10px rgba(0,0,0,.2)}
+.ga-ball.spin{animation:gaSpin 1.1s cubic-bezier(.3,.6,.4,1)}
+@keyframes gaSpin{to{transform:rotate(1080deg) scale(1.15)}}
+.ga-r{display:flex;gap:12px;align-items:flex-start;animation:rise .5s ease both}
+.ga-cap{flex:none;width:44px;height:44px;border-radius:50%;background:linear-gradient(180deg,var(--c) 50%,#fff 50%);border:2px solid var(--line)}
+.pref-sel{font:inherit;padding:8px 10px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--ink);width:100%}
+.heat{font-size:.72rem;font-weight:700;color:var(--g-soc);white-space:nowrap}.heat.town{color:var(--accent)}
+.ten li.w2 .row{padding-top:14px;padding-bottom:14px}.ten li.w3{border-width:2px;border-color:var(--g-soc)}.ten li.w3 h3{font-size:1.12rem}
+.ten li.mytown{box-shadow:0 0 0 2px var(--accent)}
+.wc-b em{display:block;margin-top:4px;font-style:normal;color:#ffd34d}
+.sugo{display:grid;grid-template-columns:repeat(8,1fr);gap:4px}
+.sg{position:relative;aspect-ratio:1;border-radius:8px;background:var(--surface2);border:1px solid var(--line);display:grid;place-items:center}
+.sg small{position:absolute;top:1px;left:3px;font-size:.55rem;color:var(--muted)}
+.sg.done{background:var(--accent-soft)}.sg.here{border:2px solid var(--accent)}.sg.goal{font-size:1.2rem}
+.sg-c{width:10px;height:10px;border-radius:50%;opacity:.7}.sg-pet svg{display:block}
+@media (prefers-reduced-motion: reduce){#sky .star,#sky .drop,.ga-ball.spin{animation:none}}
 /* はじめての案内 */
 .ob{position:fixed;inset:0;z-index:80;background:rgba(10,14,30,.55);display:grid;place-items:center;padding:16px;animation:rise .3s ease both}
 .ob-card{background:var(--surface);color:var(--ink);border-radius:20px;max-width:380px;width:100%;padding:20px;text-align:center;box-shadow:0 20px 50px rgba(0,0,0,.35)}
@@ -711,7 +740,7 @@ function mmdd(iso){ return iso.slice(5,10); }
 function seasonNow(){ if(LOOK.season==="off") return null; if(LOOK.preview){ const z=SEASONS.find(x=>x.k===LOOK.preview); if(z) return z; }
   const t=mmdd(TODAY); return SEASONS.find(z=> z.from<=z.to ? (t>=z.from&&t<=z.to) : (t>=z.from||t<=z.to)) || null; }
 function inSeason(z,iso){ const t=mmdd(iso); return z.from<=z.to ? (t>=z.from&&t<=z.to) : (t>=z.from||t<=z.to); }
-const SECS = [["pet","🐣 ペット"],["play","▶️ 1分で見る"],["weather","🌤️ 天気"],["three","☀️ 今日の3行"],["ten","📰 今日のニュース10"],["mood","🗺️ 世の中の天気図"],["know","👆 知ってた?"],["talk","🍽️ 今日の話のタネ"],["foryou","🎯 あなた向け"],["other","📚 そのほかのニュース"],["quiz","🧠 今日のクイズ"],["number","🔢 今日の数字"]];
+const SECS = [["pet","🐣 ペット"],["play","▶️ 1分で見る"],["weather","🌤️ 天気"],["three","☀️ 今日の3行"],["ten","📰 今日のニュース10"],["mood","🗺️ 世の中の天気図"],["know","👆 知ってた?"],["talk","🍽️ 今日の話のタネ"],["reporter","🎙️ よむまる記者"],["local","🏠 わたしの街"],["gacha","🎰 今日の1本ガチャ"],["foryou","🎯 あなた向け"],["other","📚 そのほかのニュース"],["quiz","🧠 今日のクイズ"],["number","🔢 今日の数字"]];
 const LOOK = (()=>{ let p={}; try{ p=JSON.parse(store.get("nw-look")||"{}")||{}; }catch(_){ p={}; }
   const fix=(arr,all)=>{ const a=(Array.isArray(arr)?arr:[]).filter(k=>all.includes(k)); all.forEach(k=>{ if(!a.includes(k)) a.push(k); }); return a; };
   const had=new Set(Array.isArray(p.order)?p.order:[]); p.order=fix(p.order,SECS.map(s=>s[0]));
@@ -843,10 +872,10 @@ function renderToday(){
   S.ten=`<section aria-label="今日のニュース10">
       <div class="sec-h"><h2>📰 今日のニュース10</h2><span class="sub">関心の高い順</span></div>
       <ol class="ten" style="margin-top:10px">${t.map((n,i)=>{
-        const big=i<3; const link=n.ex||n.tab;
-        return `<li class="${big?'big':''}">${pinBtn({k:"t|"+n.title,h:n.title,g:n.g,d:(NEWS[0]||{}).d,ex:n.ex},"abs")}<button class="row${link?' link':''}"${n.ex?` data-ex="${n.ex}"`:''}${n.tab?` data-tab="${n.tab}"`:''} ${link?'':'tabindex="-1"'}>
+        const big=i<3; const link=n.ex||n.tab; const wt=newsWeight(n); const mine=isLocal(n.title+" "+(n.text||""));
+        return `<li class="${big?'big':''} w${wt.lv}${mine?' mytown':''}">${pinBtn({k:"t|"+n.title,h:n.title,g:n.g,d:(NEWS[0]||{}).d,ex:n.ex},"abs")}<button class="row${link?' link':''}"${n.ex?` data-ex="${n.ex}"`:''}${n.tab?` data-tab="${n.tab}"`:''} ${link?'':'tabindex="-1"'}>
           <span class="rank">${i+1}</span>
-          <span>${big&&ILL[n.ill||n.ex]?`<div class="ill">${ILL[n.ill||n.ex]}</div>`:""}<span class="meta"><span class="chip ${n.g}">${GN[n.g]}</span>${n.ok?'<span class="badge-ok">✅ 複数社で確認</span>':'<span class="badge-one">⚠️ 1社のみ</span>'}</span>
+          <span>${big&&ILL[n.ill||n.ex]?`<div class="ill">${ILL[n.ill||n.ex]}</div>`:""}<span class="meta"><span class="chip ${n.g}">${GN[n.g]}</span>${wt.n>=2?`<span class="heat" title="この3日の関連ニュース">${"🔥".repeat(wt.lv)} 関連${wt.n}件</span>`:""}${mine?'<span class="heat town">🏠 あなたの街</span>':""}${n.ok?'<span class="badge-ok">✅ 複数社で確認</span>':'<span class="badge-one">⚠️ 1社のみ</span>'}</span>
           <h3>${n.icon} ${esc(n.title)}</h3>
           ${n.text?`<p>${esc(n.text)}</p>`:""}
           ${n.point?`<div class="pt">💭 <b>ここがポイント</b> ${esc(n.point)}</div>`:""}
@@ -855,6 +884,9 @@ function renderToday(){
   S.mood=moodCard();
   S.know=knowCard();
   S.talk=talkCard();
+  S.reporter=reporterCard();
+  S.local=localCard();
+  S.gacha=gachaCard();
   S.foryou=forYou();
   S.other=otherNews();
   S.quiz=D.quiz&&D.quiz.length?`<section class="card quiz" aria-label="今日のクイズ" id="quiz"></section>`:"";
@@ -878,7 +910,7 @@ function renderToday(){
   const vg=document.getElementById("vsGo"); if(vg) vg.onclick=()=>{ const q=document.getElementById("quiz"); if(q) q.scrollIntoView({behavior:"smooth",block:"center"}); else toast("いまはクイズがお休みです"); };
   const sx=document.getElementById("seasonX"); if(sx) sx.onclick=()=>{ store.set("nw-season-hide",TODAY+(seasonNow()||{}).k); document.getElementById("seasonCard")?.remove(); };
   document.getElementById("lookBtnToday").onclick=openLook;
-  bindInstall(); bindPersonal(); bindPet(); bindKnow(); bindTalk(); checkBadges();
+  bindInstall(); bindPersonal(); bindPet(); bindKnow(); bindTalk(); bindReporter(); bindGacha(); bindLocal(); checkBadges();
   main.querySelectorAll("[data-mood]").forEach(b=>b.onclick=()=>{ sState.q=""; sState.th=""; sState.ok=false; sState.onlyNew=false; sState.g=new Set([b.dataset.mood]); go("search"); });
   if(document.getElementById("quiz")) drawQuiz(0,[]);
   main.querySelectorAll("[data-ex]").forEach(b=>b.addEventListener("click",()=>openEx(b.dataset.ex)));
@@ -1407,6 +1439,8 @@ function openLook(){
       <section class="lk-sec"><h3>季節の飾り</h3><div class="hint">ハロウィンなどの期間中は、色と飾りが自動で変わります(テーマの色より優先)。</div>
         <div class="setrow"><span class="seg">${[["auto","自動"],["off","オフ"]].map(([k,l])=>`<button data-lsea="${k}" aria-pressed="${LOOK.season===k}">${l}</button>`).join("")}</span></div>
         <div class="chips">${SEASONS.map(z=>`<button class="fchip" data-lprev="${z.k}" aria-pressed="${LOOK.preview===z.k}">${z.icon} ${esc(z.name)}をためしに見る</button>`).join("")}</div></section>
+      <section class="lk-sec"><h3>空の演出</h3><div class="hint">朝・昼・夕方・夜で画面の空気が変わり、雨の日はうっすら雨つぶが流れます。</div>
+        <div class="setrow"><span class="seg">${[["on","出す"],["off","出さない"]].map(([k,l])=>`<button data-lsky="${k}" aria-pressed="${(LOOK.sky!==false)===(k==="on")}">${l}</button>`).join("")}</span></div></section>
       <section class="lk-sec"><h3>ページのペット</h3><div class="hint">各ページに、そのページに合ったコスプレをしたペットが出ます。</div>
         <div class="setrow"><span class="seg">${[["on","出す"],["off","出さない"]].map(([k,l])=>`<button data-lmas="${k}" aria-pressed="${(LOOK.mascot!==false)===(k==="on")}">${l}</button>`).join("")}</span></div></section>
       <section class="lk-sec"><h3>文字と詰め具合</h3>
@@ -1425,6 +1459,7 @@ function openLook(){
     sh.querySelectorAll("[data-ls]").forEach(b=>b.onclick=()=>{ store.set("nw-size",b.dataset.ls); applySettings(); redraw(); });
     sh.querySelectorAll("[data-lsea]").forEach(b=>b.onclick=()=>{ LOOK.season=b.dataset.lsea; if(LOOK.season==="off") LOOK.preview=""; saveLook(); applySettings(); redraw(); });
     sh.querySelectorAll("[data-lprev]").forEach(b=>b.onclick=()=>{ LOOK.preview = LOOK.preview===b.dataset.lprev ? "" : b.dataset.lprev; if(LOOK.preview) LOOK.season="auto"; saveLook(); applySettings(); redraw(); });
+    sh.querySelectorAll("[data-lsky]").forEach(b=>b.onclick=()=>{ LOOK.sky=b.dataset.lsky==="on"; saveLook(); applySky(); redraw(); });
     sh.querySelectorAll("[data-lmas]").forEach(b=>b.onclick=()=>{ LOOK.mascot=b.dataset.lmas==="on"; saveLook(); redraw(); });
     sh.querySelectorAll("[data-ld]").forEach(b=>b.onclick=()=>{ LOOK.density=b.dataset.ld; saveLook(); applySettings(); redraw(); });
     sh.querySelectorAll("[data-mv]").forEach(b=>b.onclick=()=>{ const arr=b.dataset.mv==="sec"?LOOK.order:LOOK.tabs; const i=+b.dataset.i, j=i+(+b.dataset.d); if(j<0||j>=arr.length) return; [arr[i],arr[j]]=[arr[j],arr[i]]; saveLook(); drawTabs(); redraw(`[data-mv="${b.dataset.mv}"][data-i="${j}"][data-d="${b.dataset.d}"]`); });
@@ -1650,7 +1685,13 @@ function petSVG(stage,mood,acc,size,costume){
   const C=costume?costumeSVG(costume,egg?-12:0):"";
   return `<svg viewBox="0 0 120 120" width="${S}" height="${S}" role="img" aria-label="${esc(petName())}"><defs><linearGradient id="pg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe08a"/><stop offset="1" stop-color="#ffb84d"/></linearGradient><pattern id="plaid" width="8" height="8" patternUnits="userSpaceOnUse"><path d="M0 4h8M4 0v8" stroke="#5a4127" stroke-width="1.2" opacity=".6"/></pattern></defs><ellipse cx="60" cy="112" rx="30" ry="4" fill="#000" opacity=".12"/>${costume?"":leaf}${body}${blush}${eyes}${mouth}${costume?A.replace(/<rect x="28" y="52"[^>]*>|<path d="M30 56q30-32 60 0z"[^>]*>|<ellipse cx="60" cy="48"[^>]*>/g,""):A}${C}${stage>=5&&!costume?`<text x="60" y="20" text-anchor="middle" font-size="16">👑</text>`:""}</svg>`;
 }
-function petLine(mood,st){ const n=petName(); if(st.i===0) return mood==="happy"?`たまごがあたたかい…もうすぐ生まれそう!`:`たまごの中から音がする。ニュースを読むと、${n}が生まれるよ。`;
+function petDream(){ const p=petInit(); if(p.dreamDay===TODAY) return p.dream||""; const y=new Date(Date.parse(TODAY)-864e5).toISOString().slice(0,10); const L=NEWS.filter(n=>n.d===y&&n.ok); if(!L.length) return "";
+  const r=seeded("dream"+TODAY+petName()); const n=L[Math.floor(r()*L.length)]; const g=D.glossary.find(w=>n.h.includes(w[0].replace(/\(.*?\)/,"")));
+  const kw=g?g[0].replace(/\(.*?\)/,""):(String(n.th||"").split(/[,、]/)[0]||n.h.replace(/[、。(].*$/,"").slice(0,12));
+  const T=["の海でおよいでたら、目がさめちゃった。","と追いかけっこする夢だった。","の会議に、ぼくも出席してたんだ。","がふわふわの雲になって空にうかんでた。","のニュースを、ぼくが読み上げてたよ。"];
+  p.dream=`ゆうべ「${kw}」${T[Math.floor(r()*T.length)]}(きのうのニュースより)`; p.dreamDay=TODAY; saveMe(); return p.dream; }
+function petLine(mood,st){ const n=petName(); if(st.i>0 && (ME.pet||{}).dreamDay!==TODAY && new Date(Date.now()+9*3600e3).getUTCHours()<12){ const d=petDream(); if(d) return "ふぁ〜あ。"+d; } if(st.i>0 && (ME.pet||{}).dreamDay===TODAY && (ME.pet||{}).dream && mood!=="happy" && new Date().getMinutes()%3===0) return (ME.pet||{}).dream;
+  if(st.i===0) return mood==="happy"?`たまごがあたたかい…もうすぐ生まれそう!`:`たまごの中から音がする。ニュースを読むと、${n}が生まれるよ。`;
   if(mood==="happy") return ["ごはんおいしかった!また明日もニュース読もうね","いっしょに読むと、ぼくも賢くなる気がする!","きょうのクイズ、たのしかったね"][new Date().getDate()%3];
   if(mood==="sulk") return `${petGap()}日ぶり…さみしかったんだから。(ぷい) ごはんをくれたら、ゆるしてあげる。`;
   return "おなかすいた〜。クイズに正解すると、ごはん(🍙)がもらえるよ!"; }
@@ -1687,6 +1728,7 @@ const WEAR=[
   ["book","丸めがね","ことばを10こ調べる",()=>ME.words.length>=10],
   ["ribbonbig","大きなリボン","クイズで満点をとる",()=>Object.values(ME.quiz).some(v=>+v>=3)],
   ["crown","王冠","ペットが「おとな」になる",()=>petStage().i>=3],
+  ["star","星のかみかざり","🎲 すごろくでゴール",()=>(ME.sugoGoal||[]).length>0],
   ["pumpkin","かぼちゃ帽","🎃 ハロウィン限定",()=>ME.badges.includes("halloween")],
   ["santa","サンタ帽","🎄 クリスマス限定",()=>ME.badges.includes("xmas")],
   ["kagami","鏡もち帽","🎍 お正月限定",()=>ME.badges.includes("newyear")]
@@ -1901,6 +1943,7 @@ function costumeSVG(c,dy){ const T=`transform="translate(0 ${dy})"`;
     santa:`<path d="M32 50q6-30 34-28 18 2 24 22l-6 2q-4-12-14-14z" fill="#d42a2a"/><rect x="30" y="46" width="52" height="9" rx="4.5" fill="#fff"/><circle cx="88" cy="44" r="6" fill="#fff"/>`,
     kagami:`<ellipse cx="60" cy="46" rx="22" ry="8" fill="#fffaf0" stroke="#e6d9c2"/><ellipse cx="60" cy="36" rx="16" ry="7" fill="#fffaf0" stroke="#e6d9c2"/><circle cx="60" cy="27" r="6" fill="#f59e0b"/><path d="M60 21l2-3" stroke="#3f8f3a" stroke-width="2"/>`,
     crown:`<path d="M40 48l4-18 9 10 7-14 7 14 9-10 4 18z" fill="#f5c400" stroke="#c99a00" stroke-width="2"/><circle cx="60" cy="40" r="3" fill="#e5484d"/><circle cx="47" cy="43" r="2" fill="#2563c9"/><circle cx="73" cy="43" r="2" fill="#2563c9"/>`,
+    star:`<g transform="translate(74 36)"><path d="M0 -10l3 7 8 1-6 5 2 8-7-4-7 4 2-8-6-5 8-1z" fill="#ffd34d" stroke="#e0a800" stroke-width="1.5"/></g><circle cx="52" cy="40" r="2" fill="#fff6a8"/><circle cx="86" cy="30" r="1.6" fill="#fff6a8"/>`,
     ribbonbig:`<g transform="translate(60 34)"><path d="M0 0l-18-10v20zM0 0l18-10v20z" fill="#ec4899"/><circle r="5" fill="#be185d"/></g>`
   }[c]||"";
   const item={
@@ -1941,7 +1984,7 @@ function bindMyPred(){ const $=id=>document.getElementById(id); if(!$("mpBox")) 
 function wordRarity(w){ const g=D.glossary.find(x=>x[0]===w); const k=(w||"").replace(/\(.*?\)/,""); let r=1; if(k.length>=5) r++; if(g&&["intl","it","spo"].includes(g[4])) r++; if(g&&/[A-Za-z]/.test(k)) r++; return Math.min(3,r); }
 function cardsHTML(){ const W=ME.words.filter((w,i,a)=>a.indexOf(w)===i); const total=D.glossary.length; const R=["","N","R","SR"];
   return `<section class="card"><b>🃏 ことばカード</b> <span class="hint">${W.length} / ${total}まい</span><div class="hint" style="margin:4px 0 8px">点線のことばを調べると、カードが手に入ります。タップでうらがえし。</div>
-    ${W.length?`<div class="wcards">${W.slice().reverse().map(w=>{ const g=D.glossary.find(x=>x[0]===w)||[w,"","",""," "]; const r=wordRarity(w); return `<button class="wcard r${r}" data-flip><span class="wc-f"><small>${R[r]}</small><b>${esc(w.replace(/\(.*?\)/,""))}</b><i>${"★".repeat(r)}</i></span><span class="wc-b">${esc(g[2]||"")}</span></button>`; }).join("")}</div>`:`<div class="empty">まだカードがありません。ニュースの点線のことばをタップしてみよう。</div>`}</section>`; }
+    ${W.length?`<div class="wcards">${W.slice().reverse().map(w=>{ const g=D.glossary.find(x=>x[0]===w)||[w,"","",""," "]; const r=wordRarity(w); const cm=cardComment(w,g[4]); return `<button class="wcard r${r}" data-flip><span class="wc-f"><small>${R[r]}</small><b>${esc(w.replace(/\(.*?\)/,""))}</b><i>${"★".repeat(r)}</i></span><span class="wc-b">${esc(g[2]||"")}${cm?`<em>🐣 ${esc(cm)}</em>`:""}</span></button>`; }).join("")}</div>`:`<div class="empty">まだカードがありません。ニュースの点線のことばをタップしてみよう。</div>`}</section>`; }
 // ===== 対戦の記録(挑戦状でもらった点数) =====
 function saveRival(){ if(!VS) return; ME.rivals=ME.rivals||{}; const k=VS.n; const prev=ME.rivals[k]; if(!prev||prev.d!==VS.d||prev.s<VS.s){ ME.rivals[k]={d:VS.d,s:VS.s,t:VS.t||3,at:TODAY}; saveMe(); } }
 function rankHTML(){ const R=ME.rivals||{}; const q=QID(); const mine=+(ME.quiz[(D.updated||"").slice(0,10)]||0); const rows=Object.entries(R).filter(([,v])=>v.d===q).map(([n,v])=>({n,s:v.s}));
@@ -1979,8 +2022,49 @@ function onboard(force){ if(!force && (store.get("nw-onboard")==="1" || ME.days.
     ov.querySelector("#obNext").onclick=()=>{ if(i<S.length-1){ i++; draw(); } else done(); }; const sk=ov.querySelector("#obSkip"); if(i<S.length-1) sk.onclick=done; else sk.style.visibility="hidden"; ov.querySelector("#obNext").focus(); };
   const done=()=>{ store.set("nw-onboard","1"); ov.remove(); };
   document.body.appendChild(ov); draw(); }
+// ===== よむまる記者・ガチャ・わたしの街・ことばの感想・ニュースの重さ・すごろく =====
+function cardComment(w,g){ const st=petStage().i; if(st<2) return ""; const r=seeded("cc"+w); const C={pol:["国会って、むずかしいけど大事!","みんなで決めるって、たいへんだね"],eco:["お金の話は、くらしにひびくね","ぼくのごはん代にも関係ある?"],it:["パスワード、ちゃんと変えてる?","AIって、ぼくのなかま?"],intl:["世界はつながってるんだね","いつか行ってみたいな"],spo:["ぼくも走るの、すきだよ!","すごい記録だね!"],soc:["みんな気をつけてね","ニュースで知れてよかった"],ent:["見てみたいな!","わくわくするね"]}[g]||["このことば、もう覚えたよ!","また出てきたら、すぐわかるね"]; return C[Math.floor(r()*C.length)]; }
+function newsWeight(n){ const since=new Date(Date.parse(TODAY)-3*864e5).toISOString().slice(0,10); const q=gdQuery(n.title); let c=NEWS.filter(x=>x.d>=since&&gdScore(q,x.h+" "+(x.th||""))>=0.25).length; const e=n.ex&&D.explainers[n.ex]; if(e){ const q2=gdQuery(e.name+" "+(e.now||"")); c=Math.max(c,NEWS.filter(x=>x.d>=since&&gdScore(q2,x.h+" "+(x.th||""))>=0.3).length); } return {n:c,lv:c>=6?3:c>=3?2:c>=2?1:0}; }
+function reporterCard(){ const st=petStage(); if(st.i<1) return ""; const g=petTopGenre()||GORDER.find(x=>ME.interests[x])||D.top10[0].g; const n=D.top10.find(x=>x.g===g)||NEWS.find(x=>x.g===g&&x.ok);
+  if(!n) return ""; const title=n.title||n.h, text=n.text||""; const kc={pol:"professor",eco:"banker",intl:"explorer",it:"detective"}[g]||"newsboy";
+  return `<section class="card reporter" aria-label="よむまる記者"><div class="rp-h"><span class="rp-av">${petSVG(st.i,"happy",null,64,kc)}</span><span><small class="hint">🎙️ 今日の${esc(GN[g])}担当</small><b>${esc(petName())}記者がお伝えします</b></span></div>
+    <p class="rp-t"><b>${esc(title)}</b>${text?`<br>${esc(text)}`:""}</p><div style="display:flex;gap:6px;flex-wrap:wrap"><button class="fchip" id="rpSpeak">🔊 読み上げてもらう</button>${n.ex?`<button class="fchip" data-ex="${n.ex}">くわしく →</button>`:""}</div>
+    <div class="hint" style="margin-top:6px">あなたがよく読む「${esc(GN[g])}」から選んでいます(記事はニュース10と同じ内容です)。</div></section>`; }
+function bindReporter(){ const b=document.getElementById("rpSpeak"); if(!b) return; b.onclick=()=>{ const t=document.querySelector(".rp-t").innerText; if(window.speechSynthesis&&window.speechSynthesis.speaking){ stopSpeak(); b.textContent="🔊 読み上げてもらう"; return; } speak(`${petName()}記者がお伝えします。${t}。以上、${petName()}でした。`); b.textContent="■ 止める"; }; }
+function gachaCard(){ const g=ME.gacha||{}; const done=g.d===TODAY; const n=done?NEWS.find(x=>nkey(x)===g.k):null;
+  return `<section class="card gacha" aria-label="今日の1本ガチャ"><div class="sec-h"><h2>🎰 今日の1本ガチャ</h2><span class="sub">1日1回</span></div>
+    <div id="gaBox">${done&&n?gachaResult(n):`<div class="ga-m"><div class="ga-ball" aria-hidden="true"></div><button class="fchip pet-feed" id="gaGo">ガチャを回す!</button><div class="hint">これまでの記録(${NEWS.length}件)から、1本だけ出てきます。思いがけないニュースに出会えるかも。</div></div>`}</div></section>`; }
+function gachaResult(n){ const days=Math.round((Date.parse(TODAY)-Date.parse(n.d))/864e5); return `<div class="ga-r"><span class="ga-cap" style="--c:var(--g-${n.g})"></span><div><span class="chip ${n.g}">${esc(GN[n.g])}</span> <small class="hint">${esc(mdLabel(n.d))}${days>0?`(${days}日前)`:""}</small><h3 style="font-size:1.02rem;margin:4px 0">${esc(n.h)}</h3><small class="hint">出典: ${esc(n.s||"")}</small></div></div>`; }
+function bindGacha(){ const b=document.getElementById("gaGo"); if(!b) return; b.onclick=()=>{ const r=seeded("ga"+TODAY+Math.random()); const pool=NEWS.filter(x=>x.ok); const n=pool[Math.floor(r()*pool.length)]; ME.gacha={d:TODAY,k:nkey(n)}; saveMe(); learn(n.g,0.5); track("/gacha","ガチャ");
+  const box=document.getElementById("gaBox"); box.querySelector(".ga-ball").classList.add("spin"); b.disabled=true; setTimeout(()=>{ box.innerHTML=gachaResult(n); },1100); }; }
+const PREFS=["北海道","青森県","岩手県","宮城県","秋田県","山形県","福島県","茨城県","栃木県","群馬県","埼玉県","千葉県","東京都","神奈川県","新潟県","富山県","石川県","福井県","山梨県","長野県","岐阜県","静岡県","愛知県","三重県","滋賀県","京都府","大阪府","兵庫県","奈良県","和歌山県","鳥取県","島根県","岡山県","広島県","山口県","徳島県","香川県","愛媛県","高知県","福岡県","佐賀県","長崎県","熊本県","大分県","宮崎県","鹿児島県","沖縄県"];
+const PLACE_PREF={"東京":"東京都","横浜":"神奈川県","千葉":"千葉県","伊豆諸島":"東京都","宮崎":"宮崎県","北海道":"北海道","大分":"大分県","福岡":"福岡県","関西":"大阪府","埼玉":"埼玉県","愛媛":"愛媛県","沖縄":"沖縄県","種子島(打ち上げ)":"鹿児島県"};
+function prefWords(pf){ const base=pf.replace(/[都府県]$/,""); const extra={"東京都":["東京","都内","都庁"],"大阪府":["大阪","関西"],"京都府":["京都"],"北海道":["北海道","札幌"],"神奈川県":["神奈川","横浜","川崎"],"鹿児島県":["鹿児島","種子島"],"沖縄県":["沖縄","那覇","石垣","宮古","先島"]}[pf]||[]; return [...new Set([base,...extra])].filter(x=>x.length>=2); }
+function isLocal(text){ const pf=ME.pref; if(!pf) return false; return prefWords(pf).some(w=>String(text).includes(w)); }
+function localCard(){ const pf=ME.pref;
+  if(!pf) return `<section class="card" aria-label="わたしの街"><b>🏠 わたしの街のニュース</b><div class="hint" style="margin:4px 0 8px">住んでいる都道府県を選ぶと、その地域のニュースに🏠の印がつきます(都道府県名だけをこのスマホの中に保存)。</div><select id="prefSel" class="pref-sel"><option value="">都道府県を選ぶ</option>${PREFS.map(x=>`<option>${x}</option>`).join("")}</select></section>`;
+  const L=NEWS.filter(n=>isLocal(n.h+" "+(n.th||""))).slice(0,5);
+  return `<section class="card" aria-label="わたしの街"><div class="sec-h"><h2>🏠 ${esc(pf)}のニュース</h2><button class="gd-lk" id="prefChg">変える</button></div>
+    ${L.length?`<ul class="us" style="margin-top:6px">${L.map(n=>`<li>${esc(mdLabel(n.d))} ${esc(n.h)} ${n.ok?"✅":"⚠️"}</li>`).join("")}</ul>`:`<p class="hint" style="margin:6px 0 0">最近の記録には、${esc(pf)}のニュースはまだありません。出てきたら、ここと「ニュース10」に🏠の印がつきます。</p>`}</section>`; }
+function bindLocal(){ const s=document.getElementById("prefSel"); if(s) s.onchange=()=>{ if(!s.value) return; ME.pref=s.value; saveMe(); toast(`🏠 ${s.value}を「わたしの街」にしました`); go("today",{keepScroll:true}); };
+  const c=document.getElementById("prefChg"); if(c) c.onclick=()=>{ delete ME.pref; saveMe(); go("today",{keepScroll:true}); }; }
+// すごろく(1週間。クイズの正解・おかわりクイズの正解・解説を読むと進む)
+function weekStart(){ const d=new Date(Date.parse(TODAY)); const w=(d.getUTCDay()+6)%7; return new Date(Date.parse(TODAY)-w*864e5).toISOString().slice(0,10); }
+function sugoPos(){ const ws=weekStart(); const got=Object.keys((ME.pet||{}).got||{}).filter(k=>k.slice(2,12)>=ws).length; const rd=Object.values(ME.readEx||{}).filter(d=>d>=ws).length; return Math.min(SUGO_N, got+rd); }
+const SUGO_N=15;
+function sugoHTML(){ const ws=weekStart(); const pos=sugoPos(); const W=NEWS.filter(n=>n.d>=new Date(Date.parse(ws)-7*864e5).toISOString().slice(0,10)&&n.ok); const r=seeded("sg"+ws); const sq=Array.from({length:SUGO_N},(_,i)=>{ const n=W.length?W[Math.floor(r()*W.length)]:null; return n; });
+  if(pos>=SUGO_N){ ME.sugoGoal=ME.sugoGoal||[]; if(!ME.sugoGoal.includes(ws)){ ME.sugoGoal.push(ws); saveMe(); setTimeout(()=>toast("🎉 すごろくゴール! ペットの「星のかみかざり」が着られるようになりました"),300); } }
+  return `<section class="card"><b>🎲 ニュースすごろく</b> <span class="hint">今週 ${pos}/${SUGO_N}マス</span><div class="hint" style="margin:4px 0 8px">クイズの正解・おかわりクイズの正解・解説を読むと1マス進む(月曜にリセット)。ゴールすると、ペットのレアな服がもらえます。</div>
+    <div class="sugo">${sq.map((n,i)=>`<div class="sg${i<pos?" done":""}${i===pos?" here":""}" title="${esc(n?n.h:"")}"><small>${i+1}</small>${i===pos?`<span class="sg-pet">${petSVG(Math.max(1,petStage().i),"happy",null,34,petWear())}</span>`:n?`<span class="sg-c" style="background:var(--g-${n.g})"></span>`:""}</div>`).join("")}<div class="sg goal${pos>=SUGO_N?" here":""}">🏁</div></div></section>`; }
+// 時間と天気で変わる空
+function skyTOD(){ const h=new Date(Date.now()+9*3600e3).getUTCHours(); return h>=5&&h<10?"morning":h>=10&&h<16?"day":h>=16&&h<19?"evening":"night"; }
+function applySky(){ let el=document.getElementById("sky"); if(LOOK.sky===false){ if(el) el.remove(); root.removeAttribute("data-tod"); return; }
+  root.setAttribute("data-tod",skyTOD()); const w=D.weather; const rain=w&&relDay(w.iso)==="今日"&&/雨/.test(w.sky); const reduce=(()=>{ try{ return matchMedia("(prefers-reduced-motion: reduce)").matches; }catch(_){ return false; } })();
+  if(!el){ el=document.createElement("div"); el.id="sky"; el.setAttribute("aria-hidden","true"); document.body.prepend(el); }
+  el.innerHTML=(root.dataset.tod==="night"?Array.from({length:24},(_,i)=>`<i class="star" style="left:${(i*41)%100}%;top:${(i*23)%55}%;animation-delay:${(i%6)*.5}s"></i>`).join(""):"")+(rain&&!reduce?Array.from({length:26},(_,i)=>`<b class="drop" style="left:${(i*37)%100}%;animation-delay:${(i%9)*.23}s;animation-duration:${.9+(i%4)*.2}s"></b>`).join(""):""); }
 // ===== お知らせ(新しくなったところ)。機能を足したら、いちばん上に1つ足す =====
 const UPDATES=[
+  {id:"2026-10-20l",d:"2026-10-20",t:"🎙️ よむまる記者・🎰 ガチャ・🏠 わたしの街・🎲 すごろく",L:["ペットが記者になって、よく読むジャンルの1本を伝えてくれます(読み上げも)","1日1回の「今日の1本ガチャ」、住んでいる都道府県のニュースに🏠の印","1週間のニュースすごろく(ゴールでレアな服)、ペットが見た夢の話、ことばカードにペットの感想","時間と天気で画面の空気が変わり、関連ニュースが多い話題は🔥で大きく表示"]},
   {id:"2026-10-20k",d:"2026-10-20",t:"📊 よく読まれている話題を数えはじめました",L:["どの画面・解説・ジャンルが何回開かれたかだけを数えます(GoatCounter・だれが見たかはわかりません)","質問の文章・メモ・あなたの記録は送りません。くわしくは「マイ」の使い方の「記録について」へ"]},
   {id:"2026-10-20j",d:"2026-10-20",t:"🐣 はじめての人への案内 & 📈 日経平均の長期グラフ",L:["はじめて開いた人に、ペットが3ステップで使い方を案内します(マイからもう一度見られます)","日経平均の長い期間のグラフが見られるようになりました(日経の公式データ)"]},
   {id:"2026-10-20i",d:"2026-10-20",t:"🔮 予想ノート・🃏 ことばカード・🗞️ 自分の新聞",L:["予定タブに「わたしの予想ノート」。何年先の予想でも書いておけて、その日が来たら答え合わせ","調べたことばがカードになって集まります(N・R・SR)","保存したニュースとメモで「自分だけの新聞」を作って画像で送れます。もらった挑戦状の点数でランキングも","解説の流れが横にスクロールする年表になりました"]},
@@ -2035,6 +2119,7 @@ function renderMy(){
     ${updCard()}
     <button class="lookcard" id="lookBtnMy"><span class="pal" aria-hidden="true" style="padding-left:5px">${COLORS.slice(1,6).map(c=>`<i style="background:${c[2]}"></i>`).join("")}</span><span><b>🎨 着せかえ</b><span class="hint" style="display:block">色・文字・画面の並び・タブを、わたし好みに</span></span></button>
     ${petBig()}
+    ${sugoHTML()}
     ${rankHTML()}
     ${pinsBlock()}
     <button class="lookcard" id="myPaperBtn"><span style="font-size:1.6rem" aria-hidden="true">🗞️</span><span><b>自分だけの新聞を作る</b><span class="hint" style="display:block">📍で保存したニュースとメモを、1枚の新聞に。画像で送れます</span></span></button>
@@ -2247,6 +2332,7 @@ function speakEx(k,btn){ const e=D.explainers[k]; if(!e) return; try{ const s=wi
   const u=new SpeechSynthesisUtterance(txt); u.lang="ja-JP"; u.rate=1.05; u.onend=()=>{ btn.textContent="🔊 聞く"; }; s.speak(u); btn.textContent="■ 止める"; }catch(_){} }
 
 // 起動
+try{ applySky(); setInterval(applySky,10*60*1000); }catch(_){}
 setTimeout(()=>{ try{ onboard(); }catch(_){} },600);
 try{ saveRival(); }catch(_){}
 document.getElementById("bellBtn").onclick=openUpdates; markBell();
