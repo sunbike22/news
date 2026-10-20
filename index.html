@@ -2330,6 +2330,9 @@ function petGap(){ const ds=[...ME.days].filter(d=>d<TODAY).sort(); if(!ds.lengt
 function petMood(){ const p=petInit(); if(p.feedDay===TODAY) return "happy"; if(petGap()>=3) return "sulk"; return "hungry"; }
 function petEarn(key,n){ const p=petInit(); if(p.got[key]) return 0; if(p.earnDay.d!==TODAY) p.earnDay={d:TODAY,n:0}; if(p.earnDay.n>=PET_DAY_MAX) return 0;
   const add=Math.min(n||1,PET_DAY_MAX-p.earnDay.n); p.got[key]=1; p.food+=add; p.earnDay.n+=add; saveMe(); return add; }
+// 頭にかぶる小物。コスプレの帽子とぶつかるので、コスプレ中はまるごと外す
+// (前は文字列で一部だけ消していたので、ヘアバンドの赤い玉などが頭に残っていた)
+const HEAD_ACC=["band","helmet","straw","chef","phones","ribbon"];
 function petSVG(stage,mood,acc,size,costume){
   const S=size||120; const egg=stage===0;
   const body=egg?`<path d="M60 22c22 0 34 30 34 52s-15 34-34 34-34-12-34-34 12-52 34-52z" fill="#fff7e6" stroke="#e8c98f" stroke-width="3"/><path d="M38 70l8-6 8 7 8-7 8 7 8-6 8 6" fill="none" stroke="#e8c98f" stroke-width="3" stroke-linejoin="round"/>`
@@ -2356,7 +2359,7 @@ function petSVG(stage,mood,acc,size,costume){
     straw:`<ellipse cx="60" cy="48" rx="38" ry="7" fill="#e9c46a"/><path d="M40 48q2-18 20-18t20 18z" fill="#f2d07a"/><rect x="40" y="42" width="40" height="5" fill="#d23a3a"/>`
   })[acc]||"";
   const C=costume?costumeSVG(costume,egg?-12:0):"";
-  return `<svg viewBox="0 0 120 120" width="${S}" height="${S}" role="img" aria-label="${esc(petName())}"><defs><linearGradient id="pg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe08a"/><stop offset="1" stop-color="#ffb84d"/></linearGradient><pattern id="plaid" width="8" height="8" patternUnits="userSpaceOnUse"><path d="M0 4h8M4 0v8" stroke="#5a4127" stroke-width="1.2" opacity=".6"/></pattern></defs><ellipse cx="60" cy="112" rx="30" ry="4" fill="#000" opacity=".12"/>${costume?"":leaf}${body}${blush}${eyes}${mouth}${costume?A.replace(/<rect x="28" y="52"[^>]*>|<path d="M30 56q30-32 60 0z"[^>]*>|<ellipse cx="60" cy="48"[^>]*>/g,""):A}${C}${stage>=5&&!costume?`<text x="60" y="20" text-anchor="middle" font-size="16">👑</text>`:""}</svg>`;
+  return `<svg viewBox="0 0 120 120" width="${S}" height="${S}" role="img" aria-label="${esc(petName())}"><defs><linearGradient id="pg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe08a"/><stop offset="1" stop-color="#ffb84d"/></linearGradient><pattern id="plaid" width="8" height="8" patternUnits="userSpaceOnUse"><path d="M0 4h8M4 0v8" stroke="#5a4127" stroke-width="1.2" opacity=".6"/></pattern></defs><ellipse cx="60" cy="112" rx="30" ry="4" fill="#000" opacity=".12"/>${costume?"":leaf}${body}${blush}${eyes}${mouth}${costume&&HEAD_ACC.includes(acc)?"":A}${C}${stage>=5&&!costume?`<text x="60" y="20" text-anchor="middle" font-size="16">👑</text>`:""}</svg>`;
 }
 function petDream(){ const p=petInit(); if(p.dreamDay===TODAY) return p.dream||""; const y=new Date(Date.parse(TODAY)-864e5).toISOString().slice(0,10); const L=NEWS.filter(n=>n.d===y&&n.ok); if(!L.length) return "";
   const r=seeded("dream"+TODAY+petName()); const n=L[Math.floor(r()*L.length)]; const g=D.glossary.find(w=>n.h.includes(w[0].replace(/\(.*?\)/,"")));
