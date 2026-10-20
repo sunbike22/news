@@ -115,6 +115,7 @@ main{padding-block:18px 32px}
 .wx .wx-more{display:none}.wx.open .wx-more{display:flex;flex-direction:column;gap:8px}
 .wx-sum{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center}
 .wx-tg{align-self:flex-start}
+.wm-svg{display:block;width:100%;height:auto}
 .wx-top{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center}
 .wx-ic{font-size:2.6rem;line-height:1}
 .wx-place{font-size:.88rem;color:var(--muted);font-weight:700}
@@ -1327,6 +1328,8 @@ function wxSumLine(){ const w=D.weather||{}; const bits=[];
   return `<div class="wx-sum">${bits.map(([i,t])=>`<span class="kit"><i aria-hidden="true">${i}</i>${esc(t)}</span>`).join("")}</div>`; }
 // 天気カードは1行にたたむ。自動で開くのは「わたしの街に気象庁の警報(lv1以上)」が出ているときだけ。
 // ニュースの「気をつけること」は全国の話も入るので、ここでは開く理由にしない(たたんでいても下に出す)
+// 3分ごとの自動更新でカードを作り直しても、読んでいる途中の「気をつけること」が閉じないように覚えておく
+let wxNotesOpen=false;
 function wxMust(){ let lv=-1; try{ lv=Math.max(-1,...myWarn().map(x=>+x.lv)); }catch(_){} return lv>=1; }
 function weatherCard(){
   const w=D.weather; const lab=relDay(w.iso); const notes=w.notes||[]; const severe=notes.some(n=>/警報|台風|大雨|暴風|大雪|猛暑|熱中症/.test(n));
@@ -1344,7 +1347,7 @@ function weatherCard(){
       ${notes.length?"":`<div class="hint">出典: ${esc(w.source)}</div>`}
       <div class="wx-strip" id="wxStrip" role="button" tabindex="0" data-wxh="1" aria-label="1時間ごとの天気を開く">${wxStripHTML()}</div>
     </div>
-    ${notes.length?`<details class="wx-notes"${severe?" open":""}><summary>⚠️ 気をつけること(${notes.length})</summary>${notes.map(n=>`<div class="note">${esc(n)}</div>`).join("")}<div class="hint">出典: ${esc(w.source)}</div></details>`:""}
+    ${notes.length?`<details class="wx-notes" id="wxNotes"${(severe||wxNotesOpen)?" open":""}><summary>⚠️ 気をつけること(${notes.length})</summary>${notes.map(n=>`<div class="note">${esc(n)}</div>`).join("")}<div class="hint">出典: ${esc(w.source)}</div></details>`:""}
     ${must?"":`<button class="fchip wx-tg" data-wxtg="1" aria-expanded="${open?"true":"false"}" aria-controls="wxCard">${open?"▲ とじる":"▼ くわしく"}</button>`}
     <div class="wx-btns"><button class="fchip" data-wxh="1">🕐 1時間ごと</button><button class="fchip" data-wxmap="1">🗾 全国の天気</button><button class="fchip qk-open" data-quake="1">🌏 地震・警報${qkLatestLabel()}</button></div>
   </section>`;
@@ -2333,10 +2336,13 @@ function petEarn(key,n){ const p=petInit(); if(p.got[key]) return 0; if(p.earnDa
 // 頭にかぶる小物。コスプレの帽子とぶつかるので、コスプレ中はまるごと外す
 // (前は文字列で一部だけ消していたので、ヘアバンドの赤い玉などが頭に残っていた)
 const HEAD_ACC=["band","helmet","straw","chef","phones","ribbon"];
+// SVGの中のid(グラデーション・チェック柄)は1ページに何匹出ても重ならないよう番号をつける
+// (同じidが2つあると、うしろのペットの色が前のペットのものを見にいってしまう)
+let petUID=0;
 function petSVG(stage,mood,acc,size,costume){
-  const S=size||120; const egg=stage===0;
+  const S=size||120; const egg=stage===0; const U="u"+(++petUID);
   const body=egg?`<path d="M60 22c22 0 34 30 34 52s-15 34-34 34-34-12-34-34 12-52 34-52z" fill="#fff7e6" stroke="#e8c98f" stroke-width="3"/><path d="M38 70l8-6 8 7 8-7 8 7 8-6 8 6" fill="none" stroke="#e8c98f" stroke-width="3" stroke-linejoin="round"/>`
-    : `<ellipse cx="60" cy="74" rx="${34+stage*1.2}" ry="${31+stage}" fill="${stage>=5?"url(#pg)":"#ffcf6e"}"/><ellipse cx="60" cy="86" rx="${20+stage}" ry="${12+stage*.6}" fill="#fff1cf" opacity=".85"/>`;
+    : `<ellipse cx="60" cy="74" rx="${34+stage*1.2}" ry="${31+stage}" fill="${stage>=5?`url(#pg${U})`:"#ffcf6e"}"/><ellipse cx="60" cy="86" rx="${20+stage}" ry="${12+stage*.6}" fill="#fff1cf" opacity=".85"/>`;
   const leaf=egg?"":stage>=4?`<path d="M60 44V30" stroke="#3f8f3a" stroke-width="3"/><g transform="translate(60 26)">${[0,72,144,216,288].map(a=>`<ellipse rx="5" ry="8" transform="rotate(${a}) translate(0 -7)" fill="#ff8fb3"/>`).join("")}<circle r="4.5" fill="#ffd34d"/></g>`
     : `<path d="M60 44q0-10 2-14" stroke="#3f8f3a" stroke-width="3" fill="none"/><path d="M62 31q10-10 18-4-6 9-18 4z" fill="#58b84f"/>${stage>=2?`<path d="M61 34q-10-8-17-2 6 8 17 2z" fill="#6cc763"/>`:""}`;
   const eyes=egg?"": mood==="happy"?`<path d="M42 70q5-6 10 0M68 70q5-6 10 0" stroke="#3a2a14" stroke-width="3.2" fill="none" stroke-linecap="round"/>`
@@ -2358,8 +2364,8 @@ function petSVG(stage,mood,acc,size,costume){
     mug:`<g transform="translate(88 82)"><rect width="16" height="18" rx="3" fill="#0e7490"/><path d="M16 4q7 0 7 6t-7 6" fill="none" stroke="#0e7490" stroke-width="3"/><path d="M4 -3q2-4 0-8M10 -3q2-4 0-8" stroke="#94a3b8" stroke-width="1.6" fill="none"/></g>`,
     straw:`<ellipse cx="60" cy="48" rx="38" ry="7" fill="#e9c46a"/><path d="M40 48q2-18 20-18t20 18z" fill="#f2d07a"/><rect x="40" y="42" width="40" height="5" fill="#d23a3a"/>`
   })[acc]||"";
-  const C=costume?costumeSVG(costume,egg?-12:0):"";
-  return `<svg viewBox="0 0 120 120" width="${S}" height="${S}" role="img" aria-label="${esc(petName())}"><defs><linearGradient id="pg" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe08a"/><stop offset="1" stop-color="#ffb84d"/></linearGradient><pattern id="plaid" width="8" height="8" patternUnits="userSpaceOnUse"><path d="M0 4h8M4 0v8" stroke="#5a4127" stroke-width="1.2" opacity=".6"/></pattern></defs><ellipse cx="60" cy="112" rx="30" ry="4" fill="#000" opacity=".12"/>${costume?"":leaf}${body}${blush}${eyes}${mouth}${costume&&HEAD_ACC.includes(acc)?"":A}${C}${stage>=5&&!costume?`<text x="60" y="20" text-anchor="middle" font-size="16">👑</text>`:""}</svg>`;
+  const C=costume?costumeSVG(costume,egg?-12:0,U):"";
+  return `<svg viewBox="0 0 120 120" width="${S}" height="${S}" role="img" aria-label="${esc(petName())}"><defs><linearGradient id="pg${U}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe08a"/><stop offset="1" stop-color="#ffb84d"/></linearGradient><pattern id="plaid${U}" width="8" height="8" patternUnits="userSpaceOnUse"><path d="M0 4h8M4 0v8" stroke="#5a4127" stroke-width="1.2" opacity=".6"/></pattern></defs><ellipse cx="60" cy="112" rx="30" ry="4" fill="#000" opacity=".12"/>${costume?"":leaf}${body}${blush}${eyes}${mouth}${costume&&HEAD_ACC.includes(acc)?"":A}${C}${stage>=5&&!costume?`<text x="60" y="20" text-anchor="middle" font-size="16">👑</text>`:""}</svg>`;
 }
 function petDream(){ const p=petInit(); if(p.dreamDay===TODAY) return p.dream||""; const y=new Date(Date.parse(TODAY)-864e5).toISOString().slice(0,10); const L=NEWS.filter(n=>n.d===y&&n.ok); if(!L.length) return "";
   const r=seeded("dream"+TODAY+petName()); const n=L[Math.floor(r()*L.length)]; const g=D.glossary.find(w=>n.h.includes(w[0].replace(/\(.*?\)/,"")));
@@ -2606,9 +2612,9 @@ function openWeb(k){
   sh.hidden=false; sh.scrollTop=0; document.body.style.overflow="hidden"; requestAnimationFrame(()=>requestAnimationFrame(draw)); window.addEventListener("resize",draw); track("/web/"+k,"つながり: "+e.name);
 }
 // ===== ページごとのコスプレ(自作SVG。帽子は頭の上 y≒44 を基準に描く) =====
-function costumeSVG(c,dy){ const T=`transform="translate(0 ${dy})"`;
+function costumeSVG(c,dy,U){ const T=`transform="translate(0 ${dy})"`; U=U||"";
   const hat={
-    detective:`<path d="M30 50q30-30 60 0z" fill="#8a6a43"/><path d="M30 50q30-30 60 0" fill="url(#plaid)"/><path d="M28 50h64l-6 6H34z" fill="#6b4f2e"/><path d="M60 28v-6" stroke="#6b4f2e" stroke-width="3"/><circle cx="60" cy="21" r="3" fill="#6b4f2e"/>`,
+    detective:`<path d="M30 50q30-30 60 0z" fill="#8a6a43"/><path d="M30 50q30-30 60 0" fill="url(#plaid${U})"/><path d="M28 50h64l-6 6H34z" fill="#6b4f2e"/><path d="M60 28v-6" stroke="#6b4f2e" stroke-width="3"/><circle cx="60" cy="21" r="3" fill="#6b4f2e"/>`,
     newsboy:`<path d="M32 50q2-20 28-20t28 20z" fill="#5b6472"/><path d="M32 50q28 8 56 0" fill="none" stroke="#3f4652" stroke-width="2"/><path d="M60 50q22 2 36 8-18 4-36-2z" fill="#3f4652"/><circle cx="60" cy="31" r="3" fill="#3f4652"/>`,
     explorer:`<ellipse cx="60" cy="50" rx="40" ry="8" fill="#c9b27c"/><path d="M38 50q0-24 22-24t22 24z" fill="#e2cf98"/><rect x="38" y="44" width="44" height="5" fill="#7a5c2e"/>`,
     professor:`<path d="M60 28l34 10-34 10-34-10z" fill="#222"/><rect x="44" y="40" width="32" height="10" fill="#333"/><path d="M90 39v14" stroke="#f5c400" stroke-width="2"/><circle cx="90" cy="55" r="3" fill="#f5c400"/>`,
@@ -3488,9 +3494,10 @@ function openWxMap(day){ const M=AL.wxmap; const sh=document.getElementById("she
       const [dx,dy]=WXM_OFF[c[0]]||[8,-10]; const bx=isNaha?px:Math.max(4,Math.min(W-70,px+dx)), by=isNaha?py:Math.max(4,Math.min(H-40,py+dy));
       return `${isNaha?`<rect x="${W-82}" y="${H-80}" width="78" height="74" rx="8" class="wm-inset"/><text x="${W-43}" y="${H-64}" text-anchor="middle" class="wm-inset-n" style="font-size:9.5px;font-weight:700">沖縄</text>`:`<circle cx="${px}" cy="${py}" r="3" class="wm-dot"/>${Math.hypot(dx,dy)>20?`<line x1="${px}" y1="${py}" x2="${bx+33}" y2="${by+16}" class="wm-ln"/>`:""}`}
         <g transform="translate(${bx},${by})" class="wm-l"><rect width="66" height="36" rx="8"/><text x="33" y="13" text-anchor="middle" class="wm-n">${esc(c[0])}</text><text x="12" y="31" text-anchor="middle" class="wm-i">${wmoIcon(x[0])}</text><text x="42" y="31" text-anchor="middle" class="wm-t" textLength="38" lengthAdjust="spacingAndGlyphs"><tspan fill="${tempColor(x[1])}">${Math.round(x[1])}</tspan><tspan class="wm-s">/</tspan><tspan fill="#3b82f6">${Math.round(x[2])}</tspan></text></g>`; }).join("");
-    box.innerHTML=`<svg viewBox="0 0 ${W} ${H}" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" role="img" aria-label="全国の天気の地図">${jp.map(f=>`<path d="${path(f)}" class="wm-land"/>`).join("")}${lab}</svg>`;
+    box.innerHTML=`<svg viewBox="0 0 ${W} ${H}" class="wm-svg" preserveAspectRatio="xMidYMid meet" role="img" aria-label="全国の天気の地図">${jp.map(f=>`<path d="${path(f)}" class="wm-land"/>`).join("")}${lab}</svg>`;
   }).catch(()=>{ const box=document.getElementById("wxMapBox"); if(box) box.innerHTML='<div class="empty">地図を読み込めませんでした。下の一覧を見てください。</div>'; }); }
 document.addEventListener("click",ev=>{ if(ev.target.closest("[data-wxmap]")) openWxMap(0); });
+document.addEventListener("toggle",ev=>{ if(ev.target&&ev.target.id==="wxNotes") wxNotesOpen=ev.target.open; },true);
 document.addEventListener("click",ev=>{ const t=ev.target.closest("[data-wxtg]"); if(!t) return;
   ev.preventDefault(); ev.stopPropagation(); LOOK.wxOpen=!(LOOK.wxOpen===true); saveLook();
   const c=document.getElementById("wxCard"); if(c){ c.outerHTML=weatherCard();
