@@ -112,6 +112,9 @@ main{padding-block:18px 32px}
 
 /* 天気(いちばん上にコンパクトに) */
 .wx{display:flex;flex-direction:column;gap:8px}
+.wx .wx-more{display:none}.wx.open .wx-more{display:flex;flex-direction:column;gap:8px}
+.wx-sum{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center}
+.wx-tg{align-self:flex-start}
 .wx-top{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center}
 .wx-ic{font-size:2.6rem;line-height:1}
 .wx-place{font-size:.88rem;color:var(--muted);font-weight:700}
@@ -1051,6 +1054,8 @@ const LOOK = (()=>{ let p={}; try{ p=JSON.parse(store.get("nw-look")||"{}")||{};
   // v7: かんたん/ふつうモード。今までの人は「ふつう」。聞くボタンはふつうではかくす。ことばタブは最初はかくす
   // v9: おすすめは「おたのしみ」の中へ
   // v10: 新しいおたのしみ(温度計・旅・連想・あのとき・ビンゴ・予想くらべ)は「おたのしみ」の中に入れる
+  // v11: ニュース10は最初「短く」・天気カードは1行にたたむ(2026-10-21)
+  if(!p.v11){ p.v11=1; p.len="short"; p.wxOpen=false; }
   if(!p.v10){ p.v10=1; const K={thermo:true,trip2:true,assoc:true,back:true,bingo:true,battle:true,kurashi:true}; p.off=Object.assign({},p.off,K); if(p.cfg) Object.values(p.cfg).forEach(c=>{ if(c&&c.off) Object.assign(c.off,K); }); }
   if(!p.v9){ p.v9=1; p.off=Object.assign({},p.off,{picks:true}); if(p.cfg) Object.values(p.cfg).forEach(c=>{ if(c&&c.off) c.off.picks=true; }); }
   // v8: 1分まとめはふつうモードではかくす(かんたんモードでは出す)
@@ -1314,18 +1319,33 @@ function warnLine(){ const A=myWarn(); if(!A.length) return `<div id="wxWarn"></
   const pf=prefNow(); const txt=String(top.text||"").replace(/^【[^】]*】/,"").replace(new RegExp("^"+pf+"(では|地方では)、?"),"").replace(new RegExp("^"+prefShort(pf)+"(県|都|府|地方)?(では)?、?"),"");
   if(top.lv===0) return `<div id="wxWarn"><div class="wx-info" role="button" tabindex="0" data-quake="1">${ic} <b>${esc(prefNow())}に${esc(nm)}</b> ${esc(txt)} <span class="hint">気象庁発表</span></div></div>`;
   return `<div id="wxWarn"><div class="wx-warn ${top.lv>=2?"sp":""}" role="button" tabindex="0" data-quake="1"><b>${ic} ${esc(prefNow())}に${esc(nm)}が出ています</b><small>${esc(txt)}</small><small class="hint">気象庁発表 ・ タップでくわしく</small></div></div>`; }
+// たたんでいるときの1行(傘＋持ち物を2つまで)
+function wxSumLine(){ const w=D.weather||{}; const bits=[];
+  if(w.umbrella) bits.push(["☔",w.umbrella]);
+  kitItems().slice(0,2).forEach(x=>bits.push(x));
+  if(!bits.length) bits.push(["👕",w.wear||"ふつうの服で"]);
+  return `<div class="wx-sum">${bits.map(([i,t])=>`<span class="kit"><i aria-hidden="true">${i}</i>${esc(t)}</span>`).join("")}</div>`; }
+// 天気カードは1行にたたむ。自動で開くのは「わたしの街に気象庁の警報(lv1以上)」が出ているときだけ。
+// ニュースの「気をつけること」は全国の話も入るので、ここでは開く理由にしない(たたんでいても下に出す)
+function wxMust(){ let lv=-1; try{ lv=Math.max(-1,...myWarn().map(x=>+x.lv)); }catch(_){} return lv>=1; }
 function weatherCard(){
   const w=D.weather; const lab=relDay(w.iso); const notes=w.notes||[]; const severe=notes.some(n=>/警報|台風|大雨|暴風|大雪|猛暑|熱中症/.test(n));
-  return `<section class="card wx" aria-label="天気">
+  const must=wxMust(); const open=must||LOOK.wxOpen===true;
+  return `<section class="card wx${open?" open":""}" id="wxCard" aria-label="天気">
     <div class="wx-top"><span class="wx-ic" aria-hidden="true">${skyIcon(w.sky)}</span>
       <div class="wx-main"><div class="wx-place">${esc(lab)}の${esc(w.place)}</div><div class="wx-sky">${esc(w.sky)}</div></div>
       <div class="wx-t num" aria-label="最高${w.hi}度 最低${w.lo}度"><b>${w.hi}°</b><span>${w.lo}°</span></div></div>
     ${warnLine()}
-    <div class="wx-um">☔ ${esc(w.umbrella)}</div>
-    ${kitLine()}
-    <div class="wx-rain">${w.rain.map(([t,p])=>`<span><small>${esc(t)}</small><b class="num">${p}%</b></span>`).join("")}<span class="wx-wear">👕 ${esc(w.wear)}</span></div>
-    ${notes.length?`<details class="wx-notes"${severe?" open":""}><summary>⚠️ 気をつけること(${notes.length})</summary>${notes.map(n=>`<div class="note">${esc(n)}</div>`).join("")}<div class="hint">出典: ${esc(w.source)}</div></details>`:`<div class="hint">出典: ${esc(w.source)}</div>`}
-    <div class="wx-strip" id="wxStrip" role="button" tabindex="0" data-wxh="1" aria-label="1時間ごとの天気を開く">${wxStripHTML()}</div>
+    ${open?"":wxSumLine()}
+    <div class="wx-more">
+      <div class="wx-um">☔ ${esc(w.umbrella)}</div>
+      ${kitLine()}
+      <div class="wx-rain">${w.rain.map(([t,p])=>`<span><small>${esc(t)}</small><b class="num">${p}%</b></span>`).join("")}<span class="wx-wear">👕 ${esc(w.wear)}</span></div>
+      ${notes.length?"":`<div class="hint">出典: ${esc(w.source)}</div>`}
+      <div class="wx-strip" id="wxStrip" role="button" tabindex="0" data-wxh="1" aria-label="1時間ごとの天気を開く">${wxStripHTML()}</div>
+    </div>
+    ${notes.length?`<details class="wx-notes"${severe?" open":""}><summary>⚠️ 気をつけること(${notes.length})</summary>${notes.map(n=>`<div class="note">${esc(n)}</div>`).join("")}<div class="hint">出典: ${esc(w.source)}</div></details>`:""}
+    ${must?"":`<button class="fchip wx-tg" data-wxtg="1" aria-expanded="${open?"true":"false"}" aria-controls="wxCard">${open?"▲ とじる":"▼ くわしく"}</button>`}
     <div class="wx-btns"><button class="fchip" data-wxh="1">🕐 1時間ごと</button><button class="fchip" data-wxmap="1">🗾 全国の天気</button><button class="fchip qk-open" data-quake="1">🌏 地震・警報${qkLatestLabel()}</button></div>
   </section>`;
 }
@@ -1348,8 +1368,8 @@ function renderToday(){
       <button class="fchip" id="shareImg" style="margin-top:10px">🖼️ 画像にして送る</button>
     </section>`;
   S.ten=`<section aria-label="今日のニュース10">
-      <div class="sec-h"><h2>📰 今日のニュース10</h2><span class="seg len-seg" role="group" aria-label="長さ">${[["short","短く"],["full","くわしく"]].map(([k,l])=>`<button data-len="${k}" aria-pressed="${(LOOK.len||"full")===k}">${l}</button>`).join("")}</span></div>
-      <ol class="ten${(LOOK.len||"full")==="short"?" short":""}" style="margin-top:10px">${t.map((n,i)=>{
+      <div class="sec-h"><h2>📰 今日のニュース10</h2><span class="seg len-seg" role="group" aria-label="長さ">${[["short","短く"],["full","くわしく"]].map(([k,l])=>`<button data-len="${k}" aria-pressed="${(LOOK.len||"short")===k}">${l}</button>`).join("")}</span></div>
+      <ol class="ten${(LOOK.len||"short")==="short"?" short":""}" style="margin-top:10px">${t.map((n,i)=>{
         const big=i<3; const link=n.ex||n.tab; const wt=newsWeight(n); const mine=isLocal(n.title+" "+(n.text||""));
         return `<li class="${big?'big':''} w${wt.lv}${mine?' mytown':''}">${pinBtn({k:"t|"+n.title,h:n.title,g:n.g,d:(NEWS[0]||{}).d,ex:n.ex},"abs")}<button class="row${link?' link':''}"${n.ex?` data-ex="${n.ex}"`:''}${n.tab?` data-tab="${n.tab}"`:''} ${link?'':'tabindex="-1"'}>
           <span class="rank">${i+1}</span>
@@ -3088,6 +3108,10 @@ function englishCard(){ if(!EN) return ""; const W=[]; (EN.top10||[]).forEach((e
     <ul class="enlist">${W.map(([a,b,t])=>`<li><span><b lang="en">${esc(a)}</b> = ${esc(b)}<small class="hint" style="display:block">${esc(t||"")}</small></span><button class="fchip" data-say="${esc(a)}">🔊</button></li>`).join("")}</ul></section>`; }
 // ===== お知らせ(新しくなったところ)。機能を足したら、いちばん上に1つ足す =====
 const UPDATES=[
+  {id:"2026-10-21f",d:"2026-10-21",t:"📰「きょう」がスッキリしました",L:[
+    "ニュース10は、はじめは見出しだけの「短く」になりました。見出しの右の「くわしく」でいつでも元にもどせます",
+    "天気は1行にたたみました。「▼ くわしく」で、次の6時間・持ち物・グラフが開きます。わたしの街に気象庁の警報が出ている日は、はじめから開いています",
+    "ことばカードが大きくなって、裏の説明が最後まで読めるようになりました"]},
   {id:"2026-10-21e",d:"2026-10-21",t:"🎒 持ち物・⚠️わたしの街の警報・💬話しながら読む など",L:[
     "天気に「🎒 きょうの持ち物」(傘・はおるもの・水分など)と、「⚠️ わたしの街への気象庁のよびかけ」が出るようになりました",
     "大きな地震や警報のときは「🆘 こまったときは」(まずすること・公式リンク)が開けます",
@@ -3464,6 +3488,10 @@ function openWxMap(day){ const M=AL.wxmap; const sh=document.getElementById("she
     box.innerHTML=`<svg viewBox="0 0 ${W} ${H}" width="100%" height="auto" preserveAspectRatio="xMidYMid meet" role="img" aria-label="全国の天気の地図">${jp.map(f=>`<path d="${path(f)}" class="wm-land"/>`).join("")}${lab}</svg>`;
   }).catch(()=>{ const box=document.getElementById("wxMapBox"); if(box) box.innerHTML='<div class="empty">地図を読み込めませんでした。下の一覧を見てください。</div>'; }); }
 document.addEventListener("click",ev=>{ if(ev.target.closest("[data-wxmap]")) openWxMap(0); });
+document.addEventListener("click",ev=>{ const t=ev.target.closest("[data-wxtg]"); if(!t) return;
+  ev.preventDefault(); ev.stopPropagation(); LOOK.wxOpen=!(LOOK.wxOpen===true); saveLook();
+  const c=document.getElementById("wxCard"); if(c){ c.outerHTML=weatherCard();
+    if(!LOOK.wxOpen){ const n=document.getElementById("wxCard"); if(n) n.scrollIntoView({block:"nearest"}); } } });
 function openWx(day){ const R=wxRows(); const sh=document.getElementById("sheet");
   const ni0=R.length?wxNowIdx(R):0; const days=[...new Set(R.slice(ni0).map(r=>r.iso))]; const d=day||(R[ni0]&&R[ni0].iso)||days[0]||TODAY; const L=R.filter(r=>r.iso===d); const ni=wxNowIdx(R); const nowR=R[ni];
   const mx=L.length?L.reduce((a,b)=>b.temp>a.temp?b:a):null, mn=L.length?L.reduce((a,b)=>b.temp<a.temp?b:a):null; const rainy=L.filter(r=>(r.pop||0)>=50);
@@ -3516,9 +3544,10 @@ async function loadAlerts(){
   qs.forEach(q=>{ const t=Date.parse(q.at); if(isNaN(t)) return; const m=merged.find(o=>Math.abs(Date.parse(o.at)-t)<150000&&(o.place===q.place||o.place==="調査中"||q.place==="調査中"));
     if(!m) merged.push(Object.assign({},q)); else { if(qr(q.maxi)>qr(m.maxi)) m.maxi=q.maxi; if(!m.mag&&q.mag) m.mag=q.mag; if(m.place==="調査中"&&q.place!=="調査中") m.place=q.place; if(m.depth==null&&q.depth!=null) m.depth=q.depth; } });
   AL.quakes=merged.filter(q=>Date.now()-Date.parse(q.at)<3*864e5).slice(0,15); AL.tsunami=ts; AL.special=special; AL.ok=!!(a||p);
-  drawAlertBand(); if(wxPlace()) await loadWxLocal(); const wsx=document.getElementById("wxStrip"); if(wsx) wsx.innerHTML=wxStripHTML();
-  const wwn=document.getElementById("wxWarn"); if(wwn) wwn.outerHTML=warnLine();
-  const wkt=document.querySelector(".wx-kit"); if(wkt) wkt.outerHTML=kitLine(); const b=document.querySelector("[data-quake] .qk-last"); if(b) b.outerHTML=qkLatestLabel();
+  drawAlertBand(); if(wxPlace()) await loadWxLocal();
+  // 天気カードはまるごと作り直す(よびかけ・持ち物・次の6時間・自動で開くかを、まとめてそろえる)
+  const wxc=document.getElementById("wxCard"); if(wxc) wxc.outerHTML=weatherCard();
+  const b=document.querySelector("[data-quake] .qk-last"); if(b) b.outerHTML=qkLatestLabel();
   const sh=document.getElementById("sheet"); if(sh&&!sh.hidden&&document.getElementById("qkx")) openQuake(true); }
 function qhm(at){ const d=new Date(Date.parse(at)+9*36e5); return `${d.getUTCMonth()+1}/${d.getUTCDate()} ${d.getUTCHours()}:${String(d.getUTCMinutes()).padStart(2,"0")}`; }
 function qago(at){ const m=Math.round((Date.now()-Date.parse(at))/6e4); return m<1?"いま":m<60?`${m}分前`:m<24*60?`${Math.floor(m/60)}時間前`:`${Math.floor(m/1440)}日前`; }
