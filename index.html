@@ -1464,22 +1464,26 @@ function pickGenres(){ if(!PK||!PK.g) return []; const has=Object.keys(PK.g).fil
   const mine=base.slice().sort((a,b)=>interestScore(b)-interestScore(a));
   return mine; }
 function picksCard(){ if(!PK||!PK.g) return ""; const all=GORDER.slice();
-  const mine=pickGenres(); const sel=ME.pickSel&&all.includes(ME.pickSel)?ME.pickSel:(mine[0]||all[0]); const G=PK.g[sel]||{ttl:GN[sel],items:[]};
+  // 💗 好きなこと(PK.t)のおすすめを先に。キーは "t:野球のキー" の形で ME.pickSel に入れる
+  const myT=myTopics(); const tKey=x=>String(x||"").startsWith("t:")?x.slice(2):null;
+  const mine=pickGenres(); let sel=ME.pickSel; if(!(tKey(sel)&&myT.includes(tKey(sel)))&&!all.includes(sel)) sel=myT.length?"t:"+myT[0]:(mine[0]||all[0]);
+  const tk=tKey(sel); const TT=tk?TOPIC[tk]:null;
+  const G=tk?Object.assign({items:[]},(PK.t||{})[tk],{ttl:`💗 ${TT[2]}のおすすめ`}):(PK.g[sel]||{ttl:GN[sel],items:[]}); const gcls=tk?TT[3]:sel; const selName=tk?TT[2]:GN[sel];
   const tabs=(mine.length?mine:all).concat(ME.pickAll?all.filter(g=>!mine.includes(g)):[]);
   return `<section class="card picks" aria-label="ジャンル別おすすめ"><div class="sec-h"><h2>🎁 ジャンル別おすすめ</h2><span class="sub">週2回更新</span></div>
     ${mine.length?"":`<p class="hint" style="margin:4px 0 6px">下の「✏️ 気になるジャンルを選ぶ」で選ぶと、そのジャンルのおすすめが並びます。</p>`}
-    <div class="chips pk-tabs">${[...new Set(tabs)].map(g=>`<button class="fchip" data-pk="${g}" aria-pressed="${g===sel}"><span class="c" style="background:var(--g-${g})"></span>${GN[g]}</button>`).join("")}${!ME.pickAll&&all.some(g=>!mine.includes(g))&&mine.length?`<button class="fchip" id="pkAll">＋ ほかのジャンル</button>`:""}</div>
-    <h3 class="pk-ttl">${esc(G.ttl||GN[sel])}</h3>
-    ${(G.items||[]).length?"":`<p class="pk-empty">「${esc(GN[sel])}」のおすすめは、いま準備中です。次の更新(${esc(PK.next||"月・木の朝")})から並びます。</p>`}
-    <ul class="pk-list">${(G.items||[]).map(x=>`<li><span class="pk-k chip ${sel}">${esc(x.k)}</span><b class="pk-n">${esc(x.n)}</b>${x.d?`<span class="pk-d">🗓️ ${esc(x.d)}</span>`:""}<p>${esc(x.t)}</p>${x.src?`<small class="hint">出典: ${esc(x.src)}</small>`:""}</li>`).join("")}</ul>
+    <div class="chips pk-tabs">${myT.map(k=>`<button class="fchip" data-pk="t:${k}" aria-pressed="${sel==="t:"+k}">💗 ${esc(TOPIC[k][2])}</button>`).join("")}${[...new Set(tabs)].map(g=>`<button class="fchip" data-pk="${g}" aria-pressed="${g===sel}"><span class="c" style="background:var(--g-${g})"></span>${GN[g]}</button>`).join("")}${!ME.pickAll&&all.some(g=>!mine.includes(g))&&mine.length?`<button class="fchip" id="pkAll">＋ ほかのジャンル</button>`:""}</div>
+    <h3 class="pk-ttl">${esc(G.ttl||selName)}</h3>
+    ${(G.items||[]).length?"":`<p class="pk-empty">「${esc(selName)}」のおすすめは、いま準備中です。次の更新(${esc(PK.next||"月・木の朝")})から並びます。</p>`}
+    <ul class="pk-list">${(G.items||[]).map(x=>`<li><span class="pk-k chip ${gcls}">${esc(x.k)}</span><b class="pk-n">${esc(x.n)}</b>${x.d?`<span class="pk-d">🗓️ ${esc(x.d)}</span>`:""}<p>${esc(x.t)}</p>${x.src?`<small class="hint">出典: ${esc(x.src)}</small>`:""}</li>`).join("")}</ul>
     <div class="hint" style="margin-top:6px">次の更新: ${esc(PK.next||"")}。広告ではありません。複数の情報で日付などを確かめています。</div>
     <button class="fchip" id="pkEdit" style="margin-top:8px">${ME.pkEdit?"✓ できた":"✏️ 気になるジャンルを選ぶ"}</button>
-    ${ME.pkEdit?`<div class="pk-ed"><div class="hint">押すと「気になる」に入ったり外れたりします(マイ→⚙️設定 からも変えられます)。</div><div style="margin:6px 0">${recIntHTML()}</div><div class="chips">${GORDER.map(g=>`<button class="fchip" data-pki="${g}" aria-pressed="${!!ME.interests[g]}"><span class="c" style="background:var(--g-${g})"></span>${GN[g]}</button>`).join("")}</div></div>`:""}</section>`; }
+    ${ME.pkEdit?`<div class="pk-ed"><button class="tp-open" data-topics="1"><span aria-hidden="true">💗</span><span><b>好きなことで選ぶ</b><small>野球・料理・AI など ${TOPICS.length}こ から</small></span><span aria-hidden="true">→</span></button><div class="hint">押すと「気になる」に入ったり外れたりします(マイ→⚙️設定 からも変えられます)。</div><div style="margin:6px 0">${recIntHTML()}</div><div class="chips">${GORDER.map(g=>`<button class="fchip" data-pki="${g}" aria-pressed="${!!ME.interests[g]}"><span class="c" style="background:var(--g-${g})"></span>${GN[g]}</button>`).join("")}</div></div>`:""}</section>`; }
 function bindPicks(inSheet){ const c=document.querySelector(".picks"); if(!c) return; const re=()=>{ const x=document.querySelector(".picks"); if(x){ x.outerHTML=picksCard(); bindPicks(inSheet); } };
   const ed=c.querySelector("#pkEdit"); if(ed) ed.onclick=()=>{ ME.pkEdit=!ME.pkEdit; saveMe(); re(); };
   c.querySelectorAll("[data-recint]").forEach(b=>b.onclick=()=>{ applyRecInt(); re(); });
   c.querySelectorAll("[data-pki]").forEach(b=>b.onclick=()=>{ const g=b.dataset.pki; ME.interests[g]=!ME.interests[g]; if(ME.interests[g]) ME.pickSel=g; saveMe(); toast(ME.interests[g]?`🎯「${GN[g]}」を気になるジャンルに入れました`:`「${GN[g]}」を外しました`); re(); });
-  c.querySelectorAll("[data-pk]").forEach(b=>b.onclick=()=>{ ME.pickSel=b.dataset.pk; saveMe(); learn(b.dataset.pk,0.3); track("/picks/"+b.dataset.pk,"おすすめ: "+GN[b.dataset.pk]); re(); });
+  c.querySelectorAll("[data-pk]").forEach(b=>b.onclick=()=>{ const k=b.dataset.pk; ME.pickSel=k; saveMe(); if(!k.startsWith("t:")) learn(k,0.3); track("/picks/"+k,"おすすめ: "+(k.startsWith("t:")?(TOPIC[k.slice(2)]||[])[2]:GN[k])); re(); });
   const a=c.querySelector("#pkAll"); if(a) a.onclick=()=>{ ME.pickAll=1; saveMe(); re(); };
   c.querySelectorAll("[data-tab]").forEach(b=>b.onclick=()=>{ if(inSheet){ const sh=document.getElementById("sheet"); sh.hidden=true; sh.innerHTML=""; document.body.style.overflow=""; } go(b.dataset.tab); }); }
 
@@ -2712,8 +2716,9 @@ function forYou(){
   const bg=t=>{ const z=String(t).replace(/[\s、。「」『』()()・!?!?:：,.\-—…]/g,""); const S2=new Set(); for(let i=0;i<z.length-1;i++) S2.add(z.slice(i,i+2)); return S2; };
   const seen=[...D.top10.map(t=>bg(t.title)),...(D.three||[]).map(t=>bg(t.title))];
   const dup=h=>{ const a=bg(h); return seen.some(b=>{ let c=0; a.forEach(x=>{ if(b.has(x)) c++; }); return c/Math.max(1,Math.min(a.size,b.size))>=0.35; }); };
-  const sc=n=>interestScore(n.g)+(topicHit(n)?8:0);
-  const L=NEWS.filter(n=>days.includes(n.d) && sc(n)>0 && !topH.has(n.h) && !dup(n.h)).sort((a,b)=>sc(b)-sc(a) || b.ok-a.ok || b.d.localeCompare(a.d)).slice(0,6);
+  // 好きなこと(💗)は7日さかのぼって探す。ジャンルだけのものは2日分
+  const sc=n=>interestScore(n.g)+(topicHit(n)?8:0); const since7=new Date(Date.parse(TODAY)-6*864e5).toISOString().slice(0,10);
+  const L=NEWS.filter(n=>(days.includes(n.d)||(n.d>=since7&&topicHit(n))) && sc(n)>0 && !topH.has(n.h) && !dup(n.h)).sort((a,b)=>(sc(b)-sc(a)) || b.d.localeCompare(a.d) || b.ok-a.ok).slice(0,8);
   if(!L.length) return "";
   return `<section aria-label="あなた向け"><div class="sec-h"><h2>🎯 あなた向け</h2><button class="fchip" data-topics="1">💗 好きなことを変える</button></div>
     <ul class="ten fy" style="margin-top:10px">${L.map(n=>`<li>${pinBtn({k:nkey(n),h:n.h,g:n.g,d:n.d},"abs")}<div class="row"><span><span class="meta"><span class="chip ${n.g}">${GN[n.g]}</span>${topicChip(n)}${isNew(n)?'<span class="chip newchip">🆕</span>':''}${n.ok?'<span class="badge-ok">✅</span>':'<span class="badge-one">⚠️ 1社</span>'}<span class="hint">${mdLabel(n.d)}</span></span><h3>${esc(n.h)}</h3></span></div></li>`).join("")}</ul></section>`;
