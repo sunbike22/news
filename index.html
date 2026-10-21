@@ -639,15 +639,22 @@ details.faq p{margin:10px 0 12px}
 /* 💗 好きなこと */
 .tp-gh{margin:16px 0 8px;font-size:1.02rem}
 .tp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:8px}
-.tp{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-height:84px;padding:10px 6px;border-radius:16px;border:2px solid var(--line);background:var(--surface);color:var(--ink);font:inherit;cursor:pointer;text-align:center}
+.tpk{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-height:84px;padding:10px 6px;border-radius:16px;border:2px solid var(--line);background:var(--surface);color:var(--ink);font:inherit;cursor:pointer;text-align:center}
 .tp-i{font-size:1.8rem;line-height:1} .tp-n{font-size:.88rem;font-weight:700;line-height:1.3}
-.tp[aria-pressed="true"]{border-color:#e5484d;background:color-mix(in srgb,#e5484d 12%,var(--surface))}
-.tp[aria-pressed="true"]::after{content:"💗";position:absolute;top:4px;right:6px;font-size:.9rem}
+.tpk[aria-pressed="true"]{border-color:#e5484d;background:color-mix(in srgb,#e5484d 12%,var(--surface))}
+.tpk[aria-pressed="true"]::after{content:"💗";position:absolute;top:4px;right:6px;font-size:.9rem}
 .tp-bar{position:sticky;bottom:0;display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:16px;padding:10px 0 calc(10px + env(safe-area-inset-bottom,0px));background:var(--bg);border-top:1px solid var(--line)}
 .tp-bar .fchip{min-height:48px;font-size:1.05rem;padding:0 22px}
 .tp-open{display:flex;align-items:center;gap:10px;width:100%;text-align:left;font:inherit;color:var(--ink);background:var(--bg);border:2px dashed var(--line);border-radius:14px;padding:10px 12px;margin-bottom:10px;cursor:pointer}
 .tp-open>span:first-child{font-size:1.5rem} .tp-open small{display:block;color:var(--muted);font-size:.85rem;margin-top:2px} .tp-open>span:nth-child(2){flex:1}
 .chip.tpchip{background:color-mix(in srgb,#e5484d 14%,var(--surface));color:var(--ink)}
+.ten-ft{display:flex;align-items:center;gap:8px;margin-top:6px;min-height:32px}
+.ten-ft .more{margin:0}
+.th-cr summary{cursor:pointer}
+:root[data-mode="easy"] .me-strip{display:none}
+.ob-tp{grid-template-columns:repeat(3,1fr);gap:6px}
+.ob-tp .tpk{min-height:68px;padding:6px 4px;border-radius:12px} .ob-tp .tp-i{font-size:1.5rem}
+.wx-notes .hint{font-size:.82rem;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .pop b{font-size:1.05rem}
 /* かんたんモード: 押すところは44px以上(指が太くても押しやすく) */
 :root[data-mode="easy"] .fchip,:root[data-mode="easy"] .iconbtn,:root[data-mode="easy"] .seg button{min-height:44px}
@@ -1528,7 +1535,7 @@ function contItems(){ if(!NEW_KEYS.size) return []; const nw=NEWS.filter(n=>NEW_
 function corrRecent(){ try{ const C=D.corrections||[]; const seen=store.get("nw-corr")||""; const y=TODAY.slice(0,4);
     return C.map(c=>({k:c[0]+"|"+String(c[1]).slice(0,12),d:y+"-"+String(c[0]).replace("/","-").split("-").map(x=>String(x).padStart(2,"0")).join("-"),t:c[1]}))
       .filter(c=>c.d>=new Date(Date.parse(TODAY)-4*864e5).toISOString().slice(0,10)&&!seen.includes(c.k)); }catch(_){ return []; } }
-function contCard(){ const L=contItems(); const C=corrRecent(); if(!L.length&&!C.length) return "";
+function contCard(){ const L=contItems(); const C=[]; /* 訂正は「きょう」には出さず、下の「✏️ 訂正の記録」にまとめる(2026-10-21) */ if(!L.length&&!C.length) return "";
   return `<section class="card cont" aria-label="つづきがあります"><b>🔔 つづきがあります</b><ul class="ct">${L.map((x,i)=>`<li><button class="ct-b" data-ct="${i}"><span>${x.i} ${esc(x.t)}</span><small>${esc(x.h)}</small></button></li>`).join("")}${C.slice(0,2).map(c=>`<li><button class="ct-b" data-corr="${esc(c.k)}"><span>✏️ 前の記録を直しました</span><small>${esc(c.t)}</small></button></li>`).join("")}</ul></section>`; }
 function quickCard(){ const w=D.weather; const kwN=kwList().reduce((a,k)=>a+NEWS.filter(n=>NEW_KEYS.has(nkey(n))&&(n.h+" "+(n.th||"")).includes(k)).length,0);
   const ws=weekStart(TODAY); const gl=GOALS.filter(g=>g[5](ws)<g[3]).length;
@@ -1624,9 +1631,9 @@ function renderToday(){
         const big=i<3; const link=n.ex||n.tab; const wt=newsWeight(n); const mine=isLocal(n.title+" "+(n.text||""));
         return `<li class="${big?'big':''} w${wt.lv}${mine?' mytown':''}">${pinBtn({k:"t|"+n.title,h:n.title,g:n.g,d:(NEWS[0]||{}).d,ex:n.ex},"abs")}<button class="row${link?' link':''}"${n.ex?` data-ex="${n.ex}"`:''}${n.tab?` data-tab="${n.tab}"`:''} ${link?'':'tabindex="-1"'}>
           <span class="rank">${i+1}</span>
-          <span>${big&&ILL[n.ill||n.ex]?`<div class="ill">${ILL[n.ill||n.ex]}</div>`:""}<span class="meta"><span class="chip ${n.g}">${GN[n.g]}</span>${n.ok?`<span class="badge-ok tap" role="button" tabindex="0" data-trust="${esc(n.title)}" data-ok="1" title="タップで出典">✅<small style="font-size:.82rem;font-weight:700;margin-left:2px">確認ずみ</small></span>`:`<span class="badge-one tap" role="button" tabindex="0" data-trust="${esc(n.title)}" data-ok="0" title="タップでわけ">⚠️ 1社</span>`}${mine?'<span class="heat town">🏠 あなたの街</span>':""}${wt.lv>=2?`<span class="heat" title="この3日で関連ニュース${wt.n}件">🔥</span>`:""}<span class="sh-btn" role="button" tabindex="0" data-share="t:${i}" aria-label="このニュースを送る">📤 送る</span></span>
+          <span>${big&&ILL[n.ill||n.ex]?`<div class="ill">${ILL[n.ill||n.ex]}</div>`:""}<span class="meta"><span class="chip ${n.g}">${GN[n.g]}</span>${topicChip(n)}${n.ok?`<span class="badge-ok tap" role="button" tabindex="0" data-trust="${esc(n.title)}" data-ok="1" title="タップで出典">✅<small style="font-size:.82rem;font-weight:700;margin-left:2px">確認ずみ</small></span>`:`<span class="badge-one tap" role="button" tabindex="0" data-trust="${esc(n.title)}" data-ok="0" title="タップでわけ">⚠️ 1社</span>`}${mine?'<span class="heat town">🏠 あなたの街</span>':""}${wt.lv>=2?`<span class="heat" title="この3日で関連ニュース${wt.n}件">🔥</span>`:""}</span>
           ${(()=>{ const e=enOf("top10",i); if(langMode()==="en"&&e) return `<h3 lang="en">${n.icon} ${esc(e.t)}</h3>${e.x?`<p lang="en">${esc(e.x)}</p>`:""}<p class="jsub">${esc(n.title)}</p>${(e.w||[]).length?`<span class="enw">${e.w.map(([a,b])=>`<i>📘 ${esc(a)} = ${esc(b)}</i>`).join("")}</span>`:""}<span class="ensay" role="button" tabindex="0" data-say="${esc(e.t+". "+(e.x||""))}">🔊 English</span>`; return `<h3>${n.icon} ${esc(n.title)}</h3>${n.text?`<p>${esc(n.text)}</p>`:""}${enBlock(e)}`; })()}
-          ${srcLine(n)}${link?`<span class="more">${n.ex?'くわしい解説 →':'グラフを見る →'}</span>`:''}</span>${thumbHTML(n)}</button>${n.point?`<details class="pt"><summary>💭 ここがポイント</summary>${esc(n.point)}</details>`:""}</li>`;}).join("")}</ol>
+          ${srcLine(n)}<span class="ten-ft">${link?`<span class="more">${n.ex?'くわしい解説 →':'グラフを見る →'}</span>`:''}<span class="sh-btn" role="button" tabindex="0" data-share="t:${i}" aria-label="このニュースを送る">📤 送る</span></span></span>${thumbHTML(n)}</button>${n.point?`<details class="pt"><summary>💭 ここがポイント</summary>${esc(n.point)}</details>`:""}</li>`;}).join("")}</ol>
       ${thumbCredit(t)}
     </section>`;
   S.mood=moodCard();
@@ -2585,6 +2592,7 @@ const TOPIC_GROUPS=[
   ["mideast","🕌","中東","intl","中東|イスラエル|イラン|ガザ|サウジ|イエメン|パレスチナ|ホルムズ"],
   ["defense","🛡️","安全保障・平和","intl","防衛|安全保障|自衛隊|ミサイル|核兵器|停戦|平和|紛争"],
   ["trade","🚢","貿易・世界の経済","eco","関税|貿易|輸出|輸入|サプライチェーン|G7|G20|WTO|IMF"]]]];
+const OB_TOPICS=["money","health","bosai","cook","sweets","pet","travel","anime","movie","music","game","baseball","soccer","ai","gadget","space","politics","asia"];
 const TOPICS=TOPIC_GROUPS.flatMap(g=>g[1]); const TOPIC=Object.fromEntries(TOPICS.map(t=>[t[0],t]));
 const TOPIC_RE={}; TOPICS.forEach(t=>{ try{ TOPIC_RE[t[0]]=new RegExp(t[4]); }catch(_){} });
 function myTopics(){ ME.topics=ME.topics||{}; return Object.keys(ME.topics).filter(k=>ME.topics[k]&&TOPIC[k]); }
@@ -2596,7 +2604,7 @@ function openTopics(){ const sh=document.getElementById("sheet"); ME.topics=ME.t
   sh.innerHTML=`<div class="bar"><div class="wrap"><button class="iconbtn" id="tpx" aria-label="もどる">← もどる</button><span class="ttl">💗 好きなことを選ぶ</span></div></div><div class="wrap body">
     <p class="obp" style="margin-top:0">好きなことを、いくつでも押してください。<b>押すと💗がつきます</b>。もう一度押すと外れます。</p>
     <p class="hint" style="margin-top:-4px">選んだことに関係するニュースが「🎯 あなた向け」に先に並び、💗の札がつきます。記録はこのスマホの中だけです。</p>
-    ${TOPIC_GROUPS.map(([gn,L])=>`<h3 class="tp-gh">${esc(gn)}</h3><div class="tp-grid">${L.map(t=>`<button class="tp" data-tp="${t[0]}" aria-pressed="${!!sel[t[0]]}"><span class="tp-i" aria-hidden="true">${t[1]}</span><span class="tp-n">${esc(t[2])}</span></button>`).join("")}</div>`).join("")}
+    ${TOPIC_GROUPS.map(([gn,L])=>`<h3 class="tp-gh">${esc(gn)}</h3><div class="tp-grid">${L.map(t=>`<button class="tpk" data-tp="${t[0]}" aria-pressed="${!!sel[t[0]]}"><span class="tp-i" aria-hidden="true">${t[1]}</span><span class="tp-n">${esc(t[2])}</span></button>`).join("")}</div>`).join("")}
     <div class="tp-bar"><span id="tpCnt">${cnt()}こ 選んでいます</span><button class="fchip pet-feed" id="tpSave">これで決める</button></div></div>`;
   sh.hidden=false; sh.scrollTop=0; document.body.style.overflow="hidden";
   const close=()=>{ sh.hidden=true; sh.innerHTML=""; document.body.style.overflow=""; };
@@ -3217,6 +3225,10 @@ function onboard(force){ if(!force && (store.get("nw-onboard")==="1" || ME.days.
   const steps=[
     {t:"ようこそ!",pet:"newsboy",h:()=>`<p class="obp">毎日のニュースを、やさしい言葉でまとめたアプリです。<br><b>使いやすい方を選んでください。</b>(あとで「設定」から変えられます)</p>
       <div class="mode-cards">${[["easy","🔰","かんたん(おすすめ)","文字が大きく、天気・ニュース・聞くボタンだけ"],["normal","📱","ふつう(なれている人向け)","ペットやクイズなど、ぜんぶの機能"]].map(([k,i,n,d])=>`<button class="mode-c" data-obm="${k}" aria-pressed="${LOOK.mode===k}"><span class="mi">${i}</span><b>${n}</b><small>${d}</small></button>`).join("")}</div>`},
+    {t:"好きなことを選んでね",pet:"newsboy",h:()=>{ ME.topics=ME.topics||{}; const n=myTopics().length;
+      return `<p class="obp">気になることを押してください(いくつでも)。<b>選んだことのニュースには 💗 がつきます。</b>選ばなくても使えます。</p>
+      <div class="tp-grid ob-tp">${OB_TOPICS.map(k=>TOPIC[k]).filter(Boolean).map(t=>`<button class="tpk" data-obtp="${t[0]}" aria-pressed="${!!ME.topics[t[0]]}"><span class="tp-i" aria-hidden="true">${t[1]}</span><span class="tp-n">${esc(t[2])}</span></button>`).join("")}</div>
+      <p class="obp hint" id="obTpN" style="margin-top:10px">${n?`💗 ${n}こ 選んでいます。`:""}ぜんぶで ${TOPICS.length}こ あります。あとで マイ→⚙️設定 の「💗 好きなこと」で足せます。</p>`; }},
     {t:"画面の見かた",pet:"professor",h:()=>mock()+legend()},
     {t:"こまったときは",pet:"detective",h:()=>`<ul class="obh">
       <li><span class="obk">← もどる</span><span>左上のボタンで、前の画面にもどります</span></li>
@@ -3229,10 +3241,12 @@ function onboard(force){ if(!force && (store.get("nw-onboard")==="1" || ME.days.
     ov.innerHTML=`<div class="ob-card"><div class="ob-step">${i+1} / ${V.length}</div><div class="ob-pet">${petSVG(Math.max(1,petStage().i),"happy",null,i===1?64:88,st.pet)}</div><h2>${esc(st.t)}</h2>${st.h()}
       <div class="ob-bt">${i>0?`<button class="fchip" id="obBack">← もどる</button>`:`<button class="fchip" id="obSkip">とばす</button>`}<button class="fchip pet-feed ob-next" id="obNext">${last?"はじめる!":"つぎへ →"}</button></div></div>`;
     ov.querySelectorAll("[data-obm]").forEach(b=>b.onclick=()=>{ setMode(b.dataset.obm); go("today"); draw(); });
+    ov.querySelectorAll("[data-obtp]").forEach(b=>b.onclick=()=>{ const k=b.dataset.obtp; ME.topics=ME.topics||{}; if(ME.topics[k]) delete ME.topics[k]; else ME.topics[k]=true; saveMe(); b.setAttribute("aria-pressed",String(!!ME.topics[k]));
+      const el=ov.querySelector("#obTpN"); if(el) el.textContent=`${myTopics().length?`💗 ${myTopics().length}こ 選んでいます。`:""}ぜんぶで ${TOPICS.length}こ あります。あとで マイ→⚙️設定 の「💗 好きなこと」で足せます。`; });
     ov.querySelector("#obNext").onclick=()=>{ if(!last){ i++; draw(); } else done(); };
     const bk=ov.querySelector("#obBack"); if(bk) bk.onclick=()=>{ i--; draw(); }; const sk=ov.querySelector("#obSkip"); if(sk) sk.onclick=done;
-    ov.querySelector("#obNext").focus(); };
-  const done=()=>{ store.set("nw-onboard","1"); ov.remove(); go(current||"today"); };
+    ov.querySelector("#obNext").focus({preventScroll:true}); const cd=ov.querySelector(".ob-card"); if(cd) cd.scrollTop=0; };
+  const done=()=>{ store.set("nw-onboard","1"); ov.remove(); go(current||"today"); if(myTopics().length) setTimeout(()=>toast(`💗 好きなことのニュースに 💗 をつけます(${myTopics().length}こ)`),600); };
   document.querySelectorAll(".toast").forEach(t=>t.remove()); document.body.appendChild(ov); draw(); }
 // ===== よむまる記者・ガチャ・わたしの街・ことばの感想・ニュースの重さ・すごろく =====
 function cardComment(w,g){ const st=petStage().i; if(st<2) return ""; const r=seeded("cc"+w); const C={pol:["国会って、むずかしいけど大事!","みんなで決めるって、たいへんだね"],eco:["お金の話は、くらしにひびくね","ぼくのごはん代にも関係ある?"],it:["パスワード、ちゃんと変えてる?","AIって、ぼくのなかま?"],intl:["世界はつながってるんだね","いつか行ってみたいな"],spo:["ぼくも走るの、すきだよ!","すごい記録だね!"],sci:["ふしぎがわかると、たのしいね","からだも大事にしようね"],soc:["みんな気をつけてね","ニュースで知れてよかった"],ent:["見てみたいな!","わくわくするね"]}[g]||["このことば、もう覚えたよ!","また出てきたら、すぐわかるね"]; return C[Math.floor(r()*C.length)]; }
@@ -3645,8 +3659,12 @@ function funGrid(){ const L=FUN.filter(f=>(FUN_SET[f[0]]||FUN_ALWAYS.includes(f[
     ${hid?`<button class="fchip" id="funMore" data-hid="${hid}" aria-expanded="${funOpen?"true":"false"}" style="margin-top:8px">${funOpen?"▲ とじる":`… ほか ${hid}こ を見る`}</button>`:""}</section>`; }
 // ===== お知らせ(新しくなったところ)。機能を足したら、いちばん上に1つ足す =====
 const UPDATES=[
+  {id:"2026-10-21o",d:"2026-10-21",t:"💗 はじめに好きなことを選べるように・画面を整理",L:[
+    "はじめて開いたときの案内で、好きなこと(野球・料理・AI など)を選べます。選んだことのニュースには、ニュース10でも 💗 がつきます",
+    "ニュース10の「📤 送る」を下の行に移して、見出しを広く読めるようにしました。写真の撮影者は「📷」を押すと出ます",
+    "「きょう」から、前の記録の訂正のお知らせを外しました(いちばん下の「✏️ 訂正の記録」で見られます)"]},
   {id:"2026-10-21n",d:"2026-10-21",t:"💗 好きなことを こまかく選べるように",L:[
-    "野球・アニメ・料理・宇宙・AI・ペット・鉄道・美容・中東 など、55こ の中から「好きなこと」を選べます(マイ→⚙️設定 の「気になるジャンル」、または「🎯 あなた向け」の「💗 好きなことを変える」)",
+    "野球・アニメ・料理・宇宙・AI・ペット・鉄道・美容・中東 など、58こ の中から「好きなこと」を選べます(マイ→⚙️設定 の「気になるジャンル」、または「🎯 あなた向け」の「💗 好きなことを変える」)",
     "選んだことに関係するニュースが「🎯 あなた向け」に先に並び、💗の札がつきます"]},
   {id:"2026-10-21m",d:"2026-10-21",t:"🗺️ 防災マップ・モードの切りかえを見やすく",L:[
     "「🛟 地震・防災」に🗺️ 防災マップ。雨雲・川があふれたら水につかる所・津波・高潮・がけ崩れの所・近くのにげる場所を、ほかのサイトに行かずにこのアプリの中で見られます。「📍 いまいる所で見る」も(場所はどこにも送りません)",
@@ -4135,9 +4153,9 @@ function thumbOf(n){ if(n.ex&&PHOTOS[n.ex]) return {u:PHOTOS[n.ex][0].replace(/\
   const p=k&&TH[k]; return p?{u:"https://images.unsplash.com/photo-"+p[0],by:p[1]}:null; }
 function thumbHTML(n){ if(!thumbOn()) return ""; const p=thumbOf(n);
   if(!p) return `<span class="th th-e" aria-hidden="true" style="--c:var(--g-${n.g});--cs:var(--g-${n.g}-s)">${n.icon||"📰"}</span>`;
-  return `<span class="th"><img src="${p.u}?w=176&h=176&fit=crop&q=60&auto=format" alt="" loading="lazy" decoding="async" width="88" height="88" onerror="this.parentNode.classList.add('th-x');this.remove()"></span>`; }
+  return `<span class="th"><img src="${p.u}?w=176&h=176&fit=crop&q=60&auto=format" alt="" loading="lazy" decoding="async" width="88" height="88" onerror="this.parentNode.remove()"></span>`; }
 function thumbCredit(list){ if(!thumbOn()) return ""; const by=[...new Set(list.map(thumbOf).filter(Boolean).map(p=>p.by))]; if(!by.length) return "";
-  return `<p class="th-cr">📷 写真はイメージです(ニュースの現場の写真ではありません)。撮影: ${by.map(esc).join("・")} / <a href="https://unsplash.com/?utm_source=mainichi_news&utm_medium=referral" target="_blank" rel="noopener">Unsplash</a></p>`; }
+  return `<details class="th-cr"><summary>📷 写真はイメージです(ニュースの現場の写真ではありません)</summary>撮影: ${by.map(esc).join("・")} / <a href="https://unsplash.com/?utm_source=mainichi_news&utm_medium=referral" target="_blank" rel="noopener">Unsplash</a></details>`; }
 function photoBlock(k){ const p=PHOTOS[k]; if(!p) return ""; return `<figure class="photo"><img src="${p[0]}" alt="" loading="lazy" onerror="this.closest('figure').remove()"><figcaption>📷 イメージ写真: ${esc(p[1])} / <a href="https://unsplash.com/?utm_source=mainichi_news&utm_medium=referral" target="_blank" rel="noopener">Unsplash</a></figcaption></figure>`; }
 
 // ===== 解説の読み上げ =====
