@@ -255,6 +255,30 @@ def wxmap_fetch(prev_m):
         out.append([name, la, lo, days, c.get("temperature_2m"), c.get("weather_code")])
     return {"at": iso(NOW), "dates": L[0]["daily"]["time"][:2], "cities": out}
 
+
+# ---------- 雨雲の動き(気象庁のナウキャスト)の時刻 ----------
+# アプリは地図のタイル画像を直接読む。ここでは「どの時刻の画像があるか」だけを入れる(5分ごとに増える)。
+def radar_fetch():
+    def jl(u):
+        req = urllib.request.Request(u, headers={"User-Agent": UA, "Origin": "https://sunbike22.github.io"})
+        with urllib.request.urlopen(req, timeout=20) as r:
+            return json.loads(r.read().decode()), r.headers.get("Access-Control-Allow-Origin")
+    n1, cors = jl("https://www.jma.go.jp/bosai/jmatile/data/nowc/targetTimes_N1.json")
+    n2, _ = jl("https://www.jma.go.jp/bosai/jmatile/data/nowc/targetTimes_N2.json")
+    past = sorted({(x["basetime"], x["validtime"]) for x in n1 if x.get("basetime") == x.get("validtime")})[-12:]
+    fut = sorted({(x["basetime"], x["validtime"]) for x in n2 if x.get("validtime", "") > x.get("basetime", "")})[:12]
+    probe = {"cors_json": cors}
+    if past:
+        b, v = past[-1]
+        u = f"https://www.jma.go.jp/bosai/jmatile/data/nowc/{b}/none/{v}/surf/hrpns/6/56/25.png"
+        try:
+            req = urllib.request.Request(u, headers={"User-Agent": UA, "Origin": "https://sunbike22.github.io"})
+            with urllib.request.urlopen(req, timeout=20) as r:
+                probe["tile"] = r.status; probe["cors_tile"] = r.headers.get("Access-Control-Allow-Origin"); probe["type"] = r.headers.get("Content-Type")
+        except Exception as e:  # noqa: BLE001
+            probe["tile"] = f"{type(e).__name__}: {e}"[:120]
+    return {"at": iso(NOW), "past": [list(x) for x in past], "fut": [list(x) for x in fut], "probe": probe}
+
 # ---------- 前回分と通知 ----------
 prev = {}
 try:
@@ -312,8 +336,15 @@ try:
     wxm = wxmap_fetch(prev.get("wxmap"))
 except Exception as e:  # noqa: BLE001
     errors["wxmap"] = f"{type(e).__name__}: {e}"[:200]
+radar = None
+try:
+    radar = radar_fetch()
+except Exception as e:  # noqa: BLE001
+    errors["radar"] = f"{type(e).__name__}: {e}"[:200]
 out = {"quakes": quakes, "qsrc": qsrc, "tsunami": tsunami, "special": special, "warn": warn, "sent": sent, "wx": wx, "wxmap": wxm}
 same = {k: prev.get(k) for k in out} == out
+# 雨雲は5分ごとに新しくなるので、変わったかどうかの判定には入れない(書くときは入れる)
+out["radar"] = radar or prev.get("radar")
 out["checked"] = iso(NOW)
 out["updated"] = prev.get("updated") if same and prev.get("updated") else iso(NOW)
 if errors:
