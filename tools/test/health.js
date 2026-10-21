@@ -45,7 +45,7 @@ for(const [mode,dark,w] of [["normal",false,390],["normal",true,390],["easy",fal
     for(const k of Object.keys(T.PET_KINDS)) for(let st=0;st<=5;st++) for(const m of ["happy","hungry","sulk"]) chk(T.petSVG(st,m,st>=3?"glasses":null,60,null,k),k+st+m);
     for(const w of T.WEAR) for(const k of Object.keys(T.PET_KINDS)) chk(T.petSVG(3,"happy",null,60,w[0],k),"wear:"+w[0]+k);
     return {bad,kinds:Object.keys(T.PET_KINDS).length,wear:T.WEAR.length,stage:T.petStage().name}; });
-  ok("ペット: テスト用の手がかりがある", !r.noHook); if(!r.noHook){ ok("ペット: 絵がこわれていない(種類×段階×気分×服)", !r.bad.length, (r.bad||[]).slice(0,3).join(",")); ok("ペット: 6種類・服19以上", r.kinds>=6&&r.wear>=19, r.kinds+"/"+r.wear); ok("ペット: 名人になれる", r.stage==="ニュース名人", r.stage); }
+  ok("ペット: テスト用の手がかりがある", !r.noHook); if(!r.noHook){ ok("ペット: 絵がこわれていない(種類×段階×気分×服)", !r.bad.length, (r.bad||[]).slice(0,3).join(",")); ok("ペット: 7種類・服19以上", r.kinds>=7&&r.wear>=19, r.kinds+"/"+r.wear); ok("ペット: 名人になれる", r.stage==="ニュース名人", r.stage); }
   await p.evaluate(()=>document.getElementById("tab-my").click()); await p.waitForTimeout(600);
   const hasBtn=await p.$("#petRestart"); ok("名人: 「新しいたまご」のボタンが出る", !!hasBtn);
   if(hasBtn){ await hasBtn.click(); await p.waitForTimeout(700); const a=await p.evaluate(()=>{const T=window.NW_TEST;return {st:T.petStage().i,hall:T.petHall().length,gen:T.ME.pet.gen};}); ok("名人: 新しいたまごになり、前の子は殿堂へ", a.st===0&&a.hall===1&&a.gen===2, JSON.stringify(a)); }
