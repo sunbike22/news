@@ -6,6 +6,7 @@
 ## ファイル
 - `index.html` — 見た目と動き(HTML・CSS・JavaScript を1ファイルに)。外部ライブラリは Chart.js・地図用の d3/topojson(jsDelivr。どれも使うページを開いたときだけ `loadScript`/`loadChart` で読む。最初の表示を軽くするため、head で読み込まない)、Google Fonts(見出し用の Dela Gothic One だけ。本文はスマホに入っている文字)、閲覧数の GoatCounter(gc.zgo.at)だけ。データの読み込み先は、地震・警報の raw.githubusercontent.com(alerts ブランチ)と api.p2pquake.net、地域の天気の api.open-meteo.com(わたしの街が東京以外のときだけ)、ドライブ保存の accounts.google.com・www.googleapis.com(見る人がつないだときだけ)。
 - `data.js` — 中身のデータ(`window.NEWS_DATA`)。ニュースの更新では、基本的にこのファイルだけを書き換える。
+- `langs.js` — 🌍 ことばで世界一周のことば(`window.NEWS_LANGS`)。開いたときだけ読む。
 - `picks.js` — 🎁 ジャンル別おすすめ(`window.NEWS_PICKS = {updated,label,next,g:{ジャンル:{ttl,items:[{k,n,d,t,src}]}}}`)。定期タスク「ジャンル別おすすめの更新(週2回)」(月・木 5:47)だけが書き換える。ent=映画・小説・マンガのイチオシ、spo=今週の大会(人気順・海外も)、sci=今週の科学・健康など13ジャンル。ひとことは40字くらい・ネタバレなし・広告の言い方をしない・出典つき。アプリは「✨ おたのしみ」の中の「🎁 ジャンル別おすすめ」に出す(`FUN`・新しい更新があると赤い点 `ME.pickSeen`)。出すのは気になるジャンル(`ME.interests`。1つも選んでいなければ よく読むジャンル)。カードの「✏️ 気になるジャンルを選ぶ」とマイ→⚙️設定で、いつでも足したり外したりできる。
 - `.github/workflows/backup.yml` — 毎週日曜 6:17 にサイト一式を GitHub の「リリース」(backup-日付)として保存。新しい8つを残す。手で動かすこともできる。元に戻すときはリリースの zip を使う。
 - `manifest.webmanifest`・`sw.js`・`icon-*.png`・`apple-touch-icon.png` — ホーム画面に追加してアプリのように使うための設定。`sw.js` は前回の内容をオフラインでも読めるようにする(index.html と data.js はネット優先)。
@@ -114,6 +115,17 @@
 - 🧰 くらしの便利は「役に立つもの」なので **数字タブ**(`renderNumbers`)に置く(`LOOK` の `v12` で移行)。📘 今日の英単語は**そのまま残す**(おたのしみの入口の1つ。v12 でいったん消してしまったので `v13` でもどした)。
 - ニュースの地図(`.mapsvg`)は `max-width:430px`。PCで画面より大きくならないようにする。
 - **置き場所の考え方**: 「きょう」の画面は増やさない。役に立つものは天気カード・数字カードの中、読みやすさのものは解説ページの中、遊びは「✨ おたのしみ」の中、設定はマイ→⚙️設定に入れる。新しい `SECS` は `LOOK` の移行(v10 など)で `off` にして、おたのしみに出す。
+
+## 2026-10-21 夜に足したもの
+- 🌍 **ことばで世界一周**(`langCard`・おたのしみの入口 `lang`・`FUN_ALWAYS`): `langs.js`(`window.NEWS_LANGS`、72語×6言語: en/zh(ピンイン `zr`)/ko(ローマ字 `kr`)/es/fr/de、`kw`=見出しで探すことば)を**開いたときだけ** `loadScript("langs.js?v=1")` で読む(語を変えたら `?v=` を上げる)。今日のニュース10・3行に `kw` が出たことばを先に出し、足りない分は未習から日替わり。🔊 は `sayLang(text,langCode)`=端末の `speechSynthesis`(その言語の声を `getVoices()` から選ぶ。外には送らない)。聞きたい言語は `ME.langs`(既定 en/ko/zh)、おぼえた語は `ME.langSeen{語:日付}`。🎯 聞いて当てる(`lgQuizHTML`、1日5問 `ME.langQ`、正解でごはん1)。**訳語を足すときは、よく知られた基本語だけにする**(確かでない訳は入れない)。
+- 🦜 **ことばのオウム「ポリー」**(`parrotSVG(face,size)`・自作SVG)。ことばで世界一周の案内役。しゃべると `.lg-av.talk` でゆれる。キャラは よむまる(ペット)・🦉ホー先生・🦜ポリー の3人。
+- 🈁 **ふりがな**(`rubyOn`/`rubyHTML`/`applyRuby`・`nw-ruby`): `glossify` が点線のことばを `<ruby>よみ</ruby>` にする(読みが同じ・かなだけの語にはつけない)。未設定ならかんたんモードだけオン。設定はマイ→⚙️設定の読み上げの下。
+- 解説の**左右スワイプ**(`bindExNav`・`exNavHTML`): 年表・地図・4コマ・図の上では反応しない。下に「← 前 / 次 →」のボタンも。
+- 🧩 **ならべかえ**(`orderQuizHTML`/`bindOrderQuiz`・`ME.oq{解説:日付}`): 年表(46字以内)から4つを日替わりで取り出し、起きた順にタップ。全部正解でごはん1。年表が4つ未満なら出ない。
+- 🔁 **まちがえた問題**(`quizWrongAdd`/`drawReview`・`ME.quizWrong` 20問まで): 結果画面から。正解したら消える。ごはんは出ない。
+- 連続記録の**おなおし**(`streakInfo`): 1日だけ空いた日を7日に1回までつなぐ。`ME.days` だけから計算するので新しい記録は増えない。つながった日は `ME.frzSeen` で1回だけトースト。
+- 📆 **今月のふりかえり**(`monthData`/`monthCard`・`[data-mshare]`): マイ→記録に今月分。月のはじめ1〜3日は `letterCard` の枠に先月分(`ME.monthSeen` で消す)。📤 は Web Share → だめならコピー。
+- ペットの服に **traveler**(旅のぼうしとカメラ、`WEAR`: 世界一周で10語)。
 
 ## 毎日使いたくなる・わかりやすさ
 - 🗓️ 今週の目標(`goalCard`、`GOALS`: 開く5日・クイズ満点2回・解説3本。月曜はじまり。ぜんぶ達成でごはん🍙×3、`ME.weekDone`)。
