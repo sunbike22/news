@@ -1052,7 +1052,7 @@ function mmdd(iso){ return iso.slice(5,10); }
 function seasonNow(){ if(LOOK.season==="off") return null; if(LOOK.preview){ const z=SEASONS.find(x=>x.k===LOOK.preview); if(z) return z; }
   const t=mmdd(TODAY); return SEASONS.find(z=> z.from<=z.to ? (t>=z.from&&t<=z.to) : (t>=z.from||t<=z.to)) || null; }
 function inSeason(z,iso){ const t=mmdd(iso); return z.from<=z.to ? (t>=z.from&&t<=z.to) : (t>=z.from||t<=z.to); }
-const SECS = [["weather","🌤️ 天気"],["quick","⏱️ 1分まとめ"],["cont","🔔 つづきがあります"],["letter","💌 ペットからの手紙"],["listen","🔊 ニュースを聞く"],["three","☀️ 今日の3行"],["ten","📰 今日のニュース10"],["pet","🐣 ペット"],["goal","🗓️ 今週の目標"],["play","▶️ 1分で見る"],["foryou","🎯 あなた向け"],["picks","🎁 ジャンル別おすすめ"],["kw","🔖 わたしのキーワード"],["quiz","🧠 今日のクイズ"],["number","🔢 今日の数字"],["fun","✨ おたのしみ"],["other","📚 そのほかのニュース"],["mood","🗺️ 世の中の天気図"],["know","👆 知ってた?"],["talk","🍽️ 今日の話のタネ"],["reporter","🎙️ よむまる記者"],["local","🏠 わたしの街"],["gacha","🎰 今日の1本ガチャ"],["thermo","🌡️ ニュースの温度計"],["trip2","🗺️ ペットの旅"],["assoc","🔗 ニュース連想"],["back","📅 あのとき何してた?"],["bingo","🎲 ニュースビンゴ"],["battle","⚔️ 予想くらべ"]];
+const SECS = [["weather","🌤️ 天気"],["quick","⏱️ 1分まとめ"],["cont","🔔 つづきがあります"],["letter","💌 ペットからの手紙"],["listen","🔊 ニュースを聞く"],["three","☀️ 今日の3行"],["ten","📰 今日のニュース10"],["pet","🐣 ペット"],["goal","🗓️ 今週の目標"],["play","▶️ 1分で見る"],["foryou","🎯 あなた向け"],["picks","🎁 ジャンル別おすすめ"],["kw","🔖 わたしのキーワード"],["quiz","🧠 今日のクイズ"],["number","🔢 今日の数字"],["fun","✨ おたのしみ"],["other","📚 そのほかのニュース"],["english","📘 今日の英単語"],["mood","🗺️ 世の中の天気図"],["know","👆 知ってた?"],["talk","🍽️ 今日の話のタネ"],["reporter","🎙️ よむまる記者"],["local","🏠 わたしの街"],["gacha","🎰 今日の1本ガチャ"],["thermo","🌡️ ニュースの温度計"],["trip2","🗺️ ペットの旅"],["assoc","🔗 ニュース連想"],["back","📅 あのとき何してた?"],["bingo","🎲 ニュースビンゴ"],["battle","⚔️ 予想くらべ"]];
 const LOOK = (()=>{ let p={}; try{ p=JSON.parse(store.get("nw-look")||"{}")||{}; }catch(_){ p={}; }
   const fix=(arr,all)=>{ const a=(Array.isArray(arr)?arr:[]).filter(k=>all.includes(k)); all.forEach(k=>{ if(!a.includes(k)) a.push(k); }); return a; };
   const had=new Set(Array.isArray(p.order)?p.order:[]); p.order=fix(p.order,SECS.map(s=>s[0]));
@@ -1067,9 +1067,13 @@ const LOOK = (()=>{ let p={}; try{ p=JSON.parse(store.get("nw-look")||"{}")||{};
   // v9: おすすめは「おたのしみ」の中へ
   // v10: 新しいおたのしみ(温度計・旅・連想・あのとき・ビンゴ・予想くらべ)は「おたのしみ」の中に入れる
   // v12: 英単語をやめ、くらしの便利は「数字」タブへ。おたのしみは「今日のひとつ」「世の中の空気」にまとめた
-  if(!p.v12){ p.v12=1; p.off=p.off||{}; delete p.off.english; delete p.off.kurashi;
-    if(p.cfg) Object.values(p.cfg).forEach(c=>{ if(c&&c.off){ delete c.off.english; delete c.off.kurashi; } });
-    if(Array.isArray(p.order)) p.order=p.order.filter(k=>k!=="english"&&k!=="kurashi"); }
+  if(!p.v12){ p.v12=1; p.off=p.off||{}; delete p.off.kurashi;
+    if(p.cfg) Object.values(p.cfg).forEach(c=>{ if(c&&c.off) delete c.off.kurashi; });
+    if(Array.isArray(p.order)) p.order=p.order.filter(k=>k!=="kurashi"); }
+  // v13: 英単語はやめずに残す(v12 でいったん消してしまった人の分も、おたのしみ側にもどす)
+  if(!p.v13){ p.v13=1; p.off=p.off||{}; if(p.off.english===undefined) p.off.english=true;
+    if(p.cfg) Object.values(p.cfg).forEach(c=>{ if(c&&c.off&&c.off.english===undefined) c.off.english=true; });
+    if(Array.isArray(p.order)&&!p.order.includes("english")) p.order.push("english"); }
   // v11: ニュース10は最初「短く」・天気カードは1行にたたむ(2026-10-21)
   if(!p.v11){ p.v11=1; p.len="short"; p.wxOpen=false; }
   if(!p.v10){ p.v10=1; const K={thermo:true,trip2:true,assoc:true,back:true,bingo:true,battle:true,kurashi:true}; p.off=Object.assign({},p.off,K); if(p.cfg) Object.values(p.cfg).forEach(c=>{ if(c&&c.off) Object.assign(c.off,K); }); }
@@ -1089,7 +1093,7 @@ function saveLook(){ store.set("nw-look", JSON.stringify(LOOK)); }
 const MODE_PRESET={
   easy:()=>{ const on=["weather","quick","cont","listen","three","ten","quiz","goal"]; const order=[...on,...SECS.map(x=>x[0]).filter(k=>!on.includes(k))]; const off={}; order.forEach(k=>{ if(!on.includes(k)) off[k]=true; });
     return {order,off,tabs:["today","explain","search","my","plan","map","numbers","words"],tabOff:{plan:true,map:true,numbers:true,words:true},size:"l"}; },
-  normal:()=>{ const off={listen:true,quick:true,picks:true,mood:true,know:true,talk:true,reporter:true,local:true,gacha:true};
+  normal:()=>{ const off={listen:true,quick:true,picks:true,english:true,mood:true,know:true,talk:true,reporter:true,local:true,gacha:true};
     return {order:SECS.map(x=>x[0]),off,tabs:["today","explain","search","plan","my","map","numbers","words"],tabOff:{map:true,numbers:true,words:true},size:"m"}; }};
 function modeSnap(){ return {order:LOOK.order.slice(),off:Object.assign({},LOOK.off),tabs:LOOK.tabs.slice(),tabOff:Object.assign({},LOOK.tabOff),size:store.get("nw-size")||"m"}; }
 function setMode(m,fresh){ if(m!=="easy") m="normal"; if(m===LOOK.mode&&!fresh) return;
@@ -1446,6 +1450,7 @@ function renderToday(){
     </section>`;
   S.mood=moodCard();
   S.know=knowCard();
+  S.english=englishCard();
   S.fun=funGrid();
   S.talk=talkCard();
   S.reporter=reporterCard();
@@ -3159,8 +3164,11 @@ function funSetHTML(key){ const L=FUN_SET[key]; if(!L) return "";
   const body=cur[2]()||`<div class="empty">今日はまだありません。</div>`;
   return `<div class="seg fun-seg" role="group" aria-label="見るもの">${L.map(([k,n])=>`<button data-funsel="${key}:${k}" aria-pressed="${k===cur[0]}">${esc(n)}</button>`).join("")}</div>
     <div id="funSetBody" style="margin-top:10px">${body}</div>`; }
-const FUN=[["picks","🎁","ジャンル別おすすめ",()=>picksCard()],["pick","🎰","今日のひとつ",()=>funSetHTML("pick")],["air","🌡️","世の中の空気",()=>funSetHTML("air")],["local","🏠","わたしの街",()=>localCard()],["trip2","🗺️","ペットの旅",()=>travelCard()],["assoc","🔗","ニュース連想",()=>assocCard()],["back","📅","あのとき何してた?",()=>backCard()],["bingo","🎲","ニュースビンゴ",()=>bingoCard()],["battle","⚔️","予想くらべ",()=>battleCard()]];
+const FUN=[["picks","🎁","ジャンル別おすすめ",()=>picksCard()],["pick","🎰","今日のひとつ",()=>funSetHTML("pick")],["english","📘","今日の英単語",()=>englishCard()],["air","🌡️","世の中の空気",()=>funSetHTML("air")],["local","🏠","わたしの街",()=>localCard()],["trip2","🗺️","ペットの旅",()=>travelCard()],["assoc","🔗","ニュース連想",()=>assocCard()],["back","📅","あのとき何してた?",()=>backCard()],["bingo","🎲","ニュースビンゴ",()=>bingoCard()],["battle","⚔️","予想くらべ",()=>battleCard()]];
 const FUN_SHOW=6; let funOpen=false;
+function englishCard(){ if(!EN) return ""; const W=[]; (EN.top10||[]).forEach((e,i)=>(e.w||[]).forEach(w=>W.push([w[0],w[1],D.top10[i]&&D.top10[i].title]))); if(!W.length) return "";
+  return `<section class="card" aria-label="今日の英単語"><b>📘 今日の英単語</b><div class="hint" style="margin:4px 0 8px">今日のニュースに出てきた英語。🔊で発音が聞けます。</div>
+    <ul class="enlist">${W.map(([a,b,t])=>`<li><span><b lang="en">${esc(a)}</b> = ${esc(b)}<small class="hint" style="display:block">${esc(t||"")}</small></span><button class="fchip" data-say="${esc(a)}">🔊</button></li>`).join("")}</ul></section>`; }
 function funGrid(){ const L=FUN.filter(f=>FUN_SET[f[0]]?true:LOOK.off[f[0]]); if(!L.length) return "";
   const dot=k=>(k==="gacha"&&(ME.gacha||{}).d!==TODAY)||(k==="picks"&&PK&&ME.pickSeen!==PK.updated);
   const S2=L.slice().sort((a,b)=>(dot(b[0])?1:0)-(dot(a[0])?1:0)); const hid=Math.max(0,S2.length-FUN_SHOW);
@@ -3173,7 +3181,7 @@ const UPDATES=[
   {id:"2026-10-21h",d:"2026-10-21",t:"🎨 文字が読みやすくなりました・おたのしみの整理",L:[
     "着せかえの色によって、下のタブやジャンルの札の文字がうすく見えることがありました。色あいはそのままに、読める濃さへ自動でそろえるようにしました(9色すべて・明るい画面と暗い画面の両方で確認)",
     "✨ おたのしみを 15こ → 9こ に。1本ガチャ・よむまる記者・知ってた?・話のタネは「🎰 今日のひとつ」、天気図と温度計は「🌡️ 世の中の空気」にまとめました(中身はそのまま、中で切りかえ)",
-    "🧰 くらしの便利は「📈 数字」のページへ移りました。📘 今日の英単語はおしまいにしました(英語はニュース10の切りかえで読めます)"]},
+    "🧰 くらしの便利は「📈 数字」のページへ移りました。📘 今日の英単語はそのまま、おたのしみの中にあります"]},
   {id:"2026-10-21g",d:"2026-10-21",t:"🔍 地図と捜査ボードを、指で大きくできます",L:[
     "日本地図・世界地図・全国の天気・捜査ボードを、2本指でひろげると大きくなります(ダブルタップでも)",
     "大きくしたあとは、指でなぞって見たいところへ動かせます。下の「＋ − もどす」でも変えられます"]},
