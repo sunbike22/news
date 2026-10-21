@@ -161,6 +161,10 @@ main{padding-block:18px 32px}
 .ten.short li.mytown{border-left:4px solid var(--accent)}
 .ten.short li{position:relative}.ten.short .row{padding-right:50px!important}
 .len-seg{margin-left:auto}
+.fw7-s{list-style:none;margin:10px 0 6px;padding:0;display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.fw7-s li{display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 0;border-radius:10px;background:var(--surface2);border:1px solid var(--line)}
+.fw7-s li b{font-size:.95rem}.fw7-s li small{font-size:.95rem}.fw7-s li.on{background:var(--ok-soft);border-color:var(--ok)}.fw7-s li.now{border:2px solid var(--accent);background:var(--accent-soft)}.fw7-s li.miss{opacity:.55}
+.fw7-t{margin:4px 0 6px;line-height:1.6}.fw7-g{display:flex;flex-wrap:wrap;gap:6px}.fw7-g .fchip{min-height:46px;font-weight:700}
 .wd-sea{fill:var(--accent-soft);opacity:.5}.wd-n{fill:#2f6fed;fill-opacity:.75;stroke:#fff;stroke-width:1}
 .wd-e{stroke:#fff;stroke-width:.8;fill-opacity:.85}.wd-e.eq{fill:#e5484d}.wd-e.storm{fill:#8e44ad}.wd-e.flood{fill:#1e88e5}.wd-e.volcano{fill:#a0522d}.wd-e.fire{fill:#f57c00}.wd-e.drought{fill:#c0a000}.wd-e.other{fill:#777}
 .wd-dot{display:inline-block;width:12px;height:12px;border-radius:50%;margin-right:4px;vertical-align:-1px;border:1.5px solid #fff;box-shadow:0 0 0 1px var(--line)}.wd-leg{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:.88rem;margin:4px 0 6px}.wd-ev li{margin:4px 0;line-height:1.55}
@@ -1256,7 +1260,7 @@ function mmdd(iso){ return iso.slice(5,10); }
 function seasonNow(){ if(LOOK.season==="off") return null; if(LOOK.preview){ const z=SEASONS.find(x=>x.k===LOOK.preview); if(z) return z; }
   const t=mmdd(TODAY); return SEASONS.find(z=> z.from<=z.to ? (t>=z.from&&t<=z.to) : (t>=z.from||t<=z.to)) || null; }
 function inSeason(z,iso){ const t=mmdd(iso); return z.from<=z.to ? (t>=z.from&&t<=z.to) : (t>=z.from||t<=z.to); }
-const SECS = [["weather","🌤️ 天気"],["follow","📬 追っているニュースの続報"],["quick","⏱️ 1分まとめ"],["cont","🔔 つづきがあります"],["letter","💌 ペットからの手紙"],["listen","🔊 ニュースを聞く"],["three","☀️ 今日の3行"],["ten","📰 今日のニュース10"],["one","🎯 きょうの1問"],["pet","🐣 ペット"],["goal","🗓️ 今週の目標"],["play","▶️ 1分で見る"],["foryou","🎯 あなた向け"],["picks","🎁 ジャンル別おすすめ"],["kw","🔖 わたしのキーワード"],["quiz","🧠 今日のクイズ"],["number","🔢 今日の数字"],["fun","✨ おたのしみ"],["other","📚 そのほかのニュース"],["english","📘 今日の英単語"],["mood","🗺️ 世の中の天気図"],["know","👆 知ってた?"],["talk","🍽️ 今日の話のタネ"],["reporter","🎙️ ペット記者"],["local","🏠 わたしの街"],["gacha","🎰 今日の1本ガチャ"],["thermo","🌡️ ニュースの温度計"],["trip2","🗺️ ペットの旅"],["assoc","🔗 ニュース連想"],["back","📅 あのとき何してた?"],["bingo","🎲 ニュースビンゴ"],["battle","⚔️ 予想くらべ"]];
+const SECS = [["weather","🌤️ 天気"],["follow","📬 追っているニュースの続報"],["quick","⏱️ 1分まとめ"],["cont","🔔 つづきがあります"],["letter","💌 ペットからの手紙"],["listen","🔊 ニュースを聞く"],["three","☀️ 今日の3行"],["ten","📰 今日のニュース10"],["one","🎯 きょうの1問"],["first","🌱 はじめての7日間"],["pet","🐣 ペット"],["goal","🗓️ 今週の目標"],["play","▶️ 1分で見る"],["foryou","🎯 あなた向け"],["picks","🎁 ジャンル別おすすめ"],["kw","🔖 わたしのキーワード"],["quiz","🧠 今日のクイズ"],["number","🔢 今日の数字"],["fun","✨ おたのしみ"],["other","📚 そのほかのニュース"],["english","📘 今日の英単語"],["mood","🗺️ 世の中の天気図"],["know","👆 知ってた?"],["talk","🍽️ 今日の話のタネ"],["reporter","🎙️ ペット記者"],["local","🏠 わたしの街"],["gacha","🎰 今日の1本ガチャ"],["thermo","🌡️ ニュースの温度計"],["trip2","🗺️ ペットの旅"],["assoc","🔗 ニュース連想"],["back","📅 あのとき何してた?"],["bingo","🎲 ニュースビンゴ"],["battle","⚔️ 予想くらべ"]];
 const LOOK = (()=>{ let p={}; try{ p=JSON.parse(store.get("nw-look")||"{}")||{}; }catch(_){ p={}; }
   const fix=(arr,all)=>{ const a=(Array.isArray(arr)?arr:[]).filter(k=>all.includes(k)); all.forEach(k=>{ if(!a.includes(k)) a.push(k); }); return a; };
   const had=new Set(Array.isArray(p.order)?p.order:[]); p.order=fix(p.order,SECS.map(s=>s[0]));
@@ -1274,6 +1278,9 @@ const LOOK = (()=>{ let p={}; try{ p=JSON.parse(store.get("nw-look")||"{}")||{};
   if(!p.v12){ p.v12=1; p.off=p.off||{}; delete p.off.kurashi;
     if(p.cfg) Object.values(p.cfg).forEach(c=>{ if(c&&c.off) delete c.off.kurashi; });
     if(Array.isArray(p.order)) p.order=p.order.filter(k=>k!=="kurashi"); }
+  // v18: 「🌱 はじめての7日間」(はじめて開いた日から8日目まで・目標を選ぶまでだけ出る)を きょうの1問 の下に(2026-10-22)
+  if(!p.v18){ p.v18=1; const fx=c=>{ if(!c) return; if(Array.isArray(c.order)){ c.order=c.order.filter(k=>k!=="first"); const t=c.order.indexOf("one"); c.order.splice(t<0?c.order.length:t+1,0,"first"); } if(c.off) delete c.off.first; };
+    fx(p); if(p.cfg){ fx(p.cfg.easy); fx(p.cfg.normal); } }
   // v17: 「📬 続報」(追っているニュースに続きが出た日・山場の日だけ出る)を天気のすぐ下に(2026-10-22)
   if(!p.v17){ p.v17=1; const fx=c=>{ if(!c) return; if(Array.isArray(c.order)){ c.order=c.order.filter(k=>k!=="follow"); const t=c.order.indexOf("weather"); c.order.splice(t<0?0:t+1,0,"follow"); } if(c.off) delete c.off.follow; };
     fx(p); if(p.cfg){ fx(p.cfg.easy); fx(p.cfg.normal); } }
@@ -1308,7 +1315,7 @@ function saveLook(){ store.set("nw-look", JSON.stringify(LOOK)); }
 // ===== かんたんモード / ふつうモード =====
 // それぞれのモードが「きょうの並び・表示」「下のタブ」「文字の大きさ」を別々に覚える。かんたんモードに、ふつうの機能を足すこともできる
 const MODE_PRESET={
-  easy:()=>{ const on=["weather","follow","listen","three","ten","one","quiz"]; const order=[...on,...SECS.map(x=>x[0]).filter(k=>!on.includes(k))]; const off={}; order.forEach(k=>{ if(!on.includes(k)) off[k]=true; });
+  easy:()=>{ const on=["weather","follow","listen","three","ten","one","first","quiz"]; const order=[...on,...SECS.map(x=>x[0]).filter(k=>!on.includes(k))]; const off={}; order.forEach(k=>{ if(!on.includes(k)) off[k]=true; });
     return {order,off,tabs:["today","explain","search","my","plan","map","numbers","words"],tabOff:{plan:true,map:true,numbers:true,words:true},size:"l"}; },
   normal:()=>{ const off={listen:true,quick:true,picks:true,english:true,mood:true,know:true,talk:true,reporter:true,local:true,gacha:true,play:true,goal:true,kw:true};
     return {order:SECS.map(x=>x[0]),off,tabs:["today","explain","search","plan","my","map","numbers","words"],tabOff:{map:true,numbers:true,words:true},size:"m"}; }};
@@ -1715,7 +1722,7 @@ function renderToday(){
   S.kw=kwCard();
   S.picks=picksCard(); S.goal=goalCard(); S.letter=letterCard(); S.cont=contCard(); S.quick=quickCard();
   S.other=otherNews();
-  S.one=oneCard(); S.follow=followCard();
+  S.one=oneCard(); S.follow=followCard(); S.first=firstCard();
   S.quiz=D.quiz&&D.quiz.length?`<section class="card quiz" aria-label="今日のクイズ" id="quiz"></section>`:"";
   S.number=`<section class="card" aria-label="今日の数字">
       <div class="sec-h"><h2>🔢 今日の数字</h2></div>
@@ -2766,12 +2773,28 @@ function bindPins(){
   document.querySelectorAll("[data-unpin]").forEach(b=>b.onclick=()=>{ delete ME.pins[b.dataset.unpin]; saveMe(); renderMy(); });
 }
 
+// ===== 🌱 はじめての7日間(続けるのがいちばんむずかしいのは最初の1週間。毎日ちがう小さなごほうび)と、続ける目標を自分で選ぶ =====
+const FW7=["🍙 ごはん1こ","🍙 ごはん1こ","🎨 ペットの色を変えてみよう","🍙 ごはん1こ","🔔 続きを追うを使ってみよう","🍙 ごはん1こ","🎉 ごはん3こ"];
+function firstDay(){ if(!ME.firstDay){ ME.firstDay=[...ME.days].sort()[0]||TODAY; saveMe(); } return ME.firstDay; }
+function firstCard(){ const f=firstDay(); const n=-daysFrom(f); /* 0=はじめての日 */
+  if(n>=7){ if(ME.sgoal||n>14) return ""; const st=streak();
+    return `<section class="card fw7" aria-label="続ける目標"><b>🎯 続ける目標を選ぼう</b><p class="hint" style="margin:4px 0 8px">はじめての1週間、おつかれさまでした。いま ${st}日 連続です。次はどこまで続けてみますか?(あとで変えられます)</p>
+      <div class="fw7-g">${[14,30,100].map(g=>`<button class="fchip" data-sgoal="${g}">🔥 ${g}日</button>`).join("")}<button class="fchip" data-sgoal="0">目標なしで</button></div></section>`; }
+  const set=new Set(ME.days); const cells=[]; for(let i=0;i<7;i++){ const d=new Date(Date.parse(f)+i*864e5).toISOString().slice(0,10); cells.push([d,i<n?(set.has(d)?"on":"miss"):i===n?"now":"fut",i]); }
+  const amt=n===6?3:(n===2||n===4)?0:1; const g=amt?petEarn("fw7:"+TODAY,amt):0;
+  if(g) setTimeout(()=>toast(`🌱 はじめての${n+1}日目のごほうび: 🍙 ごはん+${g}`),1200);
+  return `<section class="card fw7" aria-label="はじめての7日間"><div class="sec-h" style="margin:0"><h2>🌱 はじめての7日間</h2><span class="sub">${n+1}日目</span></div>
+    <ol class="fw7-s">${cells.map(([d,c,i])=>`<li class="${c}"><b>${i+1}</b><small>${c==="on"||c==="now"?"✅":c==="miss"?"…":FW7[i].slice(0,2)}</small></li>`).join("")}</ol>
+    <p class="fw7-t">きょうのごほうび: <b>${FW7[n]}</b>${n<6?`。あしたは <b>${FW7[n+1]}</b>`:""}</p>
+    ${n===2?`<button class="fchip" data-tab="my">🎨 マイ で色を変える</button>`:n===4?`<button class="fchip" data-tab="explain">🔔 解説を開いて追ってみる</button>`:""}</section>`; }
+document.addEventListener("click",ev=>{ const b=ev.target.closest("[data-sgoal]"); if(!b) return; ME.sgoal=+b.dataset.sgoal||-1; saveMe(); const c=b.closest(".fw7"); if(c) c.remove(); try{ if(current==="today") go("today",{keepScroll:true}); }catch(_){} toast(ME.sgoal>0?`🔥 目標は ${ME.sgoal}日。上の記録の行に出ます`:"わかりました。いつでも マイ から目標を決められます"); });
+function sgoalTxt(){ const g=ME.sgoal; if(!(g>0)) return ""; const s=streak(); return s>=g?` 🏆`:` / ${g}日`; }
 // きょう画面に出すカード
 function personalCards(){
   const out=[]; const s=streak(); const lv=level();
   const newCount=NEW_KEYS.size;
   out.push(`<section class="me-strip" aria-label="あなたの記録">
-    <button class="ms" data-tab="my">🔥 <b class="num">${s}日</b>連続</button>
+    <button class="ms" data-tab="my">🔥 <b class="num">${s}日</b>連続${sgoalTxt()}</button>
     <button class="ms" data-tab="my">⭐ <b>レベル${lv.i+1}</b></button>
     ${newCount?`<button class="ms new" id="newBtn">🆕 <b class="num">${newCount}件</b>前回から</button>`:`<button class="ms" id="weekBtn">📅 ふりかえり</button>`}
   </section>`);
@@ -3866,6 +3889,7 @@ function funGrid(){ const L=FUN.filter(f=>(FUN_SET[f[0]]||FUN_ALWAYS.includes(f[
     ${hid?`<button class="fchip" id="funMore" data-hid="${hid}" aria-expanded="${funOpen?"true":"false"}" style="margin-top:8px">${funOpen?"▲ とじる":`… ほか ${hid}こ を見る`}</button>`:""}</section>`; }
 // ===== お知らせ(新しくなったところ)。機能を足したら、いちばん上に1つ足す =====
 const UPDATES=[
+  {id:"2026-10-22m",d:"2026-10-22",t:"🌱 はじめての7日間",L:["はじめて開いた日から1週間、毎日ちがう小さなごほうびが出ます(7日目は🍙×3)。","1週間たったら、続ける目標(14日・30日・100日)を自分で選べます。上の記録の行に出ます。"]},
   {id:"2026-10-22l",d:"2026-10-22",t:"🌍 世界のいま",L:["世界のどこで何が起きているかを1枚の地図に。このアプリで伝えたニュースの場所(青)と、世界の地震・台風・山火事など(公的機関の発表)を重ねました。","🛟 防災のページと、地図のページから開けます。うわさやSNSの書きこみは使っていません。"]},
   {id:"2026-10-22k",d:"2026-10-22",t:"👥 みんなの「ゆれた」マップ",L:["🛟 防災のページに、ゆれを感じた人が「ゆれた」ボタンを押した数を地図にしたページができました(P2P地震情報)。","アプリを開いている間に、急に報告が増えたらそっとお知らせします。人の報告(目安)なので、正式な震度は気象庁の発表を見てください。"]},
   {id:"2026-10-22j",d:"2026-10-22",t:"🔔 続きを追う",L:["解説のページで「🔔 続きを追う」を押すと、そのお話に続きが出た日と、山場の前の日だけ「きょう」のいちばん上でお知らせします。","追っているお話は マイ で見たり、やめたりできます。ほかのニュースは読まなくても大丈夫です。"]},
