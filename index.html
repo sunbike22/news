@@ -607,6 +607,34 @@ details.faq p{margin:10px 0 12px}
 #eewBand .eew-in>b{font-size:1.3rem}
 #eewBand small{font-size:.85rem;opacity:.95}
 #eewBand .iconbtn{align-self:flex-end;background:#fff;color:#c4161c;border-color:#fff}
+
+/* 🔁 モードの切りかえ */
+.mm-pair{display:flex;align-items:center;gap:6px;margin-bottom:10px}
+.mm{flex:1;border:2px solid var(--line);border-radius:14px;padding:8px;background:var(--surface);font-size:.82rem;min-width:0}
+.mm.on{opacity:.75} .mm:not(.on){border-color:var(--accent-btn,var(--accent))}
+.mm-h{font-weight:800;font-size:.92rem;margin-bottom:6px;display:flex;justify-content:space-between;gap:4px}
+.mm-h small{font-weight:700;color:var(--muted)}
+.mm-r{background:var(--bg);border-radius:6px;padding:4px 6px;margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.mm.easy .mm-r{font-size:.92rem;padding:6px}
+.mm-t{display:flex;flex-wrap:wrap;gap:2px 8px;margin-top:6px;border-top:1px solid var(--line);padding-top:4px}
+.mm-t span{font-size:.82rem;white-space:nowrap}
+.mm-arrow{font-size:1.4rem;font-weight:800;color:var(--muted)}
+.ms-h{margin:12px 0 6px;font-size:1.05rem}
+.ms-l{list-style:none;padding:0;margin:0;display:flex;flex-direction:column;gap:6px}
+.ms-l li{display:flex;gap:8px;align-items:flex-start;line-height:1.5} .ms-l li span{flex:none}
+.ms-bt{display:flex;flex-direction:column;gap:8px} .ms-bt .fchip{min-height:48px;font-size:1.05rem;justify-content:center}
+.ms-card{display:flex;gap:12px;align-items:center;text-align:left;cursor:pointer;font:inherit;color:var(--ink);width:100%}
+.ms-card .ms-i{font-size:1.8rem} .ms-card small{display:block;color:var(--muted);font-size:.88rem;margin-top:2px}
+
+.bm-layers{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px}
+.bm-layers .fchip{white-space:nowrap}
+.rd-in img.rd-hz{opacity:.75}
+.bm-pt{position:absolute;transform:translate(-50%,-50%);width:22px;height:22px;border-radius:50%;border:2px solid #fff;background:#15803d;color:#fff;font-size:.72rem;font-weight:800;padding:0;box-shadow:0 1px 3px #0006;cursor:pointer;z-index:2}
+.bm-lg{display:flex;flex-wrap:wrap;gap:6px 12px;margin:10px 0 4px;font-size:.88rem}
+.bm-lg i{display:inline-block;width:14px;height:14px;border-radius:3px;border:1px solid #0002;margin-right:4px;vertical-align:-2px}
+.bm-kind{margin:10px 0 4px}
+.bm-list{margin:0;padding-left:1.6em;display:flex;flex-direction:column;gap:6px}
+.bm-list small{display:block;color:var(--muted);font-size:.85rem}
 .pop b{font-size:1.05rem}
 /* かんたんモード: 押すところは44px以上(指が太くても押しやすく) */
 :root[data-mode="easy"] .fchip,:root[data-mode="easy"] .iconbtn,:root[data-mode="easy"] .seg button{min-height:44px}
@@ -1613,6 +1641,7 @@ function renderToday(){
     ${personalCards()}
     ${navigator.onLine===false?'<div class="offline">📴 いまはオフラインです。前に読み込んだ内容を表示しています。</div>':''}
     ${body||'<div class="card"><b>表示する項目がありません</b><div class="hint">着せかえで、見たい項目をオンにしてください。</div></div>'}
+    ${LOOK.mode==="easy"?`<button class="card ms-card" data-modesw="normal"><span class="ms-i" aria-hidden="true">📱</span><span><b>もっと使ってみる?</b><small>ふつうモードで何が増えるか見る(すぐには変わりません)→</small></span></button>`:""}
     <button class="fchip" id="lookBtnToday" style="align-self:flex-start">🎨 この画面の並びを変える</button>
     ${footer()}
   </div>`;
@@ -2331,7 +2360,7 @@ function bindFooter(){}
 document.getElementById("setBtn").onclick=()=>{
   const p=document.getElementById("pop"); const t=store.get("nw-theme")||"system"; const s=store.get("nw-size")||"m";
   p.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><b>設定</b><button class="iconbtn" id="popx" aria-label="閉じる" style="background:transparent;color:inherit;border-color:currentColor;width:auto;padding:0 12px">✕ とじる</button></div>
-    <div class="setrow" style="margin-bottom:10px"><span style="min-width:5em">モード</span><span class="seg">${[["easy","かんたん"],["normal","ふつう"]].map(([k,l])=>`<button data-pmode="${k}" aria-pressed="${LOOK.mode===k}">${l}</button>`).join("")}</span></div>
+    <div class="setrow" style="margin-bottom:10px"><span style="min-width:5em">モード<small style="display:block;font-size:.82rem;opacity:.8">押すと、どう変わるか見られます</small></span><span class="seg">${[["easy","かんたん"],["normal","ふつう"]].map(([k,l])=>`<button data-pmode="${k}" aria-pressed="${LOOK.mode===k}">${l}</button>`).join("")}</span></div>
     <div class="setrow" style="margin-bottom:10px"><span style="min-width:5em">文字の大きさ</span><span class="seg">${[["m","ふつう"],["l","大きめ"],["xl","特大"]].map(([k,l])=>`<button data-size="${k}" aria-pressed="${s===k}">${l}</button>`).join("")}</span></div>
     <div class="setrow"><span style="min-width:5em">画面の色</span><span class="seg">${[["system","スマホに合わせる"],["light","明るい"],["dark","暗い"]].map(([k,l])=>`<button data-theme="${k}" aria-pressed="${t===k}">${l}</button>`).join("")}</span></div>
     <div style="display:flex;flex-direction:column;gap:8px;margin-top:12px"><button class="fchip" id="popTabs">🧭 下のボタン(ページ)を選ぶ</button><button class="fchip" id="popLook">🎨 色・画面の並びを変える</button><button class="fchip" id="popHelp">🔰 使い方を見る</button><button class="fchip" id="popMore">⚙️ ほかの設定(お知らせ・読み上げの速さ・ふりがな など) →</button></div>`;
@@ -2341,7 +2370,7 @@ document.getElementById("setBtn").onclick=()=>{
   document.getElementById("popTabs").onclick=()=>{ p.hidden=true; openTabs(); };
   document.getElementById("popHelp").onclick=()=>{ p.hidden=true; onboard(true); };
   document.getElementById("popMore").onclick=()=>{ p.hidden=true; MYTAB="set"; go("my"); window.scrollTo(0,0); };
-  p.querySelectorAll("[data-pmode]").forEach(b=>b.onclick=e=>{ e.stopPropagation(); setMode(b.dataset.pmode); p.hidden=true; go(current||"today"); toast(`${modeName()}モードにしました`); });
+  p.querySelectorAll("[data-pmode]").forEach(b=>b.onclick=e=>{ e.stopPropagation(); p.hidden=true; if(b.dataset.pmode===LOOK.mode) return; openModeSwitch(b.dataset.pmode); });
   p.querySelectorAll("[data-size]").forEach(b=>b.onclick=e=>{e.stopPropagation(); store.set("nw-size",b.dataset.size); applySettings(); p.querySelectorAll("[data-size]").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));});
   p.querySelectorAll("[data-theme]").forEach(b=>b.onclick=e=>{e.stopPropagation(); store.set("nw-theme",b.dataset.theme); applySettings(); p.querySelectorAll("[data-theme]").forEach(x=>x.setAttribute("aria-pressed",String(x===b))); if(current==="numbers"||current==="plan") go(current,{keepScroll:true});});
 };
@@ -2390,7 +2419,7 @@ function openLook(){
     </div>`;
     sh.querySelector("#lkx").onclick=close; sh.querySelector("#lkdone").onclick=close;
     sh.querySelector("#lkTabs").onclick=()=>{ openTabs(); };
-    sh.querySelectorAll("[data-lmode]").forEach(b=>b.onclick=()=>{ setMode(b.dataset.lmode); redraw(); toast(`${modeName()}モードにしました`); });
+    sh.querySelectorAll("[data-lmode]").forEach(b=>b.onclick=()=>{ if(b.dataset.lmode===LOOK.mode) return; openModeSwitch(b.dataset.lmode); });
     sh.querySelectorAll("[data-col]").forEach(b=>b.onclick=()=>{ LOOK.color=b.dataset.col; saveLook(); applySettings(); redraw(); });
     sh.querySelectorAll("[data-lt]").forEach(b=>b.onclick=()=>{ store.set("nw-theme",b.dataset.lt); applySettings(); redraw(); });
     sh.querySelectorAll("[data-ls]").forEach(b=>b.onclick=()=>{ store.set("nw-size",b.dataset.ls); applySettings(); redraw(); });
@@ -3513,6 +3542,9 @@ function funGrid(){ const L=FUN.filter(f=>(FUN_SET[f[0]]||FUN_ALWAYS.includes(f[
     ${hid?`<button class="fchip" id="funMore" data-hid="${hid}" aria-expanded="${funOpen?"true":"false"}" style="margin-top:8px">${funOpen?"▲ とじる":`… ほか ${hid}こ を見る`}</button>`:""}</section>`; }
 // ===== お知らせ(新しくなったところ)。機能を足したら、いちばん上に1つ足す =====
 const UPDATES=[
+  {id:"2026-10-21m",d:"2026-10-21",t:"🗺️ 防災マップ・モードの切りかえを見やすく",L:[
+    "「🛟 地震・防災」に🗺️ 防災マップ。雨雲・川があふれたら水につかる所・津波・高潮・がけ崩れの所・近くのにげる場所を、ほかのサイトに行かずにこのアプリの中で見られます。「📍 いまいる所で見る」も(場所はどこにも送りません)",
+    "かんたん ⇄ ふつう を変えるときは、先に「どう変わるか」を絵で見せてから切りかえます。いつでも元にもどせて、記録は消えません"]},
   {id:"2026-10-21l",d:"2026-10-21",t:"🔰 はじめての人にもわかりやすく",L:[
     "はじめて開いた人は「かんたん」から始まります。かんたんは 天気 → 🔊聞く → 3行 → ニュース → クイズ だけです",
     "むずかしいことばを、やさしく言いかえました(例: トピック名 → あいことば、バックアップ → 記録をとっておく)。「設定」から ほかの設定にも行けます",
@@ -4150,20 +4182,44 @@ function drawAlertBand(){ const el=document.getElementById("alertBand"); if(!el)
   el.hidden=!L.length; el.innerHTML=L.map(x=>`<div class="al-band ${x.lv==="mid"?"mid":""}" role="button" tabindex="0" data-quake="1"><span class="ai" aria-hidden="true">${x.i}</span><span style="flex:1"><b>${esc(x.t)}</b><small>${esc(x.s)} ・ タップでくわしく</small></span><button class="al-x" data-alx="${esc(x.id)}" aria-label="この知らせを閉じる">✕</button></div>`).join("")
     + (L.some(x=>x.lv==="high")?`<button class="sos-go" data-sos="1">🆘 こまったときは(まずすること)</button>`:""); }
 // ===== 🆘 こまったときは(大きな災害のとき、まず見る画面。文字を大きく・ボタンを4つだけ) =====
-const SOS=[["🛡️","まず身を守る","地震のときは頭を守り、机の下へ。ゆれがおさまってから火を消し、ドアを開けて出口をつくる。津波の注意が出たら、海や川から離れて高いところへ。暴風のときは建物の中にいる。",[["気象庁 キキクル(危ないところの地図)","https://www.jma.go.jp/bosai/risk/"]]],
+const SOS=[["🛡️","まず身を守る","地震のときは頭を守り、机の下へ。ゆれがおさまってから火を消し、ドアを開けて出口をつくる。津波の注意が出たら、海や川から離れて高いところへ。暴風のときは建物の中にいる。",[["🗺️ 防災マップ(このアプリの中)","#bmap"]]],
   ["🏃","避難する","自治体の「避難指示」が出たら、すぐに安全なところへ。夜や大雨で外が危ないときは、家の2階など少しでも高いところへ。",[["気象庁 警報・注意報","https://www.jma.go.jp/bosai/warning/"],["NHK 防災・災害情報","https://www.nhk.or.jp/kishou-saigai/"]]],
   ["🔌","停電・断水のとき","ブレーカーを落としてから避難する(電気が戻ったときの火事をふせぐ)。水はお風呂にためておくと手洗いやトイレに使える。",[["政府 防災情報のページ","https://www.bousai.go.jp/"]]],
   ["📞","家族に知らせる","電話はつながりにくくなります。災害用伝言ダイヤル「171」や、メッセージアプリのほうがつながりやすいです。",[["災害用伝言ダイヤル171(NTT東日本)","https://www.ntt-east.co.jp/saigai/voice171/"],["web171(インターネットの伝言板)","https://www.web171.jp/"]]]];
 function openSOS(){ const sh=document.getElementById("sheet");
   sh.innerHTML=`<div class="bar"><div class="wrap"><button class="iconbtn" id="sosx" aria-label="もどる">← もどる</button><span class="ttl">🆘 こまったときは</span></div></div><div class="wrap body sos">
     <p class="hint">大きな地震や警報が出たときに、まずすることをまとめています。いちばん新しい情報は、下の公式のページとテレビ・ラジオで確かめてください。</p>
-    ${SOS.map(([i,t,x,links],n)=>`<details class="sos-b"${n===0?" open":""}><summary><span aria-hidden="true">${i}</span>${esc(t)}</summary><p>${esc(x)}</p>${links.map(([a,u])=>`<a href="${u}" target="_blank" rel="noopener">${esc(a)} →</a>`).join("")}</details>`).join("")}
+    ${SOS.map(([i,t,x,links],n)=>`<details class="sos-b"${n===0?" open":""}><summary><span aria-hidden="true">${i}</span>${esc(t)}</summary><p>${esc(x)}</p>${links.map(([a,u])=>u==="#bmap"?`<button class="fchip" data-bmap="shelter">${esc(a)} →</button>`:`<a href="${u}" target="_blank" rel="noopener">${esc(a)} →</a>`).join("")}</details>`).join("")}
     <div class="exp" style="margin-top:12px">📣 ゆれる前の<b>緊急地震速報</b>は、スマホの緊急速報(エリアメール)で受け取ってください。このアプリは「起きたこと」をわかりやすく伝える役です。</div>
     <button class="iconbtn" id="sosx2" style="align-self:flex-start;margin-top:10px">← もどる</button></div>`;
   sh.hidden=false; sh.scrollTop=0; document.body.style.overflow="hidden";
   const close=()=>{ sh.hidden=true; sh.innerHTML=""; document.body.style.overflow=""; };
   sh.querySelector("#sosx").onclick=close; sh.querySelector("#sosx2").onclick=close; track("/sos","こまったときは"); }
 document.addEventListener("click",ev=>{ if(ev.target.closest("[data-sos]")){ ev.stopPropagation(); openSOS(); } },true);
+// ===== 🔁 かんたん ⇄ ふつう の切りかえ(押す前に「どう変わるか」を見せてから切りかえる) =====
+const MODE_DIFF={
+  normal:{t:"📱 ふつうモードにすると",plus:[["🐣","ニュースで育つペット「よむまる」と、クイズでごはん"],["✨","おたのしみ(今日のひとつ・ことばで世界一周・すごろく など)"],["🏅","バッジ・連続記録・今週の目標"],["📅","下のボタンに「予定」が増える"]],
+    minus:[["🔤","文字が少し小さくなる(設定でいつでも大きくできます)"],["🔊","大きな「今日のニュースを聞く」ボタンは、しまわれます"]],
+    rows:["🌤️ 天気","☀️ 今日の3行","📰 ニュース10","🐣 ペット","🧠 クイズ","✨ おたのしみ…"],tabs:["きょう","解説","さがす","予定","マイ"]},
+  easy:{t:"🔰 かんたんモードにすると",plus:[["🔤","文字が大きくなる"],["🔊","いちばん上に「今日のニュースを聞く」の大きなボタン"],["👀","天気・3行・ニュース・クイズだけの、すっきりした画面"]],
+    minus:[["🐣","ペット・おたのしみ・バッジは画面から見えなくなる(記録は消えません)"],["📅","下のボタンの「予定」はかくれる"]],
+    rows:["🌤️ 天気","🔊 聞く(大きなボタン)","☀️ 今日の3行","📰 ニュース10","🧠 クイズ"],tabs:["きょう","解説","さがす","マイ"]}};
+function modeMock(m,on){ const d=MODE_DIFF[m]; return `<div class="mm ${on?"on":""} ${m}"><div class="mm-h">${m==="easy"?"🔰 かんたん":"📱 ふつう"}${on?"<small>いま</small>":""}</div>${d.rows.map(r=>`<div class="mm-r">${r}</div>`).join("")}<div class="mm-t">${d.tabs.map(t=>`<span>${t}</span>`).join("")}</div></div>`; }
+function openModeSwitch(to,after){ if(to!=="easy") to="normal"; const from=LOOK.mode; const d=MODE_DIFF[to]; const sh=document.getElementById("sheet");
+  sh.innerHTML=`<div class="bar"><div class="wrap"><button class="iconbtn" id="msx" aria-label="もどる">← もどる</button><span class="ttl">モードを変える</span></div></div><div class="wrap body">
+    ${from===to?`<p class="obp">いまも <b>${to==="easy"?"かんたん":"ふつう"}モード</b>です。</p>`:""}
+    <h2 style="margin:4px 0 10px;font-size:1.25rem">${d.t}</h2>
+    <div class="mm-pair">${modeMock(from,true)}<span class="mm-arrow" aria-hidden="true">→</span>${modeMock(to,false)}</div>
+    <h3 class="ms-h">➕ 増えるもの</h3><ul class="ms-l">${d.plus.map(([i,t])=>`<li><span>${i}</span>${esc(t)}</li>`).join("")}</ul>
+    <h3 class="ms-h">➖ 変わるもの</h3><ul class="ms-l">${d.minus.map(([i,t])=>`<li><span>${i}</span>${esc(t)}</li>`).join("")}</ul>
+    <div class="exp" style="margin:12px 0">🔁 <b>いつでも元にもどせます。</b>右上の「設定」→「モード」で切りかえられます。ペット・連続日数・保存したニュースなどの記録は、どちらのモードでも消えません。</div>
+    <div class="ms-bt">${from!==to?`<button class="fchip pet-feed" id="msGo">${to==="easy"?"🔰 かんたんにする":"📱 ふつうにする"}</button><button class="fchip" id="msNo">${from==="easy"?"🔰 かんたんのまま":"📱 ふつうのまま"}</button>`:`<button class="fchip" id="msNo">← もどる</button>`}</div></div>`;
+  sh.hidden=false; sh.scrollTop=0; document.body.style.overflow="hidden";
+  const close=()=>{ sh.hidden=true; sh.innerHTML=""; document.body.style.overflow=""; };
+  sh.querySelector("#msx").onclick=close; sh.querySelector("#msNo").onclick=close;
+  const g=sh.querySelector("#msGo"); if(g) g.onclick=()=>{ close(); setMode(to); go("today"); window.scrollTo(0,0); toast(`${to==="easy"?"🔰 かんたん":"📱 ふつう"}モードにしました。もどすときは 右上の「設定」→「モード」`); if(after) after(); };
+  track("/mode","モードを変える"); }
+document.addEventListener("click",ev=>{ const b=ev.target.closest("[data-modesw]"); if(b){ ev.stopPropagation(); openModeSwitch(b.dataset.modesw); } },true);
 // ===== 📡 リアルタイム(P2P地震情報の WebSocket。アプリを開いている間だけつなぐ) =====
 // 気象庁の発表を配る P2P地震情報 から、地震・津波・緊急地震速報(警報)が届いたらすぐ反映する。
 // 画面を閉じたら切る(電池と通信を使わない)。つながらないときは今までどおり3分ごとの読み直しだけ。
@@ -4209,11 +4265,22 @@ document.addEventListener("click",ev=>{ if(ev.target.closest("[data-eewx]")){ EE
 document.addEventListener("visibilitychange",()=>{ if(document.visibilityState==="visible"){ RT.retry=0; rtConnect(); } else rtStop(); });
 setTimeout(rtConnect,2500);
 
-// ===== ☔ 雨雲レーダー(気象庁「雨雲の動き」のタイル+国土地理院の淡色地図) =====
-// 時刻の一覧は気象庁の targetTimes を直接読む(CORS OK を Actions で確認・2026-10-21)。だめなら alert.json の radar を使う。
+// ===== 🗺️ 防災マップ(雨雲・浸水・土砂・にげる場所を、このアプリの中で見る) =====
+// 地図: 国土地理院の淡色地図。雨雲: 気象庁「雨雲の動き」。浸水・土砂: 重ねるハザードマップ(国土地理院)のタイル。
+// にげる場所: 国土地理院の「指定緊急避難場所」データ(geojson)。どれも CORS * を Actions で確認(2026-10-21)。
 const JMAT="https://www.jma.go.jp/bosai/jmatile/data/nowc/";
-const RADAR={i:-1,lv:1,frames:[],play:null};
-const RD_LV=[["🗾 全国",5],["🏙️ 地方",7],["📍 街",9]];
+const HZ="https://disaportaldata.gsi.go.jp/raster/";
+const RADAR={i:-1,lv:1,frames:[],play:null,layer:"rain",center:null,shel:"04",pts:[]};
+const RD_LV=[["🗾 全国",5],["🏙️ 地方",7],["📍 街",10],["🏠 近所",13]];
+// ラスターの重ね絵。maxZ をこえて拡大するときは、親のタイルを大きくして使う
+const BM_LAYERS={
+  rain:{n:"☔ 雨雲",d:"いまと1時間先の雨",maxZ:10},
+  flood:{n:"🌊 川の水があふれたら",d:"水につかるかもしれない深さ(想定最大)",maxZ:17,src:["01_flood_l2_shinsuishin_data"],lg:[["#f7f5a9","〜0.5m"],["#ffd8c0","0.5〜3m"],["#ffb7b7","3〜5m"],["#ff9191","5〜10m"],["#f285c9","10〜20m"],["#dc7adc","20m〜"]]},
+  tsunami:{n:"🌊 津波が来たら",d:"水につかるかもしれない深さ",maxZ:17,src:["04_tsunami_newlegend_data"],lg:[["#ffffb3","〜0.3m"],["#f7f5a9","0.3〜1m"],["#f8e1a6","1〜2m"],["#ffd8c0","2〜3m"],["#ffb7b7","3〜5m"],["#ff9191","5〜10m"],["#f285c9","10m〜"]]},
+  tide:{n:"🌀 高潮が来たら",d:"台風で海の水があふれたときの深さ",maxZ:17,src:["03_hightide_l2_shinsuishin_data"],lg:[["#f7f5a9","〜0.5m"],["#ffd8c0","0.5〜3m"],["#ffb7b7","3〜5m"],["#ff9191","5m〜"]]},
+  dosha:{n:"⛰️ がけ崩れ・土石流",d:"土砂災害が起きやすい場所",maxZ:17,src:["05_dosekiryukeikaikuiki","05_kyukeishakeikaikuiki","05_jisuberikeikaikuiki"],lg:[["#ffe600","気をつける区域"],["#e0322b","とくに危ない区域"]]},
+  shelter:{n:"🏃 にげる場所",d:"市町村が決めた避難場所(🏠 近所で表示)",maxZ:0}};
+const SHEL_KIND=[["04","地震"],["01","大雨・洪水"],["05","津波"],["02","がけ崩れ"],["06","大きな火事"]];
 async function radarFrames(){
   const g=u=>tmo(fetch(u,{cache:"no-store"}).then(r=>r.ok?r.json():Promise.reject()),8000);
   let past=[],fut=[];
@@ -4223,57 +4290,95 @@ async function radarFrames(){
     const bt=n2.reduce((a,x)=>x.basetime>a?x.basetime:a,""); fut=n2.filter(x=>x.basetime===bt&&x.validtime>x.basetime).map(x=>[x.basetime,x.validtime]).sort((a,b)=>a[1]<b[1]?-1:1).slice(0,12);
   }catch(_){ const r=AL.radar; if(r){ past=r.past||[]; fut=r.fut||[]; } }
   return past.map(x=>({b:x[0],v:x[1],f:0})).concat(fut.map(x=>({b:x[0],v:x[1],f:1}))); }
-function rdTime(v){ const d=new Date(Date.UTC(+v.slice(0,4),+v.slice(4,6)-1,+v.slice(6,8),+v.slice(8,10),+v.slice(10,12))+9*36e5); return `${d.getUTCHours()}:${String(d.getUTCMinutes()).padStart(2,"0")}`; }
-function rdCenter(){ const lv=RD_LV[RADAR.lv][1]; if(lv<=5) return [36.6,137.6]; const p=PREF_LL[prefNow()]||PREF_LL["東京都"]; return [p[0],p[1]]; }
+function rdIso(v){ return v.replace(/(\d{4})(\d\d)(\d\d)(\d\d)(\d\d)\d\d/,"$1-$2-$3T$4:$5:00Z"); }
+function rdTime(v){ const d=new Date(Date.parse(rdIso(v))+9*36e5); return `${d.getUTCHours()}:${String(d.getUTCMinutes()).padStart(2,"0")}`; }
+function rdCenter(){ if(RADAR.center) return RADAR.center; const lv=RD_LV[RADAR.lv][1]; if(lv<=5) return [36.6,137.6]; const p=PREF_LL[prefNow()]||PREF_LL["東京都"]; return [p[0],p[1]]; }
 function rdPx(lat,lon,z){ const n=256*Math.pow(2,z), s=Math.sin(lat*Math.PI/180); return [(lon+180)/360*n,(0.5-Math.log((1+s)/(1-s))/(4*Math.PI))*n]; }
 function rdOvUrl(f,z,x,y){ return `${JMAT}${f.b}/none/${f.v}/surf/hrpns/${z}/${x}/${y}.png`; }
+// 見えている範囲のタイルを並べる(z をこえるときは tz のタイルを拡大)
+function bmTiles(x0,y0,W,H,z,tz){ const k=Math.pow(2,z-tz), sz=256*k, L=[];
+  for(let tx=Math.floor(x0/sz);tx<=Math.floor((x0+W)/sz);tx++) for(let ty=Math.floor(y0/sz);ty<=Math.floor((y0+H)/sz);ty++) L.push({tx,ty,st:`left:${Math.round(tx*sz-x0)}px;top:${Math.round(ty*sz-y0)}px;width:${sz}px;height:${sz}px`});
+  return L; }
+const IMG_ERR=`onerror="this.style.visibility='hidden'" onload="this.style.visibility=''"`;
 function rdMapHTML(W,H){ const z=RD_LV[RADAR.lv][1]; const [la,lo]=rdCenter(); const [cx,cy]=rdPx(la,lo,z); const x0=cx-W/2,y0=cy-H/2;
-  const f=RADAR.frames[RADAR.i]; let base="",ov="";
-  for(let tx=Math.floor(x0/256);tx<=Math.floor((x0+W)/256);tx++) for(let ty=Math.floor(y0/256);ty<=Math.floor((y0+H)/256);ty++){
-    const st=`left:${Math.round(tx*256-x0)}px;top:${Math.round(ty*256-y0)}px`;
-    base+=`<img alt="" src="https://cyberjapandata.gsi.go.jp/xyz/pale/${z}/${tx}/${ty}.png" style="${st}" onerror="this.style.visibility='hidden'">`;
-    ov+=`<img alt="" class="rd-ov" data-t="${z}/${tx}/${ty}" ${f?`src="${rdOvUrl(f,z,tx,ty)}"`:""} style="${st}" onerror="this.style.visibility='hidden'" onload="this.style.visibility=''">`; }
-  const me=RADAR.lv>0?`<span class="rd-me" style="left:${W/2}px;top:${H/2}px"><i></i>${esc((PREF_LL[prefNow()]||[0,0,"東京"])[2])}</span>`:"";
-  return `<div class="rd-in" style="width:${W}px;height:${H}px">${base}${ov}${me}</div>`; }
+  const L=BM_LAYERS[RADAR.layer]; let base="",ov="";
+  bmTiles(x0,y0,W,H,z,Math.min(z,18)).forEach(t=>{ base+=`<img alt="" src="https://cyberjapandata.gsi.go.jp/xyz/pale/${z}/${t.tx}/${t.ty}.png" style="${t.st}" ${IMG_ERR}>`; });
+  if(RADAR.layer==="rain"){ const tz=Math.min(z,L.maxZ); const f=RADAR.frames[RADAR.i];
+    bmTiles(x0,y0,W,H,z,tz).forEach(t=>{ ov+=`<img alt="" class="rd-ov" data-t="${tz}/${t.tx}/${t.ty}" ${f?`src="${rdOvUrl(f,tz,t.tx,t.ty)}"`:""} style="${t.st}" ${IMG_ERR}>`; }); }
+  else if(L.src){ const tz=Math.min(z,L.maxZ); L.src.forEach(src=>bmTiles(x0,y0,W,H,z,tz).forEach(t=>{ ov+=`<img alt="" class="rd-hz" src="${HZ}${src}/${tz}/${t.tx}/${t.ty}.png" style="${t.st}" ${IMG_ERR}>`; })); }
+  let pts=""; if(RADAR.layer==="shelter") RADAR.pts.forEach((p,i)=>{ const [px,py]=rdPx(p.la,p.lo,z); const x=px-x0,y=py-y0; if(x<-10||y<-10||x>W+10||y>H+10) return; pts+=`<button class="bm-pt" data-pt="${i}" style="left:${x}px;top:${y}px" aria-label="${esc(p.name)}">${i<9?i+1:""}</button>`; });
+  const me=RADAR.lv>0?`<span class="rd-me" style="left:${W/2}px;top:${H/2}px"><i></i>${RADAR.center?"いまいる所":esc((PREF_LL[prefNow()]||[0,0,"東京"])[2])}</span>`:"";
+  return `<div class="rd-in" style="width:${W}px;height:${H}px">${base}${ov}${pts}${me}</div>`; }
 function rdSet(i){ RADAR.i=Math.max(0,Math.min(RADAR.frames.length-1,i)); const f=RADAR.frames[RADAR.i]; if(!f) return;
   document.querySelectorAll("#rdBox .rd-ov").forEach(im=>{ const [z,x,y]=im.dataset.t.split("/"); im.src=rdOvUrl(f,z,x,y); });
   const s=document.getElementById("rdSlider"); if(s) s.value=RADAR.i;
-  const nowI=RADAR.frames.findIndex(x=>x.f===1)-1; const lab=document.getElementById("rdLabel");
-  if(lab) lab.innerHTML=`<b class="num">${rdTime(f.v)}</b> ${f.f?`<span class="rd-tag fut">予想</span>`:RADAR.i===nowI||(!RADAR.frames.some(x=>x.f)&&RADAR.i===RADAR.frames.length-1)?`<span class="rd-tag">いま</span>`:`<span class="rd-tag past">${Math.round((Date.parse(RADAR.frames[nowI<0?RADAR.frames.length-1:nowI].v.replace(/(\d{4})(\d\d)(\d\d)(\d\d)(\d\d)\d\d/,"$1-$2-$3T$4:$5:00Z"))-Date.parse(f.v.replace(/(\d{4})(\d\d)(\d\d)(\d\d)(\d\d)\d\d/,"$1-$2-$3T$4:$5:00Z")))/6e4)}分前</span>`}`; }
+  let nowI=RADAR.frames.findIndex(x=>x.f===1)-1; if(nowI<0) nowI=RADAR.frames.length-1; const lab=document.getElementById("rdLabel");
+  if(lab) lab.innerHTML=`<b class="num">${rdTime(f.v)}</b> ${f.f?`<span class="rd-tag fut">予想</span>`:RADAR.i===nowI?`<span class="rd-tag">いま</span>`:`<span class="rd-tag past">${Math.round((Date.parse(rdIso(RADAR.frames[nowI].v))-Date.parse(rdIso(f.v)))/6e4)}分前</span>`}`; }
 function rdStopPlay(){ if(RADAR.play){ clearInterval(RADAR.play); RADAR.play=null; } const b=document.getElementById("rdPlay"); if(b) b.textContent="▶ 動かす"; }
-function rdDraw(){ const box=document.getElementById("rdBox"); if(!box) return; const W=Math.round(box.clientWidth)||360, H=Math.round(Math.min(W*1.15,innerHeight*0.62));
-  box.style.height=H+"px"; box.innerHTML=rdMapHTML(W,H); zoomable(box,box.firstElementChild,{max:4}); }
-async function openRadar(){ const sh=document.getElementById("sheet"); rdStopPlay();
-  sh.innerHTML=`<div class="bar"><div class="wrap"><button class="iconbtn" id="rdx" aria-label="もどる">← もどる</button><span class="ttl">☔ 雨雲レーダー</span><button class="iconbtn" id="rdr" aria-label="新しくする" style="margin-left:auto;width:auto;padding:0 10px">↻ 新しくする</button></div></div><div class="wrap body">
-    <div class="seg rd-lv" role="group" aria-label="地図の広さ">${RD_LV.map(([l],i)=>`<button data-rdlv="${i}" aria-pressed="${i===RADAR.lv}">${l}</button>`).join("")}</div>
-    <div id="rdBox" class="rd-box" aria-label="雨雲の地図"></div>
-    <div class="rd-ctl"><button class="fchip" id="rdPlay" style="white-space:nowrap">▶ 動かす</button><span id="rdLabel" class="rd-lab">読みこみ中…</span></div>
-    <input type="range" id="rdSlider" min="0" max="0" value="0" aria-label="時刻を選ぶ" style="width:100%"><div class="rd-ends"><span>← 1時間前</span><span>いま</span><span>1時間後 →</span></div>
+// にげる場所: 見えている範囲の z10 の geojson を読み、近い順に
+const SHEL_CACHE=new Map();
+async function loadShelters(){ const z=RD_LV[RADAR.lv][1]; RADAR.pts=[]; if(z<12) return;
+  const [la,lo]=rdCenter(); const [cx,cy]=rdPx(la,lo,10); const box=document.getElementById("rdBox"); const W=box?box.clientWidth:360, H=box?box.clientHeight:400;
+  const k=Math.pow(2,z-10), x0=cx-W/2/k, y0=cy-H/2/k; const tiles=[];
+  for(let tx=Math.floor(x0/256);tx<=Math.floor((x0+W/k)/256);tx++) for(let ty=Math.floor(y0/256);ty<=Math.floor((y0+H/k)/256);ty++) tiles.push(`${tx}/${ty}`);
+  const all=[]; await Promise.all(tiles.map(async t=>{ const key=RADAR.shel+"/"+t; let j=SHEL_CACHE.get(key);
+    if(!j){ try{ j=await tmo(fetch(`https://cyberjapandata.gsi.go.jp/xyz/skhb${RADAR.shel}/10/${t}.geojson`).then(r=>r.ok?r.json():{features:[]}),15000); }catch(_){ j={features:[]}; } SHEL_CACHE.set(key,j); }
+    (j.features||[]).forEach(f=>{ const c=(f.geometry||{}).coordinates; if(!c) return; const pr=f.properties||{}; all.push({name:pr.name||pr["名称"]||"避難場所",addr:pr.address||pr["住所"]||"",la:c[1],lo:c[0]}); }); }));
+  const km=(a,b)=>{ const R=6371,r=Math.PI/180; const x=(b.lo-a.lo)*r*Math.cos((a.la+b.la)/2*r), y=(b.la-a.la)*r; return R*Math.hypot(x,y); };
+  const c={la,lo}; all.forEach(p=>p.km=km(c,p)); all.sort((a,b)=>a.km-b.km); RADAR.pts=all.slice(0,60); }
+function bmSideHTML(){ const L=BM_LAYERS[RADAR.layer]; const z=RD_LV[RADAR.lv][1];
+  if(RADAR.layer==="rain") return `<div class="rd-ctl"><button class="fchip" id="rdPlay" style="white-space:nowrap">▶ 動かす</button><span id="rdLabel" class="rd-lab">読みこみ中…</span></div>
+    <input type="range" id="rdSlider" min="0" max="${Math.max(0,RADAR.frames.length-1)}" value="${Math.max(0,RADAR.i)}" aria-label="時刻を選ぶ" style="width:100%"><div class="rd-ends"><span>← 1時間前</span><span>いま</span><span>1時間後 →</span></div>
     <div class="rd-scale" aria-label="雨の強さの色"><span style="background:#a0d2ff">1</span><span style="background:#218cff">5</span><span style="background:#0041ff;color:#fff">10</span><span style="background:#faf500">20</span><span style="background:#ff9900">30</span><span style="background:#ff2800;color:#fff">50</span><span style="background:#b40068;color:#fff">80〜</span><small>1時間の雨の量(ミリ)。右ほど強い雨</small></div>
-    <p class="hint">左へ動かすと少し前、右の「予想」は1時間先までの見こみです。2本指でひろげると拡大できます。予想は外れることもあるので、出かける前にもう一度見てください。</p>
-    <p class="hint">出典: <a href="https://www.jma.go.jp/bosai/nowc/" target="_blank" rel="noopener">気象庁 雨雲の動き</a>(高解像度降水ナウキャスト)・地図: <a href="https://maps.gsi.go.jp/development/ichiran.html" target="_blank" rel="noopener">国土地理院</a></p>
+    <p class="hint">左へ動かすと少し前、右の「予想」は1時間先までの見こみです。予想は外れることもあるので、出かける前にもう一度見てください。</p>`;
+  if(RADAR.layer==="shelter"){ const kinds=`<div class="chips bm-kind">${SHEL_KIND.map(([k,n])=>`<button class="fchip" data-shk="${k}" aria-pressed="${RADAR.shel===k}">${n}</button>`).join("")}</div>`;
+    if(z<12) return kinds+`<p class="exp">🏠 「近所」にすると、にげる場所が地図に出ます。</p>`;
+    return kinds+(RADAR.pts.length?`<h3 class="ms-h">近いにげる場所(${esc(SHEL_KIND.find(x=>x[0]===RADAR.shel)[1])}のとき)</h3><ol class="bm-list">${RADAR.pts.slice(0,8).map((p,i)=>`<li data-pt="${i}"><b>${esc(p.name)}</b><small>${esc(p.addr)} ・ 約${p.km<1?Math.round(p.km*1000)+"m":p.km.toFixed(1)+"km"}</small></li>`).join("")}</ol>`:`<p class="hint" id="bmShelMsg">読みこみ中…</p>`)
+      +`<p class="hint">「どの災害のときに使える場所か」は場所によってちがいます。上で災害の種類を選んでください。実際ににげるときは、市町村の知らせにしたがってください。</p>`; }
+  return `<div class="bm-lg">${L.lg.map(([c,t])=>`<span><i style="background:${c}"></i>${esc(t)}</span>`).join("")}</div><p class="hint">${esc(L.d)}。色がないところも安全とはかぎりません。${z<10?"「📍 街」「🏠 近所」にすると、くわしく見えます。":""}</p>`; }
+function rdDraw(){ const box=document.getElementById("rdBox"); if(!box) return; const W=Math.round(box.clientWidth)||360, H=Math.round(Math.min(W*1.1,innerHeight*0.55));
+  box.style.height=H+"px"; const zc=box.parentNode.querySelector("#rdBox+.zc"); if(zc) zc.remove(); box.innerHTML=rdMapHTML(W,H); zoomable(box,box.firstElementChild,{max:4,skip:e=>!!(e.target.closest&&e.target.closest(".bm-pt"))}); }
+function bmSide(){ const el=document.getElementById("bmSide"); if(!el) return; el.innerHTML=bmSideHTML(); const sh=document.getElementById("sheet");
+  const pl=sh.querySelector("#rdPlay"); if(pl) pl.onclick=()=>{ if(RADAR.play){ rdStopPlay(); return; } if(!RADAR.frames.length) return; pl.textContent="⏸ 止める";
+    let i=RADAR.i>=RADAR.frames.length-1?0:RADAR.i; RADAR.play=setInterval(()=>{ if(!document.getElementById("rdBox")) return rdStopPlay(); rdSet(i); i++; if(i>=RADAR.frames.length) rdStopPlay(); },700); };
+  const sl=sh.querySelector("#rdSlider"); if(sl) sl.oninput=e=>{ rdStopPlay(); rdSet(+e.target.value); };
+  if(RADAR.layer==="rain"&&RADAR.frames.length) rdSet(RADAR.i);
+  if(RADAR.layer==="rain"&&!RADAR.frames.length){ const lab=document.getElementById("rdLabel"); if(lab&&RADAR.loaded) lab.textContent="いま読みこめませんでした。「↻ 新しくする」を押してください。"; }
+  sh.querySelectorAll("[data-shk]").forEach(b=>b.onclick=async()=>{ RADAR.shel=b.dataset.shk; await bmRefresh(); }); }
+async function bmRefresh(){ rdStopPlay(); if(RADAR.layer==="shelter"){ bmSide(); await loadShelters(); } rdDraw(); bmSide(); }
+async function openBMap(layer){ const sh=document.getElementById("sheet"); rdStopPlay(); if(layer) RADAR.layer=layer;
+  if(RADAR.layer==="shelter"&&RADAR.lv<3) RADAR.lv=3;
+  sh.innerHTML=`<div class="bar"><div class="wrap"><button class="iconbtn" id="rdx" aria-label="もどる">← もどる</button><span class="ttl">🗺️ 防災マップ</span><button class="iconbtn" id="rdr" aria-label="新しくする" style="margin-left:auto;width:auto;padding:0 10px">↻ 新しくする</button></div></div><div class="wrap body">
+    <div class="bm-layers" role="group" aria-label="地図に重ねるもの">${Object.entries(BM_LAYERS).map(([k,v])=>`<button class="fchip" data-bml="${k}" aria-pressed="${RADAR.layer===k}">${v.n}</button>`).join("")}</div>
+    <div class="seg rd-lv" role="group" aria-label="地図の広さ">${RD_LV.map(([l],i)=>`<button data-rdlv="${i}" aria-pressed="${i===RADAR.lv}">${l}</button>`).join("")}</div>
+    <div id="rdBox" class="rd-box" aria-label="防災マップ"></div>
+    <button class="fchip" id="bmGeo" style="margin-top:8px">📍 いまいる所で見る${RADAR.center?"(使っています)":""}</button>
+    <div id="bmSide"></div>
+    <p class="hint">「いまいる所」はこのスマホの中だけで使い、どこにも送りません。2本指でひろげると拡大できます。</p>
+    <p class="hint">出典: 気象庁(雨雲の動き)・国土地理院(地図・重ねるハザードマップ・指定緊急避難場所)。地図は市町村などが作った「想定」で、これより大きな災害が起きることもあります。</p>
     <button class="iconbtn" id="rdx2" style="margin-top:6px">← もどる</button></div>`;
   sh.hidden=false; sh.scrollTop=0; document.body.style.overflow="hidden";
   const close=()=>{ rdStopPlay(); sh.hidden=true; sh.innerHTML=""; document.body.style.overflow=""; };
   sh.querySelector("#rdx").onclick=close; sh.querySelector("#rdx2").onclick=close;
-  sh.querySelector("#rdr").onclick=()=>{ RADAR.frames=[]; openRadar(); };
-  sh.querySelectorAll("[data-rdlv]").forEach(b=>b.onclick=()=>{ RADAR.lv=+b.dataset.rdlv; sh.querySelectorAll("[data-rdlv]").forEach(x=>x.setAttribute("aria-pressed",x===b)); const zc=sh.querySelector("#rdBox+.zc"); if(zc) zc.remove(); rdDraw(); });
-  sh.querySelector("#rdPlay").onclick=()=>{ if(RADAR.play){ rdStopPlay(); return; } if(!RADAR.frames.length) return; sh.querySelector("#rdPlay").textContent="⏸ 止める";
-    let i=RADAR.i>=RADAR.frames.length-1?0:RADAR.i; RADAR.play=setInterval(()=>{ if(!document.getElementById("rdBox")) return rdStopPlay(); rdSet(i); i++; if(i>=RADAR.frames.length){ rdStopPlay(); } },700); };
-  sh.querySelector("#rdSlider").oninput=e=>{ rdStopPlay(); rdSet(+e.target.value); };
-  rdDraw(); track("/radar","雨雲レーダー");
-  if(!RADAR.frames.length) RADAR.frames=await radarFrames();
-  if(!document.getElementById("rdBox")) return;
-  const lab=document.getElementById("rdLabel");
-  if(!RADAR.frames.length){ if(lab) lab.textContent="いま読みこめませんでした。↻で読み直すか、気象庁のページで見てください。"; return; }
-  const s=document.getElementById("rdSlider"); s.max=RADAR.frames.length-1;
-  const nowI=RADAR.frames.findIndex(x=>x.f===1); rdSet(nowI>0?nowI-1:RADAR.frames.length-1); }
-document.addEventListener("click",ev=>{ if(ev.target.closest("[data-radar]")){ ev.stopPropagation(); openRadar(); } },true);
+  sh.querySelector("#rdr").onclick=()=>{ RADAR.frames=[]; RADAR.loaded=false; SHEL_CACHE.clear(); openBMap(); };
+  sh.querySelectorAll("[data-bml]").forEach(b=>b.onclick=()=>{ RADAR.layer=b.dataset.bml; sh.querySelectorAll("[data-bml]").forEach(x=>x.setAttribute("aria-pressed",x===b));
+    if(RADAR.layer==="shelter"&&RADAR.lv<3){ RADAR.lv=3; sh.querySelectorAll("[data-rdlv]").forEach(x=>x.setAttribute("aria-pressed",+x.dataset.rdlv===3)); } bmRefresh(); });
+  sh.querySelectorAll("[data-rdlv]").forEach(b=>b.onclick=()=>{ RADAR.lv=+b.dataset.rdlv; if(RADAR.lv===0) RADAR.center=null; sh.querySelectorAll("[data-rdlv]").forEach(x=>x.setAttribute("aria-pressed",x===b)); bmRefresh(); });
+  sh.querySelector("#bmGeo").onclick=()=>{ const g=sh.querySelector("#bmGeo"); if(!navigator.geolocation){ toast("このスマホでは場所がわかりませんでした"); return; } g.textContent="📍 さがしています…";
+    navigator.geolocation.getCurrentPosition(pos=>{ RADAR.center=[pos.coords.latitude,pos.coords.longitude]; if(RADAR.lv<2) RADAR.lv=RADAR.layer==="rain"?2:3; g.textContent="📍 いまいる所で見る(使っています)"; sh.querySelectorAll("[data-rdlv]").forEach(x=>x.setAttribute("aria-pressed",+x.dataset.rdlv===RADAR.lv)); bmRefresh(); },
+      ()=>{ g.textContent="📍 いまいる所で見る"; toast("場所を使えませんでした(スマホの設定で「位置情報」を許可すると使えます)"); },{enableHighAccuracy:false,timeout:12000,maximumAge:300000}); };
+  sh.querySelector("#rdBox").addEventListener("click",ev=>{ const b=ev.target.closest(".bm-pt"); if(!b) return; const p=RADAR.pts[+b.dataset.pt]; if(p) toast(`🏃 ${esc(p.name)}<br><small>${esc(p.addr)}</small>`); });
+  track("/bmap","防災マップ "+RADAR.layer);
+  await bmRefresh();
+  if(RADAR.layer==="rain"&&!RADAR.frames.length){ RADAR.frames=await radarFrames(); RADAR.loaded=true; if(!document.getElementById("rdBox")) return;
+    let nowI=RADAR.frames.findIndex(x=>x.f===1); RADAR.i=nowI>0?nowI-1:RADAR.frames.length-1; rdDraw(); bmSide(); } }
+function openRadar(){ return openBMap("rain"); }
+document.addEventListener("click",ev=>{ const r=ev.target.closest("[data-radar],[data-bmap]"); if(r){ ev.preventDefault(); ev.stopPropagation(); openBMap(r.dataset.bmap||"rain"); } },true);
 function openQuake(refresh){ const sh=document.getElementById("sheet"); sh.dataset.kind="quake";
   const tsu=AL.tsunami, sp=(AL.special||[]).filter(x=>Date.now()-Date.parse(x.at)<24*36e5);
   sh.innerHTML=`<div class="bar"><div class="wrap"><button class="iconbtn" id="qkx" aria-label="もどる">← もどる</button><span class="ttl">🛟 防災(地震・雨雲・警報)</span><button class="iconbtn" id="qkr" aria-label="新しくする" style="margin-left:auto;width:auto;padding:0 10px">↻ 新しくする</button></div></div><div class="wrap body">
    ${rtStatHTML()}
-   <div class="bs-go"><button class="fchip" data-radar="1">☔ 雨雲レーダー<small>いまと1時間先の雨</small></button><a class="fchip" href="https://hinanmap.gsi.go.jp/" target="_blank" rel="noopener">🏃 にげる場所の地図<small>避難場所(国土地理院)</small></a><a class="fchip" href="https://disaportal.gsi.go.jp/" target="_blank" rel="noopener">🗺️ 家のまわりの危ない場所<small>ハザードマップ</small></a><a class="fchip" href="https://www.jma.go.jp/bosai/risk/" target="_blank" rel="noopener">⚠️ 大雨で危ない場所<small>キキクル(気象庁)</small></a></div>
+   <div class="bs-go"><button class="fchip" data-bmap="rain">☔ 雨雲レーダー<small>いまと1時間先の雨</small></button><button class="fchip" data-bmap="shelter">🏃 にげる場所<small>近くの避難場所</small></button><button class="fchip" data-bmap="flood">🌊 水につかる所<small>川があふれたら</small></button><button class="fchip" data-bmap="dosha">⛰️ がけ崩れの所<small>土砂災害の区域</small></button></div>
    <p class="hint">気象庁の発表を、アプリを開いたときに直接読んでいます(ニュースの1日4回の更新を待ちません)。開いている間は、新しい知らせもすぐ受けとります。${AL.checked?`最後に確かめた時刻: ${qhm(AL.checked)}`:""}${AL.ok?"":" ・ <b>いま読み込めませんでした。下の公式ページで確かめてください。</b>"}</p>
    ${tsu?`<div class="al-band" style="cursor:default"><span class="ai">🌊</span><span><b>${esc(tsu.grade)}</b><small>${esc(tsu.areas.join("・"))}${tsu.count>tsu.areas.length?" ほか":""}</small></span></div>`:`<p>🌊 津波の警報・注意報は、いま出ていません。</p>`}
    ${sp.map(x=>`<div class="al-band" style="cursor:default;margin-top:8px"><span class="ai">⚠️</span><span><b>特別警報</b><small>${esc(x.who||"")} ${esc(x.text||"")}</small></span></div>`).join("")}
@@ -4283,7 +4388,7 @@ function openQuake(refresh){ const sh=document.getElementById("sheet"); sh.datas
    <div class="hint">気象庁の発表の文をそのまま出しています。「わたしの街」は、天気の「🕐 1時間ごと」のページで選べます。</div>
    <h3 style="margin:18px 0 0">最近の地震(3日以内)</h3>
    ${AL.quakes.length?`<ul class="qk-list">${AL.quakes.map(q=>{ const r=qr(q.maxi); const c=r>=8?"l7":r>=6?"l6":r>=4?"l5":r===3?"l4":r===2?"l3":""; return `<li><span class="qk-s ${c}"><span><small>震度</small>${esc(QN[q.maxi]||"?")}</span></span><span><b>${esc(q.place)}</b><br><span class="hint">${qhm(q.at)}ごろ(${qago(q.at)})${q.mag?` ・ 大きさ(マグニチュード)${esc(q.mag)}`:""}${q.depth!=null?` ・ 深さ${q.depth===0?"ごく浅い":esc(q.depth)+"km"}`:""}</span></span></li>`; }).join("")}</ul>`:`<p class="hint" style="margin-top:8px">${AL.ok?"3日以内に震度のある地震の情報はありません。":"読み込み中か、つながりませんでした。"}</p>`}
-   <h3 style="margin:20px 0 0">公式ページで確かめる</h3>
+   <h3 style="margin:20px 0 0">もっとくわしく(公式のページが開きます)</h3>
    <div class="qk-links">
      <a href="https://www.jma.go.jp/bosai/map.html#contents=earthquake_map" target="_blank" rel="noopener">📍 気象庁 地震情報<small>震度の地図・くわしい発表</small></a>
      <a href="https://www.jma.go.jp/bosai/map.html#contents=tsunami" target="_blank" rel="noopener">🌊 気象庁 津波警報・注意報</a>
