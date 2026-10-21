@@ -1,0 +1,16 @@
+name: probe (一時的な確認)
+on: workflow_dispatch
+permissions: {contents: read}
+jobs:
+  p:
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          for u in "https://api.p2pquake.net/v2/history?codes=561&limit=3" "https://api.p2pquake.net/v2/history?codes=9611&limit=2" "https://api.p2pquake.net/v2/history?codes=555&limit=1" \
+            "https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/4.5_day.geojson" \
+            "https://www.gdacs.org/gdacsapi/api/events/geteventlist/MAP" \
+            "https://www.gdacs.org/xml/rss.xml" \
+            "https://eonet.gsfc.nasa.gov/api/v3/events?status=open&days=7&limit=5" \
+            "https://api.gdeltproject.org/api/v2/doc/doc?query=sourcelang:japanese&mode=artlist&maxrecords=3&format=json" \
+            "https://api.gdeltproject.org/api/v2/geo/geo?query=flood&format=geojson&timespan=24h"; do
+            echo "=== $u"; curl -s -m 25 -D h.txt -o b.txt -H "Origin: https://sunbike22.github.io" "$u"; head -1 h.txt; grep -i 'access-control-allow-origin\|content-type' h.txt; wc -c < b.txt; head -c 1500 b.txt; echo; done
