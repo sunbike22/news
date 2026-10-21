@@ -1,36 +1,36 @@
 // まいにちニュース — データ(Notion「ニュース」から書き出し)
 // 自動更新でこのファイルだけを書き換える想定
 window.NEWS_DATA = {
-  updated: "2026-10-21T18:10:00+09:00",
+  updated: "2026-10-21T22:40:00+09:00",
 
-  updatedLabel: "10/21(水) 夕方 6:10",
+  updatedLabel: "10/21(水) 夜 10:40",
 
-  nextLabel: "10/21(水) 夜 10:30ごろ",
+  nextLabel: "10/22(木) 朝 6:50ごろ",
 
-  weather: {"iso":"2026-10-21","date":"10/21(水)","place":"東京","sky":"くもりのち晴れ","hi":30,"lo":20,"umbrella":"傘はたぶんいらない(にわか雨に備えて折りたたみがあると安心)","rain":[["朝",20],["昼",10],["夜",20]],"wear":"昼は半そで。夜はひんやりするので羽織るものを","notes":["都心は30.3℃で、記録が残る中で最も遅い真夏日に。夜は北風に変わって涼しくなり、あすは23〜24℃ほど。新宿区などに強風注意報が夜12時まで続く(気象庁)。帽子やかさが飛ばされないように","台風30号: 大型で「猛烈な」勢力(21日3時 900hPa)。先島諸島は22日から大しけ、23日(金)〜24日(土)ごろ暴風のおそれ。そのあと九州など西日本へ向かうおそれも"],"source":"tenki.jp(10/21 5:45の解説・新宿区 10/20 22:00発表)・AccuWeather(10/21 6:50)・ウェザーニュース(台風 10/21 5:16)・tenki.jp(30.3℃ 10/21 15:24)"},
+  weather: {"iso":"2026-10-22","date":"10/22(木)","place":"東京","sky":"くもり時々晴れ","hi":24,"lo":20,"umbrella":"傘はたぶんいらない(念のため折りたたみがあると安心)","rain":[["朝",20],["昼",30],["夜",20]],"wear":"長そでが活躍。夜は17℃くらいまで下がるので羽織るものを","notes":["きょうの30℃から一気に下がり、昼も25℃に届かない予想。24日(土)は雨で肌寒くなりそう。服装で調整しよう","台風30号: 900hPaの猛烈な勢力のまま、23日に与那国島の南へ。そのあと北へ進み、九州・中国・四国も予報円に入った(気象庁 21日夜6時45分)"],"source":"tenki.jp(千代田区 10/21 9:00発表)・AccuWeather(10/21 20:50)・ウェザーニュース(10/21 16:55)"},
 
   three: [
     {"label":"世界のトレンド","tone":"intl","title":"中東の争いが広がる 英国がサウジへ戦闘機","text":"イエメンで19日の攻撃の死者は73人に。原油は20日に少し下がったが100ドル超えのままで、ガソリン代にもつながる。","ex":"saudi"},
     {"label":"日本のトレンド","tone":"pol","title":"食料品の消費税1%法案 委員会で話し合いスタート","text":"21日は「下がった税の分が、お店の値段に本当に出るか」が論点に。財源も配るお金の対象もまだはっきりしない。買い物の税金に関わる話。","ex":"tax"},
-    {"label":"世間の関心事","tone":"soc","title":"10月下旬に30℃ 東京で「いちばん遅い真夏日」","text":"21日、東京都心は30.3℃。統計を取り始めてから最も遅い記録。土曜は最高18℃の予想で、寒暖差が大きい。服装と体調に気をつけて。"}
+    {"label":"世間の関心事","tone":"soc","title":"秋田で川があふれた 最も高い「レベル5」の警報","text":"21日夜、由利本荘市の子吉川で氾濫。一部の地区に「緊急安全確保」が出た。近くの人は、外が危ないときは家の2階など高い所へ。政府も連絡室を作った。"}
   ],
 
   top10: [
+    {"g":"soc","ok":1,"icon":"🌊","title":"秋田・子吉川があふれ、「レベル5氾濫特別警報」。一部に「緊急安全確保」","text":"21日夜8時15分、気象庁が由利本荘市の子吉川に、いちばん上の「レベル5」の警報を出した。近くの石沢川でも氾濫。3地区の448世帯・約1200人に「緊急安全確保」(NHK・ANN・FNN)。","point":"「緊急安全確保」は、もう避難所まで行くのが危ないかもしれないときの合図。外に出るのが危なければ、家の2階など少しでも高い所へ。政府は東北〜北陸の大雨で官邸に連絡室を作った(NHK・ANN・TBS)。"},
     {"g":"eco","ok":1,"icon":"💴","title":"食料品の消費税1%法案、委員会で話し合いスタート。「値段は本当に下がる?」","text":"21日、衆議院の財務金融委員会でくわしい質疑が始まった。決まれば2027年4月から2年間、食料品の税が8%→1%になる。","point":"公明党は「税が下がっても値段がそのままの場合もある」とした去年の政府の答弁と食い違うと指摘。片山財務相は「説明責任は免れない」と述べ、お店の値段を確かめる大臣の会議を作る考えを示した(ANN・NHK・ロイター)。","ex":"tax"},
     {"g":"it","ok":1,"icon":"🔐","title":"車探しの「カーセンサー」371万件、警察官ら12.5万人分も漏れたおそれ","text":"リクルートが21日に発表。車の問い合わせをした人の名前・住所など最大約371万件が漏れたおそれ。悪用はまだ確認されていない(ITmedia・ASCII・NHK)。","point":"警察庁は、安否確認メールの会社(アルカディア)への攻撃で、全国20府県警の警察官・職員約12.5万人分と、防犯メールに登録した人のアドレスが漏れたおそれと発表した(時事・NHK)。会社の名前をかたるあやしいメールに注意しよう。","ex":"cyber"},
-    {"g":"soc","ok":1,"icon":"🥵","title":"東京都心で30.3℃。記録が残る中でいちばん遅い真夏日","text":"大阪・名古屋も最も遅い真夏日になった(tenki.jp・ウェザーニュース・朝日)。","point":"夜から北の冷たい空気が入り、東京はあす23〜24℃、24日(土)は最高18℃の予想で「11月上旬なみ」。一気に秋が深まるので、羽織るものを用意して体調に気をつけよう。"},
+    {"g":"it","ok":1,"icon":"🛠️","title":"多くのウェブサイトを動かすプログラム「PHP」に重大な欠陥が2つ。サーバーを乗っ取られるおそれ。修正版は21日夜11時に公開予定で、念のためサービスを止めた所も"},
+    {"g":"soc","ok":1,"icon":"🌀","ill":"typhoon","title":"台風30号は900hPaの猛烈な勢力のまま、23日に与那国島の南へ。そのあと北へ進み、九州・中国・四国も予報円に入った(気象庁 夜6時45分)"},
+    {"g":"intl","ok":1,"icon":"🇺🇦","title":"米国の特使がプーチン氏と約3時間会談し、ウクライナの終戦案を話し合った(結論はまだ)。ロシアは拘束していた米国人を解放"},
+    {"g":"soc","ok":1,"icon":"🥵","title":"東京都心で30.3℃、記録に残る中でいちばん遅い真夏日。あすは23〜24℃、24日(土)は最高18℃の予想"},
     {"g":"intl","ok":1,"icon":"⚔️","title":"イエメンでフーシ派の攻撃の死者が73人に。英国はサウジを守るため戦闘機を送る","ex":"saudi"},
-    {"g":"soc","ok":1,"icon":"🌀","ill":"typhoon","title":"猛烈な台風30号。先島諸島は23〜24日に接近し、八重山は最大瞬間風速60mの予想。26日ごろ対馬の近くへ進む予想も(進路はまだ幅が大きい)"},
-    {"g":"eco","ok":1,"icon":"📈","title":"日経平均は545円高の64,621円、3日ぶりに上がった。米国の株高でAI・半導体の株が買い戻された(一時1300円こえの値上がり)"},
-    {"g":"it","ok":1,"icon":"🖥️","title":"「お名前ドットコム」の仮想サーバー(FXの自動売買などに使う)に不正なプログラム。全プランを止め、最大2万6739台に影響のおそれ(GMO発表)"},
-    {"g":"it","ok":1,"icon":"💹","title":"岩井コスモ証券で客の知らない株の売買注文(7口座。取引は元にもどし客の負担なし)。一連の攻撃で金融の被害は初めてとみられる","ex":"cyber"},
-    {"g":"intl","ok":1,"icon":"🇺🇦","title":"米国の特使が21日にロシアでプーチン氏と会う予定。ウクライナの終戦の新しい案を伝えるとみられる(結果はまだ)"},
-    {"g":"spo","ok":1,"icon":"🏀","title":"NBAが開幕。史上初の24年目のレブロンが新しいチーム(76ers)での初戦で14得点、逆転勝ち。八村・河村選手のクリッパーズは22日から"}
+    {"g":"eco","ok":1,"icon":"📈","title":"日経平均は545円高の64,621円、3日ぶりに上がった。米国の株高でAI・半導体の株が買い戻された"},
+    {"g":"it","ok":1,"icon":"💹","title":"岩井コスモ証券で客の知らない株の売買注文(7口座。取引は元にもどし客の負担なし)。一連の攻撃で金融の被害は初めてとみられる","ex":"cyber"}
   ],
 
   quiz: [
     {"q":"21日にリクルートが発表した「カーセンサー」などで漏れたおそれがある情報は、最大で約何件?","o":["約3.7万件","約37万件","約371万件","約3710万件"],"a":2,"e":"車の問い合わせをした人の名前・住所など最大約371万件。21日の時点で悪用は確認されていない。"},
-    {"q":"その日の最高気温が何℃以上だと「真夏日」という?","o":["25℃","30℃","35℃","40℃"],"a":1,"e":"21日の東京都心は30.3℃で、記録が残る中でいちばん遅い真夏日。25℃以上は夏日、35℃以上は猛暑日。"},
+    {"q":"21日夜、秋田の子吉川に気象庁が出した「氾濫特別警報」は、警戒レベルのいくつ?","o":["レベル2","レベル3","レベル4","レベル5"],"a":3,"e":"いちばん上のレベル5。由利本荘市の一部の地区には「緊急安全確保」も出た。外が危ないときは家の2階など少しでも高い所へ。"},
     {"q":"食料品の消費税1%法案を、21日からくわしく話し合い始めた衆議院の委員会は?","o":["予算委員会","財務金融委員会","外務委員会","文部科学委員会"],"a":1,"e":"税金やお金の仕組みの法案を話し合う委員会。決まれば2027年4月から2年間、食料品の税が8%→1%になる。"}
   ],
 
@@ -44,7 +44,8 @@ window.NEWS_DATA = {
     ["2026-10-20T14:27:20Z",157.92],
     ["2026-10-20T22:04:20Z",158.26],
     ["2026-10-21T04:27:46Z",158.11],
-    ["2026-10-21T09:28:20Z",158.14]
+    ["2026-10-21T09:28:20Z",158.14],
+    ["2026-10-21T14:25:52Z",158.09]
   ],
 
   markets: [
@@ -75,6 +76,20 @@ window.NEWS_DATA = {
   },
 
   news: [
+    ["2026-10-21","soc",1,"秋田・由利本荘市の子吉川で氾濫、気象庁が「レベル5氾濫特別警報」(21日20時15分)","NHK 10/21 20:55、ANN(KSB)10/21 20:31、FNN(tenki.jp掲載)10/21 21:28、日本気象協会 10/21 19:59","",""],
+    ["2026-10-21","soc",1,"由利本荘市の3地区448世帯・約1200人に「緊急安全確保」(警戒レベル5)。石沢川でも氾濫","ANN(KSB)10/21、NHK 10/21 21:36(石沢地区に緊急安全確保)、ABEMA 10/21。世帯・人数はANNの数字","",""],
+    ["2026-10-21","pol",1,"東北〜北陸の大雨で政府が官邸連絡室を設置、首相が被害の把握などを指示","NHK 10/21、ANN 10/21、TBS 10/21","",""],
+    ["2026-10-21","soc",1,"台風30号、900hPaの猛烈な勢力のまま23日に与那国島の南へ。その後北上し九州・中国・四国も予報円に(気象庁18時45分)","HBC(見出し、気象庁18:45発表)10/21、NHK 10/21、tenki.jp 10/21、日経(見出し)10/21","台風",""],
+    ["2026-10-21","it",1,"プログラム言語PHPに重大な欠陥2件(深刻度9.2)、修正版を日本時間21日23時に公開へ。サーバー乗っ取りのおそれ","ITmedia 10/21 9:50、Help Net Security 10/21、The Hacker News 10/21、共同(見出し)10/21、piyolog 10/21 17:45","不正アクセスとAI",""],
+    ["2026-10-21","it",0,"PHPの欠陥への対応で、厚生労働省の介護サイトやさくらインターネットの一部機能も停止","共同(見出し、Yahoo・Infoseek)10/21","不正アクセスとAI",""],
+    ["2026-10-21","it",0,"PHPの欠陥への備えで、保育施設向けアプリ「コドモン」が全サービスを一時停止(22日早朝に再開見込み)","セキュリティ対策Lab(ロケットボーイズ)10/21 16:08","不正アクセスとAI",""],
+    ["2026-10-21","intl",1,"米特使ウィトコフ氏がサンクトペテルブルクでプーチン氏と約3時間会談。ウクライナの終戦案や米ロ首脳会談を話し合う","TASS 10/21、アルジャジーラ(AFP・ロイター)10/21 21:08更新、点新聞(央視)10/21、共同(見出し)10/21","",""],
+    ["2026-10-21","intl",1,"ロシアが拘束していた米国人の元教師ハバード氏(72)を解放。会談に合わせた善意のしるしと報道","ABCニュース 10/21、アルジャジーラ 10/21、TASS 10/21","",""],
+    ["2026-10-21","it",0,"データベース「TiDB」のPingCAP、日本国内で最大約5万件の個人情報が不正アクセスで漏れたと発表","ビジネス+IT(見出し)10/21","不正アクセスとAI",""],
+    ["2026-10-21","it",0,"不正アクセスによる個人情報の漏えいが相次ぎ、警視庁への相談も相次ぐ","NHK(見出し)10/21","不正アクセスとAI",""],
+    ["2026-10-21","soc",0,"宮崎・日向市で33.6℃、10月の最高気温を更新。22日は気温が下がる","NHK(見出し)10/21","",""],
+    ["2026-10-21","soc",0,"北海道は22日にかけ大気が不安定、山の方では雪の見込み","NHK(見出し)10/21","",""],
+    ["2026-10-21","sci",0,"21日夜はオリオン座流星群が見ごろのピーク(ハレー彗星のちりが元)","ウェザーニュース 10/21","宇宙・科学",""],
     ["2026-10-21","it",1,"リクルート「カーセンサー」などに不正アクセス、最大約371万件の個人情報が漏れたおそれ","ITmedia 10/21 12:41、ASCII 10/21、NHK 10/21(リクルート発表)","不正アクセスとAI","N12"],
     ["2026-10-21","it",0,"GMO系のFX自動売買サービスへの不正アクセス、顧客情報が見られたおそれ","日経 10/21(見出し)","不正アクセスとAI",""],
     ["2026-10-21","it",0,"イオン、グループ各社のWebサイトで不正アクセスを確認、個人情報が漏れたか調査中","ASCII.jp 10/21(Yahooにも転載)","不正アクセスとAI",""],
@@ -432,4 +447,4 @@ window.NEWS_DATA = {
     ["10/19","10/12の見出しの「体育の日」を「スポーツの日」に直した"]
   ]
 };
-window.NEWS_DATA.en = {"three":[{"t":"Conflict in the Middle East spreads; Britain sends fighter jets to Saudi Arabia","x":"In Yemen, the death toll from the attack on the 19th rose to 73. Oil fell a little on the 20th but is still above 100 dollars, which affects gas prices."},{"t":"Bill to cut the tax on food to 1%: committee debate begins","x":"On the 21st, the main question was whether the tax cut will really show up in store prices. How to pay for it and who will get cash are still not clear. It is about the tax on your shopping."},{"t":"30°C in late October: Tokyo's latest \"midsummer day\" on record","x":"On the 21st, central Tokyo reached 30.3°C, the latest such day since records began. Saturday's high is expected to be 18°C, a big change in temperature. Be careful with your clothes and your health."}],"top10":[{"t":"Committee debate begins on the bill to cut the tax on food to 1%. \"Will prices really go down?\"","x":"On the 21st, detailed questioning started at the Financial Affairs Committee of the House of Representatives. If passed, the tax on food will drop from 8% to 1% for two years from April 2027.","w":[["committee","委員会"],["price","値段"]]},{"t":"Up to 3.71 million records from the car search site \"Carsensor\" and data on about 125,000 police officers and staff may have leaked","x":"Recruit announced it on the 21st. Names and addresses of people who asked about cars, up to about 3.71 million records, may have leaked. No misuse has been confirmed yet (ITmedia, ASCII, NHK).","w":[["leak","漏れる"],["personal information","個人情報"]]},{"t":"Central Tokyo hit 30.3°C, the latest \"midsummer day\" on record","x":"Osaka and Nagoya also had their latest midsummer days on record (tenki.jp, Weathernews, Asahi).","w":[["midsummer day","真夏日"],["record","記録"]]},{"t":"The death toll from a Houthi attack in Yemen rose to 73. Britain will send fighter jets to protect Saudi Arabia","w":[["death toll","死者数"],["fighter jet","戦闘機"]]},{"t":"Violent Typhoon No. 30 will approach the Sakishima Islands on the 23rd and 24th, with gusts of up to 60 meters per second expected in Yaeyama. It may move near Tsushima around the 26th (the path is still uncertain)","w":[["typhoon","台風"],["gust","瞬間風速"]]},{"t":"The Nikkei average rose 545 yen to 64,621 yen, its first rise in three days. AI and chip stocks were bought back after U.S. stocks rose (at one point up more than 1,300 yen)","w":[["stock","株"],["rise","上がる"]]},{"t":"A harmful program was found on \"Onamae.com\" virtual servers (used for things like automatic FX trading). All plans were stopped, and up to 26,739 servers may be affected (GMO announcement)","w":[["virtual server","仮想サーバー"],["harmful program","不正なプログラム"]]},{"t":"Stock orders customers did not make were placed at Iwai Cosmo Securities (7 accounts; the trades were reversed and customers will not pay). It seems to be the first financial damage in this series of attacks","w":[["securities company","証券会社"],["account","口座"]]},{"t":"A U.S. envoy plans to meet President Putin in Russia on the 21st. He is expected to share a new plan to end the war in Ukraine (no result yet)","w":[["envoy","特使"],["end the war","終戦"]]},{"t":"The NBA season has started. In his record 24th season, LeBron scored 14 points in his first game with his new team (the 76ers), a come-from-behind win. Hachimura and Kawamura's Clippers start on the 22nd","w":[["season","シーズン"],["come-from-behind win","逆転勝ち"]]}],"ex":{"saudi":"In the Middle East, an armed group and Saudi Arabia keep fighting, and oil prices are rising. This also connects to gas prices in Japan.","tax":"A plan to lower the tax on food you buy at the supermarket from 8% to 1%. It has not been decided yet.","cyber":"Bad actors keep breaking into the computers of companies and government offices and stealing information such as names and addresses.","mmx":"A Japanese probe has left for Mars. The plan is to bring back sand from a small moon near Mars.","sato":"The Hanshin Tigers agreed to let Sato, this year's \"Triple Crown\" hitter, try to play in Major League Baseball in America.","series":"Games to decide Japan's best pro baseball team start on Saturday, October 24.","yokohama":"There was an election to choose the leader (mayor) of Yokohama, and a new person was chosen.","past":"Three weeks of worries about a big typhoon and a volcano, a new governor of Okinawa and new ministers, and higher interest rates in America."}};
+window.NEWS_DATA.en = {"three":[{"t":"Conflict in the Middle East spreads; Britain sends fighter jets to Saudi Arabia","x":"In Yemen, the death toll from the attack on the 19th rose to 73. Oil fell a little on the 20th but is still above 100 dollars, which affects gas prices."},{"t":"Bill to cut the tax on food to 1%: committee debate begins","x":"On the 21st, the main question was whether the tax cut will really show up in store prices. How to pay for it and who will get cash are still not clear. It is about the tax on your shopping."},{"t":"A river overflowed in Akita: the highest \"Level 5\" warning","x":"On the night of the 21st, the Koyoshi River in Yurihonjo City overflowed. An \"emergency safety\" alert was issued for some areas. People nearby should move to a higher place, such as the second floor of their home, if it is dangerous outside. The government also set up an office to gather information."}],"top10":[{"t":"The Koyoshi River in Akita overflowed, and a \"Level 5\" special flood warning was issued. Some areas got an \"emergency safety\" alert","x":"At 8:15 p.m. on the 21st, the Japan Meteorological Agency issued the highest \"Level 5\" warning for the Koyoshi River in Yurihonjo City. The nearby Ishizawa River also overflowed. About 1,200 people in 448 households in 3 areas got an \"emergency safety\" alert (NHK, ANN, FNN).","w":[["overflow","あふれる"],["warning","警報"]]},{"t":"Committee debate begins on the bill to cut the tax on food to 1%. \"Will prices really go down?\"","x":"On the 21st, detailed questioning started at the Financial Affairs Committee of the House of Representatives. If passed, the tax on food will drop from 8% to 1% for two years from April 2027.","w":[["committee","委員会"],["price","値段"]]},{"t":"Up to 3.71 million records from the car search site \"Carsensor\" and data on about 125,000 police officers and staff may have leaked","x":"Recruit announced it on the 21st. Names and addresses of people who asked about cars, up to about 3.71 million records, may have leaked. No misuse has been confirmed yet (ITmedia, ASCII, NHK).","w":[["leak","漏れる"],["personal information","個人情報"]]},{"t":"Two serious flaws were found in \"PHP,\" a program that runs many websites. Servers could be taken over. A fixed version is planned for 11 p.m. on the 21st, and some services were stopped just in case","w":[["flaw","欠陥"],["fixed version","修正版"]]},{"t":"Typhoon No. 30 is still violent at 900 hPa and will move south of Yonaguni Island on the 23rd. After that it will move north, and Kyushu, Chugoku and Shikoku are now inside the forecast circle (JMA, 6:45 p.m.)","w":[["typhoon","台風"],["forecast","予報"]]},{"t":"A U.S. envoy talked with President Putin for about three hours about a plan to end the war in Ukraine (no decision yet). Russia freed an American it had been holding","w":[["envoy","特使"],["release","解放する"]]},{"t":"Central Tokyo hit 30.3°C, the latest \"midsummer day\" on record. Tomorrow will be 23 to 24°C, and Saturday the 24th is expected to have a high of 18°C","w":[["midsummer day","真夏日"],["record","記録"]]},{"t":"The death toll from a Houthi attack in Yemen rose to 73. Britain will send fighter jets to protect Saudi Arabia","w":[["death toll","死者数"],["fighter jet","戦闘機"]]},{"t":"The Nikkei average rose 545 yen to 64,621 yen, its first rise in three days. AI and chip stocks were bought back after U.S. stocks rose","w":[["stock","株"],["rise","上がる"]]},{"t":"Stock orders customers did not make were placed at Iwai Cosmo Securities (7 accounts; the trades were reversed and customers will not pay). It seems to be the first financial damage in this series of attacks","w":[["securities company","証券会社"],["account","口座"]]}],"ex":{"saudi":"In the Middle East, an armed group and Saudi Arabia keep fighting, and oil prices are rising. This also connects to gas prices in Japan.","tax":"A plan to lower the tax on food you buy at the supermarket from 8% to 1%. It has not been decided yet.","cyber":"Bad actors keep breaking into the computers of companies and government offices and stealing information such as names and addresses.","mmx":"A Japanese probe has left for Mars. The plan is to bring back sand from a small moon near Mars.","sato":"The Hanshin Tigers agreed to let Sato, this year's \"Triple Crown\" hitter, try to play in Major League Baseball in America.","series":"Games to decide Japan's best pro baseball team start on Saturday, October 24.","yokohama":"There was an election to choose the leader (mayor) of Yokohama, and a new person was chosen.","past":"Three weeks of worries about a big typhoon and a volcano, a new governor of Okinawa and new ministers, and higher interest rates in America."}};
