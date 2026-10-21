@@ -358,5 +358,6 @@ for q in quakes[:3]:
     print(" ", q)
 # 30分に1回は checked を更新するため、変わっていなくても書き出す(見張りが動いている証拠)
 last = prev.get("checked") or ""
-if not same or last < iso(NOW - datetime.timedelta(minutes=30)):
+radar_new = bool(radar) and (radar.get("past") or [None])[-1] != ((prev.get("radar") or {}).get("past") or [None])[-1]
+if not same or radar_new or last < iso(NOW - datetime.timedelta(minutes=30)):
     print("CHANGED")
