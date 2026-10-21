@@ -139,7 +139,7 @@ main{padding-block:18px 32px}
 .wx-um{font-weight:700;font-size:1.02rem;background:var(--accent-soft);border-radius:10px;padding:6px 10px}
 .wx-kit{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:.92rem}
 .wx-kit b{font-weight:800}
-.badge-ok.tap,.badge-one.tap{cursor:pointer;text-decoration:underline dotted;text-underline-offset:2px}
+.badge-ok.tap,.badge-one.tap{cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;min-height:40px;padding:0 6px;margin:-8px 0}
 .ten.short li>button>span>p,.ten.short .srcl,.ten.short .pt,.ten.short .ill,.ten.short .enb{display:none}
 .ten.short li{padding-top:8px;padding-bottom:8px}
 .len-seg{margin-left:auto}
@@ -608,6 +608,12 @@ details.faq p{margin:10px 0 12px}
 #eewBand small{font-size:.85rem;opacity:.95}
 #eewBand .iconbtn{align-self:flex-end;background:#fff;color:#c4161c;border-color:#fff}
 .pop b{font-size:1.05rem}
+/* かんたんモード: 押すところは44px以上(指が太くても押しやすく) */
+:root[data-mode="easy"] .fchip,:root[data-mode="easy"] .iconbtn,:root[data-mode="easy"] .seg button{min-height:44px}
+:root[data-mode="easy"] header .iconbtn{min-width:44px}
+.sh-btn{min-height:40px}
+:root[data-mode="easy"] .view{padding-bottom:calc(96px + env(safe-area-inset-bottom,0px))}
+.rd-ends{display:flex;justify-content:space-between;font-size:.82rem;color:var(--muted);margin-top:-2px}
 /* 黒い吹き出しの中の白いボタンは、文字をふつうの濃い色にもどす(うすい字で読めなかった) */
 .pop .seg button:not([aria-pressed="true"]),.pop .fchip:not([aria-pressed="true"]){color:var(--ink)}
 
@@ -1176,6 +1182,10 @@ const LOOK = (()=>{ let p={}; try{ p=JSON.parse(store.get("nw-look")||"{}")||{};
   if(!p.v12){ p.v12=1; p.off=p.off||{}; delete p.off.kurashi;
     if(p.cfg) Object.values(p.cfg).forEach(c=>{ if(c&&c.off) delete c.off.kurashi; });
     if(Array.isArray(p.order)) p.order=p.order.filter(k=>k!=="kurashi"); }
+  // v14: かんたんモードは「天気→🔊聞く→3行→ニュース10→クイズ」だけにそろえる(はじめての案内のとおりに)
+  if(!p.v14){ p.v14=1; const fix=c=>{ if(!c||!c.off) return; ["quick","cont","goal"].forEach(k=>c.off[k]=true);
+      if(Array.isArray(c.order)){ c.order=c.order.filter(k=>k!=="listen"); const w=c.order.indexOf("weather"); c.order.splice(w<0?0:w+1,0,"listen"); delete c.off.listen; } };
+    if(p.mode==="easy") fix(p); if(p.cfg&&p.cfg.easy) fix(p.cfg.easy); }
   // v13: 英単語はやめずに残す(v12 でいったん消してしまった人の分も、おたのしみ側にもどす)
   if(!p.v13){ p.v13=1; p.off=p.off||{}; if(p.off.english===undefined) p.off.english=true;
     if(p.cfg) Object.values(p.cfg).forEach(c=>{ if(c&&c.off&&c.off.english===undefined) c.off.english=true; });
@@ -1197,7 +1207,7 @@ function saveLook(){ store.set("nw-look", JSON.stringify(LOOK)); }
 // ===== かんたんモード / ふつうモード =====
 // それぞれのモードが「きょうの並び・表示」「下のタブ」「文字の大きさ」を別々に覚える。かんたんモードに、ふつうの機能を足すこともできる
 const MODE_PRESET={
-  easy:()=>{ const on=["weather","quick","cont","listen","three","ten","quiz","goal"]; const order=[...on,...SECS.map(x=>x[0]).filter(k=>!on.includes(k))]; const off={}; order.forEach(k=>{ if(!on.includes(k)) off[k]=true; });
+  easy:()=>{ const on=["weather","listen","three","ten","quiz"]; const order=[...on,...SECS.map(x=>x[0]).filter(k=>!on.includes(k))]; const off={}; order.forEach(k=>{ if(!on.includes(k)) off[k]=true; });
     return {order,off,tabs:["today","explain","search","my","plan","map","numbers","words"],tabOff:{plan:true,map:true,numbers:true,words:true},size:"l"}; },
   normal:()=>{ const off={listen:true,quick:true,picks:true,english:true,mood:true,know:true,talk:true,reporter:true,local:true,gacha:true};
     return {order:SECS.map(x=>x[0]),off,tabs:["today","explain","search","plan","my","map","numbers","words"],tabOff:{map:true,numbers:true,words:true},size:"m"}; }};
@@ -1544,9 +1554,9 @@ function weatherCard(){
       ${notes.length?"":`<div class="hint">出典: ${esc(w.source)}</div>`}
       <div class="wx-strip" id="wxStrip" role="button" tabindex="0" data-wxh="1" aria-label="1時間ごとの天気を開く">${wxStripHTML()}</div>
     </div>
-    ${notes.length?`<details class="wx-notes" id="wxNotes"${(severe||wxNotesOpen)?" open":""}><summary>⚠️ 気をつけること(${notes.length})</summary>${notes.map(n=>`<div class="note">${esc(n)}</div>`).join("")}<div class="hint">出典: ${esc(w.source)}</div></details>`:""}
+    ${notes.length?`<details class="wx-notes" id="wxNotes"${((severe&&LOOK.mode!=="easy")||wxNotesOpen)?" open":""}><summary>⚠️ 気をつけること(${notes.length})</summary>${notes.map(n=>`<div class="note">${esc(n)}</div>`).join("")}<div class="hint">出典: ${esc(w.source)}</div></details>`:""}
     ${must?"":`<button class="fchip wx-tg" data-wxtg="1" aria-expanded="${open?"true":"false"}" aria-controls="wxCard">${open?"▲ とじる":"▼ くわしく"}</button>`}
-    <div class="wx-btns"><button class="fchip" data-wxh="1">🕐 1時間ごと</button><button class="fchip" data-wxmap="1">🗾 全国の天気</button><button class="fchip" data-radar="1">☔ 雨雲</button><button class="fchip qk-open" data-quake="1">🛟 防災${qkLatestLabel()}</button></div>
+    <div class="wx-btns"><button class="fchip" data-wxh="1">🕐 1時間ごと</button><button class="fchip" data-wxmap="1">🗾 全国の天気</button><button class="fchip" data-radar="1">☔ 雨雲</button><button class="fchip qk-open" data-quake="1">🛟 地震・防災${qkLatestLabel()}</button></div>
   </section>`;
 }
 function exLink(id){ return id && D.explainers[id] ? ` data-ex="${id}"` : ""; }
@@ -1573,7 +1583,7 @@ function renderToday(){
         const big=i<3; const link=n.ex||n.tab; const wt=newsWeight(n); const mine=isLocal(n.title+" "+(n.text||""));
         return `<li class="${big?'big':''} w${wt.lv}${mine?' mytown':''}">${pinBtn({k:"t|"+n.title,h:n.title,g:n.g,d:(NEWS[0]||{}).d,ex:n.ex},"abs")}<button class="row${link?' link':''}"${n.ex?` data-ex="${n.ex}"`:''}${n.tab?` data-tab="${n.tab}"`:''} ${link?'':'tabindex="-1"'}>
           <span class="rank">${i+1}</span>
-          <span>${big&&ILL[n.ill||n.ex]?`<div class="ill">${ILL[n.ill||n.ex]}</div>`:""}<span class="meta"><span class="chip ${n.g}">${GN[n.g]}</span>${n.ok?`<span class="badge-ok tap" role="button" tabindex="0" data-trust="${esc(n.title)}" data-ok="1" title="タップで出典">✅</span>`:`<span class="badge-one tap" role="button" tabindex="0" data-trust="${esc(n.title)}" data-ok="0" title="タップでわけ">⚠️ 1社</span>`}${mine?'<span class="heat town">🏠 あなたの街</span>':""}${wt.lv>=2?`<span class="heat" title="この3日で関連ニュース${wt.n}件">🔥</span>`:""}<span class="sh-btn" role="button" tabindex="0" data-share="t:${i}" aria-label="このニュースを送る">📤 送る</span></span>
+          <span>${big&&ILL[n.ill||n.ex]?`<div class="ill">${ILL[n.ill||n.ex]}</div>`:""}<span class="meta"><span class="chip ${n.g}">${GN[n.g]}</span>${n.ok?`<span class="badge-ok tap" role="button" tabindex="0" data-trust="${esc(n.title)}" data-ok="1" title="タップで出典">✅<small style="font-size:.82rem;font-weight:700;margin-left:2px">確認ずみ</small></span>`:`<span class="badge-one tap" role="button" tabindex="0" data-trust="${esc(n.title)}" data-ok="0" title="タップでわけ">⚠️ 1社</span>`}${mine?'<span class="heat town">🏠 あなたの街</span>':""}${wt.lv>=2?`<span class="heat" title="この3日で関連ニュース${wt.n}件">🔥</span>`:""}<span class="sh-btn" role="button" tabindex="0" data-share="t:${i}" aria-label="このニュースを送る">📤 送る</span></span>
           ${(()=>{ const e=enOf("top10",i); if(langMode()==="en"&&e) return `<h3 lang="en">${n.icon} ${esc(e.t)}</h3>${e.x?`<p lang="en">${esc(e.x)}</p>`:""}<p class="jsub">${esc(n.title)}</p>${(e.w||[]).length?`<span class="enw">${e.w.map(([a,b])=>`<i>📘 ${esc(a)} = ${esc(b)}</i>`).join("")}</span>`:""}<span class="ensay" role="button" tabindex="0" data-say="${esc(e.t+". "+(e.x||""))}">🔊 English</span>`; return `<h3>${n.icon} ${esc(n.title)}</h3>${n.text?`<p>${esc(n.text)}</p>`:""}${enBlock(e)}`; })()}
           ${srcLine(n)}${link?`<span class="more">${n.ex?'くわしい解説 →':'グラフを見る →'}</span>`:''}</span>${thumbHTML(n)}</button>${n.point?`<details class="pt"><summary>💭 ここがポイント</summary>${esc(n.point)}</details>`:""}</li>`;}).join("")}</ol>
       ${thumbCredit(t)}
@@ -1657,8 +1667,8 @@ const isStandalone=()=>{ try{ return matchMedia("(display-mode: standalone)").ma
 const isIOS=/iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform==="MacIntel" && navigator.maxTouchPoints>1);
 function installCard(){
   if(isStandalone() || store.get("nw-install-hide")==="1") return "";
-  const how = deferredPrompt ? "ボタンを押すだけで、ホーム画面にアイコンができます。" : isIOS ? "下の共有ボタン(□に↑)→「ホーム画面に追加」で、アプリのように開けます。" : "ブラウザのメニュー(︙)→「ホーム画面に追加」または「アプリをインストール」で、アプリのように開けます。";
-  return `<div class="install" id="inst"><img src="icon-192.png" alt=""><span><b>アプリとして使う</b><span class="hint">${how}</span></span><span style="display:flex;flex-direction:column;gap:6px">${deferredPrompt?'<button class="fchip" id="instGo">追加する</button>':''}<button class="fchip" id="instX" aria-label="この案内を閉じる">閉じる</button></span></div>`;
+  const how = deferredPrompt ? "「置く」を押すと、スマホの画面にこのアプリのボタンができます。" : isIOS ? "画面のいちばん下の「□に↑」のマークを押す →「ホーム画面に追加」を押すと、スマホの画面にこのアプリのボタンができます。" : "画面の右上の「︙」を押す →「ホーム画面に追加」を押すと、スマホの画面にこのアプリのボタンができます。";
+  return `<div class="install" id="inst"><img src="icon-192.png" alt=""><span><b>📲 スマホの画面に、このアプリのボタンを置く</b><span class="hint">${how}</span></span><span style="display:flex;flex-direction:column;gap:6px">${deferredPrompt?'<button class="fchip" id="instGo">置く</button>':''}<button class="fchip" id="instX" aria-label="この案内を閉じる">閉じる</button></span></div>`;
 }
 function bindInstall(){
   const go1=document.getElementById("instGo"); if(go1) go1.onclick=async()=>{ try{ deferredPrompt.prompt(); await deferredPrompt.userChoice; }catch(_){} deferredPrompt=null; document.getElementById("inst")?.remove(); };
@@ -1715,7 +1725,7 @@ function openStory(fn){
   track(typeof fn==="function"?"/play/week":"/play/today","1分で見る");
   const el=document.getElementById("story"); const S=(typeof fn==="function"?fn:buildSlides)();
   el.innerHTML=`<div class="bars">${S.map(()=>"<i><b></b></i>").join("")}</div>
-    <div class="ctl"><span class="lbl" id="stLbl"></span><button class="sbtn" id="stVoice" aria-pressed="false">🔈 読み上げ</button><button class="sbtn" id="stPause" aria-label="一時停止">❚❚</button><button class="sbtn" id="stClose" aria-label="閉じる">✕</button></div>
+    <div class="ctl"><span class="lbl" id="stLbl"></span><button class="sbtn" id="stVoice" aria-pressed="false">🔈 読み上げ</button><button class="sbtn" id="stPause" aria-label="一時停止">❚❚</button><button class="sbtn" id="stClose" aria-label="閉じる" style="width:auto;padding:0 12px">✕ とじる</button></div>
     <div class="stage" id="stStage"><button class="tapl" aria-label="前へ"></button><button class="tapr" aria-label="次へ"></button></div>`;
   el.hidden=false; document.body.style.overflow="hidden";
   st={S,i:0,t0:0,el:0,paused:false,raf:0,voice:store.get("nw-voice")==="1"};
@@ -2320,16 +2330,17 @@ function footer(){ return `<footer class="foot">
 function bindFooter(){}
 document.getElementById("setBtn").onclick=()=>{
   const p=document.getElementById("pop"); const t=store.get("nw-theme")||"system"; const s=store.get("nw-size")||"m";
-  p.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><b>設定</b><button class="iconbtn" id="popx" aria-label="閉じる" style="background:transparent;color:inherit;border-color:currentColor">✕</button></div>
+  p.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><b>設定</b><button class="iconbtn" id="popx" aria-label="閉じる" style="background:transparent;color:inherit;border-color:currentColor;width:auto;padding:0 12px">✕ とじる</button></div>
     <div class="setrow" style="margin-bottom:10px"><span style="min-width:5em">モード</span><span class="seg">${[["easy","かんたん"],["normal","ふつう"]].map(([k,l])=>`<button data-pmode="${k}" aria-pressed="${LOOK.mode===k}">${l}</button>`).join("")}</span></div>
     <div class="setrow" style="margin-bottom:10px"><span style="min-width:5em">文字の大きさ</span><span class="seg">${[["m","ふつう"],["l","大きめ"],["xl","特大"]].map(([k,l])=>`<button data-size="${k}" aria-pressed="${s===k}">${l}</button>`).join("")}</span></div>
-    <div class="setrow"><span style="min-width:5em">画面の色</span><span class="seg">${[["system","自動"],["light","明るい"],["dark","暗い"]].map(([k,l])=>`<button data-theme="${k}" aria-pressed="${t===k}">${l}</button>`).join("")}</span></div>
-    <div style="display:flex;flex-direction:column;gap:8px;margin-top:12px"><button class="fchip" id="popTabs">🧭 下のボタン(ページ)を選ぶ</button><button class="fchip" id="popLook">🎨 色・画面の並びを変える</button><button class="fchip" id="popHelp">🔰 使い方を見る</button></div>`;
+    <div class="setrow"><span style="min-width:5em">画面の色</span><span class="seg">${[["system","スマホに合わせる"],["light","明るい"],["dark","暗い"]].map(([k,l])=>`<button data-theme="${k}" aria-pressed="${t===k}">${l}</button>`).join("")}</span></div>
+    <div style="display:flex;flex-direction:column;gap:8px;margin-top:12px"><button class="fchip" id="popTabs">🧭 下のボタン(ページ)を選ぶ</button><button class="fchip" id="popLook">🎨 色・画面の並びを変える</button><button class="fchip" id="popHelp">🔰 使い方を見る</button><button class="fchip" id="popMore">⚙️ ほかの設定(お知らせ・読み上げの速さ・ふりがな など) →</button></div>`;
   p.hidden=false;
   document.getElementById("popx").onclick=()=>p.hidden=true;
   document.getElementById("popLook").onclick=()=>{ p.hidden=true; openLook(); };
   document.getElementById("popTabs").onclick=()=>{ p.hidden=true; openTabs(); };
   document.getElementById("popHelp").onclick=()=>{ p.hidden=true; onboard(true); };
+  document.getElementById("popMore").onclick=()=>{ p.hidden=true; MYTAB="set"; go("my"); window.scrollTo(0,0); };
   p.querySelectorAll("[data-pmode]").forEach(b=>b.onclick=e=>{ e.stopPropagation(); setMode(b.dataset.pmode); p.hidden=true; go(current||"today"); toast(`${modeName()}モードにしました`); });
   p.querySelectorAll("[data-size]").forEach(b=>b.onclick=e=>{e.stopPropagation(); store.set("nw-size",b.dataset.size); applySettings(); p.querySelectorAll("[data-size]").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));});
   p.querySelectorAll("[data-theme]").forEach(b=>b.onclick=e=>{e.stopPropagation(); store.set("nw-theme",b.dataset.theme); applySettings(); p.querySelectorAll("[data-theme]").forEach(x=>x.setAttribute("aria-pressed",String(x===b))); if(current==="numbers"||current==="plan") go(current,{keepScroll:true});});
@@ -2438,7 +2449,7 @@ function voiceCard(){ const r=sayRate();
     <div class="hint" style="margin-top:6px">ことば辞典にあることば(点線のことば)に、よみがなをつけます。かんたんモードでは最初からついています。</div>
     <div class="sec-h" style="margin-top:12px"><h2 style="font-size:1rem">📷 ニュースの写真</h2></div>
     <div class="chips" id="vThumb">${[["1","出す"],["0","出さない"]].map(([v,l])=>`<button class="fchip" data-thumb="${v}" aria-pressed="${(store.get("nw-thumb")==="0"?"0":"1")===v}">${l}</button>`).join("")}</div>
-    <div class="hint" style="margin-top:6px">ニュース10の右にイメージ写真を出します。通信量を節約したいときは「出さない」に。スマホのデータセーバーがオンのときは自動で出しません。</div></section>`; }
+    <div class="hint" style="margin-top:6px">ニュース10の右にイメージ写真を出します。スマホの通信料(ギガ)を減らしたいときは「出さない」に。スマホが「通信を節約する設定」のときは、自動で出しません。</div></section>`; }
 function saveMe(){ store.set("nw-me", JSON.stringify(ME)); }
 const nkey = n => (n.d+"|"+n.h).slice(0,80);
 // 訪問日と連続記録
@@ -2519,7 +2530,7 @@ const TIER_OLD=["s3","s7","s30","ex5","quiz","w10","vote","vote5","pet1","pet3"]
 
 // ピン留めとメモ
 function pinAttrs(o){ return `data-pk="${esc(o.k)}" data-ph="${esc(o.h)}" data-pg="${esc(o.g||"")}" data-pd="${esc(o.d||"")}" data-pex="${esc(o.ex||"")}"`; }
-function pinBtn(o,extraCls){ const on=!!ME.pins[o.k]; return `<button class="pin-btn ${extraCls||""}" ${pinAttrs(o)} aria-pressed="${on}" aria-label="${on?"保存をやめる":"保存する"}" title="あとで読む・メモ">${on?"📌":"📍"}</button>`; }
+function pinBtn(o,extraCls){ const on=!!ME.pins[o.k]; return `<button class="pin-btn ${extraCls||""}" ${pinAttrs(o)} aria-pressed="${on}" aria-label="${on?"保存をやめる":"保存する"}" title="あとで読む・メモ">${on?"🔖":"🏷️"}</button>`; }
 document.addEventListener("click",ev=>{ const b=ev.target.closest(".pin-btn"); if(!b) return; ev.preventDefault(); ev.stopPropagation();
   const k=b.dataset.pk; if(ME.pins[k]){ if(ME.pins[k].memo && !b.dataset.confirm){ b.dataset.confirm="1"; toast("メモがあります。もう一度押すと保存をやめます"); setTimeout(()=>delete b.dataset.confirm,3000); return; } delete ME.pins[k]; toast("保存をやめました"); }
   else { ME.pins[k]={h:b.dataset.ph,g:b.dataset.pg,d:b.dataset.pd,ex:b.dataset.pex,memo:"",at:new Date(Date.now()+9*3600e3).toISOString()}; learn(b.dataset.pg,1); track("/pin/"+(b.dataset.pg||"other"),"保存: "+(GN[b.dataset.pg]||"その他")); toast("📌 保存しました。「マイ」でメモも書けます"); }
@@ -2546,7 +2557,7 @@ function personalCards(){
   const newCount=NEW_KEYS.size;
   out.push(`<section class="me-strip" aria-label="あなたの記録">
     <button class="ms" data-tab="my">🔥 <b class="num">${s}日</b>連続</button>
-    <button class="ms" data-tab="my">⭐ <b>Lv.${lv.i+1}</b></button>
+    <button class="ms" data-tab="my">⭐ <b>レベル${lv.i+1}</b></button>
     ${newCount?`<button class="ms new" id="newBtn">🆕 <b class="num">${newCount}件</b>前回から</button>`:`<button class="ms" id="weekBtn">📅 ふりかえり</button>`}
   </section>`);
   const vr=voteResults(); const fresh=vr.settled.filter(x=>!ME.notified[x.p.no]);
@@ -3058,7 +3069,10 @@ function paperImage(nm,P){ const W=1080,H=1350; const c=document.createElement("
   }
 
 // ===== はじめての人への案内(3ステップ。ペットが案内する) =====
-function onboard(force){ if(!force && (store.get("nw-onboard")==="1" || ME.days.length>1)) return; const ov=document.createElement("div"); ov.className="ob"; ov.setAttribute("role","dialog"); ov.setAttribute("aria-label","はじめての方へ");
+function onboard(force){ if(!force && (store.get("nw-onboard")==="1" || ME.days.length>1)) return;
+  // はじめての人は「かんたん」から(押さずに進んでも、かんたんになる)。新しくなったところ(🔔)も、はじめての人には「読んだ」にしておく
+  if(!force){ if(LOOK.mode!=="easy"){ setMode("easy"); try{ go("today"); }catch(_){} } try{ store.set("nw-upd-seen",UPDATES[0].id); markBell(); }catch(_){} }
+  const ov=document.createElement("div"); ov.className="ob"; ov.setAttribute("role","dialog"); ov.setAttribute("aria-label","はじめての方へ");
   // 画面のミニ見本(番号つき)。いまのモードとタブに合わせて描く
   const mock=()=>{ const tabs=LOOK.tabs.filter(k=>!LOOK.tabOff[k]).map(k=>TABS.find(t=>t[0]===k)).filter(Boolean);
     return `<div class="obm" aria-hidden="true"><div class="obm-top"><span>まいにちニュース帳</span><span class="obm-b">🔔</span><span class="obm-b">設定</span></div>
@@ -3070,7 +3084,7 @@ function onboard(force){ if(!force && (store.get("nw-onboard")==="1" || ME.days.
     return `<ol class="obl">${L.map(([a,b],i)=>`<li><i>${i+1}</i><span><b>${a}</b><br>${b}</span></li>`).join("")}</ol>`; };
   const steps=[
     {t:"ようこそ!",pet:"newsboy",h:()=>`<p class="obp">毎日のニュースを、やさしい言葉でまとめたアプリです。<br><b>使いやすい方を選んでください。</b>(あとで「設定」から変えられます)</p>
-      <div class="mode-cards">${[["easy","🔰","かんたん","文字が大きく、天気・ニュース・聞くボタンだけ"],["normal","📱","ふつう","ペットやクイズなど、ぜんぶの機能"]].map(([k,i,n,d])=>`<button class="mode-c" data-obm="${k}" aria-pressed="${LOOK.mode===k}"><span class="mi">${i}</span><b>${n}</b><small>${d}</small></button>`).join("")}</div>`},
+      <div class="mode-cards">${[["easy","🔰","かんたん(おすすめ)","文字が大きく、天気・ニュース・聞くボタンだけ"],["normal","📱","ふつう(なれている人向け)","ペットやクイズなど、ぜんぶの機能"]].map(([k,i,n,d])=>`<button class="mode-c" data-obm="${k}" aria-pressed="${LOOK.mode===k}"><span class="mi">${i}</span><b>${n}</b><small>${d}</small></button>`).join("")}</div>`},
     {t:"画面の見かた",pet:"professor",h:()=>mock()+legend()},
     {t:"こまったときは",pet:"detective",h:()=>`<ul class="obh">
       <li><span class="obk">← もどる</span><span>左上のボタンで、前の画面にもどります</span></li>
@@ -3087,7 +3101,7 @@ function onboard(force){ if(!force && (store.get("nw-onboard")==="1" || ME.days.
     const bk=ov.querySelector("#obBack"); if(bk) bk.onclick=()=>{ i--; draw(); }; const sk=ov.querySelector("#obSkip"); if(sk) sk.onclick=done;
     ov.querySelector("#obNext").focus(); };
   const done=()=>{ store.set("nw-onboard","1"); ov.remove(); go(current||"today"); };
-  document.body.appendChild(ov); draw(); }
+  document.querySelectorAll(".toast").forEach(t=>t.remove()); document.body.appendChild(ov); draw(); }
 // ===== よむまる記者・ガチャ・わたしの街・ことばの感想・ニュースの重さ・すごろく =====
 function cardComment(w,g){ const st=petStage().i; if(st<2) return ""; const r=seeded("cc"+w); const C={pol:["国会って、むずかしいけど大事!","みんなで決めるって、たいへんだね"],eco:["お金の話は、くらしにひびくね","ぼくのごはん代にも関係ある?"],it:["パスワード、ちゃんと変えてる?","AIって、ぼくのなかま?"],intl:["世界はつながってるんだね","いつか行ってみたいな"],spo:["ぼくも走るの、すきだよ!","すごい記録だね!"],sci:["ふしぎがわかると、たのしいね","からだも大事にしようね"],soc:["みんな気をつけてね","ニュースで知れてよかった"],ent:["見てみたいな!","わくわくするね"]}[g]||["このことば、もう覚えたよ!","また出てきたら、すぐわかるね"]; return C[Math.floor(r()*C.length)]; }
 function newsWeight(n){ const since=new Date(Date.parse(TODAY)-3*864e5).toISOString().slice(0,10); const q=gdQuery(n.title); let c=NEWS.filter(x=>x.d>=since&&gdScore(q,x.h+" "+(x.th||""))>=0.25).length; const e=n.ex&&D.explainers[n.ex]; if(e){ const q2=gdQuery(e.name+" "+(e.now||"")); c=Math.max(c,NEWS.filter(x=>x.d>=since&&gdScore(q2,x.h+" "+(x.th||""))>=0.3).length); } return {n:c,lv:c>=6?3:c>=3?2:c>=2?1:0}; }
@@ -3144,11 +3158,11 @@ function applySky(){ let el=document.getElementById("sky"); if(LOOK.sky===false)
 // ===== 通知(ntfy という無料の通知サービスで、朝と夕方に1通ずつ) =====
 const NTFY_TOPIC="mainichi-news-sb22-q7k4";
 function notifyHTML(){ const url="https://ntfy.sh/"+NTFY_TOPIC;
-  return `<section class="card notif"><b>🔔 朝と夕方に通知を受け取る</b><div class="hint" style="margin:4px 0 8px">更新されたら、今日のニュース上位3つと天気がスマホに届きます(1日2回)。無料の通知サービス「ntfy」を使います。あなたの情報は送られません。</div>
-    <details class="faq plain" open><summary>📱 iPhone・Android(おすすめ)</summary><ol class="us"><li>App Store / Google Play で「<b>ntfy</b>」というアプリを入れる(無料)</li><li>アプリの「＋」を押して、トピック名に <b class="ntfy-t">${NTFY_TOPIC}</b> を入れて登録</li><li>これで朝と夕方に通知が届きます</li></ol><button class="fchip" id="ntfyCopy">📋 トピック名をコピー</button></details>
-    <details class="faq plain"><summary>💻 パソコン・Androidのブラウザ</summary><p style="margin:4px 0">下のページを開いて「Subscribe」→ 通知を許可すると、ブラウザに届きます。</p><a class="fchip" href="${url}" target="_blank" rel="noopener">🔔 通知のページを開く</a></details>
-    <div class="hint" style="margin-top:6px">やめたいときは、ntfyアプリでこのトピックを消すだけです。</div></section>`; }
-function bindNotify(){ const b=document.getElementById("ntfyCopy"); if(b) b.onclick=async()=>{ try{ await navigator.clipboard.writeText(NTFY_TOPIC); toast("📋 コピーしました"); }catch(_){ prompt("トピック名",NTFY_TOPIC); } }; }
+  return `<section class="card notif"><b>🔔 朝と夕方に、スマホへお知らせを届ける</b><div class="hint" style="margin:4px 0 8px">朝と夕方の1日2回、大事なニュース3つと天気がスマホに届きます。「ntfy(エヌティーエフワイ)」という無料のお知らせアプリを使います。あなたの名前などは送られません。</div>
+    <details class="faq plain" open><summary>📱 スマホで受けとる(3ステップ)</summary><ol class="us"><li>スマホのアプリのお店(iPhoneは「App Store」、Androidは「Google Play」)で「<b>ntfy</b>」とさがして入れる(無料)</li><li>下の「📋 あいことばをコピー」を押す → ntfyを開いて「＋」を押し、空いているところに<b>貼りつけて</b>「Subscribe(登録)」を押す<br><small class="hint">あいことば: <b class="ntfy-t">${NTFY_TOPIC}</b></small></li><li>「通知を許可しますか?」と聞かれたら「許可」。これで朝と夕方に届きます</li></ol><button class="fchip" id="ntfyCopy">📋 あいことばをコピー</button></details>
+    <details class="faq plain"><summary>💻 アプリを入れずに受けとる(パソコンなど)</summary><p style="margin:4px 0">下のボタンでページを開き、英語の「Subscribe(登録)」ボタンを押して、「許可」を押します。</p><a class="fchip" href="${url}" target="_blank" rel="noopener">🔔 お知らせのページを開く</a></details>
+    <div class="hint" style="margin-top:6px">やめたいときは、ntfyアプリの中で「まいにち」の行を消すだけです。</div></section>`; }
+function bindNotify(){ const b=document.getElementById("ntfyCopy"); if(b) b.onclick=async()=>{ try{ await navigator.clipboard.writeText(NTFY_TOPIC); toast("📋 コピーしました"); }catch(_){ prompt("あいことば(長押しでコピー)",NTFY_TOPIC); } }; }
 // ===== 記録の引っこし(バックアップ)。記録はスマホの中だけなので、ファイルかコードにして持ち運ぶ。サーバーには送らない =====
 const BAK_APP="mainichi-news";
 function bakKeys(){ const ks=[]; try{ for(let i=0;i<localStorage.length;i++){ const k=localStorage.key(i); if(k&&k.startsWith("nw-")) ks.push(k); } }catch(_){} return ks.sort(); }
@@ -3169,18 +3183,18 @@ function bakSummary(o){ let m={}; try{ m=JSON.parse(o.data["nw-me"]||"{}")||{}; 
 function bakAge(){ const t=Date.parse(store.get("nw-bak-at")||""); return isNaN(t)?null:Math.floor((Date.now()-t)/864e5); }
 function bakNeeded(){ const a=bakAge(); const has=(ME.days||[]).length>=3||(ME.words||[]).length||Object.keys(ME.pins||{}).length; return !!has&&(a===null||a>=30); }
 function backupHTML(){ const a=bakAge(); const prev=!!store.get("nwbak-prev");
-  return `<section class="card bak${bakNeeded()?" warn":""}" id="bakCard"><b>📦 記録の引っこし(バックアップ)</b>
+  return `<section class="card bak${bakNeeded()?" warn":""}" id="bakCard"><b>📦 記録をとっておく・別のスマホに移す</b>
     <div class="hint" style="margin:4px 0 8px">ペット・連続日数・ことば・保存したニュースは、このスマホの中だけにあります。機種変更やデータ消去にそなえて、ときどき保存しておくと安心です。</div>
     <div class="hint" style="margin:-2px 0 6px">📴 電波がない所でも、最後に開いたときのニュース・解説・写真は読めます${store.get("nw-off-at")?`(${(()=>{ const d=new Date(+store.get("nw-off-at")); return (d.getMonth()+1)+"/"+d.getDate()+" "+d.getHours()+":"+String(d.getMinutes()).padStart(2,"0"); })()}に準備ずみ)`:""}。</div>
     <div class="bak-st">${a===null?"まだ一度も保存していません":a===0?"✅ きょう保存しました":`前回の保存: ${a}日前`}${bakNeeded()?" ・ <b>そろそろ保存しましょう</b>":""}</div>
-    <div class="chips" style="margin-top:8px"><button class="fchip" id="bakSave">📤 記録を保存する</button><button class="fchip" id="bakLoad">📥 記録を読み込む</button></div>
+    <div class="chips" style="margin-top:8px"><button class="fchip" id="bakSave">📤 記録を保存する</button><button class="fchip" id="bakLoad">📥 とっておいた記録をもどす</button></div>
     <details class="faq plain"><summary>くわしい使い方</summary><ol class="us">
       <li><b>保存</b>:「📤 記録を保存する」を押すと、記録が1つのファイルになります。LINEで自分に送る・「ファイル」に保存する・メールで送る などで取っておけます。</li>
-      <li><b>新しいスマホで</b>:このサイトを開いて マイ →⚙️設定 →「📥 記録を読み込む」で、そのファイルを選ぶだけです。</li>
-      <li>ファイルが送れないときは「📋 コードでコピー」を使い、メモ帳などに貼っておけます。</li>
-      <li>iPhoneでは、Safariで見るときと「ホーム画面に追加」したアプリで見るときで、記録が別々です。乗りかえるときもこの方法で移せます。</li>
+      <li><b>新しいスマホで</b>:このサイトを開いて マイ →⚙️設定 →「📥 とっておいた記録をもどす」で、そのファイルを選ぶだけです。</li>
+      <li>ファイルが送れないときは「📋 文字にしてコピー」を押して、メモ帳などに貼っておけます。</li>
+      <li>iPhoneでは、ブラウザで見るときと、画面に置いたアプリで見るときで、記録が分かれます。乗りかえるときもこの方法で移せます。</li>
       <li>ファイルの中身は記録だけです(名前や住所などは入りません)。作った人のサーバーにも送られません。</li></ol>
-      <button class="fchip" id="bakCopy">📋 コードでコピー</button>${prev?' <button class="fchip" id="bakUndo">↩️ 読み込む前の記録にもどす</button>':""}</details>
+      <button class="fchip" id="bakCopy">📋 文字にしてコピー(メモに貼れます)</button>${prev?' <button class="fchip" id="bakUndo">↩️ 読み込む前の記録にもどす</button>':""}</details>
     <input type="file" id="bakFile" accept=".json,.txt,application/json,text/plain" hidden>
     ${gdHTML()}</section>`; }
 function bakDone(){ store.set("nw-bak-at",new Date().toISOString()); const c=document.getElementById("bakCard"); if(c){ c.outerHTML=backupHTML(); bindBackup(); } }
@@ -3247,7 +3261,7 @@ async function gdSync(keep){ if(!gdOn()||!gdLive()||GD.busy) return; GD.busy=tru
 document.addEventListener("visibilitychange",()=>{ if(document.visibilityState==="hidden"&&GD.dirty) gdSync(true); });
 function gdAgo(iso){ const m=Math.round((Date.now()-Date.parse(iso))/6e4); return isNaN(m)?"":m<1?"たった今":m<60?`${m}分前`:m<1440?`${Math.floor(m/60)}時間前`:`${Math.floor(m/1440)}日前`; }
 function gdHTML(){ const i=gdInfo();
-  if(!i||!i.on) return `<div class="gd-box" id="gdBox"><b>☁️ Googleドライブに自動で保存</b><div class="hint" style="margin:4px 0 8px">Googleでログインすると、記録があなたのGoogleドライブに自動で保存されます。機種変更のときは、新しいスマホで同じGoogleアカウントでつなぐだけ。<br>使うのはアプリ専用の見えない場所だけで、あなたのほかのファイルは見ません。作った人には届きません。</div><button class="fchip" id="gdConnect">☁️ Googleドライブにつなぐ</button><div id="gdMsg"></div></div>`;
+  if(!i||!i.on) return `<div class="gd-box" id="gdBox"><b>☁️ Googleに記録をあずける(Gmailを使っている人向け)</b><div class="hint" style="margin:4px 0 8px">Gmailと同じGoogleのアカウントでつなぐと、記録が自動であずけられます。スマホを買いかえたときは、新しいスマホで同じようにつなぐだけでもどります。<br>あずけた記録は、あなたにしか見えません(作った人にも届きません)。</div><button class="fchip" id="gdConnect">☁️ Googleにつなぐ</button><div id="gdMsg"></div></div>`;
   return `<div class="gd-box on" id="gdBox"><b>☁️ Googleドライブに自動で保存 <span class="gd-on">オン</span></b>
     <div class="bak-st" id="gdSt">${gdStatus()}</div>
     <div class="chips" style="margin-top:8px">${gdLive()?`<button class="fchip" id="gdNow">☁️ いま保存</button>`:`<button class="fchip gd-resume" id="gdResume">☁️ 自動保存を続ける(タップ)</button>`}<button class="fchip" id="gdPull">📥 ドライブから読み込む</button></div>
@@ -3499,6 +3513,10 @@ function funGrid(){ const L=FUN.filter(f=>(FUN_SET[f[0]]||FUN_ALWAYS.includes(f[
     ${hid?`<button class="fchip" id="funMore" data-hid="${hid}" aria-expanded="${funOpen?"true":"false"}" style="margin-top:8px">${funOpen?"▲ とじる":`… ほか ${hid}こ を見る`}</button>`:""}</section>`; }
 // ===== お知らせ(新しくなったところ)。機能を足したら、いちばん上に1つ足す =====
 const UPDATES=[
+  {id:"2026-10-21l",d:"2026-10-21",t:"🔰 はじめての人にもわかりやすく",L:[
+    "はじめて開いた人は「かんたん」から始まります。かんたんは 天気 → 🔊聞く → 3行 → ニュース → クイズ だけです",
+    "むずかしいことばを、やさしく言いかえました(例: トピック名 → あいことば、バックアップ → 記録をとっておく)。「設定」から ほかの設定にも行けます",
+    "押すところを大きくし、「✅ 確認ずみ」「🏷️ 保存」「↻ 新しくする」「✕ とじる」のように、ことばでもわかるようにしました"]},
   {id:"2026-10-21k",d:"2026-10-21",t:"🛟 リアルタイム防災",L:[
     "アプリを開いている間は、地震・津波の知らせを📡リアルタイムで受けとります。緊急地震速報(警報)が出たら、画面の上に赤い帯でお知らせします(わたしの街が対象ならスマホがふるえます)",
     "☔ 雨雲レーダー: 気象庁の「雨雲の動き」を、いまと1時間先まで。▶で動かせて、2本指で拡大できます(天気カードの「☔ 雨雲」から)",
@@ -3600,11 +3618,11 @@ const GUIDE = [
   ["👆","さわってみよう",["<b>点線のことば</b>をタップすると、意味がその場で出ます。調べたことばは「マイ」にたまります。","<b>📍</b>を押すと、そのニュースを保存できます。保存したものは「マイ」で見られて、メモも書けます。","「くわしい解説 →」から、<b>図・Q&A・これまでの流れ</b>つきの解説が読めます。<b>🔊 聞く</b>で読み上げもできます。"]],
   ["🧭","下のタブ",["<b>📰 きょう</b> 今日のまとめ ／ <b>🔎 さがす</b> ことばやジャンルで過去のニュースを検索 ／ <b>🗺️ 地図</b> どこで起きたかを地図で","<b>💡 解説</b> 大きな話題をやさしく ／ <b>📈 数字</b> 日経平均・円・原油のグラフ(数時間ごと〜全期間) ／ <b>📅 予定</b> これからの予定と、Claudeの予測","<b>⭐ マイ</b> あなたの記録・保存・着せかえ"]],
   ["🎯","続けるとたのしいこと",["<b>🐣 ペット</b>がニュースといっしょに育ちます。クイズに正解すると🍙ごはんがもらえて、あげると大きくなります。よく読むジャンルで小物が変わり、3日あけるとすねます。","開いた日・解説・クイズ・ことば・予想で<b>ポイント</b>がたまり、レベルとバッジが上がります。","「予定」の予測に<b>あなたも予想</b>して、答え合わせができます。Claudeと的中率くらべも。","毎日の連続記録は「マイ」のカレンダーで見られます。"]],
-  ["✨","ちょっと変わった楽しみ方",["<b>🗺️ 世の中の天気図</b>(きょう)…ジャンルごとのニュースの空気を、晴れ〜あらしで。","<b>👆 知ってた?</b>(きょう)…見出しを左右にはじくと、知らなかったジャンルを多めに出します。","<b>🍽️ 今日の話のタネ</b>(きょう)…家族や友だちと話せる問いかけ。","<b>🌙 寝る前ラジオ</b>(きょう)…3分でニュースを耳で。やさしい音つき。","<b>⚔️ クイズ対戦</b>…クイズのあとに挑戦状のリンクを送って勝負。","<b>📰 未来の新聞</b>(予定)…予測を新聞の紙面に。<b>🕸️ つながり地図</b>(解説)…話の流れを糸でたどる。","<b>🧮 もしも計算機</b>(数字)…円やガソリンが動いたら、財布はどうなる?","<b>⏳ タイムカプセル</b>(マイ)…決めた日まで開けられないメモ。"]],
+  ["✨","ちょっと変わった楽しみ方",["<b>🗺️ 世の中の天気図</b>(きょう)…ジャンルごとのニュースの空気を、晴れ〜あらしで。","<b>👆 知ってた?</b>(きょう)…「🤔 知らなかった / 😎 知ってた」を押すと、知らなかったジャンルを多めに出します。","<b>🍽️ 今日の話のタネ</b>(きょう)…家族や友だちと話せる問いかけ。","<b>🌙 寝る前ラジオ</b>(きょう)…3分でニュースを耳で。やさしい音つき。","<b>⚔️ クイズ対戦</b>…クイズのあとに挑戦状のリンクを送って勝負。","<b>📰 未来の新聞</b>(予定)…予測を新聞の紙面に。<b>🕸️ つながり地図</b>(解説)…話の流れを糸でたどる。","<b>🧮 もしも計算機</b>(数字)…円やガソリンが動いたら、財布はどうなる?","<b>⏳ タイムカプセル</b>(マイ)…決めた日まで開けられないメモ。"]],
   ["💬","聞いてみる",["右下の<b>💬</b>で「ニュース案内係」に質問できます。解説のQ&A・ことば辞典・ニュースの記録から、アプリの中で答えをさがします(質問はどこにも送りません)。","もっと深く知りたいときは「Claudeでもっと深く聞く」で、Claude(AI)に聞けます(アプリの外で開きます)。"]],
-  ["🎨","自分好みにする",["「マイ」の<b>🎨 着せかえ</b>で、色・文字の大きさ・詰め具合・「きょう」の並び・下のタブの並びを変えられます。","右上の<b>Aa</b>でも、文字の大きさと明るさをすぐ変えられます。"]],
-  ["📲","アプリとして使う",["iPhone: Safariの共有ボタン(□に↑)→「ホーム画面に追加」。","Android: Chromeのメニュー(︙)→「ホーム画面に追加」または「アプリをインストール」。","一度開いた内容は、電波がないところでも読めます。"]],
-  ["🔒","記録について",["あなたの記録・保存・着せかえは、<b>このスマホ(ブラウザ)の中だけ</b>に保存されます。ほかの人や作った人には見えません。",...(STATS.on&&STATS.code?["サイトをよくするため、<b>どの画面・解説・ジャンルが何回開かれたか</b>だけを数えています(GoatCounter・個人はわかりません)。質問の文章やメモは送りません。"]:[]),"更新は1日4回(朝・昼・夕方・夜)です。"]]
+  ["🎨","自分好みにする",["「マイ」の<b>🎨 着せかえ</b>で、色・文字の大きさ・詰め具合・「きょう」の並び・下のタブの並びを変えられます。","右上の<b>「設定」</b>で、文字の大きさと明るさをすぐ変えられます。"]],
+  ["📲","スマホの画面にボタンを置く",["iPhone: 画面の下の「□に↑」のマーク →「ホーム画面に追加」。","Android: 画面の右上の「︙」→「ホーム画面に追加」。","一度開いた内容は、電波がないところでも読めます。"]],
+  ["🔒","記録について",["あなたの記録・保存・着せかえは、<b>このスマホ(ブラウザ)の中だけ</b>に保存されます。ほかの人や作った人には見えません。",...(STATS.on&&STATS.code?["サイトをよくするため、<b>どの画面・解説・ジャンルが何回開かれたか</b>だけを数えています(だれが見たかはわかりません)。質問の文章やメモは送りません。"]:[]),"更新は1日4回(朝・昼・夕方・夜)です。"]]
 ];
 function guideBlock(){
   return `<details class="faq" id="guide"${ME.days.length<=1?" open":""}><summary>📘 このアプリの使い方</summary>
@@ -3620,7 +3638,7 @@ function renderMy(){
   const readNames=Object.keys(ME.readEx).filter(k=>D.explainers[k]).map(k=>D.explainers[k].name);
   main.innerHTML=`<div class="view">
     <div class="sec-h"><h2>⭐ わたしの記録</h2><span class="sub">このスマホの中だけ</span></div>
-    <div class="seg mytabs" role="tablist">${[["pet","🐣 ペット"],["save","📌 保存"],["rec","🏅 記録"],["set","⚙️ 設定"]].map(([k,l])=>`<button data-myt="${k}" aria-pressed="${MYTAB===k}">${l}${k==="set"&&bakNeeded()?'<i class="fun-dot" aria-label="記録の保存がおすすめ"></i>':""}</button>`).join("")}</div>
+    <div class="seg mytabs" role="tablist">${[["pet","🐣 ペット"],["save","🔖 保存"],["rec","🏅 記録"],["set","⚙️ 設定"]].map(([k,l])=>`<button data-myt="${k}" aria-pressed="${MYTAB===k}">${l}${k==="set"&&bakNeeded()?'<i class="fun-dot" aria-label="記録の保存がおすすめ"></i>':""}</button>`).join("")}</div>
     <div class="mysec" data-mysec="pet" ${MYTAB==="pet"?"":"hidden"}>
     ${petBig()}
     ${sugoHTML()}
@@ -3669,7 +3687,7 @@ function renderMy(){
       <div class="chips" id="myInt">${GORDER.map(g=>`<button class="fchip" data-g="${g}" aria-pressed="${!!ME.interests[g]}"><span class="c" style="background:var(--g-${g})"></span>${GN[g]}</button>`).join("")}</div><div style="margin-top:10px">${recIntHTML()}</div></section>
     ${guideBlock()}
     <button class="fchip" id="obAgain" style="align-self:flex-start">🐣 はじめての案内をもう一度見る</button>
-    <details class="faq plain"><summary>記録について</summary><p>記録は、あなたのスマホ(ブラウザ)の中だけに保存されます。ほかの人や作った人には見えません。ブラウザのデータを消すと記録も消えるので、上の「📦 記録の引っこし」でときどき保存しておくと安心です。Googleドライブにつないだときは、記録はあなた自身のGoogleドライブ(アプリ専用の見えない場所)にだけ保存されます。 <a href="privacy.html" target="_blank" rel="noopener">プライバシーについて</a></p><button class="fchip" id="resetMe" style="margin-bottom:12px">記録をすべて消す</button><div id="resetConfirm"></div></details>
+    <details class="faq plain"><summary>記録について</summary><p>記録は、あなたのスマホ(ブラウザ)の中だけに保存されます。ほかの人や作った人には見えません。スマホの「閲覧履歴やデータを消す」をすると記録も消えるので、上の「📦 記録をとっておく」でときどき保存しておくと安心です。Googleにあずけたときは、あなた自身のGoogleの中にだけ保存されます。 <a href="privacy.html" target="_blank" rel="noopener">記録の守り方</a></p><button class="fchip" id="resetMe" style="margin-bottom:12px">記録をすべて消す</button><div id="resetConfirm"></div></details>
     </div>
     ${footer()}
   </div>`;
@@ -3770,7 +3788,7 @@ function zoomable(wrap,inner,opt){
   zc.innerHTML='<span class="zt">'+(o.hint||"🔍 2本指でひろげると大きくなります")+'</span>'
     +'<button type="button" data-zin aria-label="大きくする">＋</button>'
     +'<button type="button" data-zout aria-label="小さくする">−</button>'
-    +'<button type="button" class="zre" data-zre aria-label="元の大きさにもどす">もどす</button>';
+    +'<button type="button" class="zre" data-zre aria-label="元の大きさにもどす">元の大きさ</button>';
   (o.into||wrap.parentNode).insertBefore(zc, o.into?null:wrap.nextSibling);
   ZC=zc;
   zc.querySelector("[data-zin]").onclick=()=>zoomAt(s*1.5,wrap.clientWidth/2,wrap.clientHeight/2);
@@ -4053,7 +4071,8 @@ function openWxMap(day){ const M=AL.wxmap; const sh=document.getElementById("she
     zoomable(box,box.querySelector("svg"),{max:6});
   }).catch(()=>{ const box=document.getElementById("wxMapBox"); if(box) box.innerHTML='<div class="empty">地図を読み込めませんでした。下の一覧を見てください。</div>'; }); }
 document.addEventListener("click",ev=>{ if(ev.target.closest("[data-wxmap]")) openWxMap(0); });
-document.addEventListener("toggle",ev=>{ if(ev.target&&ev.target.id==="wxNotes") wxNotesOpen=ev.target.open; },true);
+// 自分で開け閉めしたときだけ覚える(最初から開いて描いたときの toggle では覚えない=かんたんモードで勝手に開きっぱなしにならない)
+document.addEventListener("click",ev=>{ const sm=ev.target.closest&&ev.target.closest("#wxNotes > summary"); if(sm) wxNotesOpen=!sm.parentElement.open; },true);
 document.addEventListener("click",ev=>{ const t=ev.target.closest("[data-wxtg]"); if(!t) return;
   ev.preventDefault(); ev.stopPropagation(); LOOK.wxOpen=!(LOOK.wxOpen===true); saveLook();
   const c=document.getElementById("wxCard"); if(c){ c.outerHTML=weatherCard();
@@ -4117,7 +4136,7 @@ async function loadAlerts(){
   const sh=document.getElementById("sheet"); if(sh&&!sh.hidden&&document.getElementById("qkx")) openQuake(true); }
 function qhm(at){ const d=new Date(Date.parse(at)+9*36e5); return `${d.getUTCMonth()+1}/${d.getUTCDate()} ${d.getUTCHours()}:${String(d.getUTCMinutes()).padStart(2,"0")}`; }
 function qago(at){ const m=Math.round((Date.now()-Date.parse(at))/6e4); return m<1?"いま":m<60?`${m}分前`:m<24*60?`${Math.floor(m/60)}時間前`:`${Math.floor(m/1440)}日前`; }
-function qkLatestLabel(){ let q=null; try{ q=AL.quakes[0]; }catch(_){ return '<span class="qk-last"></span>'; } return q?`<span class="qk-last hint" style="margin-left:4px">(最新: ${qago(q.at)} 震度${QN[q.maxi]||"?"})</span>`:'<span class="qk-last"></span>'; }
+function qkLatestLabel(){ let q=null; try{ q=AL.quakes.find(x=>qr(x.maxi)>=qr("3")&&Date.now()-Date.parse(x.at)<24*36e5); }catch(_){ return '<span class="qk-last"></span>'; } return q?`<span class="qk-last hint" style="margin-left:4px">(最新: ${qago(q.at)} 震度${QN[q.maxi]||"?"})</span>`:'<span class="qk-last"></span>'; }
 function alertItems(){ const L=[]; const hid=(store.get("nw-alert-hide")||"").split(",");
   if(AL.tsunami) L.push({id:AL.tsunami.id,lv:"high",i:"🌊",t:`${AL.tsunami.grade}が出ています`,s:`${AL.tsunami.areas.join("・")}${AL.tsunami.count>AL.tsunami.areas.length?" ほか":""} ・ 海や川から離れてください`});
   (AL.special||[]).filter(x=>Date.now()-Date.parse(x.at)<24*36e5).slice(0,2).forEach(x=>L.push({id:x.id,lv:"high",i:"⚠️",t:"特別警報が出ています",s:`${x.who||""} ${x.text||""}`.slice(0,70)}));
@@ -4152,8 +4171,9 @@ const RT={ws:null,state:"off",retry:0,timer:null,last:null,lt:null};
 let EEW=null;
 function rtOn(){ return store.get("nw-rt")!=="0" && !(navigator.connection&&navigator.connection.saveData); }
 function rtPaint(){ const el=document.getElementById("rtStat"); if(el) el.outerHTML=rtStatHTML(); }
-function rtStatHTML(){ const on=rtOn(); const t=!on?"⏸️ リアルタイム受信: オフ":RT.state==="on"?"📡 リアルタイム受信中":RT.state==="connecting"?"📡 つないでいます…":"📡 いまはつながっていません(3分ごとに読み直します)";
-  return `<div id="rtStat" class="rt-stat ${RT.state==="on"&&on?"on":""}"><span>${t}</span><button class="fchip" data-rt="${on?"0":"1"}">${on?"止める":"オンにする"}</button></div>`; }
+function rtStatHTML(){ const on=rtOn(); const t=!on?"⏸️ 地震の知らせの すぐ受けとり: 止めています":RT.state==="on"?"📡 地震・津波の知らせを待っています(このページを開いている間、すぐ届きます)":"📡 地震・津波の知らせを、3分ごとに確かめています";
+  return `<div id="rtStat" class="rt-stat ${RT.state==="on"&&on?"on":""}"><span>${t}</span>${on?"":`<button class="fchip" data-rt="1">もう一度オンにする</button>`}</div>`; }
+function rtStopHTML(){ return rtOn()?`<button class="fchip" data-rt="0" style="margin-top:10px">知らせの すぐ受けとりをやめる(通信を減らしたいとき)</button>`:""; }
 function rtConnect(){ if(!rtOn()||document.visibilityState!=="visible"||RT.ws||!("WebSocket" in window)) return;
   let ws; RT.state="connecting"; rtPaint();
   try{ ws=new WebSocket("wss://api.p2pquake.net/v2/ws"); }catch(_){ RT.state="off"; rtPaint(); return rtLater(); }
@@ -4224,12 +4244,12 @@ function rdStopPlay(){ if(RADAR.play){ clearInterval(RADAR.play); RADAR.play=nul
 function rdDraw(){ const box=document.getElementById("rdBox"); if(!box) return; const W=Math.round(box.clientWidth)||360, H=Math.round(Math.min(W*1.15,innerHeight*0.62));
   box.style.height=H+"px"; box.innerHTML=rdMapHTML(W,H); zoomable(box,box.firstElementChild,{max:4}); }
 async function openRadar(){ const sh=document.getElementById("sheet"); rdStopPlay();
-  sh.innerHTML=`<div class="bar"><div class="wrap"><button class="iconbtn" id="rdx" aria-label="もどる">← もどる</button><span class="ttl">☔ 雨雲レーダー</span><button class="iconbtn" id="rdr" aria-label="読み直す" style="margin-left:auto">↻</button></div></div><div class="wrap body">
+  sh.innerHTML=`<div class="bar"><div class="wrap"><button class="iconbtn" id="rdx" aria-label="もどる">← もどる</button><span class="ttl">☔ 雨雲レーダー</span><button class="iconbtn" id="rdr" aria-label="新しくする" style="margin-left:auto;width:auto;padding:0 10px">↻ 新しくする</button></div></div><div class="wrap body">
     <div class="seg rd-lv" role="group" aria-label="地図の広さ">${RD_LV.map(([l],i)=>`<button data-rdlv="${i}" aria-pressed="${i===RADAR.lv}">${l}</button>`).join("")}</div>
     <div id="rdBox" class="rd-box" aria-label="雨雲の地図"></div>
-    <div class="rd-ctl"><button class="fchip" id="rdPlay">▶ 動かす</button><span id="rdLabel" class="rd-lab">読みこみ中…</span></div>
-    <input type="range" id="rdSlider" min="0" max="0" value="0" aria-label="時刻を選ぶ" style="width:100%">
-    <div class="rd-scale" aria-label="雨の強さの色"><span style="background:#a0d2ff">1</span><span style="background:#218cff">5</span><span style="background:#0041ff;color:#fff">10</span><span style="background:#faf500">20</span><span style="background:#ff9900">30</span><span style="background:#ff2800;color:#fff">50</span><span style="background:#b40068;color:#fff">80〜</span><small>mm/時</small></div>
+    <div class="rd-ctl"><button class="fchip" id="rdPlay" style="white-space:nowrap">▶ 動かす</button><span id="rdLabel" class="rd-lab">読みこみ中…</span></div>
+    <input type="range" id="rdSlider" min="0" max="0" value="0" aria-label="時刻を選ぶ" style="width:100%"><div class="rd-ends"><span>← 1時間前</span><span>いま</span><span>1時間後 →</span></div>
+    <div class="rd-scale" aria-label="雨の強さの色"><span style="background:#a0d2ff">1</span><span style="background:#218cff">5</span><span style="background:#0041ff;color:#fff">10</span><span style="background:#faf500">20</span><span style="background:#ff9900">30</span><span style="background:#ff2800;color:#fff">50</span><span style="background:#b40068;color:#fff">80〜</span><small>1時間の雨の量(ミリ)。右ほど強い雨</small></div>
     <p class="hint">左へ動かすと少し前、右の「予想」は1時間先までの見こみです。2本指でひろげると拡大できます。予想は外れることもあるので、出かける前にもう一度見てください。</p>
     <p class="hint">出典: <a href="https://www.jma.go.jp/bosai/nowc/" target="_blank" rel="noopener">気象庁 雨雲の動き</a>(高解像度降水ナウキャスト)・地図: <a href="https://maps.gsi.go.jp/development/ichiran.html" target="_blank" rel="noopener">国土地理院</a></p>
     <button class="iconbtn" id="rdx2" style="margin-top:6px">← もどる</button></div>`;
@@ -4251,18 +4271,18 @@ async function openRadar(){ const sh=document.getElementById("sheet"); rdStopPla
 document.addEventListener("click",ev=>{ if(ev.target.closest("[data-radar]")){ ev.stopPropagation(); openRadar(); } },true);
 function openQuake(refresh){ const sh=document.getElementById("sheet"); sh.dataset.kind="quake";
   const tsu=AL.tsunami, sp=(AL.special||[]).filter(x=>Date.now()-Date.parse(x.at)<24*36e5);
-  sh.innerHTML=`<div class="bar"><div class="wrap"><button class="iconbtn" id="qkx" aria-label="もどる">← もどる</button><span class="ttl">🛟 防災(地震・雨雲・警報)</span><button class="iconbtn" id="qkr" aria-label="読み直す" style="margin-left:auto">↻</button></div></div><div class="wrap body">
+  sh.innerHTML=`<div class="bar"><div class="wrap"><button class="iconbtn" id="qkx" aria-label="もどる">← もどる</button><span class="ttl">🛟 防災(地震・雨雲・警報)</span><button class="iconbtn" id="qkr" aria-label="新しくする" style="margin-left:auto;width:auto;padding:0 10px">↻ 新しくする</button></div></div><div class="wrap body">
    ${rtStatHTML()}
-   <div class="bs-go"><button class="fchip" data-radar="1">☔ 雨雲レーダー<small>いまと1時間先</small></button><a class="fchip" href="https://hinanmap.gsi.go.jp/" target="_blank" rel="noopener">🏃 避難場所の地図<small>国土地理院</small></a><a class="fchip" href="https://disaportal.gsi.go.jp/" target="_blank" rel="noopener">🗺️ ハザードマップ<small>家のまわりの危ないところ</small></a><a class="fchip" href="https://www.jma.go.jp/bosai/risk/" target="_blank" rel="noopener">⚠️ キキクル<small>土砂・浸水・洪水</small></a></div>
-   <p class="hint">気象庁の発表を、アプリを開いたときに直接読んでいます(ニュースの1日4回の更新を待ちません)。開いている間は📡リアルタイムでも受けとります。${AL.checked?`最後に確かめた時刻: ${qhm(AL.checked)}`:""}${AL.ok?"":" ・ <b>いま読み込めませんでした。下の公式ページで確かめてください。</b>"}</p>
+   <div class="bs-go"><button class="fchip" data-radar="1">☔ 雨雲レーダー<small>いまと1時間先の雨</small></button><a class="fchip" href="https://hinanmap.gsi.go.jp/" target="_blank" rel="noopener">🏃 にげる場所の地図<small>避難場所(国土地理院)</small></a><a class="fchip" href="https://disaportal.gsi.go.jp/" target="_blank" rel="noopener">🗺️ 家のまわりの危ない場所<small>ハザードマップ</small></a><a class="fchip" href="https://www.jma.go.jp/bosai/risk/" target="_blank" rel="noopener">⚠️ 大雨で危ない場所<small>キキクル(気象庁)</small></a></div>
+   <p class="hint">気象庁の発表を、アプリを開いたときに直接読んでいます(ニュースの1日4回の更新を待ちません)。開いている間は、新しい知らせもすぐ受けとります。${AL.checked?`最後に確かめた時刻: ${qhm(AL.checked)}`:""}${AL.ok?"":" ・ <b>いま読み込めませんでした。下の公式ページで確かめてください。</b>"}</p>
    ${tsu?`<div class="al-band" style="cursor:default"><span class="ai">🌊</span><span><b>${esc(tsu.grade)}</b><small>${esc(tsu.areas.join("・"))}${tsu.count>tsu.areas.length?" ほか":""}</small></span></div>`:`<p>🌊 津波の警報・注意報は、いま出ていません。</p>`}
    ${sp.map(x=>`<div class="al-band" style="cursor:default;margin-top:8px"><span class="ai">⚠️</span><span><b>特別警報</b><small>${esc(x.who||"")} ${esc(x.text||"")}</small></span></div>`).join("")}
    <h3 style="margin:18px 0 6px">⚠️ ${esc(prefNow())}への気象庁のよびかけ</h3>
    ${(()=>{ const L=myWarn().slice().sort((a,b)=>b.lv-a.lv); if(!L.length) return `<p class="hint">いま、${esc(prefNow())}へのよびかけは届いていません。下の気象庁のページでも確かめられます。</p>`;
      return L.slice(0,4).map(w=>{ const [ic,nm]=WARN_LV[w.lv]||WARN_LV[0]; return `<div class="al-band ${w.lv>=2?"":"mid"}" style="cursor:default;margin-bottom:8px"><span class="ai">${ic}</span><span><b>${esc(nm)}</b><small>${esc(String(w.text||"").replace(/^【[^】]*】/,""))}</small><small class="hint">${esc(w.who||"")} ・ ${qhm(w.at)}</small></span></div>`; }).join(""); })()}
-   <div class="hint">気象庁の発表の文をそのまま出しています。「わたしの街」はマイ→🏠で変えられます。</div>
+   <div class="hint">気象庁の発表の文をそのまま出しています。「わたしの街」は、天気の「🕐 1時間ごと」のページで選べます。</div>
    <h3 style="margin:18px 0 0">最近の地震(3日以内)</h3>
-   ${AL.quakes.length?`<ul class="qk-list">${AL.quakes.map(q=>{ const r=qr(q.maxi); const c=r>=8?"l7":r>=6?"l6":r>=4?"l5":r===3?"l4":r===2?"l3":""; return `<li><span class="qk-s ${c}"><span><small>震度</small>${esc(QN[q.maxi]||"?")}</span></span><span><b>${esc(q.place)}</b><br><span class="hint">${qhm(q.at)}ごろ(${qago(q.at)})${q.mag?` ・ M${esc(q.mag)}`:""}${q.depth!=null?` ・ 深さ${q.depth===0?"ごく浅い":esc(q.depth)+"km"}`:""}</span></span></li>`; }).join("")}</ul>`:`<p class="hint" style="margin-top:8px">${AL.ok?"3日以内に震度のある地震の情報はありません。":"読み込み中か、つながりませんでした。"}</p>`}
+   ${AL.quakes.length?`<ul class="qk-list">${AL.quakes.map(q=>{ const r=qr(q.maxi); const c=r>=8?"l7":r>=6?"l6":r>=4?"l5":r===3?"l4":r===2?"l3":""; return `<li><span class="qk-s ${c}"><span><small>震度</small>${esc(QN[q.maxi]||"?")}</span></span><span><b>${esc(q.place)}</b><br><span class="hint">${qhm(q.at)}ごろ(${qago(q.at)})${q.mag?` ・ 大きさ(マグニチュード)${esc(q.mag)}`:""}${q.depth!=null?` ・ 深さ${q.depth===0?"ごく浅い":esc(q.depth)+"km"}`:""}</span></span></li>`; }).join("")}</ul>`:`<p class="hint" style="margin-top:8px">${AL.ok?"3日以内に震度のある地震の情報はありません。":"読み込み中か、つながりませんでした。"}</p>`}
    <h3 style="margin:20px 0 0">公式ページで確かめる</h3>
    <div class="qk-links">
      <a href="https://www.jma.go.jp/bosai/map.html#contents=earthquake_map" target="_blank" rel="noopener">📍 気象庁 地震情報<small>震度の地図・くわしい発表</small></a>
@@ -4273,8 +4293,9 @@ function openQuake(refresh){ const sh=document.getElementById("sheet"); sh.datas
      <a href="https://transit.yahoo.co.jp/diainfo" target="_blank" rel="noopener">🚃 電車の運行情報<small>遅れ・運休(Yahoo!路線情報)</small></a>
    </div>
    <button class="sos-go" data-sos="1" style="margin-top:14px">🆘 こまったときは(まずすること)</button>
-   <div class="exp" style="margin-top:14px">📣 このアプリは「起きたことをわかりやすく」がお仕事です。<b>揺れる前の緊急地震速報</b>は、スマホの緊急速報(エリアメール)や防災アプリで受け取ってください。震度5弱以上・津波・特別警報は、ntfyの通知(マイ→設定)でもお知らせします。</div>
-   <p class="hint" style="margin-top:10px">出典: 気象庁(P2P地震情報 経由をふくむ)・国土地理院。SNSの書きこみやうわさは使っていません。</p></div>`;
+   <div class="exp" style="margin-top:14px">📣 このアプリは「起きたことをわかりやすく」がお仕事です。<b>揺れる前の緊急地震速報</b>は、スマホの緊急速報(エリアメール)や防災アプリで受け取ってください。震度5弱以上・津波・特別警報は、スマホへのお知らせ(マイ→⚙️設定)でも届きます。</div>
+   ${rtStopHTML()}
+   <p class="hint" style="margin-top:10px">出典: 気象庁(地震情報を配っている民間のサービス「P2P地震情報」もふくむ)・国土地理院。SNSの書きこみやうわさは使っていません。</p></div>`;
   if(!refresh){ sh.hidden=false; document.body.style.overflow="hidden"; }
   document.getElementById("qkx").onclick=()=>{ sh.hidden=true; delete sh.dataset.kind; document.body.style.overflow=""; try{ history.replaceState(null,"","#"+(current||"today")); }catch(_){} };
   document.getElementById("qkr").onclick=()=>{ toast("読み直しています…"); loadAlerts(); };
