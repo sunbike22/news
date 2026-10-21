@@ -161,6 +161,9 @@ main{padding-block:18px 32px}
 .ten.short li.mytown{border-left:4px solid var(--accent)}
 .ten.short li{position:relative}.ten.short .row{padding-right:50px!important}
 .len-seg{margin-left:auto}
+.wd-sea{fill:var(--accent-soft);opacity:.5}.wd-n{fill:#2f6fed;fill-opacity:.75;stroke:#fff;stroke-width:1}
+.wd-e{stroke:#fff;stroke-width:.8;fill-opacity:.85}.wd-e.eq{fill:#e5484d}.wd-e.storm{fill:#8e44ad}.wd-e.flood{fill:#1e88e5}.wd-e.volcano{fill:#a0522d}.wd-e.fire{fill:#f57c00}.wd-e.drought{fill:#c0a000}.wd-e.other{fill:#777}
+.wd-dot{display:inline-block;width:12px;height:12px;border-radius:50%;margin-right:4px;vertical-align:-1px;border:1.5px solid #fff;box-shadow:0 0 0 1px var(--line)}.wd-leg{display:flex;flex-wrap:wrap;gap:4px 12px;font-size:.88rem;margin:4px 0 6px}.wd-ev li{margin:4px 0;line-height:1.55}
 .fl-dot{fill:#e5484d;fill-opacity:.45;stroke:#b42318;stroke-width:1.2}.fl-n{font-size:11px;font-weight:800;fill:#7a1010;pointer-events:none}
 :root[data-theme="dark"] .fl-n{fill:#fff}:root[data-theme="dark"] .fl-dot{fill:#ff6b6b;fill-opacity:.6}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .fl-n{fill:#fff}:root:not([data-theme="light"]) .fl-dot{fill:#ff6b6b;fill-opacity:.6}}
@@ -3863,6 +3866,7 @@ function funGrid(){ const L=FUN.filter(f=>(FUN_SET[f[0]]||FUN_ALWAYS.includes(f[
     ${hid?`<button class="fchip" id="funMore" data-hid="${hid}" aria-expanded="${funOpen?"true":"false"}" style="margin-top:8px">${funOpen?"▲ とじる":`… ほか ${hid}こ を見る`}</button>`:""}</section>`; }
 // ===== お知らせ(新しくなったところ)。機能を足したら、いちばん上に1つ足す =====
 const UPDATES=[
+  {id:"2026-10-22l",d:"2026-10-22",t:"🌍 世界のいま",L:["世界のどこで何が起きているかを1枚の地図に。このアプリで伝えたニュースの場所(青)と、世界の地震・台風・山火事など(公的機関の発表)を重ねました。","🛟 防災のページと、地図のページから開けます。うわさやSNSの書きこみは使っていません。"]},
   {id:"2026-10-22k",d:"2026-10-22",t:"👥 みんなの「ゆれた」マップ",L:["🛟 防災のページに、ゆれを感じた人が「ゆれた」ボタンを押した数を地図にしたページができました(P2P地震情報)。","アプリを開いている間に、急に報告が増えたらそっとお知らせします。人の報告(目安)なので、正式な震度は気象庁の発表を見てください。"]},
   {id:"2026-10-22j",d:"2026-10-22",t:"🔔 続きを追う",L:["解説のページで「🔔 続きを追う」を押すと、そのお話に続きが出た日と、山場の前の日だけ「きょう」のいちばん上でお知らせします。","追っているお話は マイ で見たり、やめたりできます。ほかのニュースは読まなくても大丈夫です。"]},
   {id:"2026-10-22i",d:"2026-10-22",t:"🎯 きょうの1問",L:["ニュース10の下に、1日1つだけの予想「きょうの1問」ができました。⭕ そうなる か ❌ ならない を押すだけ。","結果が出たら、ここでお知らせします(当たりはごはん🍙)。この7日の結果を 🟩🟥 で送れます。"]},
@@ -4098,6 +4102,38 @@ const PLACES=[
   [/トルコ/,32.86,39.93,"トルコ"],[/ジブチ/,43.15,11.59,"ジブチ"],[/グリーンランド/,-51.72,64.18,"グリーンランド"],[/ICC|オランダ/,4.3,52.07,"オランダ(ICC)"],[/MMX|火星/,130.97,30.4,"種子島(打ち上げ)"],
   [/福生|山手線|東京|首相|国会|衆院|参院|日経平均|日銀|関文科相|簗/,139.75,35.68,"東京"]
 ];
+// ===== 🌍 世界のいま(このアプリで2社確認したニュースの場所 + 災害の一次情報。SNSは使わない) =====
+const WK={eq:["🔴","地震"],storm:["🌀","台風・嵐"],flood:["🌊","洪水"],volcano:["🌋","火山"],fire:["🔥","山火事"],drought:["🏜️","干ばつ"],other:["⚠️","災害"]};
+function worldNews(){ const since=new Date(Date.parse(TODAY)-2*864e5).toISOString().slice(0,10); const m={};
+  NEWS.filter(n=>n.d>=since).forEach(n=>{ const p=placeOf(n); if(!p) return; const k=p[3]; (m[k]=m[k]||{p,L:[]}).L.push(n); }); return Object.values(m); }
+function worldEv(){ const W=AL.world; if(!W||!W.ev) return []; const lim=Date.now()-3*864e5;
+  return W.ev.filter(e=>{ const t=Date.parse(e[4]); return isNaN(t)||t>=lim; }).filter(e=>e[0]!=="eq"||e[5]>=5); }
+let WSEL=null;
+function openWorld(){ const sh=document.getElementById("sheet"); const back=sh.dataset.kind==="quake";
+  const N=worldNews(), E=worldEv();
+  sh.innerHTML=`<div class="bar"><div class="wrap"><button class="iconbtn" id="wdx" aria-label="もどる">← もどる</button><span class="ttl">🌍 世界のいま</span></div></div><div class="wrap body">
+    <p class="obp" style="margin-top:4px">世界のどこで何が起きているかを1枚に。<b>🔵 青い丸</b>=このアプリで伝えたニュース(この3日・2社で確認)、<b>🔴 赤など</b>=地震・台風・山火事などの災害(公的機関の発表)。うわさやSNSの書きこみは使っていません。</p>
+    <div class="wd-leg"><span><i class="wd-dot" style="background:#2f6fed"></i>ニュース</span>${[["eq","#e5484d"],["storm","#8e44ad"],["flood","#1e88e5"],["volcano","#a0522d"],["fire","#f57c00"],["drought","#c0a000"]].map(([k,c])=>`<span><i class="wd-dot" style="background:${c}"></i>${WK[k][1]}</span>`).join("")}</div>
+    <div class="wxmap" id="wdMap" style="min-height:0"><div class="empty">地図を読み込んでいます…</div></div>
+    <div id="wdSel"></div>
+    <h3 style="margin:14px 0 4px;font-size:1rem">🔵 ニュースのあった場所</h3>
+    ${N.length?`<ul class="us">${N.sort((a,b)=>b.L.length-a.L.length).map(x=>`<li><b>${esc(x.p[3])}</b> <span class="hint">${x.L.length}件</span></li>`).join("")}</ul>`:`<p class="hint">この3日は、場所のわかるニュースがありません。</p>`}
+    <h3 style="margin:14px 0 4px;font-size:1rem">🌐 世界の災害(この3日)</h3>
+    ${E.length?`<ul class="us wd-ev">${E.slice(0,15).map(e=>`<li>${WK[e[0]]?WK[e[0]][0]:"⚠️"} <b>${WK[e[0]]?WK[e[0]][1]:"災害"}${e[0]==="eq"?" M"+e[5]:""}</b>${e[5]==="Red"?' <span class="chip" style="background:#ffe1e1;color:#a01010">赤の警報</span>':e[5]==="Orange"?' <span class="chip" style="background:#ffeccc;color:#8a4b00">オレンジの警報</span>':""} <span class="hint">${esc(e[1])}(英語の地名) ・ ${esc(e[6])}</span></li>`).join("")}</ul>`:`<p class="hint">${AL.world?"大きな災害の発表はありません。":"いま読み込めませんでした。少しして開き直してください。"}</p>`}
+    <p class="hint" style="margin-top:10px">出典: ニュース=このアプリの記録(報道機関2社以上)、地震=<a href="https://earthquake.usgs.gov/" target="_blank" rel="noopener">USGS(アメリカ地質調査所)</a> M5以上、災害の警報=<a href="https://www.gdacs.org/" target="_blank" rel="noopener">GDACS(国連とEU)</a>、山火事・火山・嵐=<a href="https://eonet.gsfc.nasa.gov/" target="_blank" rel="noopener">NASA EONET</a>。${AL.world&&AL.world.at?`${qhm(AL.world.at)}に取得。`:""}日本の地震・津波は気象庁の発表(🛟 防災)を見てください。</p></div>`;
+  sh.hidden=false; sh.scrollTop=0; document.body.style.overflow="hidden"; track("/world","世界のいま");
+  sh.querySelector("#wdx").onclick=()=>{ if(back) openQuake(); else { sh.hidden=true; sh.innerHTML=""; document.body.style.overflow=""; } };
+  getWorld().then(world=>{ const mb=document.getElementById("wdMap"); if(!mb) return; const W=358;
+    const proj=d3.geoEquirectangular().rotate([-150,0]).fitWidth(W,{type:"Sphere"}); const y0=proj([150,78])[1], y1=proj([150,-58])[1], H=Math.round(y1-y0); const path=d3.geoPath(proj);
+    const ev=E.map((e,i)=>{ const [x,y]=proj([e[3],e[2]]); const r=e[0]==="eq"?Math.max(2.5,(e[5]-4)*2.2):e[5]==="Red"?6:4.5; return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${r.toFixed(1)}" class="wd-e ${e[0]}" data-wde="${i}"><title>${WK[e[0]]?WK[e[0]][1]:""} ${esc(e[1])}</title></circle>`; }).join("");
+    const nw=N.map((x,i)=>{ const [px,py]=proj([x.p[1],x.p[2]]); return `<circle cx="${px.toFixed(1)}" cy="${py.toFixed(1)}" r="${(3.5+Math.sqrt(x.L.length)*1.6).toFixed(1)}" class="wd-n" data-wdn="${i}"><title>${esc(x.p[3])}</title></circle>`; }).join("");
+    mb.innerHTML=`<svg viewBox="0 ${y0.toFixed(1)} ${W} ${H}" class="wm-svg" role="img" aria-label="世界のいまの地図"><path d="${path({type:"Sphere"})}" class="wd-sea"/>${world.features.filter(f=>+f.id!==10).map(f=>`<path d="${path(f)}" class="wm-land"/>`).join("")}${ev}${nw}</svg>`;
+    zoomable(mb,mb.querySelector("svg"),{max:8});
+    mb.addEventListener("click",ev2=>{ const t=ev2.target; const sel=document.getElementById("wdSel"); if(!sel) return;
+      if(t.dataset.wdn!=null){ const x=N[+t.dataset.wdn]; sel.innerHTML=`<div class="card" style="margin-top:8px"><b>🔵 ${esc(x.p[3])}</b><ul class="us">${x.L.slice(0,5).map(n=>`<li>${esc(n.h)} <small class="hint">${mdLabel(n.d)}</small></li>`).join("")}</ul></div>`; }
+      else if(t.dataset.wde!=null){ const e=E[+t.dataset.wde]; sel.innerHTML=`<div class="card" style="margin-top:8px"><b>${WK[e[0]][0]} ${WK[e[0]][1]}${e[0]==="eq"?" M"+e[5]:""}</b><p class="hint" style="margin:4px 0 0">${esc(e[1])}(英語の地名) ・ 出典: ${esc(e[6])}</p></div>`; } });
+  }).catch(()=>{ const mb=document.getElementById("wdMap"); if(mb) mb.innerHTML='<div class="empty">地図を読み込めませんでした。下の一覧を見てください。</div>'; }); }
+document.addEventListener("click",ev=>{ if(ev.target.closest("[data-world]")) openWorld(); });
 function placeOf(n){ for(const p of PLACES){ if(p[0].test(n.h+" "+(n.th||""))) return p; } return null; }
 let mapState={view:"japan",sel:null};
 const SCRIPTS={};
@@ -4187,6 +4223,7 @@ function renderMap(){
     <div class="seg map-seg" role="group" aria-label="地図の種類"><button data-v="japan" aria-pressed="${mapState.view==="japan"}">🗾 日本</button><button data-v="world" aria-pressed="${mapState.view==="world"}">🌏 世界</button><button data-v="board" aria-pressed="${mapState.view==="board"}">🧷 捜査ボード</button></div>
     <div class="card mapbox"><div id="map" class="mapsvg"><div class="empty">地図を読み込んでいます…</div></div></div>
     <p class="hint" style="margin:0">丸をタップすると、その場所のニュースが下に出ます。</p>
+    <button class="fchip fl-go" data-world="1">🌍 世界のいま<small>世界の地震・台風・山火事も重ねて見る</small></button>
     <div id="mapList"></div>
     ${mapState.view==="board"?"":mascot("map")}
     ${footer()}
@@ -4500,7 +4537,7 @@ async function loadAlerts(){
     tmo(fetch(P2P_URL,{cache:"no-store"}).then(r=>r.ok?r.json():null),8000).catch(()=>null)];
   const [a,p]=await Promise.all(jobs);
   const qs=[]; let ts=null, special=[];
-  if(a){ (a.quakes||[]).forEach(q=>qs.push(q)); ts=a.tsunami||null; special=a.special||[]; AL.checked=a.checked||null; if(a.wx) AL.wx=a.wx; if(a.wxmap) AL.wxmap=a.wxmap; if(a.radar) AL.radar=a.radar; AL.warn=a.warn||[]; }
+  if(a){ (a.quakes||[]).forEach(q=>qs.push(q)); ts=a.tsunami||null; special=a.special||[]; AL.checked=a.checked||null; if(a.wx) AL.wx=a.wx; if(a.wxmap) AL.wxmap=a.wxmap; if(a.radar) AL.radar=a.radar; if(a.world) AL.world=a.world; AL.warn=a.warn||[]; }
   if(Array.isArray(p)){ p.forEach(r=>{
     if(r.code===551){ const e=r.earthquake||{}, h=e.hypocenter||{}; if((r.issue||{}).type==="Foreign") return; const at=p2pTime(e.time); if(!at) return;
       qs.push({id:"p"+at,at,place:h.name||"調査中",mag:h.magnitude>0?String(h.magnitude):null,depth:h.depth>0?h.depth:null,maxi:P2PS[e.maxScale]||null}); }
@@ -4768,6 +4805,7 @@ function openQuake(refresh){ const sh=document.getElementById("sheet"); sh.datas
   const tsu=AL.tsunami, sp=(AL.special||[]).filter(x=>Date.now()-Date.parse(x.at)<24*36e5);
   sh.innerHTML=`<div class="bar"><div class="wrap"><button class="iconbtn" id="qkx" aria-label="もどる">← もどる</button><span class="ttl">🛟 防災(地震・雨雲・警報)</span><button class="iconbtn" id="qkr" aria-label="新しくする" style="margin-left:auto;width:auto;padding:0 10px">↻ 新しくする</button></div></div><div class="wrap body">
    ${rtStatHTML()}
+   <button class="fchip fl-go" data-world="1">🌍 世界のいま<small>世界の地震・台風・山火事と、ニュースのあった場所</small></button>
    <button class="fchip fl-go" data-felt="1">👥 みんなの「ゆれた」マップ<small>いま、どこでゆれを感じた人が多いか(利用者の報告・目安)</small></button>
    <div class="bs-go"><button class="fchip" data-bmap="rain">☔ 雨雲レーダー<small>いまと1時間先の雨</small></button><button class="fchip" data-bmap="shelter">🏃 にげる場所<small>近くの避難場所</small></button><button class="fchip" data-bmap="flood">🌊 水につかる所<small>川があふれたら</small></button><button class="fchip" data-bmap="dosha">⛰️ がけ崩れの所<small>土砂災害の区域</small></button></div>
    <p class="hint">気象庁の発表を、アプリを開いたときに直接読んでいます(ニュースの1日4回の更新を待ちません)。開いている間は、新しい知らせもすぐ受けとります。${AL.checked?`最後に確かめた時刻: ${qhm(AL.checked)}`:""}${AL.ok?"":" ・ <b>いま読み込めませんでした。下の公式ページで確かめてください。</b>"}</p>
