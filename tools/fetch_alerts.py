@@ -256,6 +256,57 @@ def wxmap_fetch(prev_m):
     return {"at": iso(NOW), "dates": L[0]["daily"]["time"][:2], "cities": out}
 
 
+# ---------- 世界のいま(災害の一次情報だけ。SNSは使わない) ----------
+# USGS(世界の地震 M4.5以上・24時間)、GDACS(国連とEUの災害の警報。オレンジ・赤だけ)、NASA EONET(山火事・火山・嵐)。1時間に1回だけ取り直す。
+# 1件 = [種類, 名前(英語のまま), 緯度, 経度, 時刻, 強さ(地震=M/GDACS=Orange|Red), 出典]
+def world_fetch(prev_w):
+    try:
+        if prev_w and prev_w.get("at") and prev_w["at"] >= iso(NOW - datetime.timedelta(minutes=55)):
+            return prev_w
+    except Exception:  # noqa: BLE001
+        pass
+    ev, err = [], {}
+    try:
+        j = json.loads(get("https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/4.5_day.geojson", timeout=25))
+        for f in j.get("features", [])[:40]:
+            pr, g = f.get("properties", {}), (f.get("geometry") or {}).get("coordinates") or [None, None]
+            t = datetime.datetime.fromtimestamp(pr.get("time", 0) / 1000, JST)
+            ev.append(["eq", (pr.get("place") or "")[:60], round(g[1], 2), round(g[0], 2), iso(t), round(pr.get("mag") or 0, 1), "USGS"])
+    except Exception as e:  # noqa: BLE001
+        err["usgs"] = f"{type(e).__name__}: {e}"[:120]
+    try:
+        fd = (NOW - datetime.timedelta(days=7)).strftime("%Y-%m-%d")
+        j = json.loads(get("https://www.gdacs.org/gdacsapi/api/events/geteventlist/SEARCH?eventlist=TC;FL;VO;DR;WF;EQ&alertlevel=Orange;Red&fromdate=" + fd, timeout=25))
+        for f in (j.get("features") or [])[:40]:
+            pr, g = f.get("properties", {}), (f.get("geometry") or {}).get("coordinates") or [None, None]
+            if g[0] is None:
+                continue
+            kind = {"TC": "storm", "FL": "flood", "VO": "volcano", "DR": "drought", "WF": "fire", "EQ": "eq"}.get(pr.get("eventtype"), "other")
+            if kind == "eq":
+                continue  # 地震は USGS のほうで出す
+            ev.append([kind, (pr.get("name") or pr.get("eventname") or pr.get("country") or "")[:60], round(float(g[1]), 2), round(float(g[0]), 2), str(pr.get("fromdate") or "")[:19], pr.get("alertlevel") or "", "GDACS"])
+    except Exception as e:  # noqa: BLE001
+        err["gdacs"] = f"{type(e).__name__}: {e}"[:120]
+    try:
+        j = json.loads(get("https://eonet.gsfc.nasa.gov/api/v3/events?status=open&days=5&limit=60", timeout=25))
+        cm = {"wildfires": "fire", "volcanoes": "volcano", "severeStorms": "storm", "floods": "flood", "seaLakeIce": None, "snow": None, "dustHaze": None}
+        for e2 in j.get("events", []):
+            cat = ((e2.get("categories") or [{}])[0]).get("id")
+            kind = cm.get(cat, "other")
+            if not kind or not e2.get("geometry"):
+                continue
+            g = e2["geometry"][-1]; c = g.get("coordinates")
+            if g.get("type") != "Point" or not c:
+                continue
+            ev.append([kind, (e2.get("title") or "")[:60], round(c[1], 2), round(c[0], 2), str(g.get("date") or "")[:19], "", "NASA EONET"])
+    except Exception as e:  # noqa: BLE001
+        err["eonet"] = f"{type(e).__name__}: {e}"[:120]
+    if not ev and prev_w:
+        prev_w = dict(prev_w); prev_w["err"] = err
+        return prev_w
+    return {"at": iso(NOW), "ev": ev[:120], "err": err}
+
+
 # ---------- 雨雲の動き(気象庁のナウキャスト)の時刻 ----------
 # アプリは地図のタイル画像を直接読む。ここでは「どの時刻の画像があるか」だけを入れる(5分ごとに増える)。
 def radar_fetch():
@@ -359,6 +410,11 @@ try:
     wxm = wxmap_fetch(prev.get("wxmap"))
 except Exception as e:  # noqa: BLE001
     errors["wxmap"] = f"{type(e).__name__}: {e}"[:200]
+world = prev.get("world")
+try:
+    world = world_fetch(prev.get("world"))
+except Exception as e:  # noqa: BLE001
+    errors["world"] = f"{type(e).__name__}: {e}"[:200]
 radar = None
 try:
     radar = radar_fetch()
@@ -368,6 +424,7 @@ out = {"quakes": quakes, "qsrc": qsrc, "tsunami": tsunami, "special": special, "
 same = {k: prev.get(k) for k in out} == out
 # 雨雲は5分ごとに新しくなるので、変わったかどうかの判定には入れない(書くときは入れる)
 out["radar"] = radar or prev.get("radar")
+out["world"] = world  # 世界のいま(1時間ごと)も判定に入れない
 out["probe2"] = prev.get("probe2")
 if not out["probe2"]:
     try:
@@ -387,6 +444,7 @@ for q in quakes[:3]:
     print(" ", q)
 # 30分に1回は checked を更新するため、変わっていなくても書き出す(見張りが動いている証拠)
 last = prev.get("checked") or ""
+world_new = bool(world) and (world or {}).get("at") != ((prev.get("world") or {}).get("at"))
 radar_new = bool(radar) and (radar.get("past") or [None])[-1] != ((prev.get("radar") or {}).get("past") or [None])[-1]
-if not same or radar_new or last < iso(NOW - datetime.timedelta(minutes=30)):
+if not same or radar_new or world_new or last < iso(NOW - datetime.timedelta(minutes=30)):
     print("CHANGED")
