@@ -2833,24 +2833,32 @@ const PET_KINDS={
   inu:["わんまる","#e9c28f","#fff7ea",["#f3d6ad","#d6a265"],"#fff6ea"]};
 const PET_KIND_KEYS=Object.keys(PET_KINDS);
 // 🎨 ペットの色(いつでも変えられる)。[キー, 体, おなか, 名人の色(上), 名人の色(下), 名前]。null = もとの色
-const PET_COLORS=[[null,null,null,null,null,"もとの色"],["hiyoko","#ffe37a","#fff8d6","#fff0a8","#f5c93a","ひよこ"],["sakura","#ffc4d6","#fff1f5","#ffdbe6","#f59bb8","さくら"],["sora","#a8d8ff","#eef8ff","#cbe8ff","#6fb6f0","そら"],["wakaba","#a8e6a1","#effbec","#c9f0c4","#6fcf66","わかば"],["lavender","#d7c2ff","#f6f0ff","#e8dcff","#b597f5","ラベンダー"],["orange","#ffb36b","#fff1e2","#ffd0a1","#f08c2e","オレンジ"],["milk","#fff4e0","#ffffff","#fffaf0","#f0dcb8","ミルク"],["choco","#a9714b","#f3dcc4","#c48d63","#7f4f2f","チョコ"],["sumi","#6b7280","#e5e7eb","#9ca3af","#4b5563","すみ色"],["mint","#9fe3d0","#effcf8","#c2f0e3","#5ccbae","ミント"]];
+const PET_COLORS=[[null,null,null,null,null,"もとの色"],
+  ["tora","#f2a65a","#fff3e3","#f8c58f","#e08a3a","茶トラ"],["shiba","#d9894c","#fff4e6","#e8a774","#bf6d33","赤茶"],["cream","#f2dfb8","#fffaf0","#f8ecd2","#e2c48e","クリーム"],
+  ["milk","#fbf6ee","#ffffff","#fffaf3","#eadbc4","しろ"],["gray","#a8a29e","#f5f5f4","#c4bfba","#8a847f","はいいろ"],["choco","#8b5a3c","#f3dcc4","#a8714f","#6e4429","こげ茶",1],["kuro","#3f3f46","#e7e5e4","#5b5b63","#27272a","くろ",1],
+  ["hiyoko","#ffe37a","#fff8d6","#fff0a8","#f5c93a","ひよこ"],["sakura","#ffc4d6","#fff1f5","#ffdbe6","#f59bb8","さくら"],["orange","#ffb36b","#fff1e2","#ffd0a1","#f08c2e","オレンジ"],
+  ["wakaba","#a8e6a1","#effbec","#c9f0c4","#6fcf66","わかば"],["sora","#a8d8ff","#eef8ff","#cbe8ff","#6fb6f0","そら"],["lavender","#d7c2ff","#f6f0ff","#e8dcff","#b597f5","ラベンダー"],["mint","#9fe3d0","#effcf8","#c2f0e3","#5ccbae","ミント"]];
+// 種類ごとに選べる色(実際の動物にある色だけ。けろまるは何色でも、よむまるは食べ物っぽい明るい色)
+const PET_COLOR_OK={maru:["hiyoko","sakura","orange","cream","milk","wakaba"],neko:["tora","cream","milk","gray","choco","kuro"],inu:["shiba","cream","milk","gray","choco","kuro"],
+  usagi:["milk","cream","gray","choco","kuro"],pengin:["kuro","gray","choco"],kitsune:["shiba","milk","gray","choco","kuro"],kaeru:null};
+function petColorsFor(kind){ const ok=PET_COLOR_OK[kind]; return PET_COLORS.filter(c=>!c[0]||!ok||ok.includes(c[0])); }
 function petKind(){ const k=(ME.pet||{}).kind; return PET_KINDS[k]?k:"maru"; }
 function petPickKind(avoid){ const L=PET_KIND_KEYS.filter(k=>k!==avoid); return L[Math.floor(Math.random()*L.length)]; }
 // 種類ごとの絵の部品(体の前に描く"back"=耳など、体の後に描く"front"=しっぽ・くちばし・もよう)
 function petKindParts(kind,stage,egg){ if(egg) return {back:"",front:""}; const g=stage>=2;
   switch(kind){
-    case "neko": return {back:`<path d="M34 54l-4-22 18 12z" fill="#f6e4c4" stroke="#d9c39a" stroke-width="2"/><path d="M86 54l4-22-18 12z" fill="#f6e4c4" stroke="#d9c39a" stroke-width="2"/><path d="M36 48l-2-11 9 6z" fill="#ffb3c6"/><path d="M84 48l2-11-9 6z" fill="#ffb3c6"/>`,
+    case "neko": return {back:`<path d="M34 54l-4-22 18 12z" fill="var(--pb)" stroke="var(--pd)" stroke-width="2"/><path d="M86 54l4-22-18 12z" fill="var(--pb)" stroke="var(--pd)" stroke-width="2"/><path d="M36 48l-2-11 9 6z" fill="#ffb3c6"/><path d="M84 48l2-11-9 6z" fill="#ffb3c6"/>`,
       front:`<path d="M26 74h-12M27 80h-12M93 74h12M93 80h12" stroke="#7a6a50" stroke-width="2" stroke-linecap="round"/>${g?`<path d="M52 50q8 4 16 0M48 44q4 3 8 0M64 44q4 3 8 0" stroke="#d9a060" stroke-width="3" fill="none" stroke-linecap="round"/>`:""}`};
     case "kaeru": return {back:"",
-      front:`<circle cx="47" cy="50" r="12" fill="var(--pb)"/><circle cx="73" cy="50" r="12" fill="var(--pb)"/><circle cx="47" cy="50" r="8.5" fill="#fff"/><circle cx="73" cy="50" r="8.5" fill="#fff"/>${g?`<circle cx="36" cy="88" r="3" fill="#000" opacity=".12"/><circle cx="84" cy="90" r="2.5" fill="#000" opacity=".12"/>`:""}`,eyeUp:20};
-    case "usagi": return {back:`<ellipse cx="46" cy="36" rx="7" ry="20" fill="#ffd3df" stroke="#f0b6c6" stroke-width="2"/><ellipse cx="74" cy="36" rx="7" ry="20" fill="#ffd3df" stroke="#f0b6c6" stroke-width="2"/><ellipse cx="46" cy="38" rx="3.5" ry="14" fill="#ffa6bd"/><ellipse cx="74" cy="38" rx="3.5" ry="14" fill="#ffa6bd"/>`,
+      front:`<circle cx="47" cy="50" r="12" fill="var(--pb)"/><circle cx="73" cy="50" r="12" fill="var(--pb)"/><circle cx="47" cy="50" r="8.5" fill="#fff"/><circle cx="73" cy="50" r="8.5" fill="#fff"/>${g?`<circle cx="36" cy="88" r="3" fill="#000" opacity=".12"/><circle cx="84" cy="90" r="2.5" fill="#000" opacity=".12"/>`:""}`,eyeUp:20,dx:8,sy:7,dy:4};
+    case "usagi": return {back:`<ellipse cx="46" cy="36" rx="7" ry="20" fill="var(--pb)" stroke="var(--pd)" stroke-width="2"/><ellipse cx="74" cy="36" rx="7" ry="20" fill="var(--pb)" stroke="var(--pd)" stroke-width="2"/><ellipse cx="46" cy="38" rx="3.5" ry="14" fill="#ffa6bd"/><ellipse cx="74" cy="38" rx="3.5" ry="14" fill="#ffa6bd"/>`,
       front:`<circle cx="92" cy="96" r="7" fill="#fff" stroke="#f0b6c6" stroke-width="1.5"/>`};
     case "pengin": return {back:"",
-      front:`<path d="M54 78l6 7 6-7z" fill="#f59e0b"/><path d="M26 70q-10 10-4 22 8-4 10-16z" fill="#4a6a8f"/><path d="M94 70q10 10 4 22-8-4-10-16z" fill="#4a6a8f"/><ellipse cx="50" cy="106" rx="8" ry="3" fill="#f59e0b"/><ellipse cx="70" cy="106" rx="8" ry="3" fill="#f59e0b"/>`};
-    case "kitsune": return {back:`<path d="M34 56l-6-26 20 14z" fill="#f59e4c" stroke="#d97b24" stroke-width="2"/><path d="M86 56l6-26-20 14z" fill="#f59e4c" stroke="#d97b24" stroke-width="2"/><path d="M36 50l-3-14 10 8z" fill="#fff1dc"/><path d="M84 50l3-14-10 8z" fill="#fff1dc"/>`,
-      front:`<path d="M88 96q22-6 18-26 10 20-8 30z" fill="#f59e4c"/><path d="M104 74q6 6 2 14-4-6-2-14z" fill="#fff1dc"/>`};
-    case "inu": return {back:`<path d="M84 98q18 0 20-18 6 14-6 24z" fill="#d6a265"/>`,
-      front:`<ellipse cx="31" cy="64" rx="9" ry="17" transform="rotate(18 31 64)" fill="#b07a45"/><ellipse cx="89" cy="64" rx="9" ry="17" transform="rotate(-18 89 64)" fill="#b07a45"/><ellipse cx="60" cy="75.5" rx="4.2" ry="3" fill="#3a2a14"/>${g?`<ellipse cx="73" cy="66" rx="9" ry="7" fill="#c9965c" opacity=".55"/>`:""}`};
+      front:`<path d="M54 78l6 7 6-7z" fill="#f59e0b"/><path d="M26 70q-10 10-4 22 8-4 10-16z" fill="var(--pd)"/><path d="M94 70q10 10 4 22-8-4-10-16z" fill="var(--pd)"/><ellipse cx="50" cy="106" rx="8" ry="3" fill="#f59e0b"/><ellipse cx="70" cy="106" rx="8" ry="3" fill="#f59e0b"/>`};
+    case "kitsune": return {back:`<path d="M34 56l-6-26 20 14z" fill="var(--pb)" stroke="var(--pd)" stroke-width="2"/><path d="M86 56l6-26-20 14z" fill="var(--pb)" stroke="var(--pd)" stroke-width="2"/><path d="M36 50l-3-14 10 8z" fill="#fff1dc"/><path d="M84 50l3-14-10 8z" fill="#fff1dc"/>`,
+      front:`<path d="M88 96q22-6 18-26 10 20-8 30z" fill="var(--pb)" stroke="var(--pd)" stroke-width="1.5"/><path d="M104 74q6 6 2 14-4-6-2-14z" fill="#fff1dc"/>`};
+    case "inu": return {back:`<path d="M84 98q18 0 20-18 6 14-6 24z" fill="var(--pd)"/>`,
+      front:`<ellipse cx="31" cy="64" rx="9" ry="17" transform="rotate(18 31 64)" fill="var(--pd)"/><ellipse cx="89" cy="64" rx="9" ry="17" transform="rotate(-18 89 64)" fill="var(--pd)"/><ellipse cx="60" cy="75.5" rx="4.2" ry="3" fill="#3a2a14"/>${g?`<ellipse cx="73" cy="66" rx="9" ry="7" fill="var(--pd)" opacity=".45"/>`:""}`};
     default: return {back:"",front:""}; } }
 function petInit(){ ME.pet=ME.pet||{}; const p=ME.pet; p.name=p.name||""; p.fed=+p.fed||0; p.food=+p.food||0; p.got=p.got||{}; p.feedDay=p.feedDay||""; p.earnDay=p.earnDay||{d:"",n:0};
   // 種類: 前から育てている人(ごはんをあげた・2日以上開いた)は今までの よむまる。はじめての人は たまごのときに決まる
@@ -2877,10 +2885,10 @@ let petUID=0;
 function petSVG(stage,mood,acc,size,costume,kind,color){
   const S=size||120; const egg=stage===0; const U="u"+(++petUID); const mine=!PET_KINDS[kind]; kind=PET_KINDS[kind]?kind:petKind();
   // 🎨 色: 引数 color(殿堂・見本)> いまの子の ME.pet.color > 種類のもとの色
-  const PC=PET_COLORS.find(c=>c[0]===(color!==undefined?color:(mine?(ME.pet||{}).color:null)));
+  let PC=PET_COLORS.find(c=>c[0]===(color!==undefined?color:(mine?(ME.pet||{}).color:null))); if(PC&&PC[0]&&!petColorsFor(kind).includes(PC)) PC=null; // その種類にない色は もとの色で
   const K=PC&&PC[1]?[PET_KINDS[kind][0],PC[1],PC[2],[PC[3],PC[4]],PET_KINDS[kind][4]]:PET_KINDS[kind]; const KP=petKindParts(kind,stage,egg);
   const body=egg?`<path d="M60 22c22 0 34 30 34 52s-15 34-34 34-34-12-34-34 12-52 34-52z" fill="#fff7e6" stroke="#e8c98f" stroke-width="3"/><path d="M38 70l8-6 8 7 8-7 8 7 8-6 8 6" fill="none" stroke="#e8c98f" stroke-width="3" stroke-linejoin="round"/>`
-    : `${KP.back}<ellipse cx="60" cy="74" rx="${34+stage*1.2}" ry="${31+stage}" fill="${stage>=5?`url(#pg${U})`:K[1]}"/><ellipse cx="60" cy="86" rx="${20+stage}" ry="${12+stage*.6}" fill="${K[2]}" opacity=".85"/>${KP.front}`;
+    : `${KP.back}<ellipse cx="60" cy="${74+(KP.dy||0)}" rx="${34+stage*1.2+(KP.dx||0)}" ry="${31+stage-(KP.sy||0)}" fill="${stage>=5?`url(#pg${U})`:K[1]}"/>${PC&&PC[6]?`<ellipse cx="60" cy="73" rx="25" ry="13" fill="${K[2]}"/>`:""}<ellipse cx="60" cy="${86+(KP.dy||0)}" rx="${20+stage+(KP.dx||0)/2}" ry="${12+stage*.6}" fill="${K[2]}" opacity=".85"/>${KP.front}`;
   const kfl=(!egg&&kind!=="maru"&&stage===4)?`<g transform="translate(80 46) scale(.75)">${[0,72,144,216,288].map(a=>`<ellipse rx="5" ry="8" transform="rotate(${a}) translate(0 -7)" fill="#ff8fb3"/>`).join("")}<circle r="4.5" fill="#ffd34d"/></g>`:""; // ものしり: 花のかみかざり(体の上に描く)
   const leaf=egg||kind!=="maru"?"":stage>=4?`<path d="M60 44V30" stroke="#3f8f3a" stroke-width="3"/><g transform="translate(60 26)">${[0,72,144,216,288].map(a=>`<ellipse rx="5" ry="8" transform="rotate(${a}) translate(0 -7)" fill="#ff8fb3"/>`).join("")}<circle r="4.5" fill="#ffd34d"/></g>`
     : `<path d="M60 44q0-10 2-14" stroke="#3f8f3a" stroke-width="3" fill="none"/><path d="M62 31q10-10 18-4-6 9-18 4z" fill="#58b84f"/>${stage>=2?`<path d="M61 34q-10-8-17-2 6 8 17 2z" fill="#6cc763"/>`:""}`;
@@ -2904,7 +2912,7 @@ function petSVG(stage,mood,acc,size,costume,kind,color){
     straw:`<ellipse cx="60" cy="48" rx="38" ry="7" fill="#e9c46a"/><path d="M40 48q2-18 20-18t20 18z" fill="#f2d07a"/><rect x="40" y="42" width="40" height="5" fill="#d23a3a"/>`
   })[acc]||"";
   const C=costume?costumeSVG(costume,egg?-12:0,U):"";
-  return `<svg viewBox="0 0 120 120" width="${S}" height="${S}" role="img" aria-label="${esc(petName())}" style="--pb:${K[1]}"><defs><linearGradient id="pg${U}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${K[3][0]}"/><stop offset="1" stop-color="${K[3][1]}"/></linearGradient><pattern id="plaid${U}" width="8" height="8" patternUnits="userSpaceOnUse"><path d="M0 4h8M4 0v8" stroke="#5a4127" stroke-width="1.2" opacity=".6"/></pattern></defs><ellipse cx="60" cy="112" rx="30" ry="4" fill="#000" opacity=".12"/>${costume?"":leaf}${body}${costume?"":kfl}${blush}${KP.eyeUp?`<g transform="translate(0 -${KP.eyeUp})">${eyes}</g>`:eyes}${mouth}${costume&&HEAD_ACC.includes(acc)?"":(KP.eyeUp&&acc==="glasses"?`<g transform="translate(0 -${KP.eyeUp})">${A}</g>`:A)}${C}${stage>=5&&!costume?`<text x="60" y="20" text-anchor="middle" font-size="16">👑</text>`:""}</svg>`;
+  return `<svg viewBox="0 0 120 120" width="${S}" height="${S}" role="img" aria-label="${esc(petName())}" style="--pb:${K[1]};--pd:${K[3][1]}"><defs><linearGradient id="pg${U}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${K[3][0]}"/><stop offset="1" stop-color="${K[3][1]}"/></linearGradient><pattern id="plaid${U}" width="8" height="8" patternUnits="userSpaceOnUse"><path d="M0 4h8M4 0v8" stroke="#5a4127" stroke-width="1.2" opacity=".6"/></pattern></defs><ellipse cx="60" cy="112" rx="30" ry="4" fill="#000" opacity=".12"/>${costume?"":leaf}${body}${costume?"":kfl}${blush}${KP.eyeUp?`<g transform="translate(0 -${KP.eyeUp})">${eyes}</g>`:eyes}${mouth}${costume&&HEAD_ACC.includes(acc)?"":(KP.eyeUp&&acc==="glasses"?`<g transform="translate(0 -${KP.eyeUp})">${A}</g>`:A)}${C}${stage>=5&&!costume?`<text x="60" y="20" text-anchor="middle" font-size="16">👑</text>`:""}</svg>`;
 }
 function petDream(){ const p=petInit(); if(p.dreamDay===TODAY) return p.dream||""; const y=new Date(Date.parse(TODAY)-864e5).toISOString().slice(0,10); const L=NEWS.filter(n=>n.d===y&&n.ok); if(!L.length) return "";
   const r=seeded("dream"+TODAY+petName()); const n=L[Math.floor(r()*L.length)]; const g=D.glossary.find(w=>n.h.includes(w[0].replace(/\(.*?\)/,"")));
@@ -2995,7 +3003,7 @@ function petBig(){ petHatchCheck(); const p=petInit(); const st=petStage(); cons
     ${petHall().length?`<details class="faq plain" style="margin-top:8px"><summary>🏆 殿堂(名人になった子たち)</summary><div class="pet-hall">${petHall().map(h=>`<div class="ph"><span>${petSVG(5,"happy",null,56,h.wear||null,h.kind,h.color||null)}</span><b>${esc(h.name)}</b><small>第${h.gen||1}代 ・ ${esc(mdLabel(h.at))}に名人</small></div>`).join("")}</div></details>`:""}
     <details class="faq plain" style="margin-top:6px"><summary>そだて方</summary><ul class="us"><li>🧠 クイズに正解 → 🍙 ごはん(1日${PET_DAY_MAX}こまで)。あげると そだち +5</li><li>📅 開いた日 +2 ・ 💡 解説を読む +3 ・ 📖 ことばを調べる +1</li><li>3日以上あけると、すねます。ごはんをあげると元気に。</li><li>たまご → あかちゃん → こども → おとな → ものしり → ニュース名人</li><li>🥚 たまごから生まれる子は7種類。どの子が生まれるかは、生まれるまでのお楽しみ!(生まれたあとは変わりません)</li><li>🎓 名人になったら、そのまま育てるか、新しいたまごから育てるか選べます</li></ul></details>
     ${friendOn()?`<div class="hint" style="text-align:center;margin-top:6px">🐣 ともだちの「${esc(friendName())}」が遊びに来ています <button class="gd-lk" id="frRename">名前</button></div>`:`<div class="hint" style="text-align:center;margin-top:6px">ペットが「おとな」になるか、14日開くと、ともだちがやってくるよ。</div>`}
-    <details class="faq plain" style="margin-top:8px" id="petColorBox"><summary>🎨 色を変える</summary><div class="pet-colors">${PET_COLORS.map(c=>`<button class="pc-i${((p.color||null)===c[0])?" on":""}" data-pcol="${c[0]||""}" aria-pressed="${(p.color||null)===c[0]}"><span>${petSVG(Math.max(1,st.i),"happy",null,48,null,petKind(),c[0])}</span><small>${esc(c[5])}</small></button>`).join("")}</div><div class="hint">いつでも何回でも変えられます。殿堂の子は、その子の色のまま残ります。</div></details>
+    <details class="faq plain" style="margin-top:8px" id="petColorBox"><summary>🎨 色を変える</summary><div class="pet-colors">${petColorsFor(petKind()).map(c=>`<button class="pc-i${((p.color||null)===c[0])?" on":""}" data-pcol="${c[0]||""}" aria-pressed="${(p.color||null)===c[0]}"><span>${petSVG(Math.max(1,st.i),"happy",null,48,null,petKind(),c[0])}</span><small>${esc(c[5])}</small></button>`).join("")}</div><div class="hint">いつでも何回でも変えられます。色は、その動物に本当にある色から選べます(けろまるは何色でも)。殿堂の子は、その子の色のまま残ります。</div></details>
     <details class="faq plain" style="margin-top:8px"><summary>👕 着せかえ</summary>${wardrobeHTML()}<div class="hint">🔒の服は、書いてあることをすると着られるようになります。</div></details>
     <details class="faq plain"><summary>🏠 ${esc(petName())}の部屋</summary>${roomHTML()}</details>
     <details class="faq plain"><summary>📔 今週の日記</summary>${diaryHTML()}</details>
@@ -3334,7 +3342,7 @@ function cardComment(w,g){ const st=petStage().i; if(st<2) return ""; const r=se
 function newsWeight(n){ const since=new Date(Date.parse(TODAY)-3*864e5).toISOString().slice(0,10); const q=gdQuery(n.title); let c=NEWS.filter(x=>x.d>=since&&gdScore(q,x.h+" "+(x.th||""))>=0.25).length; const e=n.ex&&D.explainers[n.ex]; if(e){ const q2=gdQuery(e.name+" "+(e.now||"")); c=Math.max(c,NEWS.filter(x=>x.d>=since&&gdScore(q2,x.h+" "+(x.th||""))>=0.3).length); } return {n:c,lv:c>=6?3:c>=3?2:c>=2?1:0}; }
 function reporterCard(){ const st=petStage(); if(st.i<1) return ""; const g=petTopGenre()||GORDER.find(x=>ME.interests[x])||D.top10[0].g; const n=D.top10.find(x=>x.g===g)||NEWS.find(x=>x.g===g&&x.ok);
   if(!n) return ""; const title=n.title||n.h, text=n.text||""; const kc={pol:"professor",eco:"banker",intl:"explorer",it:"detective"}[g]||"newsboy";
-  return `<section class="card reporter" aria-label="よむまる記者"><div class="rp-h"><span class="rp-av">${petSVG(st.i,"happy",null,64,kc)}</span><span><small class="hint">🎙️ 今日の${esc(GN[g])}担当</small><b>${esc(petName())}記者がお伝えします</b></span></div>
+  return `<section class="card reporter" aria-label="ペット記者"><div class="rp-h"><span class="rp-av">${petSVG(st.i,"happy",null,64,kc)}</span><span><small class="hint">🎙️ 今日の${esc(GN[g])}担当</small><b>${esc(petName())}記者がお伝えします</b></span></div>
     <p class="rp-t"><b>${esc(title)}</b>${text?`<br>${esc(text)}`:""}</p><div style="display:flex;gap:6px;flex-wrap:wrap"><button class="fchip" id="rpSpeak">🔊 読み上げてもらう</button>${n.ex?`<button class="fchip" data-ex="${n.ex}">くわしく →</button>`:""}</div>
     <div class="hint" style="margin-top:6px">あなたがよく読む「${esc(GN[g])}」から選んでいます(記事はニュース10と同じ内容です)。</div></section>`; }
 function bindReporter(){ const b=document.getElementById("rpSpeak"); if(!b) return; b.onclick=()=>{ const t=document.querySelector(".rp-t").innerText; if(window.speechSynthesis&&window.speechSynthesis.speaking){ stopSpeak(); b.textContent="🔊 読み上げてもらう"; return; } speak(`${petName()}記者がお伝えします。${t}。以上、${petName()}でした。`); b.textContent="■ 止める"; }; }
@@ -3654,7 +3662,7 @@ function kurashiCard(){ const P=priceRows(); const R=rulesSoon();
     <div class="hint" style="margin-top:8px">リンク先は、それぞれの会社・役所の公式ページです。くわしい最新の情報は、リンク先で確かめてください。</div></section>`; }
 // いくつかのカードは1つの入口にまとめる(中身はぜんぶ残して、中で切りかえる)
 const FUN_SET={
-  pick:[["gacha","🎰 1本ガチャ",()=>gachaCard()],["reporter","🎙️ よむまる記者",()=>reporterCard()],
+  pick:[["gacha","🎰 1本ガチャ",()=>gachaCard()],["reporter","🎙️ ペット記者",()=>reporterCard()],
         ["know","👆 知ってた?",()=>knowCard()],["talk","🍽️ 話のタネ",()=>talkCard()]],
   air:[["mood","🗺️ 今日をジャンル別に",()=>moodCard()],["thermo","🌡️ 7日の動き",()=>thermoCard()]]
 };
@@ -3740,7 +3748,7 @@ function funGrid(){ const L=FUN.filter(f=>(FUN_SET[f[0]]||FUN_ALWAYS.includes(f[
     ${hid?`<button class="fchip" id="funMore" data-hid="${hid}" aria-expanded="${funOpen?"true":"false"}" style="margin-top:8px">${funOpen?"▲ とじる":`… ほか ${hid}こ を見る`}</button>`:""}</section>`; }
 // ===== お知らせ(新しくなったところ)。機能を足したら、いちばん上に1つ足す =====
 const UPDATES=[
-  {id:"2026-10-22d",d:"2026-10-22",t:"🎨 ペットの色を変えられるように",L:["マイ→ペットの「🎨 色を変える」で、ひよこ・さくら・そら・わかば・チョコ など10色から、いつでも何回でも変えられます","けろまる(かえる)の目を、頭の上の丸い所に入れました"]},
+  {id:"2026-10-22d",d:"2026-10-22",t:"🎨 ペットの色を変えられるように",L:["マイ→ペットの「🎨 色を変える」で、いつでも何回でも変えられます。犬ならこげ茶・くろ・はいいろなど、その動物に本当にある色から選べます(けろまるは何色でも)","けろまる(かえる)は、目を頭の上の丸い所に入れて、体を少し横長にしました。4コマにも、あなたのペット(種類・色・服)が出ます"]},
   {id:"2026-10-22c",d:"2026-10-22",t:"🐶 いぬの子が仲間入り",L:["たまごから、いぬの子も生まれるようになりました(たれ耳でしっぽをふる子)。何が生まれるかは、生まれるまでのお楽しみ!"]},
   {id:"2026-10-22b",d:"2026-10-22",t:"🥚 ペットが6種類に・服が5つ増えた・名人のあと",L:[
     "たまごから生まれる子が7種類になりました。どの子が生まれるかは、生まれるまでのお楽しみ! 今までの子はそのままです",
@@ -4418,7 +4426,7 @@ function openSOS(){ const sh=document.getElementById("sheet");
 document.addEventListener("click",ev=>{ if(ev.target.closest("[data-sos]")){ ev.stopPropagation(); openSOS(); } },true);
 // ===== 🔁 かんたん ⇄ ふつう の切りかえ(押す前に「どう変わるか」を見せてから切りかえる) =====
 const MODE_DIFF={
-  normal:{t:"📱 ふつうモードにすると",plus:[["🐣","ニュースで育つペット「よむまる」と、クイズでごはん"],["✨","おたのしみ(今日のひとつ・ことばで世界一周・すごろく など)"],["🏅","バッジ・連続記録・今週の目標"],["📅","下のボタンに「予定」が増える"]],
+  normal:{t:"📱 ふつうモードにすると",plus:[["🐣","ニュースで育つペットと、クイズでごはん"],["✨","おたのしみ(今日のひとつ・ことばで世界一周・すごろく など)"],["🏅","バッジ・連続記録・今週の目標"],["📅","下のボタンに「予定」が増える"]],
     minus:[["🔤","文字が少し小さくなる(設定でいつでも大きくできます)"],["🔊","大きな「今日のニュースを聞く」ボタンは、しまわれます"]],
     rows:["🌤️ 天気","☀️ 今日の3行","📰 ニュース10","🐣 ペット","🧠 クイズ","✨ おたのしみ…"],tabs:["きょう","解説","さがす","予定","マイ"]},
   easy:{t:"🔰 かんたんモードにすると",plus:[["🔤","文字が大きくなる"],["🔊","いちばん上に「今日のニュースを聞く」の大きなボタン"],["👀","天気・3行・ニュース・クイズだけの、すっきりした画面"]],
@@ -4630,7 +4638,7 @@ document.addEventListener("click",ev=>{ const x=ev.target.closest("[data-alx]");
 document.addEventListener("keydown",ev=>{ if((ev.key==="Enter"||ev.key===" ")&&ev.target.matches&&ev.target.matches(".al-band[data-quake]")){ ev.preventDefault(); openQuake(); } });
 try{ loadAlerts(); setInterval(()=>{ if(document.visibilityState==="visible") loadAlerts(); },3*60*1000); document.addEventListener("visibilitychange",()=>{ if(document.visibilityState==="visible") loadAlerts(); }); }catch(_){}
 // テスト用の手がかり(localhost で動かしたときだけ。本番では出さない)
-if(/^(localhost|127\.0\.0\.1)$/.test(location.hostname)) window.NW_TEST={petSVG,PET_KINDS,WEAR,petStage,petXP,petKind,petHall,petName,petRestart,get ME(){return ME;},get LOOK(){return LOOK;},TOPIC_GROUPS,FUN,SECS};
+if(/^(localhost|127\.0\.0\.1)$/.test(location.hostname)) window.NW_TEST={petSVG,PET_KINDS,PET_COLORS,petColorsFor,WEAR,petStage,petXP,petKind,petHall,petName,petRestart,get ME(){return ME;},get LOOK(){return LOOK;},TOPIC_GROUPS,FUN,SECS};
 const h=(location.hash||"").slice(1);
 if(h==="quake"){ go("today"); setTimeout(openQuake,50); } else if(D.explainers[h]){ go("explain"); openEx(h); }
 else if(h.startsWith("t=")) openTHash(h);
