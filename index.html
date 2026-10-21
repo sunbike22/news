@@ -810,6 +810,30 @@ svg.eat{animation:petEat .7s ease both!important}
 .ensay{align-self:flex-start;display:inline-block;margin-top:4px;font-size:.82rem;font-weight:700;color:var(--accent);border:1px solid var(--accent);border-radius:999px;padding:1px 8px;cursor:pointer}
 .jsub{font-size:.86rem;color:var(--muted);margin:2px 0 0}
 [lang="en"]{font-family:"Helvetica Neue",Arial,sans-serif}
+/* 🌍 ことばで世界一周 */
+.lg-head{display:flex;align-items:center;gap:12px;margin-bottom:8px}
+.lg-head .lg-av{flex:none;width:72px;height:72px}
+.lg-head .lg-av svg{width:100%;height:100%}
+.lg-head .lg-say{background:var(--accent-soft);border-radius:14px;padding:10px 12px;font-size:.95rem;position:relative;flex:1}
+.lg-head .lg-say::before{content:"";position:absolute;left:-8px;top:22px;border:8px solid transparent;border-right-color:var(--accent-soft);border-left:0}
+.lg-pick{display:flex;flex-wrap:wrap;gap:6px;margin:6px 0 10px}
+.lg-pick .fchip[aria-pressed="true"]{background:var(--accent-btn,var(--accent));color:var(--on-accent);border-color:var(--accent-btn,var(--accent))}
+.lg-row{border-bottom:1px solid var(--line);padding:10px 0}
+.lg-row .lg-ja{font-weight:800;font-size:1.05rem;display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.lg-row .lg-ja small{font-weight:400;color:var(--muted);font-size:.82rem}
+.lg-row .lg-ja .lg-from{font-weight:600;font-size:.82rem;color:var(--muted);background:var(--surface2);border-radius:999px;padding:1px 8px}
+.lg-tr{display:grid;grid-template-columns:auto 1fr auto;gap:6px 10px;align-items:center;margin-top:6px}
+.lg-tr .lg-l{font-size:.82rem;color:var(--muted);white-space:nowrap}
+.lg-tr .lg-w{font-size:1.05rem;font-weight:700}
+.lg-tr .lg-w small{display:block;font-weight:400;font-size:.82rem;color:var(--muted)}
+.lg-tr .lg-sp{width:40px;height:40px;border-radius:999px;border:1px solid var(--line);background:var(--surface);cursor:pointer;font-size:1.05rem}
+.lg-tr .lg-sp.on{background:var(--accent-btn,var(--accent));color:var(--on-accent);border-color:var(--accent-btn,var(--accent))}
+.lg-q{margin-top:12px;padding:12px;border-radius:12px;background:var(--surface2)}
+.lg-q .lg-opts{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:8px}
+.lg-q .lg-opts button{min-height:44px;border-radius:10px;border:1px solid var(--line);background:var(--surface);font-weight:700;cursor:pointer;font-size:1rem}
+.lg-q .lg-opts button.ok{background:var(--g-eco-s);border-color:var(--g-eco)} .lg-q .lg-opts button.ng{background:var(--g-intl-s);border-color:var(--g-intl)}
+.lg-av.talk svg{animation:lgtalk .6s ease-in-out 2}
+@keyframes lgtalk{0%,100%{transform:rotate(0)}25%{transform:rotate(-6deg)}75%{transform:rotate(6deg)}}
 .enlist{list-style:none;margin:0;padding:0}.enlist li{display:flex;justify-content:space-between;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid var(--line)}
 /* はじめての案内 */
 .ob{position:fixed;inset:0;z-index:95;background:rgba(10,14,30,.55);display:grid;place-items:center;padding:16px;animation:rise .3s ease both}
@@ -3164,12 +3188,74 @@ function funSetHTML(key){ const L=FUN_SET[key]; if(!L) return "";
   const body=cur[2]()||`<div class="empty">今日はまだありません。</div>`;
   return `<div class="seg fun-seg" role="group" aria-label="見るもの">${L.map(([k,n])=>`<button data-funsel="${key}:${k}" aria-pressed="${k===cur[0]}">${esc(n)}</button>`).join("")}</div>
     <div id="funSetBody" style="margin-top:10px">${body}</div>`; }
-const FUN=[["picks","🎁","ジャンル別おすすめ",()=>picksCard()],["pick","🎰","今日のひとつ",()=>funSetHTML("pick")],["english","📘","今日の英単語",()=>englishCard()],["air","🌡️","世の中の空気",()=>funSetHTML("air")],["local","🏠","わたしの街",()=>localCard()],["trip2","🗺️","ペットの旅",()=>travelCard()],["assoc","🔗","ニュース連想",()=>assocCard()],["back","📅","あのとき何してた?",()=>backCard()],["bingo","🎲","ニュースビンゴ",()=>bingoCard()],["battle","⚔️","予想くらべ",()=>battleCard()]];
+const FUN=[["picks","🎁","ジャンル別おすすめ",()=>picksCard()],["pick","🎰","今日のひとつ",()=>funSetHTML("pick")],["english","📘","今日の英単語",()=>englishCard()],["lang","🌍","ことばで世界一周",()=>langCard()],["air","🌡️","世の中の空気",()=>funSetHTML("air")],["local","🏠","わたしの街",()=>localCard()],["trip2","🗺️","ペットの旅",()=>travelCard()],["assoc","🔗","ニュース連想",()=>assocCard()],["back","📅","あのとき何してた?",()=>backCard()],["bingo","🎲","ニュースビンゴ",()=>bingoCard()],["battle","⚔️","予想くらべ",()=>battleCard()]];
 const FUN_SHOW=6; let funOpen=false;
 function englishCard(){ if(!EN) return ""; const W=[]; (EN.top10||[]).forEach((e,i)=>(e.w||[]).forEach(w=>W.push([w[0],w[1],D.top10[i]&&D.top10[i].title]))); if(!W.length) return "";
   return `<section class="card" aria-label="今日の英単語"><b>📘 今日の英単語</b><div class="hint" style="margin:4px 0 8px">今日のニュースに出てきた英語。🔊で発音が聞けます。</div>
     <ul class="enlist">${W.map(([a,b,t])=>`<li><span><b lang="en">${esc(a)}</b> = ${esc(b)}<small class="hint" style="display:block">${esc(t||"")}</small></span><button class="fchip" data-say="${esc(a)}">🔊</button></li>`).join("")}</ul></section>`; }
-function funGrid(){ const L=FUN.filter(f=>FUN_SET[f[0]]?true:LOOK.off[f[0]]); if(!L.length) return "";
+// ===== 🦜 ことばのオウム「ポリー」(自作SVG。いろんな国のことばを教えてくれる) =====
+function parrotSVG(f,size){ const S=size||72; const eye=f==="s"?`<path d="M38 36q5-5 10 0" stroke="#1f2a1a" stroke-width="3" fill="none" stroke-linecap="round"/>`
+    :`<circle cx="43" cy="36" r="6" fill="#fff"/><circle cx="44.5" cy="37" r="3" fill="#1f2a1a"/>`;
+  return `<svg viewBox="0 0 90 100" width="${S}" height="${S*100/90}" aria-hidden="true">
+    <path d="M18 62q-8 20 8 32 8-10 6-26z" fill="#2f9e6b"/><path d="M26 66q-6 18 6 28 6-9 3-24z" fill="#1d7a52"/>
+    <ellipse cx="46" cy="58" rx="24" ry="30" fill="#3cb878"/>
+    <path d="M30 50q-10 10-4 28 8-2 12-14z" fill="#2f9e6b"/>
+    <path d="M60 48q12 6 12 24-10-2-14-12z" fill="#e63946"/><path d="M62 54q8 6 8 16-7-3-10-10z" fill="#f4a261"/>
+    <circle cx="46" cy="36" r="17" fill="#f8d84a"/>
+    ${eye}
+    <path d="M58 40q12-2 10 8-6 6-12 2z" fill="#7a4a1e"/><path d="M58 44q7 4 10 4-4 3-10 0z" fill="#5a3410"/>
+    <path d="M36 20q6-10 16-4" stroke="#e63946" stroke-width="4" fill="none" stroke-linecap="round"/>
+    <path d="M40 86h12M38 92q8-3 16 0" stroke="#7a4a1e" stroke-width="3" fill="none" stroke-linecap="round"/>
+  </svg>`; }
+// ===== 🌍 ことばで世界一周(今日のニュースのことばを6つの言語で。声は端末の読み上げ) =====
+let LG=null; const LG_DEF=["en","ko","zh"];
+function lgSel(){ let L=Array.isArray(ME.langs)?ME.langs:null; if(!L||!L.length){ L=LG_DEF.slice(); ME.langs=L; } return L; }
+function lgToday(){ if(!LG) return []; const T=[...D.top10.map(n=>n.title),...D.three.map(t=>t.t||t.title||"")].join("\n");
+  const hit=LG.words.filter(w=>w.kw.some(k=>k&&T.includes(k))); const seen=ME.langSeen||{};
+  const rest=LG.words.filter(w=>!hit.includes(w)&&!seen[w.ja]); const r=seeded("lg"+TODAY);
+  const pick=hit.slice(0,4); while(pick.length<5&&rest.length){ pick.push(rest.splice(Math.floor(r()*rest.length),1)[0]); }
+  return pick.map(w=>({w,today:hit.includes(w)})); }
+function lgRow(w,today){ const L=lgSel(); const langs=LG.langs.filter(l=>L.includes(l[0]));
+  return `<div class="lg-row"><div class="lg-ja">${esc(w.ja)}${today?`<span class="lg-from">今日のニュースに出た</span>`:""}</div>
+    <div class="lg-tr">${langs.map(([k,n,fl,code])=>{ const t=w[k]; const r=k==="zh"?w.zr:k==="ko"?w.kr:""; return `<span class="lg-l">${fl} ${esc(n)}</span><span class="lg-w" lang="${code.split("-")[0]}">${esc(t)}${r?`<small>${esc(r)}</small>`:""}</span><button class="lg-sp" data-lgsay="${esc(t)}" data-lglang="${code}" aria-label="${esc(n)}で聞く">🔊</button>`; }).join("")}</div></div>`; }
+function langCard(){ petFlag("lang");
+  const shell=`<section class="card" aria-label="ことばで世界一周"><div class="lg-head"><span class="lg-av" id="lgAv">${parrotSVG("n",72)}</span><div class="lg-say" id="lgSay">こんにちは、ことばのオウムのポリーだよ。今日のニュースのことばを、いろんな国のことばで言ってみよう!</div></div>
+    <div id="lgBody"><div class="empty">ことばを用意しています…</div></div></section>`;
+  if(!LG){ loadScript("langs.js?v=1").then(()=>{ LG=window.NEWS_LANGS; lgRender(); }).catch(()=>{ const b=document.getElementById("lgBody"); if(b) b.innerHTML='<div class="empty">いま読み込めませんでした。通信を確かめて開き直してください。</div>'; }); }
+  else setTimeout(lgRender,0);
+  return shell; }
+function lgRender(){ const box=document.getElementById("lgBody"); if(!box||!LG) return; const L=lgSel(); const T=lgToday(); const seen=ME.langSeen||{}; const n=Object.keys(seen).length;
+  box.innerHTML=`<div class="hint">聞きたいことばを選んでね(いくつでも)</div>
+    <div class="lg-pick">${LG.langs.map(([k,nm,fl])=>`<button class="fchip" data-lgpick="${k}" aria-pressed="${L.includes(k)}">${fl} ${esc(nm)}</button>`).join("")}</div>
+    <div class="sec-h" style="margin-top:4px"><h3 style="font-size:1rem;margin:0">📰 きょうのことば</h3><span class="sub">おぼえた ${n}語</span></div>
+    ${T.map(x=>lgRow(x.w,x.today)).join("")}
+    <div class="lg-q" id="lgQ">${lgQuizHTML()}</div>
+    <p class="hint" style="margin-top:8px">🔊 は端末に入っている声を使います。その言語の声が入っていないスマホでは、別の声になることがあります。ことばは${LG.words.length}語(ニュースでよく出るもの)。</p>`;
+  box.querySelectorAll("[data-lgpick]").forEach(b=>b.onclick=()=>{ const k=b.dataset.lgpick; const i=L.indexOf(k); if(i>=0){ if(L.length>1) L.splice(i,1); else { toast("1つは選んでおいてね"); return; } } else L.push(k); ME.langs=L; saveMe(); lgRender(); });
+  lgBindQuiz(box); }
+function sayLang(t,code,btn){ try{ const s=window.speechSynthesis; if(!s) return; s.cancel(); const u=new SpeechSynthesisUtterance(t); u.lang=code; u.rate=.85*sayRate();
+    const v=(s.getVoices()||[]).find(v=>v.lang&&v.lang.replace("_","-").toLowerCase().startsWith(code.split("-")[0])); if(v) u.voice=v;
+    const av=document.getElementById("lgAv"); if(av){ av.classList.remove("talk"); void av.offsetWidth; av.classList.add("talk"); }
+    if(btn){ btn.classList.add("on"); u.onend=()=>btn.classList.remove("on"); u.onerror=()=>btn.classList.remove("on"); }
+    s.speak(u); }catch(_){} }
+document.addEventListener("click",e=>{ const b=e.target.closest("[data-lgsay]"); if(!b) return; e.preventDefault(); e.stopPropagation();
+  sayLang(b.dataset.lgsay,b.dataset.lglang,b); const row=b.closest(".lg-row"); if(row){ const ja=row.querySelector(".lg-ja").childNodes[0].textContent.trim(); ME.langSeen=ME.langSeen||{}; if(!ME.langSeen[ja]){ ME.langSeen[ja]=TODAY; saveMe(); } } track("/lang/say","ことばで世界一周"); });
+// 🎯 聞いて当てる: 選んだ言語のどれかで1語を読み上げ、日本語の4つから当てる(1日5問)
+function lgQuizHTML(){ ME.langQ=ME.langQ||{d:"",n:0,ok:0}; if(ME.langQ.d!==TODAY){ ME.langQ={d:TODAY,n:0,ok:0}; }
+  const q=ME.langQ; if(q.n>=5) return `<b>🎯 聞いて当てる</b><div class="hint" style="margin-top:4px">今日は${q.n}問中 ${q.ok}問 正解。また明日!</div>`;
+  const L=lgSel(); const langs=LG.langs.filter(l=>L.includes(l[0])); const r=seeded("lq"+TODAY+q.n); const w=LG.words[Math.floor(r()*LG.words.length)]; const lg=langs[Math.floor(r()*langs.length)];
+  const others=LG.words.filter(x=>x!==w).sort(()=>r()-.5).slice(0,3).map(x=>x.ja); const a=Math.floor(r()*4); const o=[...others]; o.splice(a,0,w.ja);
+  return `<b>🎯 聞いて当てる</b> <span class="hint">${q.n+1}/5問目 ・ ${lg[2]} ${esc(lg[1])}</span>
+    <div style="margin-top:6px"><button class="fchip" data-lgsay="${esc(w[lg[0]])}" data-lglang="${lg[3]}">🔊 もう一度聞く</button> <span class="hint">「${esc(w[lg[0]])}」は日本語で?</span></div>
+    <div class="lg-opts" data-lgans="${a}" data-lgja="${esc(w.ja)}">${o.map((t,i)=>`<button data-lgo="${i}">${esc(t)}</button>`).join("")}</div>`; }
+function lgBindQuiz(box){ const g=box.querySelector("[data-lgans]"); if(!g) return; const a=+g.dataset.lgans;
+  g.querySelectorAll("[data-lgo]").forEach(b=>b.onclick=()=>{ if(g.dataset.done) return; g.dataset.done="1"; const i=+b.dataset.lgo; const ok=i===a; b.classList.add(ok?"ok":"ng"); if(!ok) g.querySelector(`[data-lgo="${a}"]`).classList.add("ok");
+    ME.langQ.n++; if(ok){ ME.langQ.ok++; petEarn("lq|"+TODAY+"|"+ME.langQ.n,1); } ME.langSeen=ME.langSeen||{}; ME.langSeen[g.dataset.lgja]=TODAY; saveMe();
+    const sub=document.querySelector("#lgBody .sec-h .sub"); if(sub) sub.textContent="おぼえた "+Object.keys(ME.langSeen).length+"語";
+    const say=document.getElementById("lgSay"); if(say) say.textContent=ok?"せいかい! その調子!":"おしい! 「"+g.dataset.lgja+"」だったよ。";
+    setTimeout(()=>{ const q=document.getElementById("lgQ"); if(q){ q.innerHTML=lgQuizHTML(); lgBindQuiz(q.parentElement); } },1200); }); }
+const FUN_ALWAYS=["lang"]; // きょうの設定と関係なく、いつもおたのしみに出す入口
+function funGrid(){ const L=FUN.filter(f=>(FUN_SET[f[0]]||FUN_ALWAYS.includes(f[0]))?true:LOOK.off[f[0]]); if(!L.length) return "";
   const dot=k=>(k==="gacha"&&(ME.gacha||{}).d!==TODAY)||(k==="picks"&&PK&&ME.pickSeen!==PK.updated);
   const S2=L.slice().sort((a,b)=>(dot(b[0])?1:0)-(dot(a[0])?1:0)); const hid=Math.max(0,S2.length-FUN_SHOW);
   const t=([k,i,n],x)=>`<button class="fun-t${x?" xtra":""}" data-fun="${k}"><span>${i}</span><small>${esc(n)}</small>${dot(k)?'<i class="fun-dot"></i>':""}</button>`;
