@@ -2835,7 +2835,7 @@ const PET_KIND_KEYS=Object.keys(PET_KINDS);
 // 🎨 ペットの色(いつでも変えられる)。[キー, 体, おなか, 名人の色(上), 名人の色(下), 名前]。null = もとの色
 const PET_COLORS=[[null,null,null,null,null,"もとの色"],
   ["tora","#f2a65a","#fff3e3","#f8c58f","#e08a3a","茶トラ"],["shiba","#d9894c","#fff4e6","#e8a774","#bf6d33","赤茶"],["cream","#f2dfb8","#fffaf0","#f8ecd2","#e2c48e","クリーム"],
-  ["milk","#fbf6ee","#ffffff","#fffaf3","#eadbc4","しろ"],["gray","#a8a29e","#f5f5f4","#c4bfba","#8a847f","はいいろ"],["choco","#8b5a3c","#f3dcc4","#a8714f","#6e4429","こげ茶",1],["kuro","#3f3f46","#e7e5e4","#5b5b63","#27272a","くろ",1],
+  ["milk","#fbf6ee","#ffffff","#fffaf3","#eadbc4","しろ"],["gray","#a8a29e","#f5f5f4","#c4bfba","#8a847f","はいいろ"],["choco","#7b5038","#f1dcc8","#946349","#5f3c29","こげ茶",1],["kuro","#35353b","#efeae4","#4a4a52","#232327","くろ",1],
   ["hiyoko","#ffe37a","#fff8d6","#fff0a8","#f5c93a","ひよこ"],["sakura","#ffc4d6","#fff1f5","#ffdbe6","#f59bb8","さくら"],["orange","#ffb36b","#fff1e2","#ffd0a1","#f08c2e","オレンジ"],
   ["wakaba","#a8e6a1","#effbec","#c9f0c4","#6fcf66","わかば"],["sora","#a8d8ff","#eef8ff","#cbe8ff","#6fb6f0","そら"],["lavender","#d7c2ff","#f6f0ff","#e8dcff","#b597f5","ラベンダー"],["mint","#9fe3d0","#effcf8","#c2f0e3","#5ccbae","ミント"]];
 // 種類ごとに選べる色(実際の動物にある色だけ。けろまるは何色でも、よむまるは食べ物っぽい明るい色)
@@ -2850,7 +2850,7 @@ function petKindParts(kind,stage,egg){ if(egg) return {back:"",front:""}; const 
     case "neko": return {back:`<path d="M34 54l-4-22 18 12z" fill="var(--pb)" stroke="var(--pd)" stroke-width="2"/><path d="M86 54l4-22-18 12z" fill="var(--pb)" stroke="var(--pd)" stroke-width="2"/><path d="M36 48l-2-11 9 6z" fill="#ffb3c6"/><path d="M84 48l2-11-9 6z" fill="#ffb3c6"/>`,
       front:`<path d="M26 74h-12M27 80h-12M93 74h12M93 80h12" stroke="#7a6a50" stroke-width="2" stroke-linecap="round"/>${g?`<path d="M52 50q8 4 16 0M48 44q4 3 8 0M64 44q4 3 8 0" stroke="#d9a060" stroke-width="3" fill="none" stroke-linecap="round"/>`:""}`};
     case "kaeru": return {back:"",
-      front:`<circle cx="47" cy="50" r="12" fill="var(--pb)"/><circle cx="73" cy="50" r="12" fill="var(--pb)"/><circle cx="47" cy="50" r="8.5" fill="#fff"/><circle cx="73" cy="50" r="8.5" fill="#fff"/>${g?`<circle cx="36" cy="88" r="3" fill="#000" opacity=".12"/><circle cx="84" cy="90" r="2.5" fill="#000" opacity=".12"/>`:""}`,eyeUp:20,dx:8,sy:7,dy:4};
+      front:`<circle cx="47" cy="50" r="12" fill="var(--pb)"/><circle cx="73" cy="50" r="12" fill="var(--pb)"/><circle cx="47" cy="50" r="8.5" fill="#fff"/><circle cx="73" cy="50" r="8.5" fill="#fff"/>${g?`<circle cx="36" cy="88" r="3" fill="#000" opacity=".12"/><circle cx="84" cy="90" r="2.5" fill="#000" opacity=".12"/>`:""}`,eyeUp:20,dx:8,sy:7,dy:4,blush:[37,80,4.2,2.6,.6]};
     case "usagi": return {back:`<ellipse cx="46" cy="36" rx="7" ry="20" fill="var(--pb)" stroke="var(--pd)" stroke-width="2"/><ellipse cx="74" cy="36" rx="7" ry="20" fill="var(--pb)" stroke="var(--pd)" stroke-width="2"/><ellipse cx="46" cy="38" rx="3.5" ry="14" fill="#ffa6bd"/><ellipse cx="74" cy="38" rx="3.5" ry="14" fill="#ffa6bd"/>`,
       front:`<circle cx="92" cy="96" r="7" fill="#fff" stroke="#f0b6c6" stroke-width="1.5"/>`};
     case "pengin": return {back:"",
@@ -2888,15 +2888,17 @@ function petSVG(stage,mood,acc,size,costume,kind,color){
   let PC=PET_COLORS.find(c=>c[0]===(color!==undefined?color:(mine?(ME.pet||{}).color:null))); if(PC&&PC[0]&&!petColorsFor(kind).includes(PC)) PC=null; // その種類にない色は もとの色で
   const K=PC&&PC[1]?[PET_KINDS[kind][0],PC[1],PC[2],[PC[3],PC[4]],PET_KINDS[kind][4]]:PET_KINDS[kind]; const KP=petKindParts(kind,stage,egg);
   const body=egg?`<path d="M60 22c22 0 34 30 34 52s-15 34-34 34-34-12-34-34 12-52 34-52z" fill="#fff7e6" stroke="#e8c98f" stroke-width="3"/><path d="M38 70l8-6 8 7 8-7 8 7 8-6 8 6" fill="none" stroke="#e8c98f" stroke-width="3" stroke-linejoin="round"/>`
-    : `${KP.back}<ellipse cx="60" cy="${74+(KP.dy||0)}" rx="${34+stage*1.2+(KP.dx||0)}" ry="${31+stage-(KP.sy||0)}" fill="${stage>=5?`url(#pg${U})`:K[1]}"/>${PC&&PC[6]?`<ellipse cx="60" cy="73" rx="25" ry="13" fill="${K[2]}"/>`:""}<ellipse cx="60" cy="${86+(KP.dy||0)}" rx="${20+stage+(KP.dx||0)/2}" ry="${12+stage*.6}" fill="${K[2]}" opacity=".85"/>${KP.front}`;
+    : `${KP.back}<ellipse cx="60" cy="${74+(KP.dy||0)}" rx="${34+stage*1.2+(KP.dx||0)}" ry="${31+stage-(KP.sy||0)}" fill="${stage>=5?`url(#pg${U})`:K[1]}"/><ellipse cx="60" cy="${86+(KP.dy||0)}" rx="${20+stage+(KP.dx||0)/2}" ry="${12+stage*.6}" fill="${K[2]}" opacity="${PC&&PC[6]?1:.85}"/>${KP.front}`;
   const kfl=(!egg&&kind!=="maru"&&stage===4)?`<g transform="translate(80 46) scale(.75)">${[0,72,144,216,288].map(a=>`<ellipse rx="5" ry="8" transform="rotate(${a}) translate(0 -7)" fill="#ff8fb3"/>`).join("")}<circle r="4.5" fill="#ffd34d"/></g>`:""; // ものしり: 花のかみかざり(体の上に描く)
   const leaf=egg||kind!=="maru"?"":stage>=4?`<path d="M60 44V30" stroke="#3f8f3a" stroke-width="3"/><g transform="translate(60 26)">${[0,72,144,216,288].map(a=>`<ellipse rx="5" ry="8" transform="rotate(${a}) translate(0 -7)" fill="#ff8fb3"/>`).join("")}<circle r="4.5" fill="#ffd34d"/></g>`
     : `<path d="M60 44q0-10 2-14" stroke="#3f8f3a" stroke-width="3" fill="none"/><path d="M62 31q10-10 18-4-6 9-18 4z" fill="#58b84f"/>${stage>=2?`<path d="M61 34q-10-8-17-2 6 8 17 2z" fill="#6cc763"/>`:""}`;
-  const eyes=egg?"": mood==="happy"?`<path d="M42 70q5-6 10 0M68 70q5-6 10 0" stroke="#3a2a14" stroke-width="3.2" fill="none" stroke-linecap="round"/>`
-    : mood==="sulk"?`<path d="M41 67l11 3M79 67l-11 3" stroke="#3a2a14" stroke-width="3" stroke-linecap="round"/><circle cx="47" cy="72" r="2.6" fill="#3a2a14"/><circle cx="73" cy="72" r="2.6" fill="#3a2a14"/>`
-    : `<circle cx="47" cy="70" r="4" fill="#3a2a14"/><circle cx="73" cy="70" r="4" fill="#3a2a14"/><circle cx="48.3" cy="68.6" r="1.3" fill="#fff"/><circle cx="74.3" cy="68.6" r="1.3" fill="#fff"/>`;
-  const mouth=egg?"": mood==="happy"?`<path d="M54 79q6 7 12 0" fill="#c2453a"/>` : mood==="sulk"?`<path d="M54 82q6-5 12 0" stroke="#3a2a14" stroke-width="2.6" fill="none" stroke-linecap="round"/><path d="M90 50l6-4M92 56l7 0M90 62l6 4" stroke="#e5484d" stroke-width="2.4" stroke-linecap="round"/>` : `<ellipse cx="60" cy="80" rx="4" ry="3.2" fill="#c2453a"/>`;
-  const blush=egg?"":`<ellipse cx="38" cy="78" rx="5" ry="3" fill="#ff9aa2" opacity=".7"/><ellipse cx="82" cy="78" rx="5" ry="3" fill="#ff9aa2" opacity=".7"/>`;
+  // 暗い色(くろ・こげ茶)は、目を明るい色にして白目もつける(顔に灰色のマスクはのせない)
+  const dk=!!(PC&&PC[6]); const ec=dk?"#ffe9a8":"#3a2a14";
+  const eyes=egg?"": mood==="happy"?`<path d="M42 70q5-6 10 0M68 70q5-6 10 0" stroke="${ec}" stroke-width="3.2" fill="none" stroke-linecap="round"/>`
+    : mood==="sulk"?`<path d="M41 67l11 3M79 67l-11 3" stroke="${ec}" stroke-width="3" stroke-linecap="round"/>${dk?`<circle cx="47" cy="72" r="4.4" fill="#fffaf0"/><circle cx="73" cy="72" r="4.4" fill="#fffaf0"/>`:""}<circle cx="47" cy="72" r="2.6" fill="#3a2a14"/><circle cx="73" cy="72" r="2.6" fill="#3a2a14"/>`
+    : `${dk?`<circle cx="47" cy="70" r="6" fill="#fffaf0"/><circle cx="73" cy="70" r="6" fill="#fffaf0"/>`:""}<circle cx="47" cy="70" r="4" fill="#3a2a14"/><circle cx="73" cy="70" r="4" fill="#3a2a14"/><circle cx="48.3" cy="68.6" r="1.3" fill="#fff"/><circle cx="74.3" cy="68.6" r="1.3" fill="#fff"/>`;
+  const mouth=egg?"": mood==="happy"?`<path d="M54 79q6 7 12 0" fill="#c2453a"/>` : mood==="sulk"?`<path d="M54 82q6-5 12 0" stroke="${ec}" stroke-width="2.6" fill="none" stroke-linecap="round"/><path d="M90 50l6-4M92 56l7 0M90 62l6 4" stroke="#e5484d" stroke-width="2.4" stroke-linecap="round"/>` : `<ellipse cx="60" cy="80" rx="4" ry="3.2" fill="#c2453a"/>`;
+  const bl=KP.blush||[38,78,5,3,.7]; const blush=egg?"":`<ellipse cx="${bl[0]}" cy="${bl[1]}" rx="${bl[2]}" ry="${bl[3]}" fill="#ff9aa2" opacity="${dk?Math.min(.9,bl[4]+.15):bl[4]}"/><ellipse cx="${120-bl[0]}" cy="${bl[1]}" rx="${bl[2]}" ry="${bl[3]}" fill="#ff9aa2" opacity="${dk?Math.min(.9,bl[4]+.15):bl[4]}"/>`;
   const A=egg?"":({
     glasses:`<g fill="none" stroke="#2b2b2b" stroke-width="2.6"><circle cx="47" cy="70" r="9"/><circle cx="73" cy="70" r="9"/><path d="M56 70h8"/></g>`,
     tie:`<path d="M56 94h8l-2 4 4 14-6 5-6-5 4-14z" fill="#d23a3a"/>`,
@@ -3748,6 +3750,7 @@ function funGrid(){ const L=FUN.filter(f=>(FUN_SET[f[0]]||FUN_ALWAYS.includes(f[
     ${hid?`<button class="fchip" id="funMore" data-hid="${hid}" aria-expanded="${funOpen?"true":"false"}" style="margin-top:8px">${funOpen?"▲ とじる":`… ほか ${hid}こ を見る`}</button>`:""}</section>`; }
 // ===== お知らせ(新しくなったところ)。機能を足したら、いちばん上に1つ足す =====
 const UPDATES=[
+  {id:"2026-10-22e",d:"2026-10-22",t:"🐾 くろ・こげ茶のペットを見やすく",L:["くろ と こげ茶 のペットは、目を明るい色にして表情がわかりやすくなりました。","けろまるのほっぺを、ちょうどいい大きさにしました。"]},
   {id:"2026-10-22d",d:"2026-10-22",t:"🎨 ペットの色を変えられるように",L:["マイ→ペットの「🎨 色を変える」で、いつでも何回でも変えられます。犬ならこげ茶・くろ・はいいろなど、その動物に本当にある色から選べます(けろまるは何色でも)","けろまる(かえる)は、目を頭の上の丸い所に入れて、体を少し横長にしました。4コマにも、あなたのペット(種類・色・服)が出ます"]},
   {id:"2026-10-22c",d:"2026-10-22",t:"🐶 いぬの子が仲間入り",L:["たまごから、いぬの子も生まれるようになりました(たれ耳でしっぽをふる子)。何が生まれるかは、生まれるまでのお楽しみ!"]},
   {id:"2026-10-22b",d:"2026-10-22",t:"🥚 ペットが6種類に・服が5つ増えた・名人のあと",L:[
