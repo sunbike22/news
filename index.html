@@ -657,6 +657,9 @@ details.faq p{margin:10px 0 12px}
 .wx-notes .hint{font-size:.82rem;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .pet-master{margin-top:10px;padding:10px 12px;border-radius:14px;background:var(--accent-soft);border:1px solid var(--line)}
 .pet-hall{display:flex;flex-wrap:wrap;gap:10px;margin-top:6px}
+.pet-colors{display:grid;grid-template-columns:repeat(auto-fill,minmax(70px,1fr));gap:6px;margin:6px 0}
+.pc-i{display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 2px;border-radius:12px;border:2px solid var(--line);background:var(--surface);color:var(--ink);font:inherit;cursor:pointer}
+.pc-i.on{border-color:var(--accent-btn,var(--accent))} .pc-i small{font-size:.82rem}
 .pet-hall .ph{display:flex;flex-direction:column;align-items:center;min-width:84px;text-align:center}
 .pet-hall .ph small{color:var(--muted);font-size:.82rem}
 .pop b{font-size:1.05rem}
@@ -2829,6 +2832,8 @@ const PET_KINDS={
   kitsune:["こんまる","#f59e4c","#fff1dc",["#ffc48a","#ec7f1f"],"#fff0df"],
   inu:["わんまる","#e9c28f","#fff7ea",["#f3d6ad","#d6a265"],"#fff6ea"]};
 const PET_KIND_KEYS=Object.keys(PET_KINDS);
+// 🎨 ペットの色(いつでも変えられる)。[キー, 体, おなか, 名人の色(上), 名人の色(下), 名前]。null = もとの色
+const PET_COLORS=[[null,null,null,null,null,"もとの色"],["hiyoko","#ffe37a","#fff8d6","#fff0a8","#f5c93a","ひよこ"],["sakura","#ffc4d6","#fff1f5","#ffdbe6","#f59bb8","さくら"],["sora","#a8d8ff","#eef8ff","#cbe8ff","#6fb6f0","そら"],["wakaba","#a8e6a1","#effbec","#c9f0c4","#6fcf66","わかば"],["lavender","#d7c2ff","#f6f0ff","#e8dcff","#b597f5","ラベンダー"],["orange","#ffb36b","#fff1e2","#ffd0a1","#f08c2e","オレンジ"],["milk","#fff4e0","#ffffff","#fffaf0","#f0dcb8","ミルク"],["choco","#a9714b","#f3dcc4","#c48d63","#7f4f2f","チョコ"],["sumi","#6b7280","#e5e7eb","#9ca3af","#4b5563","すみ色"],["mint","#9fe3d0","#effcf8","#c2f0e3","#5ccbae","ミント"]];
 function petKind(){ const k=(ME.pet||{}).kind; return PET_KINDS[k]?k:"maru"; }
 function petPickKind(avoid){ const L=PET_KIND_KEYS.filter(k=>k!==avoid); return L[Math.floor(Math.random()*L.length)]; }
 // 種類ごとの絵の部品(体の前に描く"back"=耳など、体の後に描く"front"=しっぽ・くちばし・もよう)
@@ -2836,8 +2841,8 @@ function petKindParts(kind,stage,egg){ if(egg) return {back:"",front:""}; const 
   switch(kind){
     case "neko": return {back:`<path d="M34 54l-4-22 18 12z" fill="#f6e4c4" stroke="#d9c39a" stroke-width="2"/><path d="M86 54l4-22-18 12z" fill="#f6e4c4" stroke="#d9c39a" stroke-width="2"/><path d="M36 48l-2-11 9 6z" fill="#ffb3c6"/><path d="M84 48l2-11-9 6z" fill="#ffb3c6"/>`,
       front:`<path d="M26 74h-12M27 80h-12M93 74h12M93 80h12" stroke="#7a6a50" stroke-width="2" stroke-linecap="round"/>${g?`<path d="M52 50q8 4 16 0M48 44q4 3 8 0M64 44q4 3 8 0" stroke="#d9a060" stroke-width="3" fill="none" stroke-linecap="round"/>`:""}`};
-    case "kaeru": return {back:`<circle cx="44" cy="46" r="11" fill="#8fd36b"/><circle cx="76" cy="46" r="11" fill="#8fd36b"/><circle cx="44" cy="46" r="6" fill="#fff"/><circle cx="76" cy="46" r="6" fill="#fff"/><circle cx="45" cy="46" r="3" fill="#1f3d1a"/><circle cx="77" cy="46" r="3" fill="#1f3d1a"/>`,
-      front:g?`<circle cx="36" cy="88" r="3" fill="#6cb848" opacity=".7"/><circle cx="84" cy="90" r="2.5" fill="#6cb848" opacity=".7"/>`:""};
+    case "kaeru": return {back:"",
+      front:`<circle cx="47" cy="50" r="12" fill="var(--pb)"/><circle cx="73" cy="50" r="12" fill="var(--pb)"/><circle cx="47" cy="50" r="8.5" fill="#fff"/><circle cx="73" cy="50" r="8.5" fill="#fff"/>${g?`<circle cx="36" cy="88" r="3" fill="#000" opacity=".12"/><circle cx="84" cy="90" r="2.5" fill="#000" opacity=".12"/>`:""}`,eyeUp:20};
     case "usagi": return {back:`<ellipse cx="46" cy="36" rx="7" ry="20" fill="#ffd3df" stroke="#f0b6c6" stroke-width="2"/><ellipse cx="74" cy="36" rx="7" ry="20" fill="#ffd3df" stroke="#f0b6c6" stroke-width="2"/><ellipse cx="46" cy="38" rx="3.5" ry="14" fill="#ffa6bd"/><ellipse cx="74" cy="38" rx="3.5" ry="14" fill="#ffa6bd"/>`,
       front:`<circle cx="92" cy="96" r="7" fill="#fff" stroke="#f0b6c6" stroke-width="1.5"/>`};
     case "pengin": return {back:"",
@@ -2855,7 +2860,7 @@ function petName(){ if(ME.pet&&ME.pet.name) return ME.pet.name; return petStage(
 function petXP(){ const p=petInit(); const b=p.base||{d:0,e:0,w:0}; return Math.max(0, p.fed*5 + Math.max(0,ME.days.length-b.d)*2 + Math.max(0,Object.keys(ME.readEx).length-b.e)*3 + Math.max(0,ME.words.length-b.w)); }
 // 🎓 名人になったら、新しいたまごから育て直せる(前の子は殿堂入り)。そだちの数え直しは base に今の記録を覚えて引く
 function petHall(){ return (ME.pet||{}).hall||[]; }
-function petRestart(){ const p=petInit(); if(petStage().i<5) return false; p.hall=p.hall||[]; p.hall.push({name:petName(),kind:petKind(),xp:petXP(),wear:p.wear||null,at:TODAY,gen:p.gen||1});
+function petRestart(){ const p=petInit(); if(petStage().i<5) return false; p.hall=p.hall||[]; p.hall.push({name:petName(),kind:petKind(),color:p.color||null,xp:petXP(),wear:p.wear||null,at:TODAY,gen:p.gen||1}); delete p.color;
   p.fed=0; p.feedDay=""; p.name=""; p.wear=null; p.stay=0; p.kind=petPickKind(p.kind); p.gen=(p.gen||1)+1; p.base={d:ME.days.length,e:Object.keys(ME.readEx).length,w:ME.words.length}; saveMe(); return true; }
 function petStage(){ const xp=petXP(); let i=0; PET_STAGES.forEach((s,k)=>{ if(xp>=s[0]) i=k; }); const nx=PET_STAGES[i+1]; return {i,name:PET_STAGES[i][1],xp,next:nx,prog:nx?(xp-PET_STAGES[i][0])/(nx[0]-PET_STAGES[i][0]):1}; }
 function petTopGenre(){ let best=null,v=2.5; Object.entries(ME.auto||{}).forEach(([g,n])=>{ if(PET_ACC[g]&&n>v){v=n;best=g;} }); return best; }
@@ -2869,8 +2874,11 @@ const HEAD_ACC=["band","helmet","straw","chef","phones","ribbon"];
 // SVGの中のid(グラデーション・チェック柄)は1ページに何匹出ても重ならないよう番号をつける
 // (同じidが2つあると、うしろのペットの色が前のペットのものを見にいってしまう)
 let petUID=0;
-function petSVG(stage,mood,acc,size,costume,kind){
-  const S=size||120; const egg=stage===0; const U="u"+(++petUID); kind=PET_KINDS[kind]?kind:petKind(); const K=PET_KINDS[kind]; const KP=petKindParts(kind,stage,egg);
+function petSVG(stage,mood,acc,size,costume,kind,color){
+  const S=size||120; const egg=stage===0; const U="u"+(++petUID); const mine=!PET_KINDS[kind]; kind=PET_KINDS[kind]?kind:petKind();
+  // 🎨 色: 引数 color(殿堂・見本)> いまの子の ME.pet.color > 種類のもとの色
+  const PC=PET_COLORS.find(c=>c[0]===(color!==undefined?color:(mine?(ME.pet||{}).color:null)));
+  const K=PC&&PC[1]?[PET_KINDS[kind][0],PC[1],PC[2],[PC[3],PC[4]],PET_KINDS[kind][4]]:PET_KINDS[kind]; const KP=petKindParts(kind,stage,egg);
   const body=egg?`<path d="M60 22c22 0 34 30 34 52s-15 34-34 34-34-12-34-34 12-52 34-52z" fill="#fff7e6" stroke="#e8c98f" stroke-width="3"/><path d="M38 70l8-6 8 7 8-7 8 7 8-6 8 6" fill="none" stroke="#e8c98f" stroke-width="3" stroke-linejoin="round"/>`
     : `${KP.back}<ellipse cx="60" cy="74" rx="${34+stage*1.2}" ry="${31+stage}" fill="${stage>=5?`url(#pg${U})`:K[1]}"/><ellipse cx="60" cy="86" rx="${20+stage}" ry="${12+stage*.6}" fill="${K[2]}" opacity=".85"/>${KP.front}`;
   const kfl=(!egg&&kind!=="maru"&&stage===4)?`<g transform="translate(80 46) scale(.75)">${[0,72,144,216,288].map(a=>`<ellipse rx="5" ry="8" transform="rotate(${a}) translate(0 -7)" fill="#ff8fb3"/>`).join("")}<circle r="4.5" fill="#ffd34d"/></g>`:""; // ものしり: 花のかみかざり(体の上に描く)
@@ -2896,7 +2904,7 @@ function petSVG(stage,mood,acc,size,costume,kind){
     straw:`<ellipse cx="60" cy="48" rx="38" ry="7" fill="#e9c46a"/><path d="M40 48q2-18 20-18t20 18z" fill="#f2d07a"/><rect x="40" y="42" width="40" height="5" fill="#d23a3a"/>`
   })[acc]||"";
   const C=costume?costumeSVG(costume,egg?-12:0,U):"";
-  return `<svg viewBox="0 0 120 120" width="${S}" height="${S}" role="img" aria-label="${esc(petName())}"><defs><linearGradient id="pg${U}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${K[3][0]}"/><stop offset="1" stop-color="${K[3][1]}"/></linearGradient><pattern id="plaid${U}" width="8" height="8" patternUnits="userSpaceOnUse"><path d="M0 4h8M4 0v8" stroke="#5a4127" stroke-width="1.2" opacity=".6"/></pattern></defs><ellipse cx="60" cy="112" rx="30" ry="4" fill="#000" opacity=".12"/>${costume?"":leaf}${body}${costume?"":kfl}${blush}${eyes}${mouth}${costume&&HEAD_ACC.includes(acc)?"":A}${C}${stage>=5&&!costume?`<text x="60" y="20" text-anchor="middle" font-size="16">👑</text>`:""}</svg>`;
+  return `<svg viewBox="0 0 120 120" width="${S}" height="${S}" role="img" aria-label="${esc(petName())}" style="--pb:${K[1]}"><defs><linearGradient id="pg${U}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${K[3][0]}"/><stop offset="1" stop-color="${K[3][1]}"/></linearGradient><pattern id="plaid${U}" width="8" height="8" patternUnits="userSpaceOnUse"><path d="M0 4h8M4 0v8" stroke="#5a4127" stroke-width="1.2" opacity=".6"/></pattern></defs><ellipse cx="60" cy="112" rx="30" ry="4" fill="#000" opacity=".12"/>${costume?"":leaf}${body}${costume?"":kfl}${blush}${KP.eyeUp?`<g transform="translate(0 -${KP.eyeUp})">${eyes}</g>`:eyes}${mouth}${costume&&HEAD_ACC.includes(acc)?"":(KP.eyeUp&&acc==="glasses"?`<g transform="translate(0 -${KP.eyeUp})">${A}</g>`:A)}${C}${stage>=5&&!costume?`<text x="60" y="20" text-anchor="middle" font-size="16">👑</text>`:""}</svg>`;
 }
 function petDream(){ const p=petInit(); if(p.dreamDay===TODAY) return p.dream||""; const y=new Date(Date.parse(TODAY)-864e5).toISOString().slice(0,10); const L=NEWS.filter(n=>n.d===y&&n.ok); if(!L.length) return "";
   const r=seeded("dream"+TODAY+petName()); const n=L[Math.floor(r()*L.length)]; const g=D.glossary.find(w=>n.h.includes(w[0].replace(/\(.*?\)/,"")));
@@ -2984,9 +2992,10 @@ function petBig(){ petHatchCheck(); const p=petInit(); const st=petStage(); cons
     <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:10px"><button class="fchip pet-feed" data-feed="1" ${p.food>0?"":"disabled"}>🍙 ごはん <b id="petFood">${p.food}</b> こ ・ あげる</button><button class="fchip" id="petRename">✏️ 名前</button></div>
     <div class="hint" style="margin-top:8px">${acc?`🎒 よく読むジャンルが「${esc(PET_ACC[acc][2])}」なので、${esc(PET_ACC[acc][1])}をつけています。`:"🎒 よく読むジャンルが決まると、小物をつけはじめます。"}</div>
     ${st.i>=5?`<div class="pet-master">${p.stay?`<div class="hint">🎓 ${esc(petName())}は ニュース名人。このまま いっしょに読みつづけています。</div><button class="fchip" id="petRestart" style="margin-top:6px">🥚 新しいたまごから育てる</button>`:`<b>🎓 ${esc(petName())}が ニュース名人になりました!</b><p class="hint" style="margin:4px 0 8px">このまま いっしょに読みつづけるか、新しいたまごから 2代目を育てるか、選べます。新しくしても ${esc(petName())}は「殿堂」に残ります。記録(連続日数・バッジなど)は消えません。</p><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="fchip pet-feed" id="petStay">🏠 このまま育てる</button><button class="fchip" id="petRestart">🥚 新しいたまごから育てる</button></div>`}</div>`:""}
-    ${petHall().length?`<details class="faq plain" style="margin-top:8px"><summary>🏆 殿堂(名人になった子たち)</summary><div class="pet-hall">${petHall().map(h=>`<div class="ph"><span>${petSVG(5,"happy",null,56,h.wear||null,h.kind)}</span><b>${esc(h.name)}</b><small>第${h.gen||1}代 ・ ${esc(mdLabel(h.at))}に名人</small></div>`).join("")}</div></details>`:""}
+    ${petHall().length?`<details class="faq plain" style="margin-top:8px"><summary>🏆 殿堂(名人になった子たち)</summary><div class="pet-hall">${petHall().map(h=>`<div class="ph"><span>${petSVG(5,"happy",null,56,h.wear||null,h.kind,h.color||null)}</span><b>${esc(h.name)}</b><small>第${h.gen||1}代 ・ ${esc(mdLabel(h.at))}に名人</small></div>`).join("")}</div></details>`:""}
     <details class="faq plain" style="margin-top:6px"><summary>そだて方</summary><ul class="us"><li>🧠 クイズに正解 → 🍙 ごはん(1日${PET_DAY_MAX}こまで)。あげると そだち +5</li><li>📅 開いた日 +2 ・ 💡 解説を読む +3 ・ 📖 ことばを調べる +1</li><li>3日以上あけると、すねます。ごはんをあげると元気に。</li><li>たまご → あかちゃん → こども → おとな → ものしり → ニュース名人</li><li>🥚 たまごから生まれる子は7種類。どの子が生まれるかは、生まれるまでのお楽しみ!(生まれたあとは変わりません)</li><li>🎓 名人になったら、そのまま育てるか、新しいたまごから育てるか選べます</li></ul></details>
     ${friendOn()?`<div class="hint" style="text-align:center;margin-top:6px">🐣 ともだちの「${esc(friendName())}」が遊びに来ています <button class="gd-lk" id="frRename">名前</button></div>`:`<div class="hint" style="text-align:center;margin-top:6px">ペットが「おとな」になるか、14日開くと、ともだちがやってくるよ。</div>`}
+    <details class="faq plain" style="margin-top:8px" id="petColorBox"><summary>🎨 色を変える</summary><div class="pet-colors">${PET_COLORS.map(c=>`<button class="pc-i${((p.color||null)===c[0])?" on":""}" data-pcol="${c[0]||""}" aria-pressed="${(p.color||null)===c[0]}"><span>${petSVG(Math.max(1,st.i),"happy",null,48,null,petKind(),c[0])}</span><small>${esc(c[5])}</small></button>`).join("")}</div><div class="hint">いつでも何回でも変えられます。殿堂の子は、その子の色のまま残ります。</div></details>
     <details class="faq plain" style="margin-top:8px"><summary>👕 着せかえ</summary>${wardrobeHTML()}<div class="hint">🔒の服は、書いてあることをすると着られるようになります。</div></details>
     <details class="faq plain"><summary>🏠 ${esc(petName())}の部屋</summary>${roomHTML()}</details>
     <details class="faq plain"><summary>📔 今週の日記</summary>${diaryHTML()}</details>
@@ -2997,6 +3006,7 @@ function bindPet(){
   const fr=document.getElementById("frRename"); if(fr) fr.onclick=()=>{ const v=prompt("ともだちの名前(10文字まで)",friendName()); if(v&&v.trim()){ petInit().fname=v.trim().slice(0,10); saveMe(); go(current,{keepScroll:true}); } };
   document.querySelectorAll("[data-feed]").forEach(b=>b.onclick=()=>petFeed(b));
   document.querySelectorAll("[data-petquiz]").forEach(b=>b.onclick=()=>{ const q=document.getElementById("quiz"); if(q){ q.scrollIntoView({behavior:"smooth",block:"center"}); } else go("my"); });
+  document.querySelectorAll("[data-pcol]").forEach(b=>b.onclick=()=>{ const v=b.dataset.pcol||null; const pp=petInit(); if(v) pp.color=v; else delete pp.color; saveMe(); toast(`🎨 ${(PET_COLORS.find(c=>c[0]===v)||[])[5]||"もとの色"}にしました`); go("my",{keepScroll:true}); setTimeout(()=>{ const d=document.getElementById("petColorBox"); if(d) d.open=true; },50); });
   const ps=document.getElementById("petStay"); if(ps) ps.onclick=()=>{ petInit().stay=1; saveMe(); toast(`🏠 ${petName()}と、このまま読みつづけます`); go("my",{keepScroll:true}); };
   const pr=document.getElementById("petRestart"); if(pr) pr.onclick=()=>{ const n=petName(); if(!confirm(`${n}は「殿堂」に入り、新しいたまごから育てはじめます。\n(${n}にはもどせません。記録やバッジは消えません)\nよろしいですか?`)) return; if(petRestart()){ toast(`🥚 新しいたまごがやってきました。なにが生まれるかな? ${n}は殿堂入り!`); go("my",{keepScroll:true}); } };
   const rn=document.getElementById("petRename"); if(rn) rn.onclick=()=>{ const v=prompt("名前をつけてね(10文字まで)",petName()); if(v&&v.trim()){ petInit().name=v.trim().slice(0,10); saveMe(); go(current,{keepScroll:true}); } };
@@ -3730,6 +3740,7 @@ function funGrid(){ const L=FUN.filter(f=>(FUN_SET[f[0]]||FUN_ALWAYS.includes(f[
     ${hid?`<button class="fchip" id="funMore" data-hid="${hid}" aria-expanded="${funOpen?"true":"false"}" style="margin-top:8px">${funOpen?"▲ とじる":`… ほか ${hid}こ を見る`}</button>`:""}</section>`; }
 // ===== お知らせ(新しくなったところ)。機能を足したら、いちばん上に1つ足す =====
 const UPDATES=[
+  {id:"2026-10-22d",d:"2026-10-22",t:"🎨 ペットの色を変えられるように",L:["マイ→ペットの「🎨 色を変える」で、ひよこ・さくら・そら・わかば・チョコ など10色から、いつでも何回でも変えられます","けろまる(かえる)の目を、頭の上の丸い所に入れました"]},
   {id:"2026-10-22c",d:"2026-10-22",t:"🐶 いぬの子が仲間入り",L:["たまごから、いぬの子も生まれるようになりました(たれ耳でしっぽをふる子)。何が生まれるかは、生まれるまでのお楽しみ!"]},
   {id:"2026-10-22b",d:"2026-10-22",t:"🥚 ペットが6種類に・服が5つ増えた・名人のあと",L:[
     "たまごから生まれる子が7種類になりました。どの子が生まれるかは、生まれるまでのお楽しみ! 今までの子はそのままです",
