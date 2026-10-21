@@ -161,6 +161,11 @@ main{padding-block:18px 32px}
 .ten.short li.mytown{border-left:4px solid var(--accent)}
 .ten.short li{position:relative}.ten.short .row{padding-right:50px!important}
 .len-seg{margin-left:auto}
+.q1 .q1-q{font-size:1.12rem;font-weight:800;line-height:1.55;margin:8px 0 2px}
+.q1-b{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}.q1-b .fchip{min-height:52px;font-size:1.05rem;font-weight:800;justify-content:center}
+.q1-my{margin:10px 0 0;line-height:1.7}.q1-my .fchip{margin-left:4px}
+.q1-wk{display:flex;align-items:center;gap:4px;flex-wrap:wrap;margin-top:10px;font-size:1.15rem}.q1-wk .hint{font-size:.88rem}.q1-wk .fchip{margin-left:auto;font-size:.9rem}
+.q1-res{margin-top:8px;padding:10px 12px;border-radius:12px;background:var(--surface2);line-height:1.6}.q1-res.ok{background:var(--ok-soft)}.q1-res small{display:block;color:var(--muted)}.q1-res .fchip{margin-top:6px}
 .cast{list-style:none;margin:8px 0 0;padding:0;display:flex;flex-direction:column;gap:8px}
 .cast li{display:flex;gap:10px;align-items:flex-start;background:var(--surface2);border:1px solid var(--line);border-radius:12px;padding:9px 11px}
 .cast .ci{font-size:1.5rem;line-height:1.2}
@@ -1239,7 +1244,7 @@ function mmdd(iso){ return iso.slice(5,10); }
 function seasonNow(){ if(LOOK.season==="off") return null; if(LOOK.preview){ const z=SEASONS.find(x=>x.k===LOOK.preview); if(z) return z; }
   const t=mmdd(TODAY); return SEASONS.find(z=> z.from<=z.to ? (t>=z.from&&t<=z.to) : (t>=z.from||t<=z.to)) || null; }
 function inSeason(z,iso){ const t=mmdd(iso); return z.from<=z.to ? (t>=z.from&&t<=z.to) : (t>=z.from||t<=z.to); }
-const SECS = [["weather","🌤️ 天気"],["quick","⏱️ 1分まとめ"],["cont","🔔 つづきがあります"],["letter","💌 ペットからの手紙"],["listen","🔊 ニュースを聞く"],["three","☀️ 今日の3行"],["ten","📰 今日のニュース10"],["pet","🐣 ペット"],["goal","🗓️ 今週の目標"],["play","▶️ 1分で見る"],["foryou","🎯 あなた向け"],["picks","🎁 ジャンル別おすすめ"],["kw","🔖 わたしのキーワード"],["quiz","🧠 今日のクイズ"],["number","🔢 今日の数字"],["fun","✨ おたのしみ"],["other","📚 そのほかのニュース"],["english","📘 今日の英単語"],["mood","🗺️ 世の中の天気図"],["know","👆 知ってた?"],["talk","🍽️ 今日の話のタネ"],["reporter","🎙️ ペット記者"],["local","🏠 わたしの街"],["gacha","🎰 今日の1本ガチャ"],["thermo","🌡️ ニュースの温度計"],["trip2","🗺️ ペットの旅"],["assoc","🔗 ニュース連想"],["back","📅 あのとき何してた?"],["bingo","🎲 ニュースビンゴ"],["battle","⚔️ 予想くらべ"]];
+const SECS = [["weather","🌤️ 天気"],["quick","⏱️ 1分まとめ"],["cont","🔔 つづきがあります"],["letter","💌 ペットからの手紙"],["listen","🔊 ニュースを聞く"],["three","☀️ 今日の3行"],["ten","📰 今日のニュース10"],["one","🎯 きょうの1問"],["pet","🐣 ペット"],["goal","🗓️ 今週の目標"],["play","▶️ 1分で見る"],["foryou","🎯 あなた向け"],["picks","🎁 ジャンル別おすすめ"],["kw","🔖 わたしのキーワード"],["quiz","🧠 今日のクイズ"],["number","🔢 今日の数字"],["fun","✨ おたのしみ"],["other","📚 そのほかのニュース"],["english","📘 今日の英単語"],["mood","🗺️ 世の中の天気図"],["know","👆 知ってた?"],["talk","🍽️ 今日の話のタネ"],["reporter","🎙️ ペット記者"],["local","🏠 わたしの街"],["gacha","🎰 今日の1本ガチャ"],["thermo","🌡️ ニュースの温度計"],["trip2","🗺️ ペットの旅"],["assoc","🔗 ニュース連想"],["back","📅 あのとき何してた?"],["bingo","🎲 ニュースビンゴ"],["battle","⚔️ 予想くらべ"]];
 const LOOK = (()=>{ let p={}; try{ p=JSON.parse(store.get("nw-look")||"{}")||{}; }catch(_){ p={}; }
   const fix=(arr,all)=>{ const a=(Array.isArray(arr)?arr:[]).filter(k=>all.includes(k)); all.forEach(k=>{ if(!a.includes(k)) a.push(k); }); return a; };
   const had=new Set(Array.isArray(p.order)?p.order:[]); p.order=fix(p.order,SECS.map(s=>s[0]));
@@ -1257,6 +1262,9 @@ const LOOK = (()=>{ let p={}; try{ p=JSON.parse(store.get("nw-look")||"{}")||{};
   if(!p.v12){ p.v12=1; p.off=p.off||{}; delete p.off.kurashi;
     if(p.cfg) Object.values(p.cfg).forEach(c=>{ if(c&&c.off) delete c.off.kurashi; });
     if(Array.isArray(p.order)) p.order=p.order.filter(k=>k!=="kurashi"); }
+  // v16: 「🎯 きょうの1問」を ニュース10 のすぐ下に(2026-10-22。毎日1つだけの予想。かんたんにも出す)
+  if(!p.v16){ p.v16=1; const fx=c=>{ if(!c) return; if(Array.isArray(c.order)){ c.order=c.order.filter(k=>k!=="one"); const t=c.order.indexOf("ten"); c.order.splice(t<0?c.order.length:t+1,0,"one"); } if(c.off) delete c.off.one; };
+    fx(p); if(p.cfg){ fx(p.cfg.easy); fx(p.cfg.normal); } }
   // v15: ふつうの「きょう」を短く。1分で見る・寝る前ラジオ・今週の目標・わたしのキーワードは おたのしみ へ(2026-10-21)
   if(!p.v15){ p.v15=1; const fx=c=>{ if(!c) return; c.off=c.off||{}; ["play","goal","kw"].forEach(k=>c.off[k]=true); };
     if(p.mode!=="easy") fx(p); if(p.cfg&&p.cfg.normal) fx(p.cfg.normal); }
@@ -1285,7 +1293,7 @@ function saveLook(){ store.set("nw-look", JSON.stringify(LOOK)); }
 // ===== かんたんモード / ふつうモード =====
 // それぞれのモードが「きょうの並び・表示」「下のタブ」「文字の大きさ」を別々に覚える。かんたんモードに、ふつうの機能を足すこともできる
 const MODE_PRESET={
-  easy:()=>{ const on=["weather","listen","three","ten","quiz"]; const order=[...on,...SECS.map(x=>x[0]).filter(k=>!on.includes(k))]; const off={}; order.forEach(k=>{ if(!on.includes(k)) off[k]=true; });
+  easy:()=>{ const on=["weather","listen","three","ten","one","quiz"]; const order=[...on,...SECS.map(x=>x[0]).filter(k=>!on.includes(k))]; const off={}; order.forEach(k=>{ if(!on.includes(k)) off[k]=true; });
     return {order,off,tabs:["today","explain","search","my","plan","map","numbers","words"],tabOff:{plan:true,map:true,numbers:true,words:true},size:"l"}; },
   normal:()=>{ const off={listen:true,quick:true,picks:true,english:true,mood:true,know:true,talk:true,reporter:true,local:true,gacha:true,play:true,goal:true,kw:true};
     return {order:SECS.map(x=>x[0]),off,tabs:["today","explain","search","plan","my","map","numbers","words"],tabOff:{map:true,numbers:true,words:true},size:"m"}; }};
@@ -1692,6 +1700,7 @@ function renderToday(){
   S.kw=kwCard();
   S.picks=picksCard(); S.goal=goalCard(); S.letter=letterCard(); S.cont=contCard(); S.quick=quickCard();
   S.other=otherNews();
+  S.one=oneCard();
   S.quiz=D.quiz&&D.quiz.length?`<section class="card quiz" aria-label="今日のクイズ" id="quiz"></section>`:"";
   S.number=`<section class="card" aria-label="今日の数字">
       <div class="sec-h"><h2>🔢 今日の数字</h2></div>
@@ -3249,6 +3258,35 @@ function mascot(page){ if(LOOK.mascot===false) return ""; const m=MASCOT[page]; 
   return `<div class="mascot" data-mascot="${page}" data-i="${i}"><button class="mascot-av" aria-label="${esc(petName())}のひとこと">${petSVG(st.i,"happy",null,54,m[0])}</button><div class="mascot-b">${esc(L[i])}</div></div>`; }
 document.addEventListener("click",e=>{ const b=e.target.closest(".mascot-av"); if(!b) return; const box=b.parentElement; const m=MASCOT[box.dataset.mascot]; if(!m) return; const L=m[1].map(x=>typeof x==="function"?x():x); const i=(+box.dataset.i+1)%L.length; box.dataset.i=i; box.querySelector(".mascot-b").textContent=L[i]; const sv=b.querySelector("svg"); if(sv){ sv.classList.remove("eat"); void sv.getBoundingClientRect(); sv.classList.add("eat"); } });
 // ===== わたしの予想ノート(自分で予想を書いて、日が来たら答え合わせ) =====
+// ===== 🎯 きょうの1問(1日1つだけ。予測ノートのまだ決まっていないものから、日替わりで1つ) =====
+// 答えは ME.votes(予測ノートの「あなたは?」と同じ記録)。どの日にどれを出したかは ME.q1{日付:番号}。結果は 🟩当たり 🟥はずれ 🟨まだ ⬜答えなかった
+function q1Pick(){ ME.q1=ME.q1||{}; if(ME.q1[TODAY]) return PRED.find(x=>x.no===ME.q1[TODAY])||null;
+  const used=new Set(Object.values(ME.q1)); const open=PRED.filter(x=>x.r==="wait"&&(!x.d||x.d>=TODAY)&&!ME.votes[x.no]&&!used.has(x.no));
+  if(!open.length) return null; open.sort((a,b)=>(a.d||"9999").localeCompare(b.d||"9999")||a.no.localeCompare(b.no));
+  const pool=open.slice(0,5); let h=0; for(const ch of TODAY) h=(h*31+ch.charCodeAt(0))>>>0; const x=pool[h%pool.length]; ME.q1[TODAY]=x.no; saveMe(); return x; }
+function q1Res(d){ const no=(ME.q1||{})[d]; if(!no) return "⬜"; const v=ME.votes[no]; if(!v) return "⬜"; const p=PRED.find(x=>x.no===no); if(!p||p.r==="wait") return "🟨";
+  if(p.r!=="hit"&&p.r!=="miss") return "🟨"; return ((v.v==="yes")===(p.r==="hit"))?"🟩":"🟥"; }
+function q1Week(){ const out=[]; for(let i=6;i>=0;i--){ const d=new Date(Date.parse(TODAY)-i*864e5).toISOString().slice(0,10); out.push([d,q1Res(d)]); } return out; }
+/* 前に答えた1問の結果が出ていたら、1回だけ知らせてごはん1こ(当たりのとき) */
+function q1News(){ ME.q1seen=ME.q1seen||{}; const L=[]; Object.entries(ME.q1||{}).forEach(([d,no])=>{ if(d>=TODAY||ME.q1seen[no]) return; const r=q1Res(d); if(r==="🟩"||r==="🟥"){ const p=PRED.find(x=>x.no===no); L.push({d,no,r,p}); } }); return L; }
+function oneCard(){ const x=q1Pick(); const nw=q1News(); const wk=q1Week(); const v=x&&ME.votes[x.no];
+  const res=nw.map(o=>`<div class="q1-res ${o.r==="🟩"?"ok":"ng"}">${o.r} ${mdLabel(o.d)}の1問「${esc(o.p.t)}」は <b>${o.p.r==="hit"?"そうなりました":"そうなりませんでした"}</b>。${o.r==="🟩"?"あなたの予想は当たり!":"あなたの予想ははずれ。"}${o.p.m?`<small>${esc(o.p.m)}</small>`:""}<button class="fchip" data-q1ok="${esc(o.no)}">わかった${o.r==="🟩"?"(🍙 ごはん1こ)":""}</button></div>`).join("");
+  if(!x&&!res) return "";
+  return `<section class="card q1" id="q1Card" aria-label="きょうの1問">
+    <div class="sec-h" style="margin:0"><h2>🎯 きょうの1問</h2><span class="sub">1日1つだけ</span></div>${res}
+    ${x?`<p class="q1-q">${esc(x.t)}</p><div class="hint">答え合わせ: ${x.d?mdLabel(x.d)+"ごろ":"決まったとき"}(予測ノート ${esc(x.no.replace(/^[NP]/,""))}番)</div>
+    ${v?`<p class="q1-my">あなたの予想: <b>${v.v==="yes"?"⭕ そうなる":"❌ ならない"}</b> 。結果が出たら、ここでお知らせします。<button class="fchip" data-q1chg="1">えらびなおす</button></p>`
+      :`<div class="q1-b"><button class="fchip q1y" data-q1v="yes">⭕ そうなる</button><button class="fchip q1n" data-q1v="no">❌ ならない</button></div>`}`:`<p class="hint">きょうの1問は、もう全部答えました。結果を待ちましょう。</p>`}
+    <div class="q1-wk" aria-label="この7日の1問"><span class="hint">この7日:</span> ${wk.map(([d,r])=>`<span title="${mdLabel(d)}">${r}</span>`).join("")} <button class="fchip" data-q1share="1">📤 送る</button></div>
+  </section>`; }
+function q1Redraw(){ const c=document.getElementById("q1Card"); if(c){ const h=oneCard(); if(h) c.outerHTML=h; else c.remove(); } }
+function q1Share(){ const wk=q1Week(); const t=`まいにちニュース帳 きょうの1問\n${wk.map(x=>x[1]).join("")}\n🟩当たり 🟥はずれ 🟨まだ ⬜答えなかった\n${location.origin+location.pathname}`;
+  if(navigator.share) navigator.share({text:t}).catch(()=>{}); else { try{ navigator.clipboard.writeText(t); toast("📋 コピーしました。LINEなどに貼れます"); }catch(_){ prompt2(location.origin+location.pathname); } } }
+document.addEventListener("click",ev=>{ const t=ev.target;
+  const v=t.closest("[data-q1v]"); if(v){ const x=q1Pick(); if(!x) return; ME.votes[x.no]={v:v.dataset.q1v,at:TODAY}; ME.flags=ME.flags||{}; ME.flags.q1=1; saveMe(); const g=petEarn("q1:"+TODAY,1); toast(`🎯 記録しました。答え合わせは ${x.d?mdLabel(x.d)+"ごろ":"決まったとき"}${g?"(🍙 ごはん+1)":""}`); q1Redraw(); try{ track("q1"); }catch(_){} return; }
+  if(t.closest("[data-q1chg]")){ const x=q1Pick(); if(x){ delete ME.votes[x.no]; saveMe(); q1Redraw(); } return; }
+  const ok=t.closest("[data-q1ok]"); if(ok){ const no=ok.dataset.q1ok; ME.q1seen=ME.q1seen||{}; ME.q1seen[no]=1; saveMe(); const d=Object.keys(ME.q1).find(k=>ME.q1[k]===no); if(d&&q1Res(d)==="🟩"){ const g=petEarn("q1hit:"+no,1); if(g) toast("🍙 ごはんを1こ もらいました"); } q1Redraw(); return; }
+  if(t.closest("[data-q1share]")){ q1Share(); return; } });
 function myPredHTML(){ ME.myPred=ME.myPred||[]; const L=ME.myPred; const due=L.filter(x=>!x.r&&x.d<=TODAY); const done=L.filter(x=>x.r); const win=done.filter(x=>x.r==="hit").length;
   return `<section class="card" id="mpBox"><b>🔮 わたしの予想ノート</b><div class="hint" style="margin:4px 0 8px">自分で予想を書いておき、その日が来たら答え合わせ。何年先でもOK(このスマホの中だけ)。</div>
     <textarea class="memo" id="mpT" rows="2" maxlength="120" placeholder="例: 2029年までに、食料品の消費税は元の8%にもどっている"></textarea>
@@ -3779,6 +3817,7 @@ function funGrid(){ const L=FUN.filter(f=>(FUN_SET[f[0]]||FUN_ALWAYS.includes(f[
     ${hid?`<button class="fchip" id="funMore" data-hid="${hid}" aria-expanded="${funOpen?"true":"false"}" style="margin-top:8px">${funOpen?"▲ とじる":`… ほか ${hid}こ を見る`}</button>`:""}</section>`; }
 // ===== お知らせ(新しくなったところ)。機能を足したら、いちばん上に1つ足す =====
 const UPDATES=[
+  {id:"2026-10-22i",d:"2026-10-22",t:"🎯 きょうの1問",L:["ニュース10の下に、1日1つだけの予想「きょうの1問」ができました。⭕ そうなる か ❌ ならない を押すだけ。","結果が出たら、ここでお知らせします(当たりはごはん🍙)。この7日の結果を 🟩🟥 で送れます。"]},
   {id:"2026-10-22h",d:"2026-10-22",t:"📰 ニュース10がすっきり",L:["「短く」のときは、ニュース10を見出しだけの1つの表にしました。長い見出しは3行まで。押すと全部読めます。","写真と「📤 送る」は「くわしく」に切りかえると出ます。"]},
   {id:"2026-10-22g",d:"2026-10-22",t:"🧹 見やすさの直し",L:["見出しが変なところで折れないようにしました。小さすぎた文字を大きくしました。","「出す/かくす」のボタンを「✅ 出している」のように、いまの状態がわかる形にしました。","かんたんモードの解説は、大事なところだけ先に出し、残りは「📖 もっとくわしく見る」にまとめました。"]},
   {id:"2026-10-22f",d:"2026-10-22",t:"🔧 こまかい直し",L:["はじめての案内の「つぎへ」ボタンが、画面の下にかくれないようにしました。","設定の吹き出しで、いま選んでいるものが色つきでわかるようにしました。","解説の「これまでの流れ」の下にできていた空白をなくしました。地図に秋田・東北・新潟を足しました。"]},
