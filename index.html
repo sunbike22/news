@@ -655,6 +655,10 @@ details.faq p{margin:10px 0 12px}
 .ob-tp{grid-template-columns:repeat(3,1fr);gap:6px}
 .ob-tp .tpk{min-height:68px;padding:6px 4px;border-radius:12px} .ob-tp .tp-i{font-size:1.5rem}
 .wx-notes .hint{font-size:.82rem;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.pet-master{margin-top:10px;padding:10px 12px;border-radius:14px;background:var(--accent-soft);border:1px solid var(--line)}
+.pet-hall{display:flex;flex-wrap:wrap;gap:10px;margin-top:6px}
+.pet-hall .ph{display:flex;flex-direction:column;align-items:center;min-width:84px;text-align:center}
+.pet-hall .ph small{color:var(--muted);font-size:.82rem}
 .pop b{font-size:1.05rem}
 /* かんたんモード: 押すところは44px以上(指が太くても押しやすく) */
 :root[data-mode="easy"] .fchip,:root[data-mode="easy"] .iconbtn,:root[data-mode="easy"] .seg button{min-height:44px}
@@ -2815,10 +2819,41 @@ function icsFor(s){
 const PET_STAGES=[[0,"たまご"],[10,"あかちゃん"],[40,"こども"],[100,"おとな"],[220,"ものしり"],[400,"ニュース名人"]];
 const PET_ACC={pol:["tie","ネクタイ","政治"],eco:["glasses","メガネ","経済"],soc:["helmet","ヘルメット","社会"],it:["phones","ヘッドホン","IT"],intl:["scarf","マフラー","国際"],spo:["band","ハチマキ","スポーツ"],sci:["glasses","はかせメガネ","科学・健康"],ent:["popcorn","ポップコーン","エンタメ"],fas:["ribbon","リボン","ファッション"],home:["hammer","トンカチ","インテリア・DIY"],food:["chef","コック帽","レシピ・料理"],life:["mug","マグカップ","ライフスタイル"],trip:["straw","むぎわら帽子","旅行"]};
 const PET_DAY_MAX=8;
+// 🥚 生まれるペットの種類(たまごのときに決まり、途中では変えられない)。[キー, 名前のもと, 体の色, おなかの色, 名人のときの色(上/下), たまごの色]
+const PET_KINDS={
+  maru:["よむまる","#ffcf6e","#fff1cf",["#ffe08a","#ffb84d"],"#fff7e6"],
+  neko:["みけまる","#f6e4c4","#fffaf0",["#fff0d6","#f0c98a"],"#fff4e6"],
+  kaeru:["けろまる","#8fd36b","#e6f7d4",["#b8ec93","#6cc24a"],"#eef9e4"],
+  usagi:["ももまる","#ffd3df","#fff4f7",["#ffe2ea","#ffb3c6"],"#fff0f4"],
+  pengin:["ぺんまる","#5b7fa6","#f3f7fb",["#86a6c9","#3f6189"],"#e9f0f7"],
+  kitsune:["こんまる","#f59e4c","#fff1dc",["#ffc48a","#ec7f1f"],"#fff0df"]};
+const PET_KIND_KEYS=Object.keys(PET_KINDS);
+function petKind(){ const k=(ME.pet||{}).kind; return PET_KINDS[k]?k:"maru"; }
+function petPickKind(avoid){ const L=PET_KIND_KEYS.filter(k=>k!==avoid); return L[Math.floor(Math.random()*L.length)]; }
+// 種類ごとの絵の部品(体の前に描く"back"=耳など、体の後に描く"front"=しっぽ・くちばし・もよう)
+function petKindParts(kind,stage,egg){ if(egg) return {back:"",front:""}; const g=stage>=2;
+  switch(kind){
+    case "neko": return {back:`<path d="M34 54l-4-22 18 12z" fill="#f6e4c4" stroke="#d9c39a" stroke-width="2"/><path d="M86 54l4-22-18 12z" fill="#f6e4c4" stroke="#d9c39a" stroke-width="2"/><path d="M36 48l-2-11 9 6z" fill="#ffb3c6"/><path d="M84 48l2-11-9 6z" fill="#ffb3c6"/>`,
+      front:`<path d="M26 74h-12M27 80h-12M93 74h12M93 80h12" stroke="#7a6a50" stroke-width="2" stroke-linecap="round"/>${g?`<path d="M52 50q8 4 16 0M48 44q4 3 8 0M64 44q4 3 8 0" stroke="#d9a060" stroke-width="3" fill="none" stroke-linecap="round"/>`:""}`};
+    case "kaeru": return {back:`<circle cx="44" cy="46" r="11" fill="#8fd36b"/><circle cx="76" cy="46" r="11" fill="#8fd36b"/><circle cx="44" cy="46" r="6" fill="#fff"/><circle cx="76" cy="46" r="6" fill="#fff"/><circle cx="45" cy="46" r="3" fill="#1f3d1a"/><circle cx="77" cy="46" r="3" fill="#1f3d1a"/>`,
+      front:g?`<circle cx="36" cy="88" r="3" fill="#6cb848" opacity=".7"/><circle cx="84" cy="90" r="2.5" fill="#6cb848" opacity=".7"/>`:""};
+    case "usagi": return {back:`<ellipse cx="46" cy="36" rx="7" ry="20" fill="#ffd3df" stroke="#f0b6c6" stroke-width="2"/><ellipse cx="74" cy="36" rx="7" ry="20" fill="#ffd3df" stroke="#f0b6c6" stroke-width="2"/><ellipse cx="46" cy="38" rx="3.5" ry="14" fill="#ffa6bd"/><ellipse cx="74" cy="38" rx="3.5" ry="14" fill="#ffa6bd"/>`,
+      front:`<circle cx="92" cy="96" r="7" fill="#fff" stroke="#f0b6c6" stroke-width="1.5"/>`};
+    case "pengin": return {back:"",
+      front:`<path d="M54 78l6 7 6-7z" fill="#f59e0b"/><path d="M26 70q-10 10-4 22 8-4 10-16z" fill="#4a6a8f"/><path d="M94 70q10 10 4 22-8-4-10-16z" fill="#4a6a8f"/><ellipse cx="50" cy="106" rx="8" ry="3" fill="#f59e0b"/><ellipse cx="70" cy="106" rx="8" ry="3" fill="#f59e0b"/>`};
+    case "kitsune": return {back:`<path d="M34 56l-6-26 20 14z" fill="#f59e4c" stroke="#d97b24" stroke-width="2"/><path d="M86 56l6-26-20 14z" fill="#f59e4c" stroke="#d97b24" stroke-width="2"/><path d="M36 50l-3-14 10 8z" fill="#fff1dc"/><path d="M84 50l3-14-10 8z" fill="#fff1dc"/>`,
+      front:`<path d="M88 96q22-6 18-26 10 20-8 30z" fill="#f59e4c"/><path d="M104 74q6 6 2 14-4-6-2-14z" fill="#fff1dc"/>`};
+    default: return {back:"",front:""}; } }
 function petInit(){ ME.pet=ME.pet||{}; const p=ME.pet; p.name=p.name||""; p.fed=+p.fed||0; p.food=+p.food||0; p.got=p.got||{}; p.feedDay=p.feedDay||""; p.earnDay=p.earnDay||{d:"",n:0};
+  // 種類: 前から育てている人(ごはんをあげた・2日以上開いた)は今までの よむまる。はじめての人は たまごのときに決まる
+  if(!PET_KINDS[p.kind]){ p.kind=(p.fed>0||ME.days.length>1)?"maru":petPickKind(); p.gen=p.gen||1; saveMe(); }
   Object.keys(p.got).forEach(k=>{ if(k.slice(2,12)<new Date(Date.parse(TODAY)-7*864e5).toISOString().slice(0,10)) delete p.got[k]; }); return p; }
-function petName(){ return (ME.pet&&ME.pet.name)||"よむまる"; }
-function petXP(){ const p=petInit(); return p.fed*5 + ME.days.length*2 + Object.keys(ME.readEx).length*3 + ME.words.length; }
+function petName(){ return (ME.pet&&ME.pet.name)||PET_KINDS[petKind()][0]; }
+function petXP(){ const p=petInit(); const b=p.base||{d:0,e:0,w:0}; return Math.max(0, p.fed*5 + Math.max(0,ME.days.length-b.d)*2 + Math.max(0,Object.keys(ME.readEx).length-b.e)*3 + Math.max(0,ME.words.length-b.w)); }
+// 🎓 名人になったら、新しいたまごから育て直せる(前の子は殿堂入り)。そだちの数え直しは base に今の記録を覚えて引く
+function petHall(){ return (ME.pet||{}).hall||[]; }
+function petRestart(){ const p=petInit(); if(petStage().i<5) return false; p.hall=p.hall||[]; p.hall.push({name:petName(),kind:petKind(),xp:petXP(),wear:p.wear||null,at:TODAY,gen:p.gen||1});
+  p.fed=0; p.feedDay=""; p.name=""; p.wear=null; p.stay=0; p.kind=petPickKind(p.kind); p.gen=(p.gen||1)+1; p.base={d:ME.days.length,e:Object.keys(ME.readEx).length,w:ME.words.length}; saveMe(); return true; }
 function petStage(){ const xp=petXP(); let i=0; PET_STAGES.forEach((s,k)=>{ if(xp>=s[0]) i=k; }); const nx=PET_STAGES[i+1]; return {i,name:PET_STAGES[i][1],xp,next:nx,prog:nx?(xp-PET_STAGES[i][0])/(nx[0]-PET_STAGES[i][0]):1}; }
 function petTopGenre(){ let best=null,v=2.5; Object.entries(ME.auto||{}).forEach(([g,n])=>{ if(PET_ACC[g]&&n>v){v=n;best=g;} }); return best; }
 function petGap(){ const ds=[...ME.days].filter(d=>d<TODAY).sort(); if(!ds.length) return 0; return Math.round((Date.parse(TODAY)-Date.parse(ds[ds.length-1]))/864e5); }
@@ -2831,11 +2866,11 @@ const HEAD_ACC=["band","helmet","straw","chef","phones","ribbon"];
 // SVGの中のid(グラデーション・チェック柄)は1ページに何匹出ても重ならないよう番号をつける
 // (同じidが2つあると、うしろのペットの色が前のペットのものを見にいってしまう)
 let petUID=0;
-function petSVG(stage,mood,acc,size,costume){
-  const S=size||120; const egg=stage===0; const U="u"+(++petUID);
-  const body=egg?`<path d="M60 22c22 0 34 30 34 52s-15 34-34 34-34-12-34-34 12-52 34-52z" fill="#fff7e6" stroke="#e8c98f" stroke-width="3"/><path d="M38 70l8-6 8 7 8-7 8 7 8-6 8 6" fill="none" stroke="#e8c98f" stroke-width="3" stroke-linejoin="round"/>`
-    : `<ellipse cx="60" cy="74" rx="${34+stage*1.2}" ry="${31+stage}" fill="${stage>=5?`url(#pg${U})`:"#ffcf6e"}"/><ellipse cx="60" cy="86" rx="${20+stage}" ry="${12+stage*.6}" fill="#fff1cf" opacity=".85"/>`;
-  const leaf=egg?"":stage>=4?`<path d="M60 44V30" stroke="#3f8f3a" stroke-width="3"/><g transform="translate(60 26)">${[0,72,144,216,288].map(a=>`<ellipse rx="5" ry="8" transform="rotate(${a}) translate(0 -7)" fill="#ff8fb3"/>`).join("")}<circle r="4.5" fill="#ffd34d"/></g>`
+function petSVG(stage,mood,acc,size,costume,kind){
+  const S=size||120; const egg=stage===0; const U="u"+(++petUID); kind=PET_KINDS[kind]?kind:petKind(); const K=PET_KINDS[kind]; const KP=petKindParts(kind,stage,egg);
+  const body=egg?`<path d="M60 22c22 0 34 30 34 52s-15 34-34 34-34-12-34-34 12-52 34-52z" fill="${K[4]}" stroke="#e8c98f" stroke-width="3"/><path d="M38 70l8-6 8 7 8-7 8 7 8-6 8 6" fill="none" stroke="#e8c98f" stroke-width="3" stroke-linejoin="round"/>${kind==="maru"?"":`<circle cx="50" cy="52" r="3" fill="${K[1]}" opacity=".8"/><circle cx="70" cy="58" r="2.4" fill="${K[1]}" opacity=".8"/><circle cx="60" cy="90" r="2.6" fill="${K[1]}" opacity=".8"/>`}`
+    : `${KP.back}<ellipse cx="60" cy="74" rx="${34+stage*1.2}" ry="${31+stage}" fill="${stage>=5?`url(#pg${U})`:K[1]}"/><ellipse cx="60" cy="86" rx="${20+stage}" ry="${12+stage*.6}" fill="${K[2]}" opacity=".85"/>${KP.front}`;
+  const leaf=egg||kind!=="maru"?"":stage>=4?`<path d="M60 44V30" stroke="#3f8f3a" stroke-width="3"/><g transform="translate(60 26)">${[0,72,144,216,288].map(a=>`<ellipse rx="5" ry="8" transform="rotate(${a}) translate(0 -7)" fill="#ff8fb3"/>`).join("")}<circle r="4.5" fill="#ffd34d"/></g>`
     : `<path d="M60 44q0-10 2-14" stroke="#3f8f3a" stroke-width="3" fill="none"/><path d="M62 31q10-10 18-4-6 9-18 4z" fill="#58b84f"/>${stage>=2?`<path d="M61 34q-10-8-17-2 6 8 17 2z" fill="#6cc763"/>`:""}`;
   const eyes=egg?"": mood==="happy"?`<path d="M42 70q5-6 10 0M68 70q5-6 10 0" stroke="#3a2a14" stroke-width="3.2" fill="none" stroke-linecap="round"/>`
     : mood==="sulk"?`<path d="M41 67l11 3M79 67l-11 3" stroke="#3a2a14" stroke-width="3" stroke-linecap="round"/><circle cx="47" cy="72" r="2.6" fill="#3a2a14"/><circle cx="73" cy="72" r="2.6" fill="#3a2a14"/>`
@@ -2857,7 +2892,7 @@ function petSVG(stage,mood,acc,size,costume){
     straw:`<ellipse cx="60" cy="48" rx="38" ry="7" fill="#e9c46a"/><path d="M40 48q2-18 20-18t20 18z" fill="#f2d07a"/><rect x="40" y="42" width="40" height="5" fill="#d23a3a"/>`
   })[acc]||"";
   const C=costume?costumeSVG(costume,egg?-12:0,U):"";
-  return `<svg viewBox="0 0 120 120" width="${S}" height="${S}" role="img" aria-label="${esc(petName())}"><defs><linearGradient id="pg${U}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#ffe08a"/><stop offset="1" stop-color="#ffb84d"/></linearGradient><pattern id="plaid${U}" width="8" height="8" patternUnits="userSpaceOnUse"><path d="M0 4h8M4 0v8" stroke="#5a4127" stroke-width="1.2" opacity=".6"/></pattern></defs><ellipse cx="60" cy="112" rx="30" ry="4" fill="#000" opacity=".12"/>${costume?"":leaf}${body}${blush}${eyes}${mouth}${costume&&HEAD_ACC.includes(acc)?"":A}${C}${stage>=5&&!costume?`<text x="60" y="20" text-anchor="middle" font-size="16">👑</text>`:""}</svg>`;
+  return `<svg viewBox="0 0 120 120" width="${S}" height="${S}" role="img" aria-label="${esc(petName())}"><defs><linearGradient id="pg${U}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${K[3][0]}"/><stop offset="1" stop-color="${K[3][1]}"/></linearGradient><pattern id="plaid${U}" width="8" height="8" patternUnits="userSpaceOnUse"><path d="M0 4h8M4 0v8" stroke="#5a4127" stroke-width="1.2" opacity=".6"/></pattern></defs><ellipse cx="60" cy="112" rx="30" ry="4" fill="#000" opacity=".12"/>${costume?"":leaf}${body}${blush}${eyes}${mouth}${costume&&HEAD_ACC.includes(acc)?"":A}${C}${stage>=5&&!costume?`<text x="60" y="20" text-anchor="middle" font-size="16">👑</text>`:""}</svg>`;
 }
 function petDream(){ const p=petInit(); if(p.dreamDay===TODAY) return p.dream||""; const y=new Date(Date.parse(TODAY)-864e5).toISOString().slice(0,10); const L=NEWS.filter(n=>n.d===y&&n.ok); if(!L.length) return "";
   const r=seeded("dream"+TODAY+petName()); const n=L[Math.floor(r()*L.length)]; const g=D.glossary.find(w=>n.h.includes(w[0].replace(/\(.*?\)/,"")));
@@ -2902,11 +2937,16 @@ const WEAR=[
   ["fortune","とんがり帽子","予想を3つする",()=>Object.keys(ME.votes).length>=3],
   ["book","丸めがね","ことばを10こ調べる",()=>ME.words.length>=10],
   ["ribbonbig","大きなリボン","クイズで満点をとる",()=>Object.values(ME.quiz).some(v=>+v>=3)],
-  ["crown","王冠","ペットが「おとな」になる",()=>petStage().i>=3],
+  ["crown","王冠","ペットが「おとな」になる",()=>petStage().i>=3||petHall().length>0],
   ["star","星のかみかざり","🎲 すごろくでゴール",()=>(ME.sugoGoal||[]).length>0],
   ["pumpkin","かぼちゃ帽","🎃 ハロウィン限定",()=>ME.badges.includes("halloween")],
   ["santa","サンタ帽","🎄 クリスマス限定",()=>ME.badges.includes("xmas")],
-  ["kagami","鏡もち帽","🎍 お正月限定",()=>ME.badges.includes("newyear")]
+  ["kagami","鏡もち帽","🎍 お正月限定",()=>ME.badges.includes("newyear")],
+  ["raincoat","レインコートのフード","☔ 雨雲レーダーを開く",()=>!!(ME.flags||{}).radar],
+  ["lifevest","救命どうい(オレンジ)","🏃 にげる場所の地図を見る",()=>!!(ME.flags||{}).shelter],
+  ["heartpin","ハートのかみかざり","💗 好きなことを5こ選ぶ",()=>myTopics().length>=5],
+  ["randoseru","ランドセル","7日つづけて開く",()=>bestStreak()>=7],
+  ["medal","金メダル","ペットを「ニュース名人」まで育てる",()=>petStage().i>=5||petHall().length>0]
 ];
 function petWear(){ const w=(ME.pet||{}).wear; const it=WEAR.find(x=>x[0]===w); return it&&it[3]()?w:null; }
 function wardrobeHTML(){ const w=petWear(); return `<div class="wardrobe">${WEAR.map(([k,n,c,ok])=>{ const open=ok(); return `<button class="wd-i${w===k?" on":""}" data-wear="${k}" ${open?"":"disabled"} title="${esc(open?n:"🔒 "+c)}"><span class="wd-svg">${open?petSVG(Math.max(1,petStage().i),"happy",null,46,k):'<span class="wd-lock">🔒</span>'}</span><small>${esc(open?n:c)}</small></button>`; }).join("")}<button class="wd-i${!w?" on":""}" data-wear=""><span class="wd-svg" style="font-size:1.4rem">🚫</span><small>なにも着ない</small></button></div>`; }
@@ -2937,7 +2977,9 @@ function petBig(){ const p=petInit(); const st=petStage(); const mood=petMood();
     <div class="hint" style="text-align:center;margin-top:4px">そだち ${st.xp}${st.next?` ・ 「${esc(st.next[1])}」まで あと${st.next[0]-st.xp}`:" ・ 最高の姿!"}</div>
     <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:10px"><button class="fchip pet-feed" data-feed="1" ${p.food>0?"":"disabled"}>🍙 ごはん <b id="petFood">${p.food}</b> こ ・ あげる</button><button class="fchip" id="petRename">✏️ 名前</button></div>
     <div class="hint" style="margin-top:8px">${acc?`🎒 よく読むジャンルが「${esc(PET_ACC[acc][2])}」なので、${esc(PET_ACC[acc][1])}をつけています。`:"🎒 よく読むジャンルが決まると、小物をつけはじめます。"}</div>
-    <details class="faq plain" style="margin-top:6px"><summary>そだて方</summary><ul class="us"><li>🧠 クイズに正解 → 🍙 ごはん(1日${PET_DAY_MAX}こまで)。あげると そだち +5</li><li>📅 開いた日 +2 ・ 💡 解説を読む +3 ・ 📖 ことばを調べる +1</li><li>3日以上あけると、すねます。ごはんをあげると元気に。</li><li>たまご → あかちゃん → こども → おとな → ものしり → ニュース名人</li></ul></details>
+    ${st.i>=5?`<div class="pet-master">${p.stay?`<div class="hint">🎓 ${esc(petName())}は ニュース名人。このまま いっしょに読みつづけています。</div><button class="fchip" id="petRestart" style="margin-top:6px">🥚 新しいたまごから育てる</button>`:`<b>🎓 ${esc(petName())}が ニュース名人になりました!</b><p class="hint" style="margin:4px 0 8px">このまま いっしょに読みつづけるか、新しいたまごから 2代目を育てるか、選べます。新しくしても ${esc(petName())}は「殿堂」に残ります。記録(連続日数・バッジなど)は消えません。</p><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="fchip pet-feed" id="petStay">🏠 このまま育てる</button><button class="fchip" id="petRestart">🥚 新しいたまごから育てる</button></div>`}</div>`:""}
+    ${petHall().length?`<details class="faq plain" style="margin-top:8px"><summary>🏆 殿堂(名人になった子たち)</summary><div class="pet-hall">${petHall().map(h=>`<div class="ph"><span>${petSVG(5,"happy",null,56,h.wear||null,h.kind)}</span><b>${esc(h.name)}</b><small>第${h.gen||1}代 ・ ${esc(mdLabel(h.at))}に名人</small></div>`).join("")}</div></details>`:""}
+    <details class="faq plain" style="margin-top:6px"><summary>そだて方</summary><ul class="us"><li>🧠 クイズに正解 → 🍙 ごはん(1日${PET_DAY_MAX}こまで)。あげると そだち +5</li><li>📅 開いた日 +2 ・ 💡 解説を読む +3 ・ 📖 ことばを調べる +1</li><li>3日以上あけると、すねます。ごはんをあげると元気に。</li><li>たまご → あかちゃん → こども → おとな → ものしり → ニュース名人</li><li>🥚 たまごから生まれる子は6種類(よむまる・みけまる・けろまる・ももまる・ぺんまる・こんまる)。どの子が生まれるかは、たまごのときに決まります(途中で変えられません)</li><li>🎓 名人になったら、そのまま育てるか、新しいたまごから育てるか選べます</li></ul></details>
     ${friendOn()?`<div class="hint" style="text-align:center;margin-top:6px">🐣 ともだちの「${esc(friendName())}」が遊びに来ています <button class="gd-lk" id="frRename">名前</button></div>`:`<div class="hint" style="text-align:center;margin-top:6px">ペットが「おとな」になるか、14日開くと、ともだちがやってくるよ。</div>`}
     <details class="faq plain" style="margin-top:8px"><summary>👕 着せかえ</summary>${wardrobeHTML()}<div class="hint">🔒の服は、書いてあることをすると着られるようになります。</div></details>
     <details class="faq plain"><summary>🏠 ${esc(petName())}の部屋</summary>${roomHTML()}</details>
@@ -2949,6 +2991,8 @@ function bindPet(){
   const fr=document.getElementById("frRename"); if(fr) fr.onclick=()=>{ const v=prompt("ともだちの名前(10文字まで)",friendName()); if(v&&v.trim()){ petInit().fname=v.trim().slice(0,10); saveMe(); go(current,{keepScroll:true}); } };
   document.querySelectorAll("[data-feed]").forEach(b=>b.onclick=()=>petFeed(b));
   document.querySelectorAll("[data-petquiz]").forEach(b=>b.onclick=()=>{ const q=document.getElementById("quiz"); if(q){ q.scrollIntoView({behavior:"smooth",block:"center"}); } else go("my"); });
+  const ps=document.getElementById("petStay"); if(ps) ps.onclick=()=>{ petInit().stay=1; saveMe(); toast(`🏠 ${petName()}と、このまま読みつづけます`); go("my",{keepScroll:true}); };
+  const pr=document.getElementById("petRestart"); if(pr) pr.onclick=()=>{ const n=petName(); if(!confirm(`${n}は「殿堂」に入り、新しいたまごから育てはじめます。\n(${n}にはもどせません。記録やバッジは消えません)\nよろしいですか?`)) return; if(petRestart()){ toast(`🥚 新しいたまごがやってきました。${n}は殿堂入り!`); go("my",{keepScroll:true}); } };
   const rn=document.getElementById("petRename"); if(rn) rn.onclick=()=>{ const v=prompt("名前をつけてね(10文字まで)",petName()); if(v&&v.trim()){ petInit().name=v.trim().slice(0,10); saveMe(); go(current,{keepScroll:true}); } };
   const wq=document.getElementById("wq"); if(wq) drawWordQuiz(wq,0,[]);
 }
@@ -3120,9 +3164,14 @@ function costumeSVG(c,dy,U){ const T=`transform="translate(0 ${dy})"`; U=U||"";
     crown:`<path d="M40 48l4-18 9 10 7-14 7 14 9-10 4 18z" fill="#f5c400" stroke="#c99a00" stroke-width="2"/><circle cx="60" cy="40" r="3" fill="#e5484d"/><circle cx="47" cy="43" r="2" fill="#2563c9"/><circle cx="73" cy="43" r="2" fill="#2563c9"/>`,
     star:`<g transform="translate(74 36)"><path d="M0 -10l3 7 8 1-6 5 2 8-7-4-7 4 2-8-6-5 8-1z" fill="#ffd34d" stroke="#e0a800" stroke-width="1.5"/></g><circle cx="52" cy="40" r="2" fill="#fff6a8"/><circle cx="86" cy="30" r="1.6" fill="#fff6a8"/>`,
     ribbonbig:`<g transform="translate(60 34)"><path d="M0 0l-18-10v20zM0 0l18-10v20z" fill="#ec4899"/><circle r="5" fill="#be185d"/></g>`,
+    raincoat:`<path d="M26 60q0-34 34-36 34 2 34 36l-6 2q-4-26-28-28-24 2-28 28z" fill="#f5c400"/><path d="M34 60q26-6 52 0" fill="none" stroke="#d9a800" stroke-width="2.5"/><circle cx="60" cy="24" r="3" fill="#d9a800"/>`,
+    heartpin:`<g transform="translate(78 38)"><path d="M0 6c-8-6-10-12-5-14 3-1 5 1 5 3 0-2 2-4 5-3 5 2 3 8-5 14z" fill="#e5484d"/><circle cx="-14" cy="-2" r="2" fill="#ffb3c6"/></g>`,
     traveler:`<path d="M30 50q30-14 60 0l-4 5q-26-10-52 0z" fill="#f0e6d2" stroke="#c9b58f" stroke-width="1.5"/><path d="M40 50q0-20 20-20t20 20z" fill="#f7efdd" stroke="#c9b58f" stroke-width="1.5"/><rect x="40" y="43" width="40" height="6" fill="#2f9e6b"/><g transform="translate(76 26) rotate(12)"><path d="M0 -9l2 6 6 1-5 4 2 6-5-3-5 3 2-6-5-4 6-1z" fill="#ffd34d"/></g>`
   }[c]||"";
   const item={
+    lifevest:`<path d="M34 70q26-10 52 0v22q-26 10-52 0z" fill="#f97316"/><path d="M60 68v26M40 76h40M40 86h40" stroke="#fff" stroke-width="2.5" opacity=".9"/><rect x="54" y="72" width="12" height="18" rx="2" fill="#f97316" stroke="#fff" stroke-width="2"/>`,
+    randoseru:`<path d="M44 62q-10 2-12 14M76 62q10 2 12 14" fill="none" stroke="#b91c1c" stroke-width="5" stroke-linecap="round"/><g transform="translate(92 78)"><rect x="-4" y="-10" width="18" height="26" rx="3" fill="#dc2626"/><rect x="-4" y="-10" width="18" height="9" rx="3" fill="#b91c1c"/><rect x="1" y="2" width="8" height="4" rx="1" fill="#fbbf24"/></g>`,
+    medal:`<path d="M48 88q12 8 24 0" fill="none" stroke="#2563c9" stroke-width="4"/><circle cx="60" cy="96" r="9" fill="#f5c400" stroke="#c99a00" stroke-width="2"/><text x="60" y="100" text-anchor="middle" font-size="10" fill="#8a6500">1</text>`,
     traveler:`<g transform="translate(88 82)"><rect x="-13" y="-8" width="26" height="18" rx="3" fill="#2b2b2b"/><rect x="-6" y="-12" width="12" height="5" rx="1" fill="#444"/><circle r="6" fill="#111" stroke="#9ca3af" stroke-width="2"/><circle r="2.5" fill="#60a5fa"/><circle cx="9" cy="-4" r="1.5" fill="#f59e0b"/></g>`,
     detective:`<g transform="translate(86 78) rotate(-20)"><circle r="11" fill="rgba(200,230,255,.55)" stroke="#5b4630" stroke-width="3.5"/><rect x="-2.5" y="10" width="5" height="16" rx="2" fill="#5b4630"/><path d="M-5 -5q3-3 7-2" stroke="#fff" stroke-width="2" fill="none"/></g>`,
     newsboy:`<g transform="translate(84 80) rotate(-15)"><rect width="22" height="16" rx="1" fill="#f4f1e8" stroke="#999"/><path d="M3 4h16M3 8h10M3 12h14" stroke="#777" stroke-width="1.4"/></g>`,
@@ -3675,6 +3724,10 @@ function funGrid(){ const L=FUN.filter(f=>(FUN_SET[f[0]]||FUN_ALWAYS.includes(f[
     ${hid?`<button class="fchip" id="funMore" data-hid="${hid}" aria-expanded="${funOpen?"true":"false"}" style="margin-top:8px">${funOpen?"▲ とじる":`… ほか ${hid}こ を見る`}</button>`:""}</section>`; }
 // ===== お知らせ(新しくなったところ)。機能を足したら、いちばん上に1つ足す =====
 const UPDATES=[
+  {id:"2026-10-22b",d:"2026-10-22",t:"🥚 ペットが6種類に・服が5つ増えた・名人のあと",L:[
+    "たまごから生まれる子が6種類になりました(よむまる・みけまる・けろまる・ももまる・ぺんまる・こんまる)。どの子かは たまごのときに決まります。今までの子はそのまま",
+    "👕 着せかえに5つ追加: レインコート(雨雲レーダーを開く)・救命どうい(にげる場所を見る)・ハートのかみかざり(好きなことを5こ)・ランドセル(7日つづける)・金メダル(名人まで育てる)",
+    "🎓 ニュース名人になったら「このまま育てる」か「新しいたまごから育てる」を選べます。前の子は 🏆 殿堂に残ります"]},
   {id:"2026-10-22a",d:"2026-10-22",t:"📂 開いたときは、たたんだ形に",L:[
     "「⚠️ 気をつけること」や天気の「くわしく」、解説の「よくある疑問」、使い方などは、はじめは閉じた形にしました。見たいときに押すと開きます"]},
   {id:"2026-10-21q",d:"2026-10-21",t:"🧹「きょう」を短く・おすすめのボタンを整理",L:[
@@ -4495,7 +4548,7 @@ function bmSide(){ const el=document.getElementById("bmSide"); if(!el) return; e
   if(RADAR.layer==="rain"&&!RADAR.frames.length){ const lab=document.getElementById("rdLabel"); if(lab&&RADAR.loaded) lab.textContent="いま読みこめませんでした。「↻ 新しくする」を押してください。"; }
   sh.querySelectorAll("[data-shk]").forEach(b=>b.onclick=async()=>{ RADAR.shel=b.dataset.shk; await bmRefresh(); }); }
 async function bmRefresh(){ rdStopPlay(); if(RADAR.layer==="shelter"){ bmSide(); await loadShelters(); } rdDraw(); bmSide(); }
-async function openBMap(layer){ const sh=document.getElementById("sheet"); rdStopPlay(); if(layer) RADAR.layer=layer;
+async function openBMap(layer){ const sh=document.getElementById("sheet"); rdStopPlay(); if(layer) RADAR.layer=layer; petFlag(RADAR.layer==="shelter"?"shelter":"radar");
   if(RADAR.layer==="shelter"&&RADAR.lv<3) RADAR.lv=3;
   sh.innerHTML=`<div class="bar"><div class="wrap"><button class="iconbtn" id="rdx" aria-label="もどる">← もどる</button><span class="ttl">🗺️ 防災マップ</span><button class="iconbtn" id="rdr" aria-label="新しくする" style="margin-left:auto;width:auto;padding:0 10px">↻ 新しくする</button></div></div><div class="wrap body">
     <div class="bm-layers" role="group" aria-label="地図に重ねるもの">${Object.entries(BM_LAYERS).map(([k,v])=>`<button class="fchip" data-bml="${k}" aria-pressed="${RADAR.layer===k}">${v.n}</button>`).join("")}</div>
@@ -4510,7 +4563,7 @@ async function openBMap(layer){ const sh=document.getElementById("sheet"); rdSto
   const close=()=>{ rdStopPlay(); sh.hidden=true; sh.innerHTML=""; document.body.style.overflow=""; };
   sh.querySelector("#rdx").onclick=close; sh.querySelector("#rdx2").onclick=close;
   sh.querySelector("#rdr").onclick=()=>{ RADAR.frames=[]; RADAR.loaded=false; SHEL_CACHE.clear(); openBMap(); };
-  sh.querySelectorAll("[data-bml]").forEach(b=>b.onclick=()=>{ RADAR.layer=b.dataset.bml; sh.querySelectorAll("[data-bml]").forEach(x=>x.setAttribute("aria-pressed",x===b));
+  sh.querySelectorAll("[data-bml]").forEach(b=>b.onclick=()=>{ RADAR.layer=b.dataset.bml; petFlag(RADAR.layer==="shelter"?"shelter":"radar"); sh.querySelectorAll("[data-bml]").forEach(x=>x.setAttribute("aria-pressed",x===b));
     if(RADAR.layer==="shelter"&&RADAR.lv<3){ RADAR.lv=3; sh.querySelectorAll("[data-rdlv]").forEach(x=>x.setAttribute("aria-pressed",+x.dataset.rdlv===3)); } bmRefresh(); });
   sh.querySelectorAll("[data-rdlv]").forEach(b=>b.onclick=()=>{ RADAR.lv=+b.dataset.rdlv; if(RADAR.lv===0) RADAR.center=null; sh.querySelectorAll("[data-rdlv]").forEach(x=>x.setAttribute("aria-pressed",x===b)); bmRefresh(); });
   sh.querySelector("#bmGeo").onclick=()=>{ const g=sh.querySelector("#bmGeo"); if(!navigator.geolocation){ toast("このスマホでは場所がわかりませんでした"); return; } g.textContent="📍 さがしています…";
@@ -4558,6 +4611,8 @@ document.addEventListener("click",ev=>{ const x=ev.target.closest("[data-alx]");
   const q=ev.target.closest("[data-quake]"); if(q){ openQuake(); } });
 document.addEventListener("keydown",ev=>{ if((ev.key==="Enter"||ev.key===" ")&&ev.target.matches&&ev.target.matches(".al-band[data-quake]")){ ev.preventDefault(); openQuake(); } });
 try{ loadAlerts(); setInterval(()=>{ if(document.visibilityState==="visible") loadAlerts(); },3*60*1000); document.addEventListener("visibilitychange",()=>{ if(document.visibilityState==="visible") loadAlerts(); }); }catch(_){}
+// テスト用の手がかり(localhost で動かしたときだけ。本番では出さない)
+if(/^(localhost|127\.0\.0\.1)$/.test(location.hostname)) window.NW_TEST={petSVG,PET_KINDS,WEAR,petStage,petXP,petKind,petHall,petName,petRestart,get ME(){return ME;},get LOOK(){return LOOK;},TOPIC_GROUPS,FUN,SECS};
 const h=(location.hash||"").slice(1);
 if(h==="quake"){ go("today"); setTimeout(openQuake,50); } else if(D.explainers[h]){ go("explain"); openEx(h); }
 else if(h.startsWith("t=")) openTHash(h);

@@ -39,6 +39,8 @@
 - 記録の引っこし(マイ→設定、`backupHTML`・`bakMake`・`bakParse`): `nw-` で始まるキーを全部まとめてファイル(JSON)かコード(`NWK1:`+base64)にする。読み込む前の記録は `nwbak-prev` に残し、もどせる。最後に保存した日は `nw-bak-at`(30日たつと設定タブに赤い点)。サーバーには送らない。新しく localStorage のキーを足すときは `nw-` で始めると自動で引っこしに入る。
 - ☁️ Googleドライブに自動保存(`gdHTML`・`gdUpload`・`gdDirty`): 見る人がGoogleでログインしたときだけ、その人**自身の**Googleドライブの appDataFolder に `mainichi-kiroku.json`(`bakMake` の中身)を保存する。持ち主のサーバーには何も送らない。権限は `drive.appdata` だけ。ログイン部品 accounts.google.com/gsi/client は押したときだけ読む。クライアントIDは `GD_CLIENT`(Google Cloud のプロジェクト mainichi-news、持ち主のアカウント)。トークンは `gdrv-tok`(引っこしに入れない)、オン/最後の保存は `nw-gd`。`store.set` で `nw-` が変わると15秒後と画面を閉じたときに保存。ログインが切れたら上に「☁️ 自動保存を続ける」(`#gdBar`)。sw.js はGoogleへの通信を保存しない。
 - 例外: 閲覧数の集計(index.html の `STATS`)。2026-10-20 からオン(GoatCounter、code は `subikep22`、管理画面 https://subikep22.goatcounter.com、スクリプトは gc.zgo.at)。送るのは画面・解説・ジャンルごとの回数だけ(`track()`)。質問文・メモ・記録は送らない。オンにするときは使い方の「記録について」に自動で一文が出る。
+- 🥚 ペットの種類 `PET_KINDS`(maru よむまる・neko みけまる・kaeru けろまる・usagi ももまる・pengin ぺんまる・kitsune こんまる)。`ME.pet.kind` は たまごのときに決まり(前から育てている人=ごはんをあげた・2日以上開いた人は maru)、途中では変えない。絵は `petSVG(stage,mood,acc,size,costume,kind)` で、種類の部品は `petKindParts`(体の前=耳、体の後=しっぽ・くちばし)。名前の既定は種類ごと。
+- 🎓 名人(段階5)になると `petBig` に「このまま育てる(`ME.pet.stay`)/新しいたまごから育てる(`petRestart`)」。新しくすると前の子は `ME.pet.hall`(殿堂・名前/種類/服/日付/代)に入り、`ME.pet.base` に今の記録を覚えて そだちを0から数え直す(`petXP` が引く)。種類は前と違うものから選ぶ。服の王冠・金メダルは殿堂があれば着られる。
 - ペット(`ME.pet`): 育ち(そだち)は ごはん×5+開いた日×2+読んだ解説×3+調べたことば で計算。クイズの正解1問=ごはん1こ(1日8こまで、同じ問題は1回だけ)。小物は `PET_ACC`(よく読むジャンル)、段階は `PET_STAGES`。絵は自作SVG(`petSVG`)。おかわりクイズは ことば辞典から毎日3問(`wordQuiz`)。
 - ペットの着せかえは `WEAR`(服・着られる条件)、部屋は `ROOM`(よく読むジャンルで家具)、日記は `diaryHTML`(直近7日)、ともだち(2匹目)は `friendOn`(おとな または 14日)。使った機能の目印は `ME.flags`。
 - 予想ノート `ME.myPred`、ことばカード `cardsHTML`(レア度 `wordRarity`)、挑戦状の点数ランキング `ME.rivals`、自分だけの新聞 `openMyPaper`(保存したニュース+メモ→画像)、横の年表(解説の `timeline`+`next`)。
@@ -209,7 +211,7 @@
 - **開け閉めできるもの(details・くわしく)は、はじめは閉じておく**(2026-10-22)。開いたままにしてよいのは、自分で押して開いたもの(`wxNotesOpen`・`LOOK.wxOpen` など)と、🆘 こまったときは の最初の「まず身を守る」だけ(大きな災害のとき、押さずに読めるように)。
 - 1回の変更は1つのことに絞る。大きな変更は、先に案を出してから作る。
 - 変更したら、スマホ幅(390px)と暗い画面で崩れていないか確かめる。
-- 大きく変えたら `tools/test/`(`crawl.js`=全ボタンを押す・`flows.js`=打ちこみや切りかえ・`zoom.js`=指での拡大縮小)も動かす。使い方は `tools/test/README.md`。
+- 大きく変えたら `tools/test/`(`crawl.js`=全ボタンを押す・`flows.js`=打ちこみや切りかえ・`zoom.js`=指での拡大縮小・`contrast.js`=読みにくい色・`health.js`=定期の不具合チェック)も動かす。使い方は `tools/test/README.md`。定期タスク「アプリの不具合チェック」(火・金の朝)が `health.js` などを動かして結果を知らせる。アプリは localhost のときだけ `window.NW_TEST` を出す(テストの手がかり。本番では出ない)。
 - SVGの中の `id`(グラデーションなど)は、1ページに同じ絵が何個も出ることを考えて、1個ごとに番号をつける(`petSVG` の `U`)。同じidが2つあると、うしろの絵が前の絵の定義を見にいってしまう。
 - SVGの `height` に `auto` は書けない(属性は長さだけ)。大きさはCSSで決める。
 - `data.js` の形(キーの名前や並び)を変えたら、`index.html` の読み込み側もあわせて直す。
