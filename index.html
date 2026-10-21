@@ -635,6 +635,19 @@ details.faq p{margin:10px 0 12px}
 .bm-kind{margin:10px 0 4px}
 .bm-list{margin:0;padding-left:1.6em;display:flex;flex-direction:column;gap:6px}
 .bm-list small{display:block;color:var(--muted);font-size:.85rem}
+
+/* 💗 好きなこと */
+.tp-gh{margin:16px 0 8px;font-size:1.02rem}
+.tp-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(104px,1fr));gap:8px}
+.tp{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-height:84px;padding:10px 6px;border-radius:16px;border:2px solid var(--line);background:var(--surface);color:var(--ink);font:inherit;cursor:pointer;text-align:center}
+.tp-i{font-size:1.8rem;line-height:1} .tp-n{font-size:.88rem;font-weight:700;line-height:1.3}
+.tp[aria-pressed="true"]{border-color:#e5484d;background:color-mix(in srgb,#e5484d 12%,var(--surface))}
+.tp[aria-pressed="true"]::after{content:"💗";position:absolute;top:4px;right:6px;font-size:.9rem}
+.tp-bar{position:sticky;bottom:0;display:flex;align-items:center;justify-content:space-between;gap:10px;margin-top:16px;padding:10px 0 calc(10px + env(safe-area-inset-bottom,0px));background:var(--bg);border-top:1px solid var(--line)}
+.tp-bar .fchip{min-height:48px;font-size:1.05rem;padding:0 22px}
+.tp-open{display:flex;align-items:center;gap:10px;width:100%;text-align:left;font:inherit;color:var(--ink);background:var(--bg);border:2px dashed var(--line);border-radius:14px;padding:10px 12px;margin-bottom:10px;cursor:pointer}
+.tp-open>span:first-child{font-size:1.5rem} .tp-open small{display:block;color:var(--muted);font-size:.85rem;margin-top:2px} .tp-open>span:nth-child(2){flex:1}
+.chip.tpchip{background:color-mix(in srgb,#e5484d 14%,var(--surface));color:var(--ink)}
 .pop b{font-size:1.05rem}
 /* かんたんモード: 押すところは44px以上(指が太くても押しやすく) */
 :root[data-mode="easy"] .fchip,:root[data-mode="easy"] .iconbtn,:root[data-mode="easy"] .seg button{min-height:44px}
@@ -1440,7 +1453,7 @@ function bindKw(){ const card=document.querySelector(".kw"); if(!card) return; c
 // ===== 🎁 ジャンル別おすすめ。picks.js(週2回、自動で作り直す)から、関心のあるジャンルの分を出す =====
 const PK=window.NEWS_PICKS||null;
 function pickGenres(){ if(!PK||!PK.g) return []; const has=Object.keys(PK.g).filter(g=>(PK.g[g].items||[]).length);
-  const picked=GORDER.filter(g=>ME.interests[g]); const base=picked.length?picked:GORDER.filter(g=>interestScore(g)>0);
+  const picked=GORDER.filter(g=>ME.interests[g]||topicGenres().includes(g)); const base=picked.length?picked:GORDER.filter(g=>interestScore(g)>0);
   const mine=base.slice().sort((a,b)=>interestScore(b)-interestScore(a));
   return mine; }
 function picksCard(){ if(!PK||!PK.g) return ""; const all=GORDER.slice();
@@ -2503,9 +2516,98 @@ const NEW_KEYS = new Set(FIRST_VISIT?[]:NEWS.filter(n=>!PREV_SEEN.has(nkey(n))).
 ME.seen = NEWS.map(nkey).slice(0,800); saveMe();
 const isNew = n => NEW_KEYS.has(nkey(n));
 // 関心(自分で選んだもの+読んだものから少しずつ学ぶ)
+// ===== 💗 好きなこと(こまかい興味。Pinterest のように たくさんの中から選ぶ) =====
+// 13のジャンルはニュースの分け方のまま。その下に「好きなこと」を置き、見出しとテーマのことばで当てはめる(ME.topics)。
+// [キー, 絵文字, 名前, 親のジャンル, 見出しで探すことば(正規表現)]
+const TOPIC_GROUPS=[
+ ["くらし・お金",[
+  ["money","💴","お金・家計","eco","家計|物価|値上げ|値下げ|給付|減税|消費税|年金|賃金|給料|ボーナス|電気代|ローン|節約"],
+  ["invest","📈","株・投資","eco","株価|日経平均|投資|NISA|為替|円安|円高|金利|ビットコイン|暗号資産|株主"],
+  ["work","💼","仕事・働き方","eco","雇用|働き方|就職|転職|求人|賃上げ|残業|リモート|副業|最低賃金|採用|春闘"],
+  ["kids","👶","子育て・家族","life","子育て|保育|育休|出産|子ども|こども|少子化|家族"],
+  ["school","🎓","学校・受験","soc","学校|受験|入試|大学|高校|教育|教員|授業|部活|共通テスト"],
+  ["health","🩺","健康・医療","sci","病院|医療|病気|感染|ワクチン|インフル|コロナ|健康|治療|熱中症|花粉|がん検診|医師"],
+  ["care","🧓","介護・シニア","soc","介護|高齢者|認知症|シニア|老後|年金"],
+  ["welfare","♿","福祉・バリアフリー","soc","バリアフリー|障害|障がい|車いす|車椅子|福祉|パラ|ユニバーサル|手話|アクセシビリティ"],
+  ["bosai","🧯","防災・天気","soc","地震|台風|大雨|豪雨|津波|噴火|防災|避難|気象庁|猛暑|大雪|真夏日|線状降水帯"],
+  ["safety","🚨","事件・安全","soc","事件|逮捕|詐欺|事故|火災|強盗|容疑|警察|裁判"],
+  ["tips","💡","くらしの制度・手続き","life","制度|手続き|マイナ|保険証|補助金|申請|改正|始まる|変わる"]]],
+ ["食・住まい・おしゃれ",[
+  ["cook","🍳","料理・レシピ","food","レシピ|料理|献立|弁当|調理|作り置き"],
+  ["sweets","🍰","スイーツ・カフェ","food","スイーツ|ケーキ|チョコ|アイス|カフェ|コーヒー|パン|和菓子|新作"],
+  ["gourmet","🍜","グルメ・食べ物","food","ラーメン|すし|寿司|グルメ|外食|コンビニ|牛丼|食品|コメ|食料品|ハンバーガー"],
+  ["interior","🛋️","インテリア・住まい","home","インテリア|家具|住宅|マンション|家賃|リフォーム|DIY|収納|引っ越し|空き家"],
+  ["garden","🌱","植物・ガーデニング","home","植物|園芸|ガーデニング|花壇|紅葉|桜|庭|家庭菜園"],
+  ["pet","🐾","動物・ペット","life","犬|猫|ペット|動物|パンダ|動物園|水族館|クマ|野鳥"],
+  ["fashion","👗","ファッション","fas","ファッション|コーデ|ブランド|スニーカー|ユニクロ|コレクション|洋服|着物"],
+  ["beauty","💄","美容・コスメ","fas","美容|コスメ|化粧|スキンケア|ヘア|メイク|日焼け止め"]]],
+ ["趣味・エンタメ",[
+  ["anime","📺","アニメ","ent","アニメ|声優|ジブリ|劇場版"],
+  ["manga","📚","マンガ","ent","マンガ|漫画|コミック|ジャンプ|連載"],
+  ["book","📖","本・小説","ent","小説|書店|本屋|文学|芥川|直木|作家|ベストセラー|出版|絵本"],
+  ["movie","🎬","映画","ent","映画|劇場|興行|監督|アカデミー賞|カンヌ|ロードショー"],
+  ["drama","📡","ドラマ・テレビ","ent","ドラマ|テレビ|番組|朝ドラ|大河|配信|Netflix|ネットフリックス"],
+  ["game","🎮","ゲーム","ent","ゲーム|任天堂|Switch|スイッチ2|プレステ|PlayStation|eスポーツ|ポケモン"],
+  ["music","🎵","音楽","ent","音楽|歌手|ライブ|コンサート|アルバム|紅白|バンド|K-POP|ピアノ|オーケストラ|ヒット曲"],
+  ["idol","🎤","芸能・アイドル","ent","アイドル|芸能|タレント|俳優|女優|お笑い|芸人"],
+  ["art","🎨","アート・デザイン","ent","美術|アート|展覧会|美術館|デザイン|博物館|絵画|写真展"],
+  ["history","🏯","歴史・伝統","ent","歴史|文化財|世界遺産|城|古墳|伝統|祭り|遺跡|国宝"],
+  ["photo","📷","写真・カメラ","it","写真|カメラ|撮影"],
+  ["arch","🏗️","建築・まちづくり","home","建築|再開発|タワー|まちづくり|万博|設計|新駅|商業施設"]]],
+ ["おでかけ・のりもの",[
+  ["travel","✈️","旅行・観光","trip","旅行|観光|ホテル|温泉|訪日|インバウンド|旅館|ツアー|連休"],
+  ["outdoor","🏕️","アウトドア・登山","trip","登山|キャンプ|アウトドア|釣り|ハイキング|山岳"],
+  ["train","🚃","鉄道・飛行機","trip","鉄道|新幹線|JR|電車|運休|ダイヤ|飛行機|空港|航空|バス"],
+  ["car","🚗","車・バイク","it","自動車|乗用車|新車|EV|電気自動車|バイク|トヨタ|ホンダ|日産|スバル|マツダ|運転|免許"]]],
+ ["スポーツ",[
+  ["baseball","⚾","野球","spo","野球|プロ野球|大リーグ|MLB|甲子園|大谷|日本シリーズ|ドジャース|ワールドシリーズ|ドラフト"],
+  ["soccer","⚽","サッカー","spo","サッカー|Jリーグ|J1|W杯|ワールドカップ|なでしこ|プレミアリーグ|チャンピオンズリーグ|三笘|久保建英"],
+  ["basket","🏀","バスケ","spo","バスケ|NBA|Bリーグ|八村|河村"],
+  ["racket","🎾","テニス・ゴルフ","spo","テニス|ゴルフ|ウィンブルドン|全米オープン|全豪|全仏|錦織|大坂なおみ|松山英樹|マスターズ"],
+  ["fight","🤼","相撲・格闘技","spo","相撲|大相撲|横綱|大関|ボクシング|柔道|レスリング|格闘|井上尚弥"],
+  ["winter","⛷️","スキー・冬のスポーツ","spo","スキー|スノーボード|フィギュア|スケート|カーリング|冬季"],
+  ["run","🏃","陸上・マラソン","spo","マラソン|陸上|駅伝|箱根|ランニング|五輪|オリンピック|パラリンピック"],
+  ["motor","🏎️","F1・レース","spo","F1|モータースポーツ|角田|インディ|ル・マン"],
+  ["rugby","🏉","ラグビー・バレー","spo","ラグビー|バレーボール|バレー|ハンドボール"]]],
+ ["科学・テクノロジー",[
+  ["ai","🤖","AI(人工知能)","it","(?<![A-Za-z])AI(?![A-Za-z])|人工知能|生成|ChatGPT|Claude|Gemini|ロボット"],
+  ["cyber","🔒","サイバー・ネットの安全","it","サイバー|ハッカー|不正アクセス|情報漏|漏えい|ランサム|フィッシング|セキュリティ|なりすまし"],
+  ["gadget","📱","スマホ・ガジェット","it","スマホ|iPhone|Android|アンドロイド|アプリ|パソコン|タブレット|ガジェット|Apple|グーグル"],
+  ["space","🚀","宇宙","sci","宇宙|ロケット|JAXA|NASA|衛星|月面|月探査|火星|流星|天体|H3|皆既"],
+  ["eco_env","🌍","環境・気候","sci","環境|気候|温暖化|脱炭素|CO2|再エネ|太陽光|プラスチック|生物多様性"],
+  ["research","🔬","研究・発明","sci","研究|発見|発明|ノーベル|新技術|実験|開発に成功"],
+  ["energy","⚡","エネルギー・資源","eco","原油|石油|天然ガス|LNG|電力|原発|エネルギー|ガソリン|レアアース"]]],
+ ["政治・世界",[
+  ["politics","🏛️","政治・選挙","pol","首相|国会|選挙|内閣|政党|自民|立憲|維新|公明|法案|大臣|知事|衆院|参院"],
+  ["usa","🇺🇸","アメリカ","intl","アメリカ|米国|米政府|米大統領|トランプ|ホワイトハウス|日米|訪米"],
+  ["asia","🌏","アジア(中国・韓国など)","intl","中国|韓国|北朝鮮|台湾|インド|ASEAN|東南アジア|日中|日韓"],
+  ["europe","🇪🇺","ヨーロッパ・ロシア","intl","欧州|EU|イギリス|英国|フランス|ドイツ|ロシア|ウクライナ|NATO"],
+  ["mideast","🕌","中東","intl","中東|イスラエル|イラン|ガザ|サウジ|イエメン|パレスチナ|ホルムズ"],
+  ["defense","🛡️","安全保障・平和","intl","防衛|安全保障|自衛隊|ミサイル|核兵器|停戦|平和|紛争"],
+  ["trade","🚢","貿易・世界の経済","eco","関税|貿易|輸出|輸入|サプライチェーン|G7|G20|WTO|IMF"]]]];
+const TOPICS=TOPIC_GROUPS.flatMap(g=>g[1]); const TOPIC=Object.fromEntries(TOPICS.map(t=>[t[0],t]));
+const TOPIC_RE={}; TOPICS.forEach(t=>{ try{ TOPIC_RE[t[0]]=new RegExp(t[4]); }catch(_){} });
+function myTopics(){ ME.topics=ME.topics||{}; return Object.keys(ME.topics).filter(k=>ME.topics[k]&&TOPIC[k]); }
+function topicHit(n){ const L=myTopics(); if(!L.length) return null; /* テーマ(th)は「サイバー・AI」のように広いので使わない */ const txt=(n.h||n.title||"")+" "+(n.text||""); return L.find(k=>TOPIC_RE[k]&&TOPIC_RE[k].test(txt))||null; }
+function topicChip(n){ const k=topicHit(n); return k?`<span class="chip tpchip">💗 ${esc(TOPIC[k][2])}</span>`:""; }
+function topicGenres(){ return [...new Set(myTopics().map(k=>TOPIC[k][3]))]; }
+function openTopics(){ const sh=document.getElementById("sheet"); ME.topics=ME.topics||{}; const sel=Object.assign({},ME.topics);
+  const cnt=()=>Object.values(sel).filter(Boolean).length;
+  sh.innerHTML=`<div class="bar"><div class="wrap"><button class="iconbtn" id="tpx" aria-label="もどる">← もどる</button><span class="ttl">💗 好きなことを選ぶ</span></div></div><div class="wrap body">
+    <p class="obp" style="margin-top:0">好きなことを、いくつでも押してください。<b>押すと💗がつきます</b>。もう一度押すと外れます。</p>
+    <p class="hint" style="margin-top:-4px">選んだことに関係するニュースが「🎯 あなた向け」に先に並び、💗の札がつきます。記録はこのスマホの中だけです。</p>
+    ${TOPIC_GROUPS.map(([gn,L])=>`<h3 class="tp-gh">${esc(gn)}</h3><div class="tp-grid">${L.map(t=>`<button class="tp" data-tp="${t[0]}" aria-pressed="${!!sel[t[0]]}"><span class="tp-i" aria-hidden="true">${t[1]}</span><span class="tp-n">${esc(t[2])}</span></button>`).join("")}</div>`).join("")}
+    <div class="tp-bar"><span id="tpCnt">${cnt()}こ 選んでいます</span><button class="fchip pet-feed" id="tpSave">これで決める</button></div></div>`;
+  sh.hidden=false; sh.scrollTop=0; document.body.style.overflow="hidden";
+  const close=()=>{ sh.hidden=true; sh.innerHTML=""; document.body.style.overflow=""; };
+  sh.querySelector("#tpx").onclick=()=>{ if(JSON.stringify(sel)!==JSON.stringify(ME.topics)&&cnt()){ ME.topics=sel; saveMe(); toast(`💗 好きなことを ${cnt()}こ 覚えました`); } close(); go(current||"today",{keepScroll:true}); };
+  sh.querySelectorAll("[data-tp]").forEach(b=>b.onclick=()=>{ const k=b.dataset.tp; sel[k]=!sel[k]; if(!sel[k]) delete sel[k]; b.setAttribute("aria-pressed",String(!!sel[k])); sh.querySelector("#tpCnt").textContent=`${cnt()}こ 選んでいます`; });
+  sh.querySelector("#tpSave").onclick=()=>{ ME.topics=sel; saveMe(); const n=cnt(); close(); toast(n?`💗 好きなことを ${n}こ 覚えました。「🎯 あなた向け」に出します`:"好きなことを外しました"); go(current||"today",{keepScroll:true}); };
+  track("/topics","好きなことを選ぶ"); }
+document.addEventListener("click",ev=>{ if(ev.target.closest("[data-topics]")){ ev.preventDefault(); ev.stopPropagation(); openTopics(); } },true);
 function interestScore(g){ return (ME.interests[g]?5:0) + Math.min(4,(ME.auto[g]||0)/2); }
 function learn(g,w){ if(!g) return; ME.auto[g]=(ME.auto[g]||0)+(w||1); saveMe(); }
-function hasInterests(){ return Object.values(ME.interests).some(Boolean); }
+function hasInterests(){ return Object.values(ME.interests).some(Boolean)||myTopics().length>0; }
 // 予想ゲームの採点
 function voteResults(){ let win=0, lose=0, half=0, open=0; const settled=[];
   Object.entries(ME.votes).forEach(([no,v])=>{ const p=PRED.find(x=>x.no===no); if(!p) return; if(p.r==="wait"){ open++; return; }
@@ -2595,17 +2697,18 @@ function personalCards(){
 
   return out.join("");
 }
-function intPickHTML(){ if(hasInterests()||store.get("nw-int-hide")==="1") return ""; return `<section class="card" aria-label="関心を選ぶ"><b>🎯 気になるジャンルを選んでください</b><p class="hint" style="margin:4px 0 10px">選ぶと「あなた向け」に並びます。読んだ解説からも少しずつ学びます。記録はこのスマホの中だけに残ります。</p><div class="chips" id="intPick">${GORDER.map(g=>`<button class="fchip" data-g="${g}" aria-pressed="false"><span class="c" style="background:var(--g-${g})"></span>${GN[g]}</button>`).join("")}</div><div style="display:flex;gap:8px;margin-top:10px"><button class="fchip" id="intSave" style="background:var(--accent-btn,var(--accent));color:var(--on-accent);border-color:var(--accent-btn,var(--accent))">決める</button><button class="fchip" id="intLater">あとで</button></div></section>`; }
+function intPickHTML(){ if(hasInterests()||store.get("nw-int-hide")==="1") return ""; return `<section class="card" aria-label="関心を選ぶ"><b>🎯 気になるジャンルを選んでください</b><p class="hint" style="margin:4px 0 10px">選ぶと「あなた向け」に並びます。読んだ解説からも少しずつ学びます。記録はこのスマホの中だけに残ります。</p><div class="chips" id="intPick">${GORDER.map(g=>`<button class="fchip" data-g="${g}" aria-pressed="false"><span class="c" style="background:var(--g-${g})"></span>${GN[g]}</button>`).join("")}</div><div style="display:flex;gap:8px;margin-top:10px"><button class="fchip" id="intSave" style="background:var(--accent-btn,var(--accent));color:var(--on-accent);border-color:var(--accent-btn,var(--accent))">決める</button><button class="fchip" id="intLater">あとで</button></div><button class="tp-open" data-topics="1" style="margin:10px 0 0"><span aria-hidden="true">💗</span><span><b>もっとこまかく選ぶ</b><small>野球・アニメ・料理・宇宙・AI など ${TOPICS.length}こ から</small></span><span aria-hidden="true">→</span></button></section>`; }
 function forYou(){
-  const any=GORDER.some(g=>interestScore(g)>0); if(!any) return intPickHTML();
+  const any=GORDER.some(g=>interestScore(g)>0)||myTopics().length; if(!any) return intPickHTML();
   const days=[...new Set(NEWS.map(n=>n.d))].slice(0,2); const topH=new Set(D.top10.map(t=>t.title));
   const bg=t=>{ const z=String(t).replace(/[\s、。「」『』()()・!?!?:：,.\-—…]/g,""); const S2=new Set(); for(let i=0;i<z.length-1;i++) S2.add(z.slice(i,i+2)); return S2; };
   const seen=[...D.top10.map(t=>bg(t.title)),...(D.three||[]).map(t=>bg(t.title))];
   const dup=h=>{ const a=bg(h); return seen.some(b=>{ let c=0; a.forEach(x=>{ if(b.has(x)) c++; }); return c/Math.max(1,Math.min(a.size,b.size))>=0.35; }); };
-  const L=NEWS.filter(n=>days.includes(n.d) && interestScore(n.g)>0 && !topH.has(n.h) && !dup(n.h)).sort((a,b)=>interestScore(b.g)-interestScore(a.g) || b.ok-a.ok || b.d.localeCompare(a.d)).slice(0,5);
+  const sc=n=>interestScore(n.g)+(topicHit(n)?8:0);
+  const L=NEWS.filter(n=>days.includes(n.d) && sc(n)>0 && !topH.has(n.h) && !dup(n.h)).sort((a,b)=>sc(b)-sc(a) || b.ok-a.ok || b.d.localeCompare(a.d)).slice(0,6);
   if(!L.length) return "";
-  return `<section aria-label="あなた向け"><div class="sec-h"><h2>🎯 あなた向け</h2><button class="fchip" data-tab="my">関心を変える</button></div>
-    <ul class="ten fy" style="margin-top:10px">${L.map(n=>`<li>${pinBtn({k:nkey(n),h:n.h,g:n.g,d:n.d},"abs")}<div class="row"><span><span class="meta"><span class="chip ${n.g}">${GN[n.g]}</span>${isNew(n)?'<span class="chip newchip">🆕</span>':''}${n.ok?'<span class="badge-ok">✅</span>':'<span class="badge-one">⚠️ 1社</span>'}<span class="hint">${mdLabel(n.d)}</span></span><h3>${esc(n.h)}</h3></span></div></li>`).join("")}</ul></section>`;
+  return `<section aria-label="あなた向け"><div class="sec-h"><h2>🎯 あなた向け</h2><button class="fchip" data-topics="1">💗 好きなことを変える</button></div>
+    <ul class="ten fy" style="margin-top:10px">${L.map(n=>`<li>${pinBtn({k:nkey(n),h:n.h,g:n.g,d:n.d},"abs")}<div class="row"><span><span class="meta"><span class="chip ${n.g}">${GN[n.g]}</span>${topicChip(n)}${isNew(n)?'<span class="chip newchip">🆕</span>':''}${n.ok?'<span class="badge-ok">✅</span>':'<span class="badge-one">⚠️ 1社</span>'}<span class="hint">${mdLabel(n.d)}</span></span><h3>${esc(n.h)}</h3></span></div></li>`).join("")}</ul></section>`;
 }
 function bindPersonal(){
   const nb=document.getElementById("newBtn"); if(nb) nb.onclick=()=>{ sState.onlyNew=true; go("search"); };
@@ -3542,6 +3645,9 @@ function funGrid(){ const L=FUN.filter(f=>(FUN_SET[f[0]]||FUN_ALWAYS.includes(f[
     ${hid?`<button class="fchip" id="funMore" data-hid="${hid}" aria-expanded="${funOpen?"true":"false"}" style="margin-top:8px">${funOpen?"▲ とじる":`… ほか ${hid}こ を見る`}</button>`:""}</section>`; }
 // ===== お知らせ(新しくなったところ)。機能を足したら、いちばん上に1つ足す =====
 const UPDATES=[
+  {id:"2026-10-21n",d:"2026-10-21",t:"💗 好きなことを こまかく選べるように",L:[
+    "野球・アニメ・料理・宇宙・AI・ペット・鉄道・美容・中東 など、55こ の中から「好きなこと」を選べます(マイ→⚙️設定 の「気になるジャンル」、または「🎯 あなた向け」の「💗 好きなことを変える」)",
+    "選んだことに関係するニュースが「🎯 あなた向け」に先に並び、💗の札がつきます"]},
   {id:"2026-10-21m",d:"2026-10-21",t:"🗺️ 防災マップ・モードの切りかえを見やすく",L:[
     "「🛟 地震・防災」に🗺️ 防災マップ。雨雲・川があふれたら水につかる所・津波・高潮・がけ崩れの所・近くのにげる場所を、ほかのサイトに行かずにこのアプリの中で見られます。「📍 いまいる所で見る」も(場所はどこにも送りません)",
     "かんたん ⇄ ふつう を変えるときは、先に「どう変わるか」を絵で見せてから切りかえます。いつでも元にもどせて、記録は消えません"]},
@@ -3716,6 +3822,7 @@ function renderMy(){
     ${readTimeCard()}
     ${voiceCard()}
     <section class="card" id="myIntCard"><b>🎯 気になるジャンル</b><div class="hint" style="margin:4px 0 8px">押すと入ったり外れたりします。「あなた向け」と「🎁 ジャンル別おすすめ」に使います。</div>
+      <button class="tp-open" data-topics="1"><span aria-hidden="true">💗</span><span><b>好きなことを、もっとこまかく選ぶ</b><small>${myTopics().length?`いま ${myTopics().length}こ: ${esc(myTopics().slice(0,4).map(k=>TOPIC[k][2]).join("・"))}${myTopics().length>4?" など":""}`:`野球・アニメ・料理・宇宙・AI など ${TOPICS.length}こ から`}</small></span><span aria-hidden="true">→</span></button>
       <div class="chips" id="myInt">${GORDER.map(g=>`<button class="fchip" data-g="${g}" aria-pressed="${!!ME.interests[g]}"><span class="c" style="background:var(--g-${g})"></span>${GN[g]}</button>`).join("")}</div><div style="margin-top:10px">${recIntHTML()}</div></section>
     ${guideBlock()}
     <button class="fchip" id="obAgain" style="align-self:flex-start">🐣 はじめての案内をもう一度見る</button>
