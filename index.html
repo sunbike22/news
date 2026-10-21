@@ -141,7 +141,25 @@ main{padding-block:18px 32px}
 .wx-kit b{font-weight:800}
 .badge-ok.tap,.badge-one.tap{cursor:pointer;text-decoration:none;display:inline-flex;align-items:center;min-height:40px;padding:0 6px;margin:-8px 0}
 .ten.short li>button>span>p,.ten.short .srcl,.ten.short .pt,.ten.short .ill,.ten.short .enb{display:none}
-.ten.short li{padding-top:8px;padding-bottom:8px}
+/* 「短く」= 見出しの1行の表(写真・送る行は「くわしく」のときだけ)。1件 約200px → 約80px */
+.ten.short{gap:0;border:1px solid var(--line);border-radius:12px;overflow:hidden;background:var(--surface)}
+.ten.short li{border:0;border-radius:0;border-top:1px solid var(--line);background:none}
+.ten.short li:first-child{border-top:0}
+.ten.short .row{padding:8px 12px 8px 10px;gap:8px;grid-template-columns:26px 1fr!important}
+.ten.short .th,.ten.short .ten-ft{display:none!important}
+.ten.fy.short .row{grid-template-columns:1fr!important;display:block}.ten.fy.short .row p{display:none}
+.ten.short .rank{font-size:1rem}
+.ten.short .meta{margin-bottom:0;gap:6px}
+.ten.short .meta .chip{font-size:.82rem;padding:1px 7px}
+.ten.short h3{font-size:1rem;line-height:1.45}
+.ten .tl-s{display:none}.ten.short .tl-s{display:inline}.ten.short h3:has(.tl-s) .tl-long{display:none}
+.ten.short li:not(.exp) h3:not(:has(.tl-s)){display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden}
+.ten.short li.exp h3 .tl-long{display:inline}.ten.short li.exp h3 .tl-s{display:none}
+.ten h3{word-break:normal}
+.ten.short li.w2 .row{padding-top:8px;padding-bottom:8px}
+.ten.short li.big h3{font-size:1.05rem}
+.ten.short li.mytown{border-left:4px solid var(--accent)}
+.ten.short li{position:relative}.ten.short .row{padding-right:50px!important}
 .len-seg{margin-left:auto}
 .cast{list-style:none;margin:8px 0 0;padding:0;display:flex;flex-direction:column;gap:8px}
 .cast li{display:flex;gap:10px;align-items:flex-start;background:var(--surface2);border:1px solid var(--line);border-radius:12px;padding:9px 11px}
@@ -1658,7 +1676,7 @@ function renderToday(){
         return `<li class="${big?'big':''} w${wt.lv}${mine?' mytown':''}">${pinBtn({k:"t|"+n.title,h:n.title,g:n.g,d:(NEWS[0]||{}).d,ex:n.ex},"abs")}<button class="row${link?' link':''}"${n.ex?` data-ex="${n.ex}"`:''}${n.tab?` data-tab="${n.tab}"`:''} ${link?'':'tabindex="-1"'}>
           <span class="rank">${i+1}</span>
           <span>${big&&ILL[n.ill||n.ex]?`<div class="ill">${ILL[n.ill||n.ex]}</div>`:""}<span class="meta"><span class="chip ${n.g}">${GN[n.g]}</span>${topicChip(n)}${n.ok?`<span class="badge-ok tap" role="button" tabindex="0" data-trust="${esc(n.title)}" data-ok="1" title="タップで出典">✅<small style="font-size:.82rem;font-weight:700;margin-left:2px">確認ずみ</small></span>`:`<span class="badge-one tap" role="button" tabindex="0" data-trust="${esc(n.title)}" data-ok="0" title="タップでわけ">⚠️ 1社</span>`}${mine?'<span class="heat town">🏠 あなたの街</span>':""}${wt.lv>=2?`<span class="heat" title="この3日で関連ニュース${wt.n}件">🔥</span>`:""}</span>
-          ${(()=>{ const e=enOf("top10",i); if(langMode()==="en"&&e) return `<h3 lang="en">${n.icon} ${esc(e.t)}</h3>${e.x?`<p lang="en">${esc(e.x)}</p>`:""}<p class="jsub">${esc(n.title)}</p>${(e.w||[]).length?`<span class="enw">${e.w.map(([a,b])=>`<i>📘 ${esc(a)} = ${esc(b)}</i>`).join("")}</span>`:""}<span class="ensay" role="button" tabindex="0" data-say="${esc(e.t+". "+(e.x||""))}">🔊 English</span>`; return `<h3>${n.icon} ${esc(n.title)}</h3>${n.text?`<p>${esc(n.text)}</p>`:""}${enBlock(e)}`; })()}
+          ${(()=>{ const e=enOf("top10",i); if(langMode()==="en"&&e) return `<h3 lang="en">${n.icon} ${esc(e.t)}</h3>${e.x?`<p lang="en">${esc(e.x)}</p>`:""}<p class="jsub">${esc(n.title)}</p>${(e.w||[]).length?`<span class="enw">${e.w.map(([a,b])=>`<i>📘 ${esc(a)} = ${esc(b)}</i>`).join("")}</span>`:""}<span class="ensay" role="button" tabindex="0" data-say="${esc(e.t+". "+(e.x||""))}">🔊 English</span>`; return `<h3>${n.icon} <span class="tl-long">${esc(n.title)}</span>${n.s?`<span class="tl-s">${esc(n.s)}</span>`:""}</h3>${n.text?`<p>${esc(n.text)}</p>`:""}${enBlock(e)}`; })()}
           ${srcLine(n)}<span class="ten-ft">${link?`<span class="more">${n.ex?'くわしい解説 →':'グラフを見る →'}</span>`:''}<span class="sh-btn" role="button" tabindex="0" data-share="t:${i}" aria-label="このニュースを送る">📤 送る</span></span></span>${thumbHTML(n)}</button>${n.point?`<details class="pt"><summary>💭 ここがポイント</summary>${esc(n.point)}</details>`:""}</li>`;}).join("")}</ol>
       ${thumbCredit(t)}
     </section>`;
@@ -2750,7 +2768,7 @@ function forYou(){
   const L=NEWS.filter(n=>(days.includes(n.d)||(n.d>=since7&&topicHit(n))) && sc(n)>0 && !topH.has(n.h) && !dup(n.h)).sort((a,b)=>(sc(b)-sc(a)) || b.d.localeCompare(a.d) || b.ok-a.ok).slice(0,5);
   if(!L.length) return "";
   return `<section aria-label="あなた向け"><div class="sec-h"><h2>🎯 あなた向け</h2><button class="fchip" data-topics="1">💗 好きなことを変える</button></div>
-    <ul class="ten fy" style="margin-top:10px">${L.map(n=>`<li>${pinBtn({k:nkey(n),h:n.h,g:n.g,d:n.d},"abs")}<div class="row"><span><span class="meta"><span class="chip ${n.g}">${GN[n.g]}</span>${topicChip(n)}${isNew(n)?'<span class="chip newchip">🆕</span>':''}${n.ok?'<span class="badge-ok">✅</span>':'<span class="badge-one">⚠️ 1社</span>'}<span class="hint">${mdLabel(n.d)}</span></span><h3>${esc(n.h)}</h3></span></div></li>`).join("")}</ul></section>`;
+    <ul class="ten fy${(LOOK.len||"short")==="short"?" short":""}" style="margin-top:10px">${L.map(n=>`<li>${pinBtn({k:nkey(n),h:n.h,g:n.g,d:n.d},"abs")}<div class="row"><span><span class="meta"><span class="chip ${n.g}">${GN[n.g]}</span>${topicChip(n)}${isNew(n)?'<span class="chip newchip">🆕</span>':''}${n.ok?'<span class="badge-ok">✅</span>':'<span class="badge-one">⚠️ 1社</span>'}<span class="hint">${mdLabel(n.d)}</span></span><h3>${esc(n.h)}</h3></span></div></li>`).join("")}</ul></section>`;
 }
 function bindPersonal(){
   const nb=document.getElementById("newBtn"); if(nb) nb.onclick=()=>{ sState.onlyNew=true; go("search"); };
@@ -3761,6 +3779,7 @@ function funGrid(){ const L=FUN.filter(f=>(FUN_SET[f[0]]||FUN_ALWAYS.includes(f[
     ${hid?`<button class="fchip" id="funMore" data-hid="${hid}" aria-expanded="${funOpen?"true":"false"}" style="margin-top:8px">${funOpen?"▲ とじる":`… ほか ${hid}こ を見る`}</button>`:""}</section>`; }
 // ===== お知らせ(新しくなったところ)。機能を足したら、いちばん上に1つ足す =====
 const UPDATES=[
+  {id:"2026-10-22h",d:"2026-10-22",t:"📰 ニュース10がすっきり",L:["「短く」のときは、ニュース10を見出しだけの1つの表にしました。長い見出しは3行まで。押すと全部読めます。","写真と「📤 送る」は「くわしく」に切りかえると出ます。"]},
   {id:"2026-10-22g",d:"2026-10-22",t:"🧹 見やすさの直し",L:["見出しが変なところで折れないようにしました。小さすぎた文字を大きくしました。","「出す/かくす」のボタンを「✅ 出している」のように、いまの状態がわかる形にしました。","かんたんモードの解説は、大事なところだけ先に出し、残りは「📖 もっとくわしく見る」にまとめました。"]},
   {id:"2026-10-22f",d:"2026-10-22",t:"🔧 こまかい直し",L:["はじめての案内の「つぎへ」ボタンが、画面の下にかくれないようにしました。","設定の吹き出しで、いま選んでいるものが色つきでわかるようにしました。","解説の「これまでの流れ」の下にできていた空白をなくしました。地図に秋田・東北・新潟を足しました。"]},
   {id:"2026-10-22e",d:"2026-10-22",t:"🐾 くろ・こげ茶のペットを見やすく",L:["くろ と こげ茶 のペットは、目を明るい色にして表情がわかりやすくなりました。","けろまるのほっぺを、ちょうどいい大きさにしました。"]},
@@ -3871,6 +3890,7 @@ function langSeg(){ if(!EN) return ""; const m=langMode(); return `<span class="
 function sayJa(t){ try{ const s=window.speechSynthesis; if(!s) return; s.cancel(); const u=new SpeechSynthesisUtterance(t); u.lang="ja-JP"; u.rate=.95*sayRate(); s.speak(u); }catch(_){} }
 function sayEn(t){ try{ const s=window.speechSynthesis; if(!s) return; s.cancel(); const u=new SpeechSynthesisUtterance(t); u.lang="en-US"; u.rate=.9; s.speak(u); }catch(_){} }
 document.addEventListener("click",e=>{ const sj=e.target.closest("[data-sayj]"); if(sj){ e.preventDefault(); e.stopPropagation(); sayJa(sj.dataset.sayj); return; }
+  { const r=e.target.closest(".ten.short li>.row"); if(r&&!r.classList.contains("link")&&!e.target.closest("[data-trust],[data-share],[data-pin],a,details")){ r.parentElement.classList.toggle("exp"); } }
   const ln=e.target.closest("[data-len]"); if(ln){ e.preventDefault(); e.stopPropagation(); LOOK.len=ln.dataset.len; saveLook(); const ol=document.querySelector("ol.ten"); if(ol){ ol.classList.toggle("short",LOOK.len==="short"); document.querySelectorAll("[data-len]").forEach(x=>x.setAttribute("aria-pressed",String(x.dataset.len===LOOK.len))); } return; }
   const b=e.target.closest("[data-say]"); if(b){ e.preventDefault(); e.stopPropagation(); sayEn(b.dataset.say); track("/en/say","英語の読み上げ"); return; }
   const l=e.target.closest("[data-lang]"); if(l){ LOOK.lang=l.dataset.lang; saveLook(); track("/en/"+LOOK.lang,"英語"); go(current,{keepScroll:true}); } },true);
