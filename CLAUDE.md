@@ -6,6 +6,7 @@
 ## ファイル
 - `index.html` — 見た目と動き(HTML・CSS・JavaScript を1ファイルに)。外部ライブラリは Chart.js・地図用の d3/topojson(jsDelivr。どれも使うページを開いたときだけ `loadScript`/`loadChart` で読む。最初の表示を軽くするため、head で読み込まない)、Google Fonts(見出し用の Dela Gothic One だけ。本文はスマホに入っている文字)、閲覧数の GoatCounter(gc.zgo.at)だけ。データの読み込み先は、地震・警報の raw.githubusercontent.com(alerts ブランチ)と api.p2pquake.net、地域の天気の api.open-meteo.com(わたしの街が東京以外のときだけ)、ドライブ保存の accounts.google.com・www.googleapis.com(見る人がつないだときだけ)。
 - `data.js` — 中身のデータ(`window.NEWS_DATA`)。ニュースの更新では、基本的にこのファイルだけを書き換える。
+  - **`top10` の各項目には短い見出し `s` も付ける**(28字くらい・やさしい言葉・事実は `title` と同じ。「短く」の表に出る。2026-10-22〜)。長い `title` はそのまま残す。
 - `langs.js` — 🌍 ことばで世界一周のことば(`window.NEWS_LANGS`)。開いたときだけ読む。
 - `picks.js` — 🎁 ジャンル別おすすめ(`window.NEWS_PICKS = {updated,label,next,g:{ジャンル:{ttl,items:[{k,n,d,t,src}]}},t:{💗好きなことのキー:{items:[...]}}}`)。定期タスク「ジャンル別おすすめの更新(週2回)」(月・木 5:47)だけが書き換える。ent=映画・小説・マンガのイチオシ、spo=今週の大会(人気順・海外も)、sci=今週の科学・健康など13ジャンル。ひとことは40字くらい・ネタバレなし・広告の言い方をしない・出典つき。アプリは「✨ おたのしみ」の中の「🎁 ジャンル別おすすめ」に出す(`FUN`・新しい更新があると赤い点 `ME.pickSeen`)。出すのは気になるジャンル(`ME.interests`。1つも選んでいなければ よく読むジャンル)。カードの「✏️ 気になるジャンルを選ぶ」とマイ→⚙️設定で、いつでも足したり外したりできる。
 - `.github/workflows/backup.yml` — 毎週日曜 6:17 にサイト一式を GitHub の「リリース」(backup-日付)として保存。新しい8つを残す。手で動かすこともできる。元に戻すときはリリースの zip を使う。
