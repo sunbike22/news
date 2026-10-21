@@ -1,0 +1,185 @@
+=== https://api.p2pquake.net/v2/history?codes=561&limit=3
+exit 0
+HTTP/2 200 
+content-type: application/json; charset=utf-8
+access-control-allow-origin: *
+553
+[{"area":900,"code":561,"created_at":"2026/10/22 02:27:44.195","hop":2,"id":"6ad8f610c58757000704cd31","time":"2026/10/22 02:27:44.191","uid":"0066920261022022744169","ver":"20150406"},{"area":105,"code":561,"created_at":"2026/10/22 02:14:19.718","hop":6,"id":"6ad8f2ebc58757000704cd2b","time":"2026/10/22 02:14:19.710","uid":"9999920261022021419653","ver":"20150406"},{"area":416,"code":561,"created_at":"2026/10/22 01:31:25.191","hop":7,"id":"6ad8e8ddc58757000704cd1b","time":"2026/10/22 01:31:25.183","uid":"9999920261022013125100","ver":"20150406"}]
+=== https://api.p2pquake.net/v2/history?codes=9611&limit=2
+exit 0
+HTTP/2 200 
+content-type: application/json; charset=utf-8
+access-control-allow-origin: *
+533
+[{"area_confidences":{},"code":9611,"confidence":0,"count":1,"id":"6ad8f6102c4d3735f4b93fa4","started_at":"2026/10/22 02:27:44.191","time":"2026/10/22 02:27:44.379","updated_at":"2026/10/22 02:27:44.191","user-agent":"userquake-aggregator 20260612","ver":"20260612"},{"area_confidences":{},"code":9611,"confidence":0,"count":1,"id":"6ad8f2eb2c4d3735f4b93fa3","started_at":"2026/10/22 02:14:19.710","time":"2026/10/22 02:14:19.849","updated_at":"2026/10/22 02:14:19.710","user-agent":"userquake-aggregator 20260612","ver":"20260612"}]
+=== https://api.p2pquake.net/v2/history?codes=555&limit=1
+exit 0
+HTTP/2 200 
+content-type: application/json; charset=utf-8
+access-control-allow-origin: *
+2404
+[{"areas":[{"id":10,"peer":27},{"id":15,"peer":7},{"id":20,"peer":1},{"id":30,"peer":2},{"id":35,"peer":2},{"id":45,"peer":1},{"id":50,"peer":3},{"id":55,"peer":2},{"id":65,"peer":5},{"id":70,"peer":2},{"id":75,"peer":1},{"id":100,"peer":14},{"id":105,"peer":8},{"id":110,"peer":2},{"id":115,"peer":12},{"id":120,"peer":14},{"id":125,"peer":28},{"id":130,"peer":14},{"id":135,"peer":1},{"id":140,"peer":1},{"id":141,"peer":1},{"id":142,"peer":5},{"id":143,"peer":3},{"id":150,"peer":8},{"id":151,"peer":7},{"id":152,"peer":2},{"id":200,"peer":10},{"id":205,"peer":18},{"id":210,"peer":3},{"id":215,"peer":11},{"id":220,"peer":1},{"id":225,"peer":20},{"id":230,"peer":13},{"id":231,"peer":56},{"id":240,"peer":11},{"id":241,"peer":58},{"id":242,"peer":8},{"id":250,"peer":216},{"id":255,"peer":1},{"id":265,"peer":1},{"id":270,"peer":111},{"id":275,"peer":30},{"id":300,"peer":1},{"id":301,"peer":5},{"id":302,"peer":7},{"id":310,"peer":1},{"id":315,"peer":3},{"id":320,"peer":7},{"id":325,"peer":10},{"id":330,"peer":1},{"id":340,"peer":5},{"id":345,"peer":6},{"id":350,"peer":5},{"id":351,"peer":8},{"id":355,"peer":4},{"id":400,"peer":1},{"id":405,"peer":17},{"id":410,"peer":1},{"id":411,"peer":16},{"id":415,"peer":11},{"id":416,"peer":9},{"id":420,"peer":8},{"id":425,"peer":45},{"id":430,"peer":11},{"id":440,"peer":1},{"id":445,"peer":6},{"id":450,"peer":2},{"id":455,"peer":9},{"id":460,"peer":43},{"id":465,"peer":20},{"id":470,"peer":1},{"id":475,"peer":27},{"id":480,"peer":3},{"id":490,"peer":8},{"id":495,"peer":1},{"id":500,"peer":1},{"id":510,"peer":5},{"id":515,"peer":3},{"id":525,"peer":12},{"id":530,"peer":3},{"id":535,"peer":14},{"id":541,"peer":3},{"id":545,"peer":3},{"id":550,"peer":4},{"id":560,"peer":10},{"id":576,"peer":1},{"id":580,"peer":2},{"id":581,"peer":1},{"id":582,"peer":2},{"id":600,"peer":9},{"id":601,"peer":3},{"id":605,"peer":6},{"id":610,"peer":1},{"id":615,"peer":3},{"id":625,"peer":1},{"id":640,"peer":1},{"id":641,"peer":3},{"id":645,"peer":1},{"id":646,"peer":1},{"id":651,"peer":5},{"id":656,"peer":1},{"id":660,"peer":3},{"id":665,"peer":8},{"id":670,"peer":2},{"id":675,"peer":1},{"id":701,"peer":5},{"id":705,"peer":3},{"id":900,"peer":200},{"id":901,"peer":4},{"id":905,"peer":10}],"code":555,"created_at":"2026/10/22 02:44:36.738","hop":6,"id":"6ad8fa04c58757000704cd37","time":"2026/10/22 02:44:36.714","uid":"2026/10/22 02:47:38","ver":"20150406"}]
+=== https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/4.5_day.geojson
+exit 0
+HTTP/2 200 
+content-type: application/json; charset=utf-8
+access-control-allow-origin: *
+x-content-type-options: nosniff
+10733
+{"type":"FeatureCollection","metadata":{"generated":1792604786000,"url":"https://earthquake.usgs.gov/earthquakes/feed/v1.0/summary/4.5_day.geojson","title":"USGS Magnitude 4.5+ Earthquakes, Past Day","status":200,"api":"2.7.0","count":15},"features":[{"type":"Feature","properties":{"mag":4.9,"place":"208 km WNW of Port-Olry, Vanuatu","time":1792596153566,"updated":1792602042040,"tz":null,"url":"https://earthquake.usgs.gov/earthquakes/eventpage/us6000u3uk","detail":"https://earthquake.usgs.gov/earthquakes/feed/v1.0/detail/us6000u3uk.geojson","felt":null,"cdi":null,"mmi":null,"alert":null,"status":"reviewed","tsunami":0,"sig":369,"net":"us","code":"6000u3uk","ids":",us6000u3uk,","sources":",us,","types":",origin,phase-data,","nst":49,"dmin":6.466,"rms":0.96,"gap":113,"magType":"mb","type":"earthquake","title":"M 4.9 - 208 km WNW of Port-Olry, Vanuatu"},"geometry":{"type":"Point","coordinates":[165.3793,-14.1338,10]},"id":"us6000u3uk"},
+{"type":"Feature","properties":{"mag":5,"place":"194 km WNW of Port-Olry, Vanuatu","time":1792594587447,"updated":1792595835040,"tz":null,"url":"https://earthquake.usgs.gov/earthquakes/eventpage/us6000u3ue","detail":"https://earthquake.usgs.gov/earthquakes/feed/v1.0/detail/us6000u3ue.geojson","felt":null,"cdi":null,"mmi":null,"alert":null,"status":"reviewed","tsunami":0,"sig":385,"net":"us","code":"6000u3ue","ids":",us6000u3ue,","sources":",us,","types":",origin,phase-data,","nst":78,"dmin":6.521,"rms":0.79,"gap":98,"magType":"mww","type":"earthquake","title":"M 5.0 - 194 km WNW of Port-Olry, Vanuatu"},"geometry":{"type":"Point","coordinates":[165.5402,-14.105,10]},"id":"us6000u3ue"},
+{"type":"Feature","properties":{"mag":4.7,"place":"33 km NE of Shizunai-furukawachō, Japan","time":1792593650748,"updated":1792601177040,"tz":null,"url":"https://earthquake.usgs.gov/earthquakes/eventpage/us6000u3uc","detail":"https://earthquake.usgs.gov/earthquakes/feed/v1.0/detail/us6000u3uc.geojson","felt":null,"cdi":null,"mmi":null,"alert":null,"status":"reviewed","tsunami":0,"sig":340,"net":"us","code":"6000u3uc","ids":",us6000u3uc,","sources":",us,","types":",origin,phase-data,","nst":67,"dmin":0.683,"rms":0.67,"gap":71,"magType":"mb","type":"earthquake","title":"M 4.7 - 33 km NE of Shizunai-furukawachō, Japan"},"geometry":{"type":"Point","coordinates":[142.6247,42.573,94.112]},"id":"us6000u3uc"},
+{"type":"Feature","properties":{"mag":4.9,"place":"207 km WNW of Port-Olry, Vanuatu","time":1792593351111,"updated":1792600866040,"tz":null,"url
+=== https://www.gdacs.org/gdacsapi/api/events/geteventlist/MAP
+exit 0
+HTTP/1.1 400 Bad Request
+Content-Type: application/json; charset=utf-8
+Access-Control-Allow-Origin: *
+X-Content-Type-Options: nosniff
+36
+{"message":"Eventtype is required."}
+=== https://eonet.gsfc.nasa.gov/api/v3/events?status=open&days=7&limit=5
+exit 0
+HTTP/1.1 200 OK
+Access-Control-Allow-Origin: *
+Content-Type: application/rss+xml; charset=utf-8
+4232
+{
+	"title": "EONET Events",
+	"description": "Natural events from EONET.",
+	"link": "https://eonet.gsfc.nasa.gov/api/v3/events",
+	"events": [
+		{
+			"id": "EONET_25457",
+			"title": "Tropical Cyclone Agueda",
+            "description": null,
+			"link": "https://eonet.gsfc.nasa.gov/api/v3/events/EONET_25457",
+			"closed": null,
+				"categories": [
+					{
+					"id": "severeStorms",
+					"title": "Severe Storms"
+				}
+
+	    				],
+    			"sources": [
+					{
+					"id": "JTWC",
+					"url": "https://www.metoc.navy.mil/jtwc/products/sh0227.tcw"
+				}
+
+						
+			],
+					"geometry": [
+					{
+							"magnitudeValue": 35.00,
+					"magnitudeUnit": "kts",
+					"date": "2026-10-20T06:00:00Z",
+					"type": "Point", 
+							"coordinates": [ 53.8, -4.5 ]
+							},
+
+							{
+							"magnitudeValue": 40.00,
+					"magnitudeUnit": "kts",
+					"date": "2026-10-20T12:00:00Z",
+					"type": "Point", 
+							"coordinates": [ 53.3, -5 ]
+							},
+
+							{
+							"magnitudeValue": 40.00,
+					"magnitudeUnit": "kts",
+					"date": "2026-10-20T18:00:00Z",
+					"type": "Point", 
+							"coordinates": [ 52.7, -5.1 ]
+							},
+
+							{
+							"magnitudeValue": 45.00,
+					"magnitudeUnit": "kts",
+					"date": "2026-10-21T00:00:00Z",
+					"type": "Point", 
+							"coordinates": [ 52.5, -5.1 ]
+							},
+
+							{
+							"magnitudeValue": 45.00,
+					"magnitudeUnit": "kts",
+					"date": "2026-10-21T06:00:00Z",
+					"type": "Point", 
+							"coordinates": [ 52.2, -5.3 ]
+							}
+
+						
+			]
+		},
+
+			{
+			"id": "EONET_25455",
+			"title": "Prescribed Fire STE - Goodin Ridge RX, McCreary, Kentucky",
+            "description": null,
+			"link": "https://eonet.gsfc.nasa.gov/api/v3/events/EONET_25455",
+			"closed": null,
+				"categories": [
+					{
+					"id": "wildfires",
+					"title": "Wildfires"
+				}
+
+	    				],
+    			"sources": [
+					{
+					"id": "IRWIN",
+					"url": "https://irwin.doi.gov/observer/incidents/2026-KYDBF-260285"
+				}
+
+						
+			],
+					"geometry": [
+					{
+							"magnitudeValue": 2604.00,
+					"magnitudeUnit": "acres",
+					"date": "2026-10-18T08:25:00Z",
+					"type": "Point", 
+							"coordinates": [ -84.376511, 36.948746 ]
+							}
+
+						
+			]
+		},
+
+			{
+			"id": "EONET_25450",
+			"title": "Wildfire COOLEY, Mendocino, California",
+            "description": "4 Miles S from Yorkville, CA",
+			"link": "https://eonet.gsfc.nasa.gov/api/v3/events/EONET_25450",
+			"closed": null,
+				"categories": [
+					{
+					"id": "wildfires",
+					"title": "Wildfires"
+				}
+
+	    				],
+    	
+=== https://api.gdeltproject.org/api/v2/doc/doc?query=sourcelang:japanese&mode=artlist&maxrecords=3&format=json
+exit 0
+HTTP/1.1 429 Too Many Requests
+444
+Please limit requests to one every 5 seconds or contact kalev.leetaru5@gmail.com for larger queries. All high-traffic users should switch to our ngrams dataset: https://blog.gdeltproject.org/using-the-new-web-ngrams-dataset-to-find-relevant-coverage/. For trend analysis, please see our daily newsletter briefings: https://blog.gdeltproject.org/announcing-our-new-daily-todays-trends-on-capitol-hill-todays-media-trends-newsletter-briefings/.
+
+
+=== https://api.gdeltproject.org/api/v2/geo/geo?query=flood&format=geojson&timespan=24h
+exit 0
+HTTP/1.1 404 Not Found
+Content-Type: text/html; charset=iso-8859-1
+236
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
+<html><head>
+<title>404 Not Found</title>
+</head><body>
+<h1>Not Found</h1>
+<p>The requested URL was not found on this server.</p>
+</body></html>
+
