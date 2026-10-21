@@ -1576,17 +1576,28 @@ if("serviceWorker" in navigator){ window.addEventListener("load",()=>{ navigator
   navigator.serviceWorker.addEventListener("message",e=>{ if(e.data&&e.data.type==="warmed") store.set("nw-off-at",String(e.data.at)); }); }
 
 // ===== クイズ =====
+// 🔁 まちがえた問題(20問まで、同じ問題は1回)。正解したら一覧から消える。ごはんは出ない(くり返しかせぎを防ぐ)
+function quizWrongAdd(q){ ME.quizWrong=ME.quizWrong||[]; if(ME.quizWrong.some(x=>x.q===q.q)) return; ME.quizWrong.push({q:q.q,o:q.o,a:q.a,e:q.e,d:TODAY}); ME.quizWrong=ME.quizWrong.slice(-20); saveMe(); }
+function drawReview(i){ const box=document.getElementById("quiz"); if(!box) return; const W=ME.quizWrong||[];
+  if(!W.length||i>=W.length){ box.innerHTML=`<div class="qn"><span>🔁 まちがえた問題</span></div><div class="qq" style="font-size:1.1rem">${W.length?"ひととおり見ました。":"ぜんぶ正解ずみ! 🎉"}</div><button class="fchip" id="qback" style="margin-top:10px">← 今日のクイズにもどる</button>`; document.getElementById("qback").onclick=()=>{ const sc=+(store.get("nw-quiz-"+D.updated.slice(0,10))||0); drawQuiz(D.quiz.length,D.quiz.map((_,i)=>i<sc)); }; return; }
+  const q=W[i];
+  box.innerHTML=`<div class="qn"><span>🔁 まちがえた問題 ${i+1}/${W.length}</span><small class="hint">${esc(mdLabel(q.d))}の問題</small></div><div class="qq">${esc(q.q)}</div><div class="opts">${q.o.map((o,k)=>`<button class="opt" data-k="${k}">${esc(o)}</button>`).join("")}</div><div id="qexp"></div>`;
+  box.querySelectorAll(".opt").forEach(b=>b.onclick=()=>{ const k=+b.dataset.k; const ok=k===q.a;
+    box.querySelectorAll(".opt").forEach(x=>{ x.disabled=true; if(+x.dataset.k===q.a) x.classList.add("right"); }); if(!ok) b.classList.add("wrong");
+    if(ok){ ME.quizWrong=W.filter(x=>x!==q); saveMe(); }
+    document.getElementById("qexp").innerHTML=`<div class="exp"><b>${ok?"⭕ 正解! 一覧から消えました":"❌ もう一度あとで"}</b> ${esc(q.e)}</div><button class="fchip" id="qnext" style="margin-top:10px">${ok?"次へ →":"次へ →"}</button>`;
+    document.getElementById("qnext").onclick=()=>drawReview(ok?i:i+1); }); }
 function drawQuiz(i,res){
   const box=document.getElementById("quiz"); if(!box) return; const Q=D.quiz;
   const dots=`<span class="dots">${Q.map((_,k)=>`<i class="${res[k]===true?'r':res[k]===false?'w':''}${k===i?' c':''}"></i>`).join("")}</span>`;
   if(i>=Q.length){ const sc=res.filter(Boolean).length; store.set("nw-quiz-"+D.updated.slice(0,10),String(sc)); ME.quiz[D.updated.slice(0,10)]=Math.max(+ME.quiz[D.updated.slice(0,10)]||0,sc); saveMe(); checkBadges();
-    box.innerHTML=`<div class="qn"><span>🧠 今日の${Q.length}問クイズ</span>${dots}</div><div class="qq" style="font-size:1.3rem">${sc}問 正解! ${sc===Q.length?"🎉 満点":sc>0?"👏":"また明日!"}</div>${vsResult(sc)}<p class="hint" style="margin:0">答えはニュース10と解説にのっています。</p><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px"><button class="fchip" id="qvs">⚔️ ${VS?"結果を送り返す":"友だちに挑戦状を送る"}</button><button class="fchip" id="qre">もう一度</button><button class="fchip" id="qmore">📖 おかわりクイズ(マイ) →</button>${petInit().food>0?`<button class="fchip" data-feed="1">🍙 ×${petInit().food} ${esc(petName())}にあげる</button>`:""}</div>`;
-    document.getElementById("qvs").onclick=()=>sendChallenge(sc,Q.length); document.getElementById("qre").onclick=()=>drawQuiz(0,[]); document.getElementById("qmore").onclick=()=>go("my"); box.querySelectorAll("[data-feed]").forEach(b=>b.onclick=()=>petFeed(b)); return; }
+    box.innerHTML=`<div class="qn"><span>🧠 今日の${Q.length}問クイズ</span>${dots}</div><div class="qq" style="font-size:1.3rem">${sc}問 正解! ${sc===Q.length?"🎉 満点":sc>0?"👏":"また明日!"}</div>${vsResult(sc)}<p class="hint" style="margin:0">答えはニュース10と解説にのっています。</p><div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px"><button class="fchip" id="qvs">⚔️ ${VS?"結果を送り返す":"友だちに挑戦状を送る"}</button><button class="fchip" id="qre">もう一度</button>${(ME.quizWrong||[]).length?`<button class="fchip" id="qrev">🔁 まちがえた問題(${(ME.quizWrong||[]).length})</button>`:""}<button class="fchip" id="qmore">📖 おかわりクイズ(マイ) →</button>${petInit().food>0?`<button class="fchip" data-feed="1">🍙 ×${petInit().food} ${esc(petName())}にあげる</button>`:""}</div>`;
+    document.getElementById("qvs").onclick=()=>sendChallenge(sc,Q.length); document.getElementById("qre").onclick=()=>drawQuiz(0,[]); const qrv=document.getElementById("qrev"); if(qrv) qrv.onclick=()=>drawReview(0); document.getElementById("qmore").onclick=()=>go("my"); box.querySelectorAll("[data-feed]").forEach(b=>b.onclick=()=>petFeed(b)); return; }
   const q=Q[i];
   box.innerHTML=`<div class="qn"><span>🧠 今日の${Q.length}問クイズ ・ ${i+1}問目</span>${dots}</div><div class="qq">${esc(q.q)}</div><div class="opts">${q.o.map((o,k)=>`<button class="opt" data-k="${k}">${esc(o)}</button>`).join("")}</div><div id="qexp"></div>`;
   box.querySelectorAll(".opt").forEach(b=>b.onclick=()=>{ const k=+b.dataset.k; const ok=k===q.a;
     box.querySelectorAll(".opt").forEach(x=>{x.disabled=true; if(+x.dataset.k===q.a) x.classList.add("right");}); if(!ok) b.classList.add("wrong");
-    res[i]=ok; const got=ok?petEarn("q|"+TODAY+"|"+D.updated.slice(0,16)+"|"+i,1):0; document.getElementById("qexp").innerHTML=`<div class="exp"><b>${ok?"⭕ 正解!":"❌ ざんねん"}</b> ${got?`🍙 ${esc(petName())}のごはんを1つゲット! `:""}${esc(q.e)}</div><button class="fchip" id="qnext" style="margin-top:10px">${i+1<Q.length?"次の問題 →":"結果を見る →"}</button>`;
+    res[i]=ok; if(!ok) quizWrongAdd(q); const got=ok?petEarn("q|"+TODAY+"|"+D.updated.slice(0,16)+"|"+i,1):0; document.getElementById("qexp").innerHTML=`<div class="exp"><b>${ok?"⭕ 正解!":"❌ ざんねん"}</b> ${got?`🍙 ${esc(petName())}のごはんを1つゲット! `:""}${esc(q.e)}</div><button class="fchip" id="qnext" style="margin-top:10px">${i+1<Q.length?"次の問題 →":"結果を見る →"}</button>`;
     document.getElementById("qnext").onclick=()=>drawQuiz(i+1,res); });
 }
 
@@ -2280,7 +2291,18 @@ function saveMe(){ store.set("nw-me", JSON.stringify(ME)); }
 const nkey = n => (n.d+"|"+n.h).slice(0,80);
 // 訪問日と連続記録
 (function(){ if(!ME.days.includes(TODAY)){ ME.days.push(TODAY); ME.days=ME.days.slice(-400); } saveMe(); })();
-function streak(){ const set=new Set(ME.days); let c=0; let d=new Date(Date.parse(TODAY)); while(set.has(d.toISOString().slice(0,10))){ c++; d=new Date(d.getTime()-864e5); } return c; }
+// きのう開けなかった日が「おなおし」でつながったら、1回だけそっと知らせる
+setTimeout(()=>{ try{ const f=streakInfo().frozen; const y=new Date(Date.parse(TODAY)-864e5).toISOString().slice(0,10); if(f.includes(y)&&ME.frzSeen!==TODAY){ ME.frzSeen=TODAY; saveMe(); toast("🧵 きのうは開けなかったけど、週1回の「おなおし」で連続記録はつながっています"); } }catch(_){} },2500);
+// 連続日数。1日だけ開けなかった日は「おなおし」でつなぐ(7日に1回まで。ME.days だけから計算するので、記録を増やさない)
+function streakInfo(){ const set=new Set(ME.days); let c=0, frozen=[], lastFrz=null; let d=new Date(Date.parse(TODAY));
+  for(let guard=0;guard<800;guard++){ const k=d.toISOString().slice(0,10);
+    if(set.has(k)){ c++; d=new Date(d.getTime()-864e5); continue; }
+    const prev=new Date(d.getTime()-864e5).toISOString().slice(0,10);
+    const canFrz=set.has(prev)&&(lastFrz===null||(Date.parse(lastFrz)-Date.parse(k))>=7*864e5)&&k!==TODAY;
+    if(canFrz){ frozen.push(k); lastFrz=k; d=new Date(d.getTime()-864e5); continue; }
+    break; }
+  return {n:c,frozen}; }
+function streak(){ return streakInfo().n; }
 function bestStreak(){ const ds=[...ME.days].sort(); let best=0,cur=0,prev=null; ds.forEach(d=>{ cur = prev && Date.parse(d)-Date.parse(prev)===864e5 ? cur+1 : 1; best=Math.max(best,cur); prev=d; }); return best; }
 // 新着(前回見たあとに増えたニュース)
 const FIRST_VISIT = ME.seen.length===0;
