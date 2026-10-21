@@ -812,6 +812,10 @@ svg.eat{animation:petEat .7s ease both!important}
 .ensay{align-self:flex-start;display:inline-block;margin-top:4px;font-size:.82rem;font-weight:700;color:var(--accent);border:1px solid var(--accent);border-radius:999px;padding:1px 8px;cursor:pointer}
 .jsub{font-size:.86rem;color:var(--muted);margin:2px 0 0}
 [lang="en"]{font-family:"Helvetica Neue",Arial,sans-serif}
+/* 📆 今月のふりかえり */
+.m-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px}
+.m-it{display:flex;gap:8px;align-items:center;background:var(--surface2);border-radius:10px;padding:8px 10px}
+.m-it .mi{font-size:1.3rem}.m-it small{display:block;color:var(--muted);font-size:.82rem}.m-it b{font-size:1rem}
 /* 🧩 ならべかえ・解説の前後 */
 .oq-list{display:flex;flex-direction:column;gap:8px;margin-top:8px}
 .oq-it{position:relative;text-align:left;padding:10px 12px 10px 14px;border-radius:10px;border:1px solid var(--line);background:var(--surface);font-size:.95rem;line-height:1.45;cursor:pointer;color:var(--ink)}
@@ -1376,7 +1380,29 @@ function letterHTML(L){ const n=esc(petName()); const lines=[`先週は ${L.days
   if(L.g) lines.push(`きみは「${esc(GN[L.g])}」のニュースが好きみたい。今週もおもしろい話があるといいな。`);
   lines.push(L.days>=5?"今週もまってるね。":"今週は、もう少し会えたらうれしいな。");
   return `<div class="letter"><div class="lt-h">💌 ${n}より</div>${lines.map(x=>`<p>${x}</p>`).join("")}<div class="lt-f">${esc(mdLabel(L.lws))}の週の記録から</div></div>`; }
-function letterCard(){ const L=letterData(); if(!L) return ""; const wd=(new Date(Date.parse(TODAY)).getUTCDay()+6)%7; if(wd>2||ME.letterSeen===L.ws) return "";
+// ===== 📆 今月のふりかえり(月のはじめ1〜3日は先月分を「きょう」の手紙の枠に。マイ→記録ではいつでも今月分) =====
+function monthData(ym){ const inM=d=>typeof d==="string"&&d.slice(0,7)===ym;
+  const days=ME.days.filter(inM).sort(); const exs=Object.entries(ME.readEx).filter(([,d])=>inM(d)).map(([k])=>D.explainers[k]&&D.explainers[k].name).filter(Boolean);
+  const quizFull=Object.entries(ME.quiz||{}).filter(([d,v])=>inM(d)&&+v>=3).length, quizDays=Object.keys(ME.quiz||{}).filter(inM).length;
+  const langs=Object.entries(ME.langSeen||{}).filter(([,d])=>inM(d)).length; const wordsN=(ME.words||[]).length;
+  let best=0,cur=0,prev=null; days.forEach(dd=>{ cur=prev&&Date.parse(dd)-Date.parse(prev)===864e5?cur+1:1; best=Math.max(best,cur); prev=dd; });
+  const gv=ME.gv||{}; const top=Object.entries(gv).sort((a,b)=>b[1]-a[1])[0]; const T=timeGet?timeGet():{}; const mins=Math.round(Object.entries(T).filter(([d])=>inM(d)).reduce((a,[,v])=>a+v,0)/60);
+  return {ym,days:days.length,exs,quizFull,quizDays,langs,wordsN,best,top:top?GN[top[0]]:"",mins}; }
+function monthLabel(ym){ return +ym.slice(5,7)+"月"; }
+function monthCard(ym,opt){ ym=ym||TODAY.slice(0,7); const M=monthData(ym); if(!M.days) return ""; const o=opt||{};
+  const rows=[["📅","開いた日",M.days+"日"+(M.best>=3?`(最長${M.best}日連続)`:"")],["💡","読んだ解説",M.exs.length+"本"],["🧠","クイズ",M.quizDays?`${M.quizDays}日・満点${M.quizFull}回`:"—"],["🌍","おぼえた外国語",M.langs?M.langs+"語":"—"],["⏱️","読んだ時間",M.mins?`約${M.mins}分`:"—"],["📌","よく読んだジャンル",M.top||"—"]];
+  const txt=`📆 ${monthLabel(ym)}のふりかえり(まいにちニュース帳)\n`+rows.filter(r=>r[2]!=="—").map(r=>`${r[0]} ${r[1]}: ${r[2]}`).join("\n")+(M.exs.length?`\n読んだ解説: ${M.exs.slice(0,3).join("・")}`:"");
+  return `<section class="card month" aria-label="今月のふりかえり"><div class="sec-h"><h2>📆 ${esc(monthLabel(ym))}のふりかえり</h2><span class="sub">${o.prev?"先月のまとめ":"ここまで"}</span></div>
+    <div class="m-grid">${rows.map(([i,k,v])=>`<div class="m-it"><span class="mi">${i}</span><span><small>${esc(k)}</small><b>${esc(v)}</b></span></div>`).join("")}</div>
+    ${M.exs.length?`<div class="hint" style="margin-top:6px">読んだ解説: ${esc(M.exs.slice(0,4).join("・"))}${M.exs.length>4?" ほか":""}</div>`:""}
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:10px"><button class="fchip" data-mshare="${esc(txt)}">📤 ふりかえりを送る</button>${o.prev?`<button class="fchip" id="mSeen">読んだ</button>`:""}</div>
+    <div class="hint" style="margin-top:6px">数字はこのスマホの中の記録だけから作っています。</div></section>`; }
+document.addEventListener("click",async e=>{ const b=e.target.closest("[data-mshare]"); if(!b) return; const t=b.dataset.mshare;
+  try{ if(navigator.share){ await navigator.share({text:t}); return; } }catch(_){ return; }
+  try{ await navigator.clipboard.writeText(t); toast("📋 コピーしました。LINEなどにはりつけて送れます"); }catch(_){ prompt("このまま送ってね",t); } });
+function letterCard(){
+  { const day=+TODAY.slice(8,10); if(day<=3){ const pm=new Date(Date.parse(TODAY.slice(0,7)+"-01")-864e5).toISOString().slice(0,7); if(ME.monthSeen!==pm){ const mc=monthCard(pm,{prev:true}); if(mc) return mc; } } }
+  const L=letterData(); if(!L) return ""; const wd=(new Date(Date.parse(TODAY)).getUTCDay()+6)%7; if(wd>2||ME.letterSeen===L.ws) return "";
   return `<section class="card" aria-label="ペットからの手紙">${letterHTML(L)}<button class="fchip" id="ltOk" style="margin-top:8px">読んだ ✓</button></section>`; }
 function contItems(){ if(!NEW_KEYS.size) return []; const nw=NEWS.filter(n=>NEW_KEYS.has(nkey(n))); const out=[];
   kwList().forEach(w=>{ const h=nw.filter(n=>(n.h+" "+(n.th||"")).includes(w)); if(h.length) out.push({i:"🔖",t:`「${w}」の新しいニュース ${h.length}件`,q:w,h:h[0].h}); });
@@ -1397,6 +1423,7 @@ function quickCard(){ const w=D.weather; const kwN=kwList().reduce((a,k)=>a+NEWS
       <li><span>🗓️</span><b>${gl?`今週の目標は あと${gl}つ`:"今週の目標はぜんぶ達成!"}</b></li></ol></section>`; }
 function bindQuick(){ const b=document.getElementById("qkSay"); if(b) b.onclick=()=>{ if(window.speechSynthesis&&window.speechSynthesis.speaking){ stopSpeak(); b.textContent="🔊 聞く"; return; } speak([...document.querySelectorAll(".qk b")].map(x=>x.textContent).join("。")); b.textContent="■ 止める"; };
   const lo=document.getElementById("ltOk"); if(lo) lo.onclick=()=>{ const L=letterData(); if(L){ ME.letterSeen=L.ws; saveMe(); } lo.closest("section").remove(); };
+  const ms=document.getElementById("mSeen"); if(ms) ms.onclick=()=>{ const pm=new Date(Date.parse(TODAY.slice(0,7)+"-01")-864e5).toISOString().slice(0,7); ME.monthSeen=pm; saveMe(); ms.closest("section").remove(); };
   document.querySelectorAll("[data-corr]").forEach(b=>b.onclick=()=>{ const s0=(store.get("nw-corr")||"")+","+b.dataset.corr; store.set("nw-corr",s0.split(",").filter(Boolean).slice(-40).join(",")); b.closest("li").remove(); toast("✏️ 読んだことにしました"); });
   const L=contItems(); document.querySelectorAll("[data-ct]").forEach(b=>b.onclick=()=>{ const x=L[+b.dataset.ct]; if(!x) return; if(x.ex&&D.explainers[x.ex]){ openEx(x.ex); return; } sState.q=x.q||x.h.slice(0,8); sState.g.clear(); sState.th=""; sState.ok=false; sState.onlyNew=false; go("search"); }); }
 // ===== きょう =====
@@ -2569,6 +2596,7 @@ const WEAR=[
   ["detective","探偵の帽子","🧷 捜査ボードを開く",()=>!!(ME.flags||{}).board],
   ["explorer","探検帽","🌏 世界の地図を開く",()=>!!(ME.flags||{}).world],
   ["professor","角帽(かくぼう)","解説を5本読む",()=>Object.keys(ME.readEx).length>=5],
+  ["traveler","旅のぼうしとカメラ","🌍 ことばで世界一周で10語おぼえる",()=>Object.keys(ME.langSeen||{}).length>=10],
   ["banker","サンバイザー","🧮 もしも計算機を使う",()=>!!(ME.flags||{}).calc],
   ["fortune","とんがり帽子","予想を3つする",()=>Object.keys(ME.votes).length>=3],
   ["book","丸めがね","ことばを10こ調べる",()=>ME.words.length>=10],
@@ -2790,9 +2818,11 @@ function costumeSVG(c,dy,U){ const T=`transform="translate(0 ${dy})"`; U=U||"";
     kagami:`<ellipse cx="60" cy="46" rx="22" ry="8" fill="#fffaf0" stroke="#e6d9c2"/><ellipse cx="60" cy="36" rx="16" ry="7" fill="#fffaf0" stroke="#e6d9c2"/><circle cx="60" cy="27" r="6" fill="#f59e0b"/><path d="M60 21l2-3" stroke="#3f8f3a" stroke-width="2"/>`,
     crown:`<path d="M40 48l4-18 9 10 7-14 7 14 9-10 4 18z" fill="#f5c400" stroke="#c99a00" stroke-width="2"/><circle cx="60" cy="40" r="3" fill="#e5484d"/><circle cx="47" cy="43" r="2" fill="#2563c9"/><circle cx="73" cy="43" r="2" fill="#2563c9"/>`,
     star:`<g transform="translate(74 36)"><path d="M0 -10l3 7 8 1-6 5 2 8-7-4-7 4 2-8-6-5 8-1z" fill="#ffd34d" stroke="#e0a800" stroke-width="1.5"/></g><circle cx="52" cy="40" r="2" fill="#fff6a8"/><circle cx="86" cy="30" r="1.6" fill="#fff6a8"/>`,
-    ribbonbig:`<g transform="translate(60 34)"><path d="M0 0l-18-10v20zM0 0l18-10v20z" fill="#ec4899"/><circle r="5" fill="#be185d"/></g>`
+    ribbonbig:`<g transform="translate(60 34)"><path d="M0 0l-18-10v20zM0 0l18-10v20z" fill="#ec4899"/><circle r="5" fill="#be185d"/></g>`,
+    traveler:`<path d="M30 50q30-14 60 0l-4 5q-26-10-52 0z" fill="#f0e6d2" stroke="#c9b58f" stroke-width="1.5"/><path d="M40 50q0-20 20-20t20 20z" fill="#f7efdd" stroke="#c9b58f" stroke-width="1.5"/><rect x="40" y="43" width="40" height="6" fill="#2f9e6b"/><g transform="translate(76 26) rotate(12)"><path d="M0 -9l2 6 6 1-5 4 2 6-5-3-5 3 2-6-5-4 6-1z" fill="#ffd34d"/></g>`
   }[c]||"";
   const item={
+    traveler:`<g transform="translate(88 82)"><rect x="-13" y="-8" width="26" height="18" rx="3" fill="#2b2b2b"/><rect x="-6" y="-12" width="12" height="5" rx="1" fill="#444"/><circle r="6" fill="#111" stroke="#9ca3af" stroke-width="2"/><circle r="2.5" fill="#60a5fa"/><circle cx="9" cy="-4" r="1.5" fill="#f59e0b"/></g>`,
     detective:`<g transform="translate(86 78) rotate(-20)"><circle r="11" fill="rgba(200,230,255,.55)" stroke="#5b4630" stroke-width="3.5"/><rect x="-2.5" y="10" width="5" height="16" rx="2" fill="#5b4630"/><path d="M-5 -5q3-3 7-2" stroke="#fff" stroke-width="2" fill="none"/></g>`,
     newsboy:`<g transform="translate(84 80) rotate(-15)"><rect width="22" height="16" rx="1" fill="#f4f1e8" stroke="#999"/><path d="M3 4h16M3 8h10M3 12h14" stroke="#777" stroke-width="1.4"/></g>`,
     explorer:`<g transform="translate(86 82)"><circle r="10" fill="#fff" stroke="#7a5c2e" stroke-width="3"/><path d="M0 -7l3 7-3 7-3-7z" fill="#d23a3a"/></g>`,
@@ -3464,6 +3494,7 @@ function renderMy(){
       <div class="stat"><div class="v num">${vr.win}</div><div class="k">🎯 当たった予想</div></div>
     </div>
     <section class="card"><b>📅 この4週間</b><div class="cal" aria-label="開いた日">${last28.map(d=>`<i class="${ME.days.includes(d)?"on":""}${d===TODAY?" today":""}" title="${mdLabel(d)}"></i>`).join("")}</div><div class="hint">色がついた日が、開いた日です。</div></section>
+    ${monthCard()}
     ${cardsHTML()}
     ${rankHTML()}
     <section class="card"><b>🎯 わたしの予想</b><div class="hint" style="margin:4px 0 8px">当たり ${vr.win} ・ はずれ ${vr.lose} ・ 半分 ${vr.half} ・ 結果待ち ${vr.open}</div>
