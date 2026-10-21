@@ -161,6 +161,11 @@ main{padding-block:18px 32px}
 .ten.short li.mytown{border-left:4px solid var(--accent)}
 .ten.short li{position:relative}.ten.short .row{padding-right:50px!important}
 .len-seg{margin-left:auto}
+.fl-dot{fill:#e5484d;fill-opacity:.45;stroke:#b42318;stroke-width:1.2}.fl-n{font-size:11px;font-weight:800;fill:#7a1010;pointer-events:none}
+:root[data-theme="dark"] .fl-n{fill:#fff}:root[data-theme="dark"] .fl-dot{fill:#ff6b6b;fill-opacity:.6}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .fl-n{fill:#fff}:root:not([data-theme="light"]) .fl-dot{fill:#ff6b6b;fill-opacity:.6}}
+.fl-sum{margin:8px 0;padding:10px 12px;border-radius:12px;background:var(--surface2)}
+.fl-go{display:flex;flex-direction:column;align-items:flex-start;width:100%;text-align:left;white-space:normal;margin:8px 0;min-height:52px}.fl-go small{font-size:.85rem;color:var(--muted);font-weight:400}
 .fw-l{list-style:none;margin:8px 0 0;padding:0;display:flex;flex-direction:column;gap:10px}.fw-l>li{border-top:1px solid var(--line);padding-top:8px}.fw-l>li:first-child{border-top:0;padding-top:0}
 .fw-h{border:0;background:none;padding:0;font-size:1.05rem;text-align:left;cursor:pointer;color:var(--ink)}
 .fw-t{margin:6px 0 2px;line-height:1.6;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:3;overflow:hidden}.fw-l .fchip{margin-top:6px}.fw-p{margin:6px 0;line-height:1.6}.fw-tg[aria-pressed="true"]{background:var(--ok-soft);color:var(--ok)}
@@ -3858,6 +3863,7 @@ function funGrid(){ const L=FUN.filter(f=>(FUN_SET[f[0]]||FUN_ALWAYS.includes(f[
     ${hid?`<button class="fchip" id="funMore" data-hid="${hid}" aria-expanded="${funOpen?"true":"false"}" style="margin-top:8px">${funOpen?"▲ とじる":`… ほか ${hid}こ を見る`}</button>`:""}</section>`; }
 // ===== お知らせ(新しくなったところ)。機能を足したら、いちばん上に1つ足す =====
 const UPDATES=[
+  {id:"2026-10-22k",d:"2026-10-22",t:"👥 みんなの「ゆれた」マップ",L:["🛟 防災のページに、ゆれを感じた人が「ゆれた」ボタンを押した数を地図にしたページができました(P2P地震情報)。","アプリを開いている間に、急に報告が増えたらそっとお知らせします。人の報告(目安)なので、正式な震度は気象庁の発表を見てください。"]},
   {id:"2026-10-22j",d:"2026-10-22",t:"🔔 続きを追う",L:["解説のページで「🔔 続きを追う」を押すと、そのお話に続きが出た日と、山場の前の日だけ「きょう」のいちばん上でお知らせします。","追っているお話は マイ で見たり、やめたりできます。ほかのニュースは読まなくても大丈夫です。"]},
   {id:"2026-10-22i",d:"2026-10-22",t:"🎯 きょうの1問",L:["ニュース10の下に、1日1つだけの予想「きょうの1問」ができました。⭕ そうなる か ❌ ならない を押すだけ。","結果が出たら、ここでお知らせします(当たりはごはん🍙)。この7日の結果を 🟩🟥 で送れます。"]},
   {id:"2026-10-22h",d:"2026-10-22",t:"📰 ニュース10がすっきり",L:["「短く」のときは、ニュース10を見出しだけの1つの表にしました。長い見出しは3行まで。押すと全部読めます。","写真と「📤 送る」は「くわしく」に切りかえると出ます。"]},
@@ -4588,10 +4594,49 @@ function rtLater(){ clearTimeout(RT.timer); if(document.visibilityState!=="visib
 function rtStop(){ clearTimeout(RT.timer); if(RT.ws){ const w=RT.ws; RT.ws=null; w.onclose=null; try{ w.close(); }catch(_){} } RT.state="off"; rtPaint(); }
 function rtMsg(m){ if(!m||m.test) return;   // 訓練・テストの配信は出さない
   if(m.code===556){ eewShow(m); return; }
+  if(m.code===561){ feltAdd({a:m.area,t:p2pT(m.time||m.created_at)}); return; }
+  if(m.code===9611){ FELT.ev=m; feltCheck(); return; }
   if(m.code===551||m.code===552){ clearTimeout(RT.lt);
     RT.lt=setTimeout(()=>{ loadAlerts().then(()=>{ if(m.code===552){ if(AL.tsunami) toast("🌊 津波の情報が届きました(気象庁発表)"); return; }
       const q=AL.quakes[0]; if(q&&Date.now()-Date.parse(q.at)<20*60e3&&qr(q.maxi)>=qr("1")) toast(`📡 地震の情報 ${q.place} 最大震度${QN[q.maxi]||"?"}(気象庁発表)`); }).catch(()=>{}); },1500); } }
 const prefBase=p=>String(p||"").replace(/[都府県]$/,"");
+// ===== 👥 みんなの「ゆれた」(P2P地震情報 地震感知情報 561 と、その集計 9611) =====
+// 利用者が「ゆれた」ボタンを押した数を地域ごとに数えるだけ。SNSの書きこみは使わない。正式な震度は気象庁の発表
+const FELT={reps:[],ev:null,loaded:0,warned:0};
+function p2pT(s){ const t=Date.parse(String(s||"").replace(/\//g,"-").replace(" ","T").replace(/\.\d+$/,"")+"+09:00"); return isNaN(t)?Date.now():t; }
+function feltAdd(r){ if(r.a==null) return; FELT.reps.push(r); const lim=Date.now()-24*36e5; FELT.reps=FELT.reps.filter(x=>x.t>=lim).slice(-600); feltCheck(); }
+async function feltLoad(force){ if(!force&&Date.now()-FELT.loaded<60e3) return; FELT.loaded=Date.now();
+  try{ const [a,b]=await Promise.all([fetch("https://api.p2pquake.net/v2/history?codes=561&limit=100").then(r=>r.json()),fetch("https://api.p2pquake.net/v2/history?codes=9611&limit=1").then(r=>r.json())]);
+    const seen=new Set(FELT.reps.map(x=>x.t+":"+x.a)); (a||[]).forEach(m=>{ const r={a:m.area,t:p2pT(m.time||m.created_at)}; if(!seen.has(r.t+":"+r.a)) FELT.reps.push(r); });
+    FELT.reps.sort((x,y)=>x.t-y.t); if(b&&b[0]) FELT.ev=b[0]; FELT.ok=1; }catch(_){ FELT.ok=0; } }
+function feltRecent(min){ const lim=Date.now()-min*60e3; return FELT.reps.filter(x=>x.t>=lim); }
+/* 5分で10件以上、または集計の信頼度が0.5以上で、15分に1回だけそっと知らせる */
+function feltCheck(){ const r=feltRecent(5); const ev=FELT.ev; const evOk=ev&&Date.now()-p2pT(ev.updated_at||ev.time)<5*60e3&&(ev.confidence||0)>=0.5&&(ev.count||0)>=10;
+  if((r.length>=10||evOk)&&Date.now()-FELT.warned>15*60e3){ FELT.warned=Date.now(); loadP2PArea().then(()=>{ const top=feltTop(r).slice(0,2).map(x=>x[1]).join("・");
+    toast(`👥 ${top?top+" など で":""}「ゆれた」の報告が増えています(利用者の報告・目安)。正式な震度は気象庁の発表を待ってください`); }).catch(()=>{}); } }
+let P2PA=null; function loadP2PArea(){ return P2PA?Promise.resolve(P2PA):loadScript("p2parea.js?v=1").then(()=>(P2PA=window.P2P_AREA||{})); }
+function feltTop(L){ const c={}; L.forEach(x=>{ c[x.a]=(c[x.a]||0)+1; }); return Object.entries(c).map(([a,n])=>[a,(P2PA&&P2PA[a])?P2PA[a][0]:"地域不明",n]).sort((x,y)=>y[2]-x[2]); }
+async function openFelt(){ const sh=document.getElementById("sheet"); const back=sh.dataset.kind==="quake";
+  sh.innerHTML=`<div class="bar"><div class="wrap"><button class="iconbtn" id="flx" aria-label="もどる">← もどる</button><span class="ttl">👥 ゆれた報告</span><button class="iconbtn" id="flr" style="margin-left:auto;width:auto;padding:0 10px">↻ 新しくする</button></div></div><div class="wrap body" id="flBody"><div class="empty">読み込んでいます…</div></div>`;
+  sh.hidden=false; sh.scrollTop=0; document.body.style.overflow="hidden"; track("/felt","みんなのゆれた");
+  sh.querySelector("#flx").onclick=()=>{ if(back) openQuake(); else { sh.hidden=true; sh.innerHTML=""; document.body.style.overflow=""; } };
+  sh.querySelector("#flr").onclick=()=>{ feltLoad(true).then(feltDraw); };
+  await Promise.all([feltLoad(true),loadP2PArea().catch(()=>{})]); feltDraw(); }
+function feltDraw(){ const box=document.getElementById("flBody"); if(!box) return;
+  let span=60, L=feltRecent(60); if(L.length<3){ span=24*60; L=feltRecent(24*60); }
+  const top=feltTop(L); const ev=FELT.ev; const evFresh=ev&&Date.now()-p2pT(ev.updated_at||ev.time)<60*60e3;
+  box.innerHTML=`<p class="obp" style="margin-top:4px">「P2P地震情報」を使っている人が、<b>ゆれを感じて「ゆれた」ボタンを押した数</b>を、地域ごとに数えています。地震計ではなく<b>人の報告(目安)</b>なので、まちがいも入ります。<b>正式な震度は気象庁の発表</b>を見てください。</p>
+    <div class="fl-sum"><b>${span===60?"この1時間":"この24時間"}</b>の報告: <b class="num" style="font-size:1.3rem">${L.length}</b>件${evFresh?` ・ まとめの信頼度: <b>${Math.round((ev.confidence||0)*100)}%</b>(${ev.count||0}件)`:""}</div>
+    <div class="wxmap" id="flMap"><div class="empty">地図を読み込んでいます…</div></div>
+    ${top.length?`<h3 style="margin:12px 0 4px;font-size:1rem">多い地域</h3><ul class="wml">${top.slice(0,10).map(x=>`<li><b>${esc(x[1])}</b><span class="num">${x[2]}件</span></li>`).join("")}</ul>`:`<p class="hint">${FELT.ok===0?"いま読み込めませんでした。少しして「↻ 新しくする」を押してください。":"いまは報告がほとんどありません。"}</p>`}
+    <p class="hint" style="margin-top:10px">出典: <a href="https://www.p2pquake.net/" target="_blank" rel="noopener">P2P地震情報</a>(地震感知情報)。アプリを開いている間は、新しい報告もすぐ受けとります。数え方: 1回押すと1件。SNSの書きこみは使っていません。</p>`;
+  getWorld().then(world=>{ const mb=document.getElementById("flMap"); if(!mb) return; const jp=world.features.filter(f=>+f.id===392);
+    const W=358,H=Math.round(W*1.12); const proj=d3.geoMercator().fitExtent([[6,6],[W-6,H-6]],{type:"MultiPoint",coordinates:[[129.2,30.9],[146.0,45.6]]}); const path=d3.geoPath(proj);
+    const dots=top.map(([a,nm,n])=>{ const A=P2PA&&P2PA[a]; if(!A) return ""; let [x,y]=proj([A[3],A[2]]); if(A[3]<128.5){ x=W-43+(A[3]-127.7)*8; y=H-40+(26.3-A[2])*8; } const r=Math.min(26,5+Math.sqrt(n)*4);
+      return `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="${r.toFixed(1)}" class="fl-dot"><title>${esc(nm)} ${n}件</title></circle>${n>=3?`<text x="${x.toFixed(1)}" y="${(y+4).toFixed(1)}" text-anchor="middle" class="fl-n">${n}</text>`:""}`; }).join("");
+    mb.innerHTML=`<svg viewBox="0 0 ${W} ${H}" class="wm-svg" role="img" aria-label="ゆれたの報告の地図">${jp.map(f=>`<path d="${path(f)}" class="wm-land"/>`).join("")}<rect x="${W-82}" y="${H-80}" width="78" height="74" rx="8" class="wm-inset"/><text x="${W-43}" y="${H-64}" text-anchor="middle" class="wm-inset-n" style="font-size:9.5px;font-weight:700">沖縄</text>${dots}</svg>`;
+    zoomable(mb,mb.querySelector("svg"),{max:6}); }).catch(()=>{ const mb=document.getElementById("flMap"); if(mb) mb.innerHTML='<div class="empty">地図を読み込めませんでした。下の一覧を見てください。</div>'; }); }
+document.addEventListener("click",ev=>{ if(ev.target.closest("[data-felt]")) openFelt(); });
 function eewShow(m){
   if(m.cancelled){ if(EEW){ EEW=null; drawEew(); toast("緊急地震速報は取り消されました(気象庁発表)"); } return; }
   const ar=Array.isArray(m.areas)?m.areas:[]; const prefs=[...new Set(ar.map(a=>a.pref).filter(Boolean))];
@@ -4723,6 +4768,7 @@ function openQuake(refresh){ const sh=document.getElementById("sheet"); sh.datas
   const tsu=AL.tsunami, sp=(AL.special||[]).filter(x=>Date.now()-Date.parse(x.at)<24*36e5);
   sh.innerHTML=`<div class="bar"><div class="wrap"><button class="iconbtn" id="qkx" aria-label="もどる">← もどる</button><span class="ttl">🛟 防災(地震・雨雲・警報)</span><button class="iconbtn" id="qkr" aria-label="新しくする" style="margin-left:auto;width:auto;padding:0 10px">↻ 新しくする</button></div></div><div class="wrap body">
    ${rtStatHTML()}
+   <button class="fchip fl-go" data-felt="1">👥 みんなの「ゆれた」マップ<small>いま、どこでゆれを感じた人が多いか(利用者の報告・目安)</small></button>
    <div class="bs-go"><button class="fchip" data-bmap="rain">☔ 雨雲レーダー<small>いまと1時間先の雨</small></button><button class="fchip" data-bmap="shelter">🏃 にげる場所<small>近くの避難場所</small></button><button class="fchip" data-bmap="flood">🌊 水につかる所<small>川があふれたら</small></button><button class="fchip" data-bmap="dosha">⛰️ がけ崩れの所<small>土砂災害の区域</small></button></div>
    <p class="hint">気象庁の発表を、アプリを開いたときに直接読んでいます(ニュースの1日4回の更新を待ちません)。開いている間は、新しい知らせもすぐ受けとります。${AL.checked?`最後に確かめた時刻: ${qhm(AL.checked)}`:""}${AL.ok?"":" ・ <b>いま読み込めませんでした。下の公式ページで確かめてください。</b>"}</p>
    ${tsu?`<div class="al-band" style="cursor:default"><span class="ai">🌊</span><span><b>${esc(tsu.grade)}</b><small>${esc(tsu.areas.join("・"))}${tsu.count>tsu.areas.length?" ほか":""}</small></span></div>`:`<p>🌊 津波の警報・注意報は、いま出ていません。</p>`}
