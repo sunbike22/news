@@ -279,6 +279,29 @@ def radar_fetch():
             probe["tile"] = f"{type(e).__name__}: {e}"[:120]
     return {"at": iso(NOW), "past": [list(x) for x in past], "fut": [list(x) for x in fut], "probe": probe}
 
+
+# ---------- (ためし)防災の地図タイルが読めるか、1回だけ調べる ----------
+def probe_maps():
+    U = {"flood": "https://disaportaldata.gsi.go.jp/raster/01_flood_l2_shinsuishin_data/12/3637/1612.png",
+         "flood_kk": "https://disaportaldata.gsi.go.jp/raster/01_flood_l2_shinsuishin_kuni_data/12/3637/1612.png",
+         "dosha": "https://disaportaldata.gsi.go.jp/raster/05_dosekiryukeikaikuiki/12/3637/1612.png",
+         "dosha2": "https://disaportaldata.gsi.go.jp/raster/05_dosekiryukeikaikuiki/12/3638/1613.png",
+         "tsunami": "https://disaportaldata.gsi.go.jp/raster/04_tsunami_newlegend_data/12/3638/1614.png",
+         "takashio": "https://disaportaldata.gsi.go.jp/raster/03_hightide_l2_shinsuishin_data/12/3638/1614.png",
+         "skhb01": "https://cyberjapandata.gsi.go.jp/xyz/skhb01/10/909/403.geojson",
+         "skhb04": "https://cyberjapandata.gsi.go.jp/xyz/skhb04/10/909/403.geojson",
+         "pale9": "https://cyberjapandata.gsi.go.jp/xyz/pale/9/454/201.png"}
+    out = {}
+    for k, u in U.items():
+        try:
+            req = urllib.request.Request(u, headers={"User-Agent": UA, "Origin": "https://sunbike22.github.io"})
+            with urllib.request.urlopen(req, timeout=20) as r:
+                body = r.read()
+                out[k] = [r.status, r.headers.get("Access-Control-Allow-Origin"), r.headers.get("Content-Type"), len(body), body[:160].decode("utf-8", "replace") if k.startswith("skhb") else ""]
+        except Exception as e:  # noqa: BLE001
+            out[k] = f"{type(e).__name__}: {e}"[:120]
+    return out
+
 # ---------- 前回分と通知 ----------
 prev = {}
 try:
@@ -345,6 +368,12 @@ out = {"quakes": quakes, "qsrc": qsrc, "tsunami": tsunami, "special": special, "
 same = {k: prev.get(k) for k in out} == out
 # 雨雲は5分ごとに新しくなるので、変わったかどうかの判定には入れない(書くときは入れる)
 out["radar"] = radar or prev.get("radar")
+out["probe2"] = prev.get("probe2")
+if not out["probe2"]:
+    try:
+        out["probe2"] = probe_maps()
+    except Exception as e:  # noqa: BLE001
+        out["probe2"] = str(e)[:100]
 out["checked"] = iso(NOW)
 out["updated"] = prev.get("updated") if same and prev.get("updated") else iso(NOW)
 if errors:
