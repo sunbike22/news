@@ -671,6 +671,7 @@ details.faq p{margin:10px 0 12px}
 .rd-ends{display:flex;justify-content:space-between;font-size:.82rem;color:var(--muted);margin-top:-2px}
 /* 黒い吹き出しの中の白いボタンは、文字をふつうの濃い色にもどす(うすい字で読めなかった) */
 .pop .seg button:not([aria-pressed="true"]),.pop .fchip:not([aria-pressed="true"]){color:var(--ink)}
+.pop .seg button[aria-pressed="true"],.pop .fchip[aria-pressed="true"]{background:var(--accent-btn,var(--accent));color:var(--on-accent,#fff);box-shadow:inset 0 0 0 2px var(--bg)}
 
 /* numbers */
 .chartbox{position:relative;height:220px}
@@ -984,7 +985,7 @@ svg.eat{animation:petEat .7s ease both!important}
 .ob-pet svg{animation:petIdle 2.6s ease-in-out infinite;transform-origin:50% 90%}
 .ob-card h2{font-size:1.2rem;margin:6px 0}.ob-card p{text-align:left;margin:0 0 14px}
 .ob-dots{display:flex;gap:6px;justify-content:center}.ob-dots i{width:8px;height:8px;border-radius:50%;background:var(--line)}.ob-dots i.on{background:var(--accent)}
-.ob-bt{display:flex;justify-content:space-between}
+.ob-bt{display:flex;justify-content:space-between;position:sticky;bottom:-20px;margin:8px -20px -20px;padding:10px 20px 20px;background:var(--surface);box-shadow:0 -8px 12px -8px rgba(0,0,0,.18)}
 .ob-card{max-height:calc(100vh - 32px);overflow:auto}
 .ob-step{font-size:.85rem;color:var(--muted);font-weight:700}
 .obp{text-align:left;margin:0 0 12px;font-size:1rem;line-height:1.7}
@@ -1031,7 +1032,7 @@ svg.eat{animation:petEat .7s ease both!important}
 .htl-dot{width:14px;height:14px;border-radius:50%;background:var(--surface);border:3px solid var(--accent);z-index:1}
 .htl-i.now .htl-dot{background:var(--accent);box-shadow:0 0 0 4px var(--accent-soft)}
 .htl-i.fut .htl-dot{border-style:dashed;border-color:var(--muted)}.htl-i.fut .htl-d{color:var(--muted)}.htl-i.fut .htl-t{color:var(--muted)}
-.htl-t{font-size:.9rem;line-height:1.45}
+.htl-t{font-size:.9rem;line-height:1.45;display:-webkit-box;-webkit-line-clamp:6;-webkit-box-orient:vertical;overflow:hidden}
 /* 着せかえ・部屋・日記 */
 .wardrobe{display:grid;grid-template-columns:repeat(auto-fill,minmax(78px,1fr));gap:6px;margin:6px 0}
 .wd-i{display:flex;flex-direction:column;align-items:center;gap:2px;border:1px solid var(--line);background:var(--surface);border-radius:12px;padding:6px 4px;cursor:pointer;color:var(--ink)}
@@ -1219,7 +1220,7 @@ function mmdd(iso){ return iso.slice(5,10); }
 function seasonNow(){ if(LOOK.season==="off") return null; if(LOOK.preview){ const z=SEASONS.find(x=>x.k===LOOK.preview); if(z) return z; }
   const t=mmdd(TODAY); return SEASONS.find(z=> z.from<=z.to ? (t>=z.from&&t<=z.to) : (t>=z.from||t<=z.to)) || null; }
 function inSeason(z,iso){ const t=mmdd(iso); return z.from<=z.to ? (t>=z.from&&t<=z.to) : (t>=z.from||t<=z.to); }
-const SECS = [["weather","🌤️ 天気"],["quick","⏱️ 1分まとめ"],["cont","🔔 つづきがあります"],["letter","💌 ペットからの手紙"],["listen","🔊 ニュースを聞く"],["three","☀️ 今日の3行"],["ten","📰 今日のニュース10"],["pet","🐣 ペット"],["goal","🗓️ 今週の目標"],["play","▶️ 1分で見る"],["foryou","🎯 あなた向け"],["picks","🎁 ジャンル別おすすめ"],["kw","🔖 わたしのキーワード"],["quiz","🧠 今日のクイズ"],["number","🔢 今日の数字"],["fun","✨ おたのしみ"],["other","📚 そのほかのニュース"],["english","📘 今日の英単語"],["mood","🗺️ 世の中の天気図"],["know","👆 知ってた?"],["talk","🍽️ 今日の話のタネ"],["reporter","🎙️ よむまる記者"],["local","🏠 わたしの街"],["gacha","🎰 今日の1本ガチャ"],["thermo","🌡️ ニュースの温度計"],["trip2","🗺️ ペットの旅"],["assoc","🔗 ニュース連想"],["back","📅 あのとき何してた?"],["bingo","🎲 ニュースビンゴ"],["battle","⚔️ 予想くらべ"]];
+const SECS = [["weather","🌤️ 天気"],["quick","⏱️ 1分まとめ"],["cont","🔔 つづきがあります"],["letter","💌 ペットからの手紙"],["listen","🔊 ニュースを聞く"],["three","☀️ 今日の3行"],["ten","📰 今日のニュース10"],["pet","🐣 ペット"],["goal","🗓️ 今週の目標"],["play","▶️ 1分で見る"],["foryou","🎯 あなた向け"],["picks","🎁 ジャンル別おすすめ"],["kw","🔖 わたしのキーワード"],["quiz","🧠 今日のクイズ"],["number","🔢 今日の数字"],["fun","✨ おたのしみ"],["other","📚 そのほかのニュース"],["english","📘 今日の英単語"],["mood","🗺️ 世の中の天気図"],["know","👆 知ってた?"],["talk","🍽️ 今日の話のタネ"],["reporter","🎙️ ペット記者"],["local","🏠 わたしの街"],["gacha","🎰 今日の1本ガチャ"],["thermo","🌡️ ニュースの温度計"],["trip2","🗺️ ペットの旅"],["assoc","🔗 ニュース連想"],["back","📅 あのとき何してた?"],["bingo","🎲 ニュースビンゴ"],["battle","⚔️ 予想くらべ"]];
 const LOOK = (()=>{ let p={}; try{ p=JSON.parse(store.get("nw-look")||"{}")||{}; }catch(_){ p={}; }
   const fix=(arr,all)=>{ const a=(Array.isArray(arr)?arr:[]).filter(k=>all.includes(k)); all.forEach(k=>{ if(!a.includes(k)) a.push(k); }); return a; };
   const had=new Set(Array.isArray(p.order)?p.order:[]); p.order=fix(p.order,SECS.map(s=>s[0]));
@@ -3750,6 +3751,7 @@ function funGrid(){ const L=FUN.filter(f=>(FUN_SET[f[0]]||FUN_ALWAYS.includes(f[
     ${hid?`<button class="fchip" id="funMore" data-hid="${hid}" aria-expanded="${funOpen?"true":"false"}" style="margin-top:8px">${funOpen?"▲ とじる":`… ほか ${hid}こ を見る`}</button>`:""}</section>`; }
 // ===== お知らせ(新しくなったところ)。機能を足したら、いちばん上に1つ足す =====
 const UPDATES=[
+  {id:"2026-10-22f",d:"2026-10-22",t:"🔧 こまかい直し",L:["はじめての案内の「つぎへ」ボタンが、画面の下にかくれないようにしました。","設定の吹き出しで、いま選んでいるものが色つきでわかるようにしました。","解説の「これまでの流れ」の下にできていた空白をなくしました。地図に秋田・東北・新潟を足しました。"]},
   {id:"2026-10-22e",d:"2026-10-22",t:"🐾 くろ・こげ茶のペットを見やすく",L:["くろ と こげ茶 のペットは、目を明るい色にして表情がわかりやすくなりました。","けろまるのほっぺを、ちょうどいい大きさにしました。"]},
   {id:"2026-10-22d",d:"2026-10-22",t:"🎨 ペットの色を変えられるように",L:["マイ→ペットの「🎨 色を変える」で、いつでも何回でも変えられます。犬ならこげ茶・くろ・はいいろなど、その動物に本当にある色から選べます(けろまるは何色でも)","けろまる(かえる)は、目を頭の上の丸い所に入れて、体を少し横長にしました。4コマにも、あなたのペット(種類・色・服)が出ます"]},
   {id:"2026-10-22c",d:"2026-10-22",t:"🐶 いぬの子が仲間入り",L:["たまごから、いぬの子も生まれるようになりました(たれ耳でしっぽをふる子)。何が生まれるかは、生まれるまでのお楽しみ!"]},
@@ -3970,7 +3972,7 @@ function renderMy(){
 // ===== 地図 =====
 const PLACES=[
   [/沖縄|先島|石垣|宮古|琉球|那覇/,127.68,26.21,"沖縄"],[/横浜|神奈川|DeNA/,139.64,35.44,"横浜"],[/千葉|印旛|内房/,140.12,35.6,"千葉"],[/伊豆|大島/,139.4,34.75,"伊豆諸島"],
-  [/宮崎|延岡/,131.42,31.91,"宮崎"],[/十勝|北海道|旭岳|セイコーマート/,142.8,43.3,"北海道"],[/大分/,131.61,33.24,"大分"],[/福岡|ソフトバンク|九州/,130.4,33.59,"福岡"],
+  [/宮崎|延岡/,131.42,31.91,"宮崎"],[/十勝|北海道|旭岳|セイコーマート/,142.8,43.3,"北海道"],[/秋田|子吉川|由利本荘/,140.1,39.72,"秋田"],[/山形|最上川/,140.34,38.25,"山形"],[/青森|弘前/,140.74,40.82,"青森"],[/岩手|盛岡/,141.15,39.7,"岩手"],[/宮城|仙台/,140.87,38.27,"宮城"],[/福島|郡山|いわき/,140.47,37.75,"福島"],[/新潟|信濃川|北陸/,139.02,37.9,"新潟"],[/東北/,140.87,38.27,"東北"],[/大分/,131.61,33.24,"大分"],[/福岡|ソフトバンク|九州/,130.4,33.59,"福岡"],
   [/阪神|大阪|王将/,135.5,34.69,"関西"],[/埼玉/,139.65,35.86,"埼玉"],[/西条/,133.18,33.92,"愛媛"],
   [/サウジ|リヤド|アラムコ/,46.72,24.69,"サウジアラビア"],[/フーシ|アデン|イエメン/,45.03,12.8,"イエメン"],[/エジプト/,31.24,30.04,"エジプト"],[/ウクライナ/,30.52,50.45,"ウクライナ"],
   [/ロシア|プーチン|記者拘束/,37.62,55.75,"ロシア"],[/北朝鮮/,125.75,39.03,"北朝鮮"],[/中国|GDP/,116.4,39.9,"中国"],[/カナダ/,-75.7,45.42,"カナダ"],
@@ -4314,7 +4316,7 @@ function tempColor(t){ return t>=30?"#d93025":t>=25?"#f06a1d":t>=20?"#e8a400":t>
 function openWxMap(day){ const M=AL.wxmap; const sh=document.getElementById("sheet"); const di=day||0;
   sh.innerHTML=`<div class="bar"><div class="wrap"><button class="iconbtn" id="wmx" aria-label="もどる">← もどる</button><span class="ttl">🗾 全国の天気</span></div></div><div class="wrap body">
     ${!M?`<div class="empty">いま読み込めませんでした。少しして開き直してください。</div>`:`
-    <div class="wxs-day">${M.dates.map((d,i)=>`<button class="fchip" data-wmd="${i}" aria-pressed="${i===di}">${i===0?"今日":"明日"} ${mdLabel(d)}</button>`).join("")}</div>
+    <div class="wxs-day">${M.dates.map((d,i)=>`<button class="fchip" data-wmd="${i}" aria-pressed="${i===di}">${relDay(d)===mdLabel(d)?mdLabel(d):relDay(d)+" "+mdLabel(d)}</button>`).join("")}</div>
     <div class="wxmap" id="wxMapBox"><div class="empty">地図を読み込んでいます…</div></div>
     <p class="hint" style="margin:4px 0 0">🔴赤〜黄色の数字=最高気温 🔵青い数字=最低気温。地図にない街(高知など)は下の一覧に。</p>
     <h3 style="margin:14px 0 4px;font-size:1rem">一覧で見る</h3>
@@ -4347,7 +4349,7 @@ function openWx(day){ const R=wxRows(); const sh=document.getElementById("sheet"
    <div class="wxs-day" role="group" aria-label="場所">${wxPlace()?`<button class="fchip" data-wxp="local" aria-pressed="${wxSrc()==="local"}">📍 ${esc(PREF_LL[wxPlace()][2])}</button>`:""}<button class="fchip" data-wxp="tokyo" aria-pressed="${wxSrc()==="tokyo"}">🗼 東京</button>
      <select class="fchip" id="wxPref" style="max-width:9em" aria-label="わたしの街を選ぶ"><option value="">${wxPlace()?"街を変える":"📍 わたしの街を選ぶ"}</option>${Object.keys(PREF_LL).map(k=>`<option ${ME.pref===k?"selected":""}>${k}</option>`).join("")}</select></div>
    ${!R.length?`<div class="empty">いま読み込めませんでした。少しして開き直してください。</div>`:`
-   <div class="wxs-day">${days.map(x=>`<button class="fchip" data-wxd="${x}" aria-pressed="${x===d}">${relDay(x)} ${mdLabel(x)}</button>`).join("")}</div>
+   <div class="wxs-day">${days.map(x=>`<button class="fchip" data-wxd="${x}" aria-pressed="${x===d}">${relDay(x)===mdLabel(x)?mdLabel(x):relDay(x)+" "+mdLabel(x)}</button>`).join("")}</div>
    ${L.length?`<div class="card" style="padding:12px 14px"><b>${relDay(d)}のようす</b><ul class="us" style="margin:6px 0 0">
      <li>🌡️ いちばん暑いのは <b>${mx.h}時ごろ ${Math.round(mx.temp)}°</b>、いちばん寒いのは <b>${mn.h}時ごろ ${Math.round(mn.temp)}°</b></li>
      <li>☔ ${rainy.length?`雨が降りやすいのは <b>${rainy[0].h}時〜${rainy[rainy.length-1].h+1}時ごろ</b>(降水確率50%以上)`:"降水確率が50%をこえる時間はありません"}</li>
