@@ -14,5 +14,5 @@ jobs:
             "https://api.gdeltproject.org/api/v2/doc/doc?query=sourcelang:japanese&mode=artlist&maxrecords=3&format=json" \
             "https://api.gdeltproject.org/api/v2/geo/geo?query=flood&format=geojson&timespan=24h"; do
             echo "=== $u" >> out.txt; curl -s -m 25 -D h.txt -o b.txt -H "Origin: https://sunbike22.github.io" "$u"; echo "exit $?" >> out.txt; head -1 h.txt >> out.txt; grep -i 'access-control-allow-origin\|content-type' h.txt >> out.txt; wc -c < b.txt >> out.txt; head -c 2500 b.txt >> out.txt; echo >> out.txt; done
-          git config user.name probe; git config user.email probe@users.noreply.github.com
-          git checkout --orphan probe-out; git rm -rq --cached . ; git add out.txt; git commit -qm probe; git push -fq "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}" probe-out
+          git init -q; git config user.name probe; git config user.email probe@users.noreply.github.com
+          git checkout -qb probe-out; git add out.txt; git commit -qm probe; git push -fq "https://x-access-token:${{ github.token }}@github.com/${{ github.repository }}" probe-out
