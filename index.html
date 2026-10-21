@@ -14,6 +14,12 @@
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
 <meta name="description" content="毎日のニュースを、1分の動くスライド・検索・グラフ・解説・クイズで">
 <title>まいにちニュース帳</title>
+<meta property="og:type" content="website">
+<meta property="og:site_name" content="まいにちニュース帳">
+<meta property="og:title" content="まいにちニュース帳 — きょうのニュースを、やさしく">
+<meta property="og:description" content="毎日のニュースを、やさしいことばで。2社以上で確かめたものに✅。解説・クイズ・天気・地震の知らせも。">
+<meta property="og:image" content="https://sunbike22.github.io/news/icon-512.png">
+<meta name="twitter:card" content="summary">
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&display=swap">
@@ -265,6 +271,15 @@ main{padding-block:18px 32px}
 .ten{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
 .ten li{background:var(--surface);border:1px solid var(--line);border-radius:12px}
 .ten .row{display:grid;grid-template-columns:34px 1fr;gap:10px;align-items:start;padding:12px 14px;width:100%;text-align:left;border:0;background:none;cursor:default}
+.ten .row:has(> .th){grid-template-columns:34px 1fr 76px}
+@media (max-width:430px){ .ten .row:has(> .th){grid-template-columns:26px 1fr 68px;gap:8px} .ten .th{width:68px;height:68px} .ten.short .row:has(> .th){grid-template-columns:26px 1fr 60px} .ten.short .th{width:60px;height:60px} }
+.ten .th{width:76px;height:76px;border-radius:10px;overflow:hidden;background:var(--surface2);display:block;align-self:start;margin-top:2px}
+.ten .th img{width:100%;height:100%;object-fit:cover;display:block}
+.ten .th-e{display:flex;align-items:center;justify-content:center;font-size:2rem;background:var(--cs);border:1px solid color-mix(in srgb,var(--c) 25%,transparent)}
+.ten .th-x{display:none}
+.ten.short .th{width:64px;height:64px}.ten.short .row:has(> .th){grid-template-columns:34px 1fr 64px}
+.th-cr{font-size:.82rem;color:var(--muted);margin:8px 2px 0;line-height:1.5}
+@media (min-width:700px){ .ten .row:has(> .th){grid-template-columns:34px 1fr 96px} .ten .th{width:96px;height:96px} .ten.short .row:has(> .th){grid-template-columns:34px 1fr 72px} .ten.short .th{width:72px;height:72px} }
 .ten .row.link{cursor:pointer}
 .rank{font-family:var(--f-display);font-size:1.25rem;line-height:1.2;color:var(--muted);text-align:center}
 .ten .big .rank{color:var(--accent);font-size:1.6rem}
@@ -812,6 +827,25 @@ svg.eat{animation:petEat .7s ease both!important}
 .ensay{align-self:flex-start;display:inline-block;margin-top:4px;font-size:.82rem;font-weight:700;color:var(--accent);border:1px solid var(--accent);border-radius:999px;padding:1px 8px;cursor:pointer}
 .jsub{font-size:.86rem;color:var(--muted);margin:2px 0 0}
 [lang="en"]{font-family:"Helvetica Neue",Arial,sans-serif}
+/* 📤 かんたん共有 */
+.sh-btn{display:inline-flex;align-items:center;gap:2px;font-size:.82rem;font-weight:700;padding:3px 10px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;margin-left:auto}
+.ten li:has(.th) .row{padding-right:14px}
+.ten li:has(.th) .pin-btn.abs{top:10px;right:10px;width:34px;height:34px;border-radius:999px;font-size:1rem;opacity:1;background:color-mix(in srgb,var(--surface) 88%,transparent);box-shadow:0 1px 4px rgba(0,0,0,.18)}
+.ten li.sh-hit{outline:3px solid var(--accent);outline-offset:2px;transition:outline-color .4s}
+.sh-ov{position:fixed;inset:0;z-index:90;background:rgba(0,0,0,.45);display:flex;align-items:flex-end;justify-content:center}
+.sh-ov[hidden]{display:none}
+.sh-box{width:100%;max-width:520px;max-height:92vh;overflow:auto;background:var(--bg);border-radius:18px 18px 0 0;padding:8px 16px calc(18px + env(safe-area-inset-bottom,0px));box-shadow:0 -6px 24px rgba(0,0,0,.25);outline:0}
+.sh-grip{width:44px;height:5px;border-radius:9px;background:var(--line);margin:4px auto 8px}
+.sh-hd{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}.sh-hd b{font-size:1.1rem}
+.sh-pv{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:8px 12px}
+.sh-pv small{color:var(--muted);font-size:.82rem}
+.sh-pv pre{white-space:pre-wrap;word-break:break-word;font-family:inherit;font-size:.9rem;margin:4px 0 0;line-height:1.55;max-height:12em;overflow:auto}
+.sh-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px}
+.sh-op{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;min-height:76px;padding:10px 8px;border-radius:14px;border:1px solid var(--line);background:var(--surface);color:var(--ink);cursor:pointer;text-align:center}
+.sh-op>span{font-size:1.5rem;line-height:1}.sh-op b{font-size:.98rem}.sh-op small{font-size:.82rem;color:var(--muted);line-height:1.35}
+.sh-op.main{grid-column:1/-1;flex-direction:row;gap:12px;justify-content:flex-start;text-align:left;background:var(--accent-btn,var(--accent));border-color:var(--accent-btn,var(--accent));color:var(--on-accent)}
+.sh-op.main small{color:inherit;opacity:.9;display:block}.sh-op.main>span{font-size:1.8rem}
+.sh-op .ln{font-size:.9rem;font-weight:900;background:#06c755;color:#fff;border-radius:8px;padding:5px 7px;letter-spacing:.02em}
 /* 📆 今月のふりかえり */
 .m-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:6px}
 .m-it{display:flex;gap:8px;align-items:center;background:var(--surface2);border-radius:10px;padding:8px 10px}
@@ -1507,9 +1541,10 @@ function renderToday(){
         const big=i<3; const link=n.ex||n.tab; const wt=newsWeight(n); const mine=isLocal(n.title+" "+(n.text||""));
         return `<li class="${big?'big':''} w${wt.lv}${mine?' mytown':''}">${pinBtn({k:"t|"+n.title,h:n.title,g:n.g,d:(NEWS[0]||{}).d,ex:n.ex},"abs")}<button class="row${link?' link':''}"${n.ex?` data-ex="${n.ex}"`:''}${n.tab?` data-tab="${n.tab}"`:''} ${link?'':'tabindex="-1"'}>
           <span class="rank">${i+1}</span>
-          <span>${big&&ILL[n.ill||n.ex]?`<div class="ill">${ILL[n.ill||n.ex]}</div>`:""}<span class="meta"><span class="chip ${n.g}">${GN[n.g]}</span>${n.ok?`<span class="badge-ok tap" role="button" tabindex="0" data-trust="${esc(n.title)}" data-ok="1" title="タップで出典">✅</span>`:`<span class="badge-one tap" role="button" tabindex="0" data-trust="${esc(n.title)}" data-ok="0" title="タップでわけ">⚠️ 1社</span>`}${mine?'<span class="heat town">🏠 あなたの街</span>':""}${wt.lv>=2?`<span class="heat" title="この3日で関連ニュース${wt.n}件">🔥</span>`:""}</span>
+          <span>${big&&ILL[n.ill||n.ex]?`<div class="ill">${ILL[n.ill||n.ex]}</div>`:""}<span class="meta"><span class="chip ${n.g}">${GN[n.g]}</span>${n.ok?`<span class="badge-ok tap" role="button" tabindex="0" data-trust="${esc(n.title)}" data-ok="1" title="タップで出典">✅</span>`:`<span class="badge-one tap" role="button" tabindex="0" data-trust="${esc(n.title)}" data-ok="0" title="タップでわけ">⚠️ 1社</span>`}${mine?'<span class="heat town">🏠 あなたの街</span>':""}${wt.lv>=2?`<span class="heat" title="この3日で関連ニュース${wt.n}件">🔥</span>`:""}<span class="sh-btn" role="button" tabindex="0" data-share="t:${i}" aria-label="このニュースを送る">📤 送る</span></span>
           ${(()=>{ const e=enOf("top10",i); if(langMode()==="en"&&e) return `<h3 lang="en">${n.icon} ${esc(e.t)}</h3>${e.x?`<p lang="en">${esc(e.x)}</p>`:""}<p class="jsub">${esc(n.title)}</p>${(e.w||[]).length?`<span class="enw">${e.w.map(([a,b])=>`<i>📘 ${esc(a)} = ${esc(b)}</i>`).join("")}</span>`:""}<span class="ensay" role="button" tabindex="0" data-say="${esc(e.t+". "+(e.x||""))}">🔊 English</span>`; return `<h3>${n.icon} ${esc(n.title)}</h3>${n.text?`<p>${esc(n.text)}</p>`:""}${enBlock(e)}`; })()}
-          ${srcLine(n)}${link?`<span class="more">${n.ex?'くわしい解説 →':'グラフを見る →'}</span>`:''}</span></button>${n.point?`<details class="pt"><summary>💭 ここがポイント</summary>${esc(n.point)}</details>`:""}</li>`;}).join("")}</ol>
+          ${srcLine(n)}${link?`<span class="more">${n.ex?'くわしい解説 →':'グラフを見る →'}</span>`:''}</span>${thumbHTML(n)}</button>${n.point?`<details class="pt"><summary>💭 ここがポイント</summary>${esc(n.point)}</details>`:""}</li>`;}).join("")}</ol>
+      ${thumbCredit(t)}
     </section>`;
   S.mood=moodCard();
   S.know=knowCard();
@@ -1829,7 +1864,7 @@ function openEx(k){
   if(!ME.readEx[k]) learn(e.g,2); const seenAt=ME.readEx[k]; ME.readEx[k]=TODAY; saveMe(); setTimeout(checkBadges,800);
   const rel = NEWS.filter(n=>{ const map={saudi:"サウジ・中東",tax:"消費減税",cyber:"不正アクセスとAI"}; if(map[k]) return (n.th||"").includes(map[k]); if(k==="sato") return /佐藤輝明/.test(n.h); if(k==="series") return /日本シリーズ|CS/.test(n.h); if(k==="yokohama") return /横浜市長/.test(n.h); if(k==="past") return n.d<"2026-10-04"; return false; }).slice(0,8);
   const flow = e.flow.map((f,i)=>`${i>0?`<div class="farrow">⬇️ ${f.via?`<b>${esc(f.via)}</b>`:""}</div>`:""}<div class="fstep"><span class="fi">${f.i}</span><span><b>${esc(f.t)}</b>${f.s?`<small>${esc(f.s)}</small>`:""}</span></div>`).join("");
-  sh.innerHTML=`<div class="bar"><div class="wrap"><button class="iconbtn" id="shx" aria-label="もどる">← もどる</button><span class="ttl">${e.icon} ${esc(e.name)}</span>${pinBtn({k:"ex|"+k,h:"解説: "+e.name,g:e.g,d:TODAY,ex:k},"iconbtn")}<button class="iconbtn" id="shshare" aria-label="このページのリンクをコピー">🔗 共有</button></div></div>
+  sh.innerHTML=`<div class="bar"><div class="wrap"><button class="iconbtn" id="shx" aria-label="もどる">← もどる</button><span class="ttl">${e.icon} ${esc(e.name)}</span>${pinBtn({k:"ex|"+k,h:"解説: "+e.name,g:e.g,d:TODAY,ex:k},"iconbtn")}<button class="iconbtn" id="shshare" aria-label="この解説を送る">📤 送る</button></div></div>
   <div class="wrap body">
     <div class="hint">最終更新 ${esc(e.updated)} ・ ⏱️ 全部で約${e.min}分 ・ ${hardChip(e)} ・ 点線のことばはタップで意味が出ます</div>
     <div class="ex-acts"><button class="chat-go" id="exChat">💬 話しながら読む</button><button class="fchip" id="exSpeak">🔊 聞く</button></div>
@@ -1863,9 +1898,7 @@ function openEx(k){
   sh.querySelector("#shx").onclick=close; sh.querySelector("#shx2").onclick=close; sh.querySelector("#shx").focus();
   animateFlow(); sh.querySelector("#fplay").onclick=animateFlow;
   try{ history.replaceState(null,"","#"+k); }catch(_){}
-  sh.querySelector("#shshare").onclick=ev=>{ const url=location.href.split("#")[0]+"#"+k; const b=ev.currentTarget;
-    const done=()=>{b.textContent="✅ コピーしました"; setTimeout(()=>b.textContent="🔗 共有",1800);};
-    try{ navigator.clipboard.writeText(url).then(done,()=>{prompt2(url);}); }catch(_){ prompt2(url); } };
+  sh.querySelector("#shshare").onclick=()=>openShare("ex:"+k);
   if(e.calc) bindCalc();
   sh.querySelector("#exSpeak").onclick=ev=>speakEx(k,ev.currentTarget);
   const ec=sh.querySelector("#exChat"); if(ec) ec.onclick=()=>openExChat(k);
@@ -1939,6 +1972,63 @@ function trustPop(title,ok){ const n=D.top10.find(x=>x.title===title); const r=n
     <button class="iconbtn" id="popx" style="margin-top:10px;background:transparent;color:inherit;border-color:currentColor">閉じる</button>`;
   p.hidden=false; document.getElementById("popx").onclick=()=>p.hidden=true; }
 document.addEventListener("click",ev=>{ const b=ev.target.closest("[data-trust]"); if(b){ ev.preventDefault(); ev.stopPropagation(); trustPop(b.dataset.trust,b.dataset.ok==="1"); } },true);
+// ===== 📤 かんたん共有(だれでも迷わないように: 送る中身を先に見せて、大きなボタンで選ぶ) =====
+const SITE_URL="https://sunbike22.github.io/news/";
+function hid(t){ let h=0; for(const c of String(t)) h=(h*31+c.charCodeAt(0))>>>0; return h.toString(36); }
+function shareData(key){ const [kind,id]=String(key).split(":");
+  if(kind==="t"){ const n=D.top10[+id]; if(!n) return null; return {kind,title:n.title,icon:n.icon||"📰",g:n.g,ok:!!n.ok,sum:String(n.text||"").split("。")[0].slice(0,80),url:SITE_URL+"#t="+hid(n.title),n}; }
+  if(kind==="ex"){ const e=D.explainers[id]; if(!e) return null; return {kind,title:e.name,icon:e.icon||"💡",g:e.g,ok:true,sum:e.kid||"",url:SITE_URL+"#"+id,isEx:true}; }
+  return null; }
+function shareText(d){ return `${d.icon} ${d.title}${d.sum?`\n${d.sum}${/[。!?]$/.test(d.sum)?"":"。"}`:""}\n${d.isEx?"💡 くわしい解説":(d.ok?"✅ 2社以上で確かめたニュース":"⚠️ まだ1社だけのニュース")}\n\n📰 まいにちニュース帳\n${d.url}`; }
+function openShare(key){ const d=shareData(key); if(!d) return; const txt=shareText(d); track("/share/open","共有を開いた");
+  let ov=document.getElementById("shareOv"); if(!ov){ ov=document.createElement("div"); ov.id="shareOv"; ov.className="sh-ov"; document.body.appendChild(ov); }
+  const can=!!navigator.share;
+  ov.innerHTML=`<div class="sh-box" role="dialog" aria-modal="true" aria-label="送る"><div class="sh-grip" aria-hidden="true"></div>
+    <div class="sh-hd"><b>📤 このニュースを送る</b><button class="iconbtn" data-shx aria-label="閉じる">✕ 閉じる</button></div>
+    <div class="sh-pv"><small>相手には、こう届きます</small><pre>${esc(txt)}</pre></div>
+    <div class="sh-grid">
+      ${can?`<button class="sh-op main" data-sh="os"><span>📱</span><b>スマホで送る</b><small>LINE・メール・メッセージなど、いつものアプリを選べます</small></button>`:""}
+      <button class="sh-op" data-sh="line"><span class="ln">LINE</span><b>LINEで送る</b></button>
+      <button class="sh-op" data-sh="mail"><span>✉️</span><b>メールで送る</b></button>
+      <button class="sh-op" data-sh="copy"><span>📋</span><b>文章をコピー</b><small>はりつけて送れます</small></button>
+      <button class="sh-op" data-sh="img"><span>🖼️</span><b>画像にして送る</b><small>見出しのカード</small></button>
+    </div>
+    <p class="hint" style="margin:10px 2px 0">送られるのは、上の文章とリンクだけです。あなたの記録・メモ・ペットのことは送られません。</p></div>`;
+  ov.hidden=false; document.body.style.overflow="hidden"; ov.querySelector(".sh-box").focus?.();
+  const close=()=>{ ov.hidden=true; ov.innerHTML=""; if(document.getElementById("sheet").hidden) document.body.style.overflow=""; };
+  ov.onclick=e=>{ if(e.target===ov||e.target.closest("[data-shx]")) close(); };
+  const done=m=>{ toast(m); track("/share/"+m.slice(0,2),"共有"); };
+  ov.querySelectorAll("[data-sh]").forEach(b=>b.onclick=async()=>{ const w=b.dataset.sh;
+    if(w==="os"){ try{ await navigator.share({title:d.title,text:txt.replace("\n"+d.url,""),url:d.url}); close(); }catch(_){} return; }
+    if(w==="line"){ window.open("https://line.me/R/share?text="+encodeURIComponent(txt),"_blank","noopener"); close(); return; }
+    if(w==="mail"){ location.href="mailto:?subject="+encodeURIComponent("📰 "+d.title)+"&body="+encodeURIComponent(txt); close(); return; }
+    if(w==="copy"){ try{ await navigator.clipboard.writeText(txt); b.querySelector("b").textContent="✅ コピーしました"; setTimeout(close,900); done("📋 コピーしました。LINEなどにはりつけて送れます"); }catch(_){ prompt2(txt); } return; }
+    if(w==="img"){ b.querySelector("b").textContent="作っています…"; try{ await shareCard(d); }catch(_){ toast("画像を作れませんでした"); } close(); return; } });
+  const esck=e=>{ if(e.key==="Escape"){ close(); document.removeEventListener("keydown",esck); } }; document.addEventListener("keydown",esck); }
+document.addEventListener("click",ev=>{ const b=ev.target.closest("[data-share]"); if(b){ ev.preventDefault(); ev.stopPropagation(); openShare(b.dataset.share); } },true);
+document.addEventListener("keydown",ev=>{ if((ev.key==="Enter"||ev.key===" ")&&ev.target.matches&&ev.target.matches("[data-share]")){ ev.preventDefault(); ev.stopPropagation(); openShare(ev.target.dataset.share); } },true);
+// 🖼️ 見出しのカード画像(1080×1350。写真は使わず、色とペットの絵だけで作る=だれの権利も心配いらない)
+async function shareCard(d){ const W=1080,H=1350; const c=document.createElement("canvas"); c.width=W; c.height=H; const x=c.getContext("2d");
+  const cs=getComputedStyle(root); const gc=(cs.getPropertyValue("--g-"+d.g)||"#2747c9").trim()||"#2747c9";
+  x.fillStyle="#fffdf7"; x.fillRect(0,0,W,H);
+  x.fillStyle=gc; x.fillRect(0,0,W,22); x.globalAlpha=.12; x.fillRect(0,22,W,188); x.globalAlpha=1;
+  const F='"Hiragino Sans","Hiragino Kaku Gothic ProN","Noto Sans JP","Yu Gothic",sans-serif';
+  x.fillStyle="#1b2340"; x.font="800 40px "+F; x.fillText("📰 まいにちニュース帳",64,104);
+  x.fillStyle="#5b6478"; x.font="500 34px "+F; x.fillText(mdLabel(TODAY)+" ・ "+(GN[d.g]||""),64,160);
+  // 見出し(折り返し)
+  const wrap=(t,max,lh,y0,font,col,maxLines)=>{ x.font=font; x.fillStyle=col; let line="",y=y0,n=0; for(const ch of t){ const tl=line+ch; if(x.measureText(tl).width>max&&line){ x.fillText(line,64,y); y+=lh; line=ch; if(++n>=maxLines-1){ break; } } else line=tl; } if(line){ let L=line; if(n>=maxLines-1&&t.length>0){ while(x.measureText(L+"…").width>max&&L.length) L=L.slice(0,-1); } x.fillText(L,64,y); y+=lh; } return y; };
+  let y=wrap(d.icon+" "+d.title,W-128,86,300,"800 64px "+F,"#111827",6);
+  if(d.sum) y=wrap(d.sum,W-128,58,y+30,"500 40px "+F,"#374151",4);
+  // 確かめた印
+  x.font="800 40px "+F; const badge=d.isEx?"💡 くわしい解説つき":(d.ok?"✅ 2社以上で確認":"⚠️ まだ1社だけ"); const bw=x.measureText(badge).width+56;
+  x.fillStyle=d.ok||d.isEx?"#e4f3e9":"#fdf0d5"; roundRect(x,64,y+30,bw,76,38); x.fill(); x.fillStyle=d.ok||d.isEx?"#14532d":"#7a4a00"; x.fillText(badge,92,y+82);
+  // ペット
+  try{ const ac=petTopGenre(); const svg=petSVG(Math.max(1,petStage().i),"happy",ac&&PET_ACC[ac][0],220,petWear()); const img=new Image(); await new Promise((r,j)=>{ img.onload=r; img.onerror=j; img.src="data:image/svg+xml;charset=utf-8,"+encodeURIComponent(svg.replace("<svg ","<svg xmlns=\"http://www.w3.org/2000/svg\" ")); }); x.drawImage(img,W-300,H-330,240,240); }catch(_){}
+  x.fillStyle="#5b6478"; x.font="500 32px "+F; x.fillText("つづきは アプリで ↓",64,H-150); x.fillStyle="#2747c9"; x.font="700 34px "+F; x.fillText(d.url.replace("https://",""),64,H-100);
+  const blob=await new Promise(r=>c.toBlob(r,"image/png")); const f=new File([blob],"news-card.png",{type:"image/png"});
+  try{ if(navigator.canShare&&navigator.canShare({files:[f]})){ await navigator.share({files:[f],text:d.url}); return; } }catch(e){ if(e&&e.name==="AbortError") return; }
+  const u=URL.createObjectURL(blob); const a=document.createElement("a"); a.href=u; a.download="news-card.png"; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(u),4000); toast("🖼️ 画像を保存しました。LINEなどで送れます"); }
+function roundRect(x,a,b,w,h,r){ x.beginPath(); x.moveTo(a+r,b); x.arcTo(a+w,b,a+w,b+h,r); x.arcTo(a+w,b+h,a,b+h,r); x.arcTo(a,b+h,a,b,r); x.arcTo(a,b,a+w,b,r); x.closePath(); }
 function prompt2(url){ const p=document.getElementById("pop"); p.innerHTML=`<b>このリンクを送ってください</b><p style="margin:6px 0 0;word-break:break-all;user-select:all">${esc(url)}</p><button class="iconbtn" id="popx" style="margin-top:8px;background:transparent;color:inherit;border-color:currentColor">閉じる</button>`; p.hidden=false; document.getElementById("popx").onclick=()=>p.hidden=true; }
 
 // ===== 数字 =====
@@ -2313,7 +2403,10 @@ function voiceCard(){ const r=sayRate();
     <div class="hint" style="margin-top:6px">「🔊 聞く」やことば辞典の読み上げの速さが変わります。お子さんや、ゆっくり聞きたいときは🐢がおすすめです。</div>
     <div class="sec-h" style="margin-top:12px"><h2 style="font-size:1rem">🈁 ふりがな</h2></div>
     <div class="chips" id="vRuby">${[["1","つける"],["0","つけない"]].map(([v,l])=>`<button class="fchip" data-ruby="${v}" aria-pressed="${rubyOn()===(v==="1")}">${l}</button>`).join("")}</div>
-    <div class="hint" style="margin-top:6px">ことば辞典にあることば(点線のことば)に、よみがなをつけます。かんたんモードでは最初からついています。</div></section>`; }
+    <div class="hint" style="margin-top:6px">ことば辞典にあることば(点線のことば)に、よみがなをつけます。かんたんモードでは最初からついています。</div>
+    <div class="sec-h" style="margin-top:12px"><h2 style="font-size:1rem">📷 ニュースの写真</h2></div>
+    <div class="chips" id="vThumb">${[["1","出す"],["0","出さない"]].map(([v,l])=>`<button class="fchip" data-thumb="${v}" aria-pressed="${(store.get("nw-thumb")==="0"?"0":"1")===v}">${l}</button>`).join("")}</div>
+    <div class="hint" style="margin-top:6px">ニュース10の右にイメージ写真を出します。通信量を節約したいときは「出さない」に。スマホのデータセーバーがオンのときは自動で出しません。</div></section>`; }
 function saveMe(){ store.set("nw-me", JSON.stringify(ME)); }
 const nkey = n => (n.d+"|"+n.h).slice(0,80);
 // 訪問日と連続記録
@@ -3532,6 +3625,7 @@ function renderMy(){
   </div>`;
   main.querySelectorAll("[data-tab]").forEach(b=>b.onclick=()=>go(b.dataset.tab));
   main.querySelectorAll("#vRate [data-rate]").forEach(b=>b.onclick=()=>{ store.set("nw-rate",b.dataset.rate); main.querySelectorAll("#vRate [data-rate]").forEach(x=>x.setAttribute("aria-pressed",String(x===b))); sayJa("この速さで読み上げます"); });
+  main.querySelectorAll("#vThumb [data-thumb]").forEach(b=>b.onclick=()=>{ store.set("nw-thumb",b.dataset.thumb); main.querySelectorAll("#vThumb [data-thumb]").forEach(x=>x.setAttribute("aria-pressed",String(x===b))); toast(b.dataset.thumb==="1"?"📷 写真を出します":"写真を出さないようにしました"); });
   main.querySelectorAll("#vRuby [data-ruby]").forEach(b=>b.onclick=()=>{ store.set("nw-ruby",b.dataset.ruby); applyRuby(); main.querySelectorAll("#vRuby [data-ruby]").forEach(x=>x.setAttribute("aria-pressed",String(x===b))); toast(b.dataset.ruby==="1"?"🈁 ふりがなをつけました":"ふりがなを外しました"); });
   main.querySelectorAll("#myInt [data-g]").forEach(b=>b.onclick=()=>{ const g=b.dataset.g; ME.interests[g]=!ME.interests[g]; b.setAttribute("aria-pressed",String(!!ME.interests[g])); saveMe(); });
   main.querySelectorAll("#myIntCard [data-recint]").forEach(b=>b.onclick=()=>{ applyRecInt(); main.querySelectorAll("#myInt [data-g]").forEach(x=>x.setAttribute("aria-pressed",String(!!ME.interests[x.dataset.g]))); });
@@ -3801,6 +3895,42 @@ const PHOTOS={
   past:["https://images.unsplash.com/photo-1435527173128-983b87201f4d?w=1000&q=70&auto=format&fit=crop","Eric Rothermel"],
   mmx:["https://images.unsplash.com/photo-1770723963970-ace02c7db50e?w=1000&q=70&auto=format&fit=crop","ostudio"]
 };
+// ===== ニュースの写真(Unsplash のイメージ写真。人物・ブランド・特定の出来事が写っていないものだけ) =====
+// [写真のid, 撮影者]。見出しのことばで選び、合うものがなければ ジャンルの絵(自作)にする
+const TH={
+  shop:["1566454825481-4e48f80aa4d7","Alana Harris"], market:["1660748308408-f997ade26ef8","Mingwei Lim"],
+  cyber:["1572648151618-d54ad5890a57","Rohit"], it:["1583492207605-884991f34b2b","Kenny"],
+  heat:["1600946068917-41790f0f7e87","They CallMe ZEUS"], storm:["1688890148084-8668436708a0","Sreeja"],
+  desert:["1643925690746-9eb744dae41b","Bernd Dittrich"], flags:["1569857191056-1b2829c9829f","JM Piqué"],
+  hoop:["1519339859931-96ff5c81fbe6","Joshua Hoehne"], ballpark:["1641780931491-e50d7d49dbc8","Andre Tan"],
+  soccer:["1625187538367-6a8483a79cc2","Rachel Yoon"], rocket:["1454789415558-bdda08f4eabb","NASA"],
+  capitol:["1787355784347-e7d918e901af","DL314 Lin"], med:["1546659934-038aab8f3f3b","Christopher Boswell"],
+  cinema:["1789470808845-b51eff0b4db2","Shane Monarc"], clothes:["1785870500429-c40dc0892918","moniek van rosse"],
+  room:["1632119580908-ae947d4c7691","Spacejoy"], cook:["1789925941455-8200c6d456be","engin akyurt"],
+  coffee:["1636178959459-f87816fd4498","Prateek Gautam"], trip:["1515622472995-1a06094d2224","Emanuela Picone"]
+};
+// 上から順に当てはめる(広いことばは下に)
+const TH_RULES=[
+  [/台風|大雨|豪雨|暴風|高波|線状降水/,"storm"],[/真夏日|猛暑|熱中症|気温|℃/,"heat"],
+  [/不正アクセス|漏れ|流出|漏えい|サイバー|ハッキング|ランサム|不正なプログラム|ウイルス|パスワード|乗っ取り/,"cyber"],
+  [/日経平均|株価|株が|円安|円高|為替|市場/,"market"],[/消費税|食料品|物価|値上げ|値下げ|スーパー|米価|コメ/,"shop"],
+  [/サウジ|イエメン|フーシ|中東|イラン|イスラエル|ガザ|原油/,"desert"],
+  [/ロケット|宇宙|衛星|探査|火星|月面|JAXA|NASA/,"rocket"],[/病院|医療|ワクチン|感染|薬|健康|手術/,"med"],
+  [/NBA|バスケ/,"hoop"],[/野球|阪神|巨人|日本シリーズ|MLB|大谷|ドジャース|CS/,"ballpark"],[/サッカー|Jリーグ|W杯|ワールドカップ/,"soccer"],
+  [/映画|ドラマ|アニメ|俳優|小説|作家|音楽|ライブ/,"cinema"],[/旅行|観光|空港|ホテル/,"trip"],
+  [/首脳|会談|特使|外相|国連|大使|サミット|停戦|和平/,"flags"],[/国会|法案|首相|内閣|選挙|衆院|参院|与党|野党|知事|市長/,"capitol"]
+];
+const TH_G={pol:"capitol",eco:"market",it:"it",intl:"flags",spo:"ballpark",sci:"rocket",ent:"cinema",fas:"clothes",home:"room",food:"cook",life:"coffee",trip:"trip"};
+function thumbOn(){ if(store.get("nw-thumb")==="0") return false; try{ if(navigator.connection&&navigator.connection.saveData) return false; }catch(_){} return true; }
+// 解説に写真があればそれ、なければ見出しのことば → ジャンル の順
+function thumbOf(n){ if(n.ex&&PHOTOS[n.ex]) return {u:PHOTOS[n.ex][0].replace(/\?.*$/,""),by:PHOTOS[n.ex][1]};
+  const t=(n.title||n.h||"")+" "+(n.text||""); let k=null; for(const [re,key] of TH_RULES){ if(re.test(t)){ k=key; break; } } k=k||TH_G[n.g];
+  const p=k&&TH[k]; return p?{u:"https://images.unsplash.com/photo-"+p[0],by:p[1]}:null; }
+function thumbHTML(n){ if(!thumbOn()) return ""; const p=thumbOf(n);
+  if(!p) return `<span class="th th-e" aria-hidden="true" style="--c:var(--g-${n.g});--cs:var(--g-${n.g}-s)">${n.icon||"📰"}</span>`;
+  return `<span class="th"><img src="${p.u}?w=176&h=176&fit=crop&q=60&auto=format" alt="" loading="lazy" decoding="async" width="88" height="88" onerror="this.parentNode.classList.add('th-x');this.remove()"></span>`; }
+function thumbCredit(list){ if(!thumbOn()) return ""; const by=[...new Set(list.map(thumbOf).filter(Boolean).map(p=>p.by))]; if(!by.length) return "";
+  return `<p class="th-cr">📷 写真はイメージです(ニュースの現場の写真ではありません)。撮影: ${by.map(esc).join("・")} / <a href="https://unsplash.com/?utm_source=mainichi_news&utm_medium=referral" target="_blank" rel="noopener">Unsplash</a></p>`; }
 function photoBlock(k){ const p=PHOTOS[k]; if(!p) return ""; return `<figure class="photo"><img src="${p[0]}" alt="" loading="lazy" onerror="this.closest('figure').remove()"><figcaption>📷 イメージ写真: ${esc(p[1])} / <a href="https://unsplash.com/?utm_source=mainichi_news&utm_medium=referral" target="_blank" rel="noopener">Unsplash</a></figcaption></figure>`; }
 
 // ===== 解説の読み上げ =====
@@ -3997,7 +4127,15 @@ document.addEventListener("click",ev=>{ const x=ev.target.closest("[data-alx]");
 document.addEventListener("keydown",ev=>{ if((ev.key==="Enter"||ev.key===" ")&&ev.target.matches&&ev.target.matches(".al-band[data-quake]")){ ev.preventDefault(); openQuake(); } });
 try{ loadAlerts(); setInterval(()=>{ if(document.visibilityState==="visible") loadAlerts(); },3*60*1000); document.addEventListener("visibilitychange",()=>{ if(document.visibilityState==="visible") loadAlerts(); }); }catch(_){}
 const h=(location.hash||"").slice(1);
-if(h==="quake"){ go("today"); setTimeout(openQuake,50); } else if(D.explainers[h]){ go("explain"); openEx(h); } else go(TABS.some(t=>t[0]===h)?h:"today");
+if(h==="quake"){ go("today"); setTimeout(openQuake,50); } else if(D.explainers[h]){ go("explain"); openEx(h); }
+else if(h.startsWith("t=")) openTHash(h);
+else go(TABS.some(t=>t[0]===h)?h:"today");
+// 送られてきたリンク(#t=…)で開いたら、そのニュースまで連れていく。アプリを開いたままリンクを押したときも
+function openTHash(h){ go("today"); const want=h.slice(2); setTimeout(()=>{ const i=D.top10.findIndex(n=>hid(n.title)===want);
+    if(i>=0){ const li=document.querySelectorAll("ol.ten > li")[i]; if(li){ li.scrollIntoView({block:"center",behavior:"smooth"}); li.classList.add("sh-hit"); setTimeout(()=>li.classList.remove("sh-hit"),3200); toast("📤 送られてきたニュースはこれです"); } }
+    else { const n=NEWS.find(x=>hid(x.h)===want); if(n){ sState.q=n.h.slice(0,12); go("search"); toast("📤 少し前のニュースです。記録から探しました"); } else toast("このニュースは入れかわりました。今日のニュースを見てください"); }
+    try{ history.replaceState(null,"","#today"); }catch(_){} },400); }
+window.addEventListener("hashchange",()=>{ const x=(location.hash||"").slice(1); if(x.startsWith("t=")) openTHash(x); });
 try{ if(new URLSearchParams(location.search).get("play")==="1") setTimeout(openStory,300); }catch(_){}
 })();
 </script>
