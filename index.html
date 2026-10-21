@@ -559,6 +559,8 @@ details.faq p{margin:10px 0 12px}
 .calc .o{background:var(--g-eco-s);border-radius:12px;padding:10px;text-align:center}
 .calc .o .v{font-family:var(--f-display);font-size:1.5rem;color:var(--g-eco);line-height:1.2}
 .gl{border:0;background:none;padding:0;color:inherit;text-decoration:underline dotted var(--accent) 2px;text-underline-offset:3px;cursor:help}
+.gl ruby{ruby-position:over}.gl rt{font-size:.58em;color:var(--muted);font-weight:400;letter-spacing:0}
+:root[data-ruby="1"] .ten li>button>span>p,:root[data-ruby="1"] .ex-body p{line-height:1.95}
 .pop{position:fixed;z-index:70;left:max(16px,env(safe-area-inset-left,0px));right:max(16px,env(safe-area-inset-right,0px));bottom:calc(86px + env(safe-area-inset-bottom,0px));max-width:520px;margin:0 auto;background:var(--ink);color:var(--bg);border-radius:14px;padding:14px 16px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
 .pop b{font-size:1.05rem}
 
@@ -1131,7 +1133,7 @@ function applySettings(){ const t=store.get("nw-theme"); if(t==="light"||t==="da
   root.setAttribute("data-color",LOOK.color); root.setAttribute("data-mode",LOOK.mode); { const z=seasonNow(); if(z) root.setAttribute("data-season",z.k); else root.removeAttribute("data-season"); try{ snow(!!z&&z.k==="xmas"); }catch(_){} }
   if(LOOK.density!=="normal") root.setAttribute("data-density",LOOK.density); else root.removeAttribute("data-density");
   const m=document.querySelector('meta[name="theme-color"]'); if(m){ const z=seasonNow(); m.setAttribute("content", z? z.light[0] : (COLORS.find(c=>c[0]===LOOK.color)||COLORS[0])[2]); }
-  fixInk(); }
+  fixInk(); try{ applyRuby(); }catch(_){} }
 
 // ===== 読みやすさの自動調整(色あいはそのまま、明るさだけ動かす) =====
 // 着せかえの色や明るい/暗い画面によっては、文字と背景が近すぎて読みにくくなることがある。
@@ -1705,8 +1707,14 @@ function glossify(html){
   return html.replace(/(<[^>]+>)|([^<]+)/g,(m,tag,text)=>{ if(tag) return tag; let t=text;
     GTERMS.forEach(({key},i)=>{ if(used.has(key)) return; const idx=t.indexOf(key); if(idx<0) return; used.add(key);
       t=t.slice(0,idx)+`\u0000${i}\u0001`+t.slice(idx+key.length); });
-    return t.replace(/\u0000(\d+)\u0001/g,(_,i)=>`<button class="gl" data-gi="${i}">${esc(GTERMS[i].key)}</button>`); });
+    return t.replace(/\u0000(\d+)\u0001/g,(_,i)=>`<button class="gl" data-gi="${i}">${rubyOn()?rubyHTML(GTERMS[i]):esc(GTERMS[i].key)}</button>`); });
 }
+// ふりがな(ことば辞典の「よみ」をルビにする。漢字がにがてな人・お子さん向け。かんたんモードでは最初からオン)
+function rubyOn(){ const v=store.get("nw-ruby"); if(v==="1") return true; if(v==="0") return false; return LOOK.mode==="easy"; }
+function rubyHTML(g){ const key=g.key, yomi=String((g.w&&g.w[1])||"").replace(/\(.*?\)/,"").trim();
+  if(!yomi||yomi===key||!/[一-龠々]/.test(key)) return esc(key);
+  return `<ruby>${esc(key)}<rt>${esc(yomi)}</rt></ruby>`; }
+function applyRuby(){ root.setAttribute("data-ruby",rubyOn()?"1":"0"); }
 function showPop(i){ const w=GTERMS[i].w; if(!ME.words.includes(w[0])){ ME.words.push(w[0]); saveMe(); checkBadges(); } const p=document.getElementById("pop"); p.innerHTML=`<div style="display:flex;justify-content:space-between;gap:10px;align-items:start"><div><b>${esc(w[0])}</b> <span style="opacity:.7;font-size:.8rem">${esc(w[1])}</span></div><button class="iconbtn" id="popx" aria-label="閉じる" style="background:transparent;color:inherit;border-color:currentColor">✕</button></div><p style="margin:6px 0 0">${esc(w[2])}</p>${w[3]?`<p style="margin:6px 0 0;opacity:.85">例: ${esc(w[3])}</p>`:""}`; p.hidden=false; document.getElementById("popx").onclick=()=>p.hidden=true; }
 document.addEventListener("click",e=>{ const g=e.target.closest(".gl"); if(g){ e.preventDefault(); e.stopPropagation(); showPop(+g.dataset.gi); return; } const p=document.getElementById("pop"); if(!p.hidden && !e.target.closest("#pop")) p.hidden=true; });
 
@@ -2226,7 +2234,10 @@ function readTimeCard(){ const T=timeGet(); const today=T[TODAY]||0;
 function voiceCard(){ const r=sayRate();
   return `<section class="card" aria-label="読み上げ"><div class="sec-h"><h2>🔊 読み上げの速さ</h2></div>
     <div class="chips" id="vRate">${[[0.75,"🐢 ゆっくり"],[1,"ふつう"],[1.25,"🐇 はやい"]].map(([v,l])=>`<button class="fchip" data-rate="${v}" aria-pressed="${Math.abs(r-v)<.01}">${l}</button>`).join("")}</div>
-    <div class="hint" style="margin-top:6px">「🔊 聞く」やことば辞典の読み上げの速さが変わります。お子さんや、ゆっくり聞きたいときは🐢がおすすめです。</div></section>`; }
+    <div class="hint" style="margin-top:6px">「🔊 聞く」やことば辞典の読み上げの速さが変わります。お子さんや、ゆっくり聞きたいときは🐢がおすすめです。</div>
+    <div class="sec-h" style="margin-top:12px"><h2 style="font-size:1rem">🈁 ふりがな</h2></div>
+    <div class="chips" id="vRuby">${[["1","つける"],["0","つけない"]].map(([v,l])=>`<button class="fchip" data-ruby="${v}" aria-pressed="${rubyOn()===(v==="1")}">${l}</button>`).join("")}</div>
+    <div class="hint" style="margin-top:6px">ことば辞典にあることば(点線のことば)に、よみがなをつけます。かんたんモードでは最初からついています。</div></section>`; }
 function saveMe(){ store.set("nw-me", JSON.stringify(ME)); }
 const nkey = n => (n.d+"|"+n.h).slice(0,80);
 // 訪問日と連続記録
@@ -3424,6 +3435,7 @@ function renderMy(){
   </div>`;
   main.querySelectorAll("[data-tab]").forEach(b=>b.onclick=()=>go(b.dataset.tab));
   main.querySelectorAll("#vRate [data-rate]").forEach(b=>b.onclick=()=>{ store.set("nw-rate",b.dataset.rate); main.querySelectorAll("#vRate [data-rate]").forEach(x=>x.setAttribute("aria-pressed",String(x===b))); sayJa("この速さで読み上げます"); });
+  main.querySelectorAll("#vRuby [data-ruby]").forEach(b=>b.onclick=()=>{ store.set("nw-ruby",b.dataset.ruby); applyRuby(); main.querySelectorAll("#vRuby [data-ruby]").forEach(x=>x.setAttribute("aria-pressed",String(x===b))); toast(b.dataset.ruby==="1"?"🈁 ふりがなをつけました":"ふりがなを外しました"); });
   main.querySelectorAll("#myInt [data-g]").forEach(b=>b.onclick=()=>{ const g=b.dataset.g; ME.interests[g]=!ME.interests[g]; b.setAttribute("aria-pressed",String(!!ME.interests[g])); saveMe(); });
   main.querySelectorAll("#myIntCard [data-recint]").forEach(b=>b.onclick=()=>{ applyRecInt(); main.querySelectorAll("#myInt [data-g]").forEach(x=>x.setAttribute("aria-pressed",String(!!ME.interests[x.dataset.g]))); });
   document.getElementById("weekBtn2").onclick=()=>openStory(buildWeekSlides);
