@@ -9,7 +9,7 @@ const R=[];const ok=(n,v,d)=>R.push([v?"OK ":"NG ",n,d||""]);
 let CDP=null;
 async function pinch(p,sel,from,to){
   const cdp=CDP||(CDP=await p.context().newCDPSession(p));
-  const r=await p.evaluate(s=>{const e=document.querySelector(s);const b=e.getBoundingClientRect();return {x:b.left+b.width/2,y:b.top+b.height/2};},sel);
+  const r=await p.evaluate(s=>{const e=document.querySelector(s);e.scrollIntoView({block:"center"});const b=e.getBoundingClientRect();return {x:b.left+b.width/2,y:b.top+b.height/2};},sel);
   const send=(type,pts)=>cdp.send("Input.dispatchTouchEvent",{type,touchPoints:pts});
   const pt=(id,dx)=>({x:r.x+dx,y:r.y,id});
   await send("touchStart",[pt(1,-from/2),pt(2,from/2)]);
