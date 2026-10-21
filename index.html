@@ -812,6 +812,16 @@ svg.eat{animation:petEat .7s ease both!important}
 .ensay{align-self:flex-start;display:inline-block;margin-top:4px;font-size:.82rem;font-weight:700;color:var(--accent);border:1px solid var(--accent);border-radius:999px;padding:1px 8px;cursor:pointer}
 .jsub{font-size:.86rem;color:var(--muted);margin:2px 0 0}
 [lang="en"]{font-family:"Helvetica Neue",Arial,sans-serif}
+/* 🧩 ならべかえ・解説の前後 */
+.oq-list{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+.oq-it{position:relative;text-align:left;padding:10px 12px 10px 14px;border-radius:10px;border:1px solid var(--line);background:var(--surface);font-size:.95rem;line-height:1.45;cursor:pointer;color:var(--ink)}
+.oq-it.ok{background:var(--g-eco-s);border-color:var(--g-eco);padding-left:40px}
+.oq-it.ng{animation:oqng .4s}
+@keyframes oqng{0%,100%{transform:translateX(0)}30%{transform:translateX(-5px)}60%{transform:translateX(5px)}}
+.oq-it .oq-no{position:absolute;left:10px;top:50%;transform:translateY(-50%);width:22px;height:22px;border-radius:999px;background:var(--g-eco);color:#fff;font-weight:800;font-size:.82rem;display:flex;align-items:center;justify-content:center}
+.oq-it .oq-d{display:block;color:var(--muted);font-size:.82rem;margin-top:2px}
+.ex-nav{display:flex;gap:8px;justify-content:space-between;margin-top:6px}
+.ex-nav .fchip{flex:1;min-height:44px;white-space:normal;line-height:1.3}
 /* 🌍 ことばで世界一周 */
 .lg-head{display:flex;align-items:center;gap:12px;margin-bottom:8px}
 .lg-head .lg-av{flex:none;width:72px;height:72px}
@@ -1749,6 +1759,31 @@ function mangaHTML(m){ if(!m||!(m.p||[]).length) return ""; const st=petStage();
       <span class="mg-c r">${owlSVG(of,46)}${o&&MG_MARK[of]?`<i class="mg-mark">${MG_MARK[of]}</i>`:""}</span>
 </div>`; }).join("");
   return `<div class="blk"><h3>🎨 4コマでわかる${m.t?`「${esc(m.t)}」`:""}</h3><div class="manga">${P}</div><div class="mg-cast">左: ${esc(petName())}(あなたのペット)・右: 🦉ホー先生</div></div>`; }
+// ===== 解説の前後へ(左右スワイプ・ボタン) =====
+function exKeys(){ return Object.entries(D.explainers).filter(([,e])=>e&&e.name).map(([k])=>k); }
+function exNavHTML(k){ const K=exKeys(); const i=K.indexOf(k); if(i<0||K.length<2) return "";
+  const pv=K[(i-1+K.length)%K.length], nx=K[(i+1)%K.length];
+  return `<div class="ex-nav"><button class="fchip" data-exgo="${esc(pv)}">← ${esc(D.explainers[pv].icon)} ${esc(D.explainers[pv].name)}</button><button class="fchip" data-exgo="${esc(nx)}">${esc(D.explainers[nx].icon)} ${esc(D.explainers[nx].name)} →</button></div><div class="hint" style="text-align:center">← 画面を横にスワイプしても、前後の解説に移れます →</div>`; }
+function bindExNav(sh,k){ sh.querySelectorAll("[data-exgo]").forEach(b=>b.onclick=()=>{ openEx(b.dataset.exgo); });
+  // 横スワイプ(年表や地図など、横に動かすものの上では反応しない)
+  let st=null; const K=exKeys(); const i=K.indexOf(k); if(i<0||K.length<2) return;
+  sh.addEventListener("touchstart",e=>{ if(e.touches.length!==1||e.target.closest(".htl-wrap,.zwrap,.tspark,.chat,textarea,input,.mg,.flow,.board-wrap")){ st=null; return; } st={x:e.touches[0].clientX,y:e.touches[0].clientY,t:Date.now()}; },{passive:true});
+  sh.addEventListener("touchend",e=>{ if(!st) return; const t=e.changedTouches[0]; const dx=t.clientX-st.x, dy=t.clientY-st.y; const ok=Math.abs(dx)>90&&Math.abs(dy)<60&&Date.now()-st.t<700; st=null; if(!ok) return;
+    const to=dx<0?K[(i+1)%K.length]:K[(i-1+K.length)%K.length]; openEx(to); toast((dx<0?"次":"前")+"の解説へ"); },{passive:true}); }
+// ===== 🧩 ならべかえ: 年表から4つを取り出して、起きた順にタップ(解説に書いてあることだけ) =====
+function orderQuizHTML(e,k){ const T=(e.timeline||[]).filter(x=>x[1]&&x[1].length<=46); if(T.length<4) return "";
+  const r=seeded("oq"+k+TODAY); const idx=[...T.keys()]; const pick=[]; while(pick.length<4&&idx.length){ pick.push(idx.splice(Math.floor(r()*idx.length),1)[0]); }
+  pick.sort((a,b)=>a-b); const items=pick.map((i,n)=>({n,d:T[i][0],t:T[i][1]})); const show=items.slice().sort(()=>r()-.5);
+  const done=(ME.oq||{})[k]===TODAY;
+  return `<div class="blk oq" id="oq" data-k="${esc(k)}"><h3>🧩 ならべかえ <small class="hint" style="font-weight:400">起きた順にタップ</small></h3>
+    ${done?`<div class="hint">今日はもう正解ずみ。また明日、新しい4つが出ます。</div>`:`<div class="oq-list">${show.map(it=>`<button class="oq-it" data-oq="${it.n}">${esc(it.t)}</button>`).join("")}</div><div class="oq-msg hint" id="oqMsg">1番目だと思うものから順にタップしてね(日付は答えのあとに出ます)</div>`}</div>`; }
+function bindOrderQuiz(sh){ const box=sh.querySelector("#oq"); if(!box) return; const k=box.dataset.k; let next=0; const msg=box.querySelector("#oqMsg");
+  box.querySelectorAll("[data-oq]").forEach(b=>b.onclick=()=>{ if(b.classList.contains("ok")) return; const n=+b.dataset.oq;
+    if(n===next){ b.classList.add("ok"); b.insertAdjacentHTML("afterbegin",`<span class="oq-no">${n+1}</span>`); next++;
+      if(next===4){ ME.oq=ME.oq||{}; ME.oq[k]=TODAY; saveMe(); petEarn("oq|"+k+"|"+TODAY,1); if(msg) msg.textContent="🎉 ぜんぶ正解! 流れがつかめたね(ごはん +1)";
+        const e=D.explainers[k]; const T=(e.timeline||[]).filter(x=>x[1]&&x[1].length<=46); box.querySelectorAll(".oq-it").forEach(x=>{ const it=T.find(y=>y[1]===x.textContent.replace(/^\d/,"").trim()); if(it) x.insertAdjacentHTML("beforeend",`<small class="oq-d">${esc(it[0])}</small>`); }); }
+      else if(msg) msg.textContent=`${next}番目まで正解。次は${next+1}番目`; }
+    else { b.classList.add("ng"); setTimeout(()=>b.classList.remove("ng"),500); if(msg) msg.textContent="ちがうみたい。もっと前に起きたことがあるよ"; } }); }
 function openEx(k){
   try{ NEWS.filter(n=>n.ex===k||(D.explainers[k]&&(n.h||"").includes((D.explainers[k].name||"").slice(0,4)))).slice(0,3).forEach(travelAdd); const t0=D.top10.find(x=>x.ex===k); if(t0) travelAdd({h:t0.title,th:""}); }catch(_){}
   if(D.explainers[k]) track("/ex/"+k,"解説: "+D.explainers[k].name);
@@ -1774,13 +1809,16 @@ function openEx(k){
       <div class="htl-wrap" aria-label="年表(横にスクロール)"><div class="htl">${e.timeline.map(([d,t],i)=>`<div class="htl-i${i===e.timeline.length-1?" now":""}${isNewTl(d,seenAt)?" fresh":""}"><span class="htl-d">${esc(d)}${isNewTl(d,seenAt)?' <i class="tl-new">🆕</i>':""}</span><span class="htl-dot"></span><span class="htl-t">${esc(t)}</span></div>`).join("")}${(e.next||[]).slice(0,3).map(x=>{ const t=Array.isArray(x)?x.join(" "):String(x); const m=t.match(/^(\S+)\s+(.*)$/); return `<div class="htl-i fut"><span class="htl-d">${esc(m?m[1]:"これから")}</span><span class="htl-dot"></span><span class="htl-t">${esc(m?m[2]:t)}</span></div>`; }).join("")}</div></div>
       <div class="hint">← 横にスクロールできます。点線の先は「これからの予定」</div>
       <details class="faq plain"><summary>リストで見る</summary><ol class="tl">${e.timeline.map(([d,t])=>`<li${isNewTl(d,seenAt)?' class="fresh"':""}><b>${esc(d)}</b>${esc(t)}${isNewTl(d,seenAt)?' <i class="tl-new">🆕</i>':""}</li>`).join("")}</ol></details></div>
+    ${orderQuizHTML(e,k)}
     ${e.next.length?`<div class="blk"><h3>🔭 次の山場</h3><ul class="us">${e.next.map(n=>`<li>${esc(n)}</li>`).join("")}</ul></div>`:""}
     ${rel.length?`<div class="blk"><h3>🗞️ 関係するニュースの記録</h3><div class="res"><ul style="list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px">${rel.map(n=>`<li class="item"><div class="meta"><span class="hint">${mdLabel(n.d)}</span>${n.ok?'<span class="badge-ok">✅</span>':'<span class="badge-one">⚠️ 1社</span>'}</div><div class="h">${esc(n.h)}</div></li>`).join("")}</ul></div></div>`:""}
     ${askBlock(k)}
     <div class="src">📰 出典: ${esc(e.src)}</div>
+    ${exNavHTML(k)}
     <button class="iconbtn" id="shx2" style="align-self:flex-start">← 一覧にもどる</button>
   </div>`;
   sh.hidden=false; sh.scrollTop=0; document.body.style.overflow="hidden";
+  bindOrderQuiz(sh); bindExNav(sh,k);
   const close=()=>{ try{ window.speechSynthesis&&window.speechSynthesis.cancel(); }catch(_){} sh.hidden=true; sh.innerHTML=""; document.body.style.overflow=""; document.removeEventListener("keydown",esck); try{ history.replaceState(null,"","#"+(current||"today")); }catch(_){} };
   const esck=ev=>{ if(ev.key==="Escape") close(); };
   document.addEventListener("keydown",esck);
