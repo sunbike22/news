@@ -8,7 +8,7 @@ self.addEventListener("fetch", e => {
   const url = new URL(req.url);
   const same = url.origin === location.origin;
   // 地震・警報は新しさがすべて: 保存分を使わず、そのままネットへ
-  if (url.hostname === "raw.githubusercontent.com" || url.hostname === "api.p2pquake.net" || url.hostname === "api.open-meteo.com") return;
+  if (url.hostname === "raw.githubusercontent.com" || url.hostname === "api.p2pquake.net" || url.hostname === "api.open-meteo.com" || url.hostname === "www.jma.go.jp" || url.hostname === "cyberjapandata.gsi.go.jp") return;  // 雨雲と地図は、いつも新しいものを読む
   // Googleのログイン・ドライブ(自分の記録)は、保存せずそのままネットへ
   if (req.headers.has("authorization") || /(^|\.)google(apis)?\.com$/.test(url.hostname) || url.hostname.endsWith("gstatic.com")) return;
   const fresh = same && (url.pathname.endsWith("/") || url.pathname.endsWith(".html") || url.pathname.endsWith("data.js") || url.pathname.endsWith("picks.js"));
