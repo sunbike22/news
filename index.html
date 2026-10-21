@@ -278,7 +278,7 @@ main{padding-block:18px 32px}
 .ten .th-e{display:flex;align-items:center;justify-content:center;font-size:2rem;background:var(--cs);border:1px solid color-mix(in srgb,var(--c) 25%,transparent)}
 .ten .th-x{display:none}
 .ten.short .th{width:64px;height:64px}.ten.short .row:has(> .th){grid-template-columns:34px 1fr 64px}
-.th-cr{font-size:.82rem;color:var(--muted);margin:8px 2px 0;line-height:1.5}
+.th-cr{font-size:.82rem;color:var(--muted);margin:8px 2px 0;line-height:1.5}.th-cr a{color:var(--accent-ink,var(--accent))}
 @media (min-width:700px){ .ten .row:has(> .th){grid-template-columns:34px 1fr 96px} .ten .th{width:96px;height:96px} .ten.short .row:has(> .th){grid-template-columns:34px 1fr 72px} .ten.short .th{width:72px;height:72px} }
 .ten .row.link{cursor:pointer}
 .rank{font-family:var(--f-display);font-size:1.25rem;line-height:1.2;color:var(--muted);text-align:center}
@@ -578,6 +578,8 @@ details.faq p{margin:10px 0 12px}
 :root[data-ruby="1"] .ten li>button>span>p,:root[data-ruby="1"] .ex-body p{line-height:1.95}
 .pop{position:fixed;z-index:70;left:max(16px,env(safe-area-inset-left,0px));right:max(16px,env(safe-area-inset-right,0px));bottom:calc(86px + env(safe-area-inset-bottom,0px));max-width:520px;margin:0 auto;background:var(--ink);color:var(--bg);border-radius:14px;padding:14px 16px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
 .pop b{font-size:1.05rem}
+/* 黒い吹き出しの中の白いボタンは、文字をふつうの濃い色にもどす(うすい字で読めなかった) */
+.pop .seg button:not([aria-pressed="true"]),.pop .fchip:not([aria-pressed="true"]){color:var(--ink)}
 
 /* numbers */
 .chartbox{position:relative;height:220px}
@@ -2017,8 +2019,8 @@ async function shareCard(d){ const W=1080,H=1350; const c=document.createElement
   x.fillStyle="#5b6478"; x.font="500 34px "+F; x.fillText(mdLabel(TODAY)+" ・ "+(GN[d.g]||""),64,160);
   // 見出し(折り返し)
   const wrap=(t,max,lh,y0,font,col,maxLines)=>{ x.font=font; x.fillStyle=col; let line="",y=y0,n=0; for(const ch of t){ const tl=line+ch; if(x.measureText(tl).width>max&&line){ x.fillText(line,64,y); y+=lh; line=ch; if(++n>=maxLines-1){ break; } } else line=tl; } if(line){ let L=line; if(n>=maxLines-1&&t.length>0){ while(x.measureText(L+"…").width>max&&L.length) L=L.slice(0,-1); } x.fillText(L,64,y); y+=lh; } return y; };
-  let y=wrap(d.icon+" "+d.title,W-128,86,300,"800 64px "+F,"#111827",6);
-  if(d.sum) y=wrap(d.sum,W-128,58,y+30,"500 40px "+F,"#374151",4);
+  let y=wrap(d.icon+" "+d.title,W-128,86,300,"800 64px "+F,"#111827",4);
+  if(d.sum) y=wrap(d.sum,W-128,58,y+30,"500 40px "+F,"#374151",3); // 行数を決めて、下のペット・URLと重ならないようにする
   // 確かめた印
   x.font="800 40px "+F; const badge=d.isEx?"💡 くわしい解説つき":(d.ok?"✅ 2社以上で確認":"⚠️ まだ1社だけ"); const bw=x.measureText(badge).width+56;
   x.fillStyle=d.ok||d.isEx?"#e4f3e9":"#fdf0d5"; roundRect(x,64,y+30,bw,76,38); x.fill(); x.fillStyle=d.ok||d.isEx?"#14532d":"#7a4a00"; x.fillText(badge,92,y+82);
@@ -2565,26 +2567,35 @@ function buildWeekSlides(){
   return S;
 }
 
+// 日本語の折り返し(「。」「、」「」」などを行の頭に置かない)
+function wrapJa(x,t,max,f){ x.font=f; const NOHEAD="、。,.)」』】〕!?！？ー〜ぁぃぅぇぉっゃゅょァィゥェォッャュョ%℃"; const lines=[]; let cur="";
+  for(const ch of t){ if(ch==="\n"){ lines.push(cur); cur=""; continue; }
+    if(x.measureText(cur+ch).width>max && cur){ if(NOHEAD.includes(ch)){ cur+=ch; continue; } lines.push(cur); cur=ch; } else cur+=ch; }
+  if(cur) lines.push(cur); return lines; }
 // ===== シェア画像(今日の3行) =====
 async function shareImage(){
   const btn=document.getElementById("shareImg"); if(btn) btn.textContent="画像を作っています…";
   try{ await document.fonts.ready; }catch(_){}
-  const W=1080,H=1350,c=document.createElement("canvas"); c.width=W; c.height=H; const x=c.getContext("2d");
+  // 先に行を数えてから高さを決める(文が長い日でも下の文字と重ならない)
+  const W=1080,c=document.createElement("canvas"); c.width=W; let x=c.getContext("2d");
   const font=(w,s)=>`${w} ${s}px "Hiragino Sans","Yu Gothic",sans-serif`;
+  const cols={intl:"#c42b2b",pol:"#2563c9",spo:"#8a5a2b",sci:"#52677d",eco:"#17803f",soc:"#c25a0c",it:"#7c3aed",ent:"#c0367a"};
+  const wrap=(t,max,size,w)=>wrapJa(x,String(t||""),max,font(w,size));
+  const cards=D.three.map(t=>{ const tl=wrap(t.title,880,46,700); const bl=wrap(t.text,880,32,400);
+    return {t,tl,bl,hgt:64+tl.length*60+bl.length*46+28}; });
+  const H=Math.max(1350,260+cards.reduce((s,k)=>s+k.hgt+28,0)+150);
+  c.height=H; x=c.getContext("2d");
   x.fillStyle="#eef1f4"; x.fillRect(0,0,W,H);
   x.fillStyle="#2747c9"; x.fillRect(0,0,W,210);
   x.fillStyle="#fff"; x.font=`64px "Dela Gothic One","Hiragino Sans",sans-serif`; x.fillText("まいにちニュース帳",70,118);
   x.font=font(700,36); x.fillText(`${D.updatedLabel} の「今日の3行」`,70,175);
-  const cols={intl:"#c42b2b",pol:"#2563c9",spo:"#8a5a2b",sci:"#52677d",eco:"#17803f",soc:"#c25a0c",it:"#7c3aed",ent:"#c0367a"};
-  const wrap=(t,max,size,w)=>{ x.font=font(w,size); const lines=[]; let cur=""; for(const ch of t){ if(x.measureText(cur+ch).width>max){ lines.push(cur); cur=ch; } else cur+=ch; } if(cur) lines.push(cur); return lines; };
   let y=260;
-  D.three.forEach(t=>{ const tl=wrap(t.title,880,46,700).slice(0,2); const bl=wrap(t.text,880,32,400).slice(0,3);
-    const hgt=60+tl.length*60+bl.length*46+30;
+  cards.forEach(({t,tl,bl,hgt})=>{
     x.fillStyle="#fff"; x.beginPath(); x.roundRect?x.roundRect(60,y,960,hgt,28):x.rect(60,y,960,hgt); x.fill();
     x.fillStyle=cols[t.tone]||"#475569"; x.fillRect(60,y,14,hgt);
     x.fillStyle="#5a6478"; x.font=font(700,28); x.fillText(t.label,100,y+48);
-    x.fillStyle="#141b2d"; tl.forEach((l,i)=>{ x.font=font(700,46); x.fillText(l,100,y+108+i*60); });
-    x.fillStyle="#3b4458"; bl.forEach((l,i)=>{ x.font=font(400,32); x.fillText(l,100,y+108+tl.length*60+i*46-10); });
+    x.fillStyle="#141b2d"; x.font=font(700,46); tl.forEach((l,i)=>x.fillText(l,100,y+108+i*60));
+    x.fillStyle="#3b4458"; x.font=font(400,32); bl.forEach((l,i)=>x.fillText(l,100,y+108+tl.length*60+i*46-6));
     y+=hgt+28; });
   x.fillStyle="#5a6478"; x.font=font(400,28); x.fillText("2社以上で確かめたニュースだけ ・ まとめ: Claude(AI)",70,H-90);
   x.fillStyle="#2747c9"; x.font=font(700,32); x.fillText(location.host+location.pathname,70,H-44);
@@ -3458,6 +3469,11 @@ function funGrid(){ const L=FUN.filter(f=>(FUN_SET[f[0]]||FUN_ALWAYS.includes(f[
     ${hid?`<button class="fchip" id="funMore" data-hid="${hid}" aria-expanded="${funOpen?"true":"false"}" style="margin-top:8px">${funOpen?"▲ とじる":`… ほか ${hid}こ を見る`}</button>`:""}</section>`; }
 // ===== お知らせ(新しくなったところ)。機能を足したら、いちばん上に1つ足す =====
 const UPDATES=[
+  {id:"2026-10-21j",d:"2026-10-21",t:"📤 かんたんに送れる・📷 ニュースの写真",L:[
+    "ニュース10の「📤 送る」から、LINE・メール・コピー・画像で、だれにでもかんたんに送れます。送られた人がリンクを開くと、そのニュースの場所に飛びます",
+    "ニュース10に小さな写真がつきました(イメージ写真です)。いらないときは マイ→⚙️設定 で消せます",
+    "「今日の3行」の画像で、文が長い日に下の文字と重なっていたのを直しました。設定の吹き出しのボタンも読みやすくしました",
+    "毎日のまとめに、海外の報道機関の記事からも、日本につながる出来事を集めるようにしました"]},
   {id:"2026-10-21i",d:"2026-10-21",t:"🌍 ことばで世界一周・🈁 ふりがな・🧩 ならべかえ など",L:[
     "✨ おたのしみに「🌍 ことばで世界一周」。今日のニュースのことばを 英語・中国語・韓国語・スペイン語・フランス語・ドイツ語で。🔊で聞けて、「聞いて当てる」クイズも。案内役は新キャラ 🦜 ポリー",
     "🈁 ふりがな(マイ→⚙️設定): ことば辞典にあることばに、よみがなをつけられます。かんたんモードでは最初からオン",

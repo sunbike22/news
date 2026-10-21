@@ -62,6 +62,10 @@ for(const dark of [false,true]) for(const col of COLORS){
       all[k]=all[k]||{n:0,min:99,where:new Set(),ex:x};
       all[k].n++; all[k].min=Math.min(all[k].min,x.cr); all[k].where.add((dark?"暗":"明")+col); });
   }
+  // 設定の吹き出し(黒い背景の中のボタン)も測る
+  await p.evaluate(()=>document.getElementById("setBtn").click()); await p.waitForTimeout(300);
+  (await p.evaluate(probe)).forEach(x=>{ const k=x.tag+"."+String(x.cls).split(" ").slice(0,2).join(".")+" | "+x.t+" (設定)";
+    all[k]=all[k]||{n:0,min:99,where:new Set(),ex:x}; all[k].n++; all[k].min=Math.min(all[k].min,x.cr); all[k].where.add((dark?"暗":"明")+col); });
   await ctx.close();
 }
 const rows=Object.entries(all).sort((a,b)=>a[1].min-b[1].min);
