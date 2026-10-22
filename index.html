@@ -3346,7 +3346,10 @@ function oneCard(){ const x=q1Pick(); const nw=q1News(); const wk=q1Week(); cons
   </section>`; }
 function q1Redraw(){ const c=document.getElementById("q1Card"); if(c){ const h=oneCard(); if(h) c.outerHTML=h; else c.remove(); } }
 function q1Share(){ const wk=q1Week(); const t=`まいにちニュース帳 きょうの1問\n${wk.map(x=>x[1]).join("")}\n🟩当たり 🟥はずれ 🟨まだ ⬜答えなかった\n${location.origin+location.pathname}`;
-  if(navigator.share) navigator.share({text:t}).catch(()=>{}); else { try{ navigator.clipboard.writeText(t); toast("📋 コピーしました。LINEなどに貼れます"); }catch(_){ prompt2(location.origin+location.pathname); } } }
+  if(navigator.share){ navigator.share({text:t}).catch(()=>{}); return; }
+  /* コピーは待ってから「コピーしました」と出す(待たないと、失敗しても「コピーしました」と出てしまう) */
+  const fb=()=>prompt2(location.origin+location.pathname);
+  try{ navigator.clipboard.writeText(t).then(()=>toast("📋 コピーしました。LINEなどに貼れます")).catch(fb); }catch(_){ fb(); } }
 document.addEventListener("click",ev=>{ const t=ev.target;
   const v=t.closest("[data-q1v]"); if(v){ const x=q1Pick(); if(!x) return; ME.votes[x.no]={v:v.dataset.q1v,at:TODAY}; ME.flags=ME.flags||{}; ME.flags.q1=1; saveMe(); const g=petEarn("q1:"+TODAY,1); toast(`🎯 記録しました。答え合わせは ${x.d?mdLabel(x.d)+"ごろ":"決まったとき"}${g?"(🍙 ごはん+1)":""}`); q1Redraw(); try{ track("q1"); }catch(_){} return; }
   if(t.closest("[data-q1chg]")){ const x=q1Pick(); if(x){ delete ME.votes[x.no]; saveMe(); q1Redraw(); } return; }
