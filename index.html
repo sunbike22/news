@@ -161,6 +161,12 @@ main{padding-block:18px 32px}
 .ten.short li.mytown{border-left:4px solid var(--accent)}
 .ten.short li{position:relative}.ten.short .row{padding-right:50px!important}
 .len-seg{margin-left:auto}
+.rd-min{margin-top:4px}
+.done-c{border:2px solid var(--ok);background:var(--ok-soft)}
+.done-h{display:flex;gap:10px;align-items:center}.done-i{font-size:2rem;line-height:1}.done-h b{font-size:1.08rem;display:block}.done-h small{display:block;color:var(--muted);font-size:.88rem;margin-top:2px}
+.done-t{margin:10px 0 6px;line-height:1.7}
+.done-why{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px;font-size:.92rem;line-height:1.55}
+.ob-why{list-style:none;margin:0 0 12px;padding:10px 12px;border-radius:12px;background:var(--surface2);text-align:left;display:flex;flex-direction:column;gap:4px;font-size:.95rem;line-height:1.55}
 .fw7-s{list-style:none;margin:10px 0 6px;padding:0;display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
 .fw7-s li{display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 0;border-radius:10px;background:var(--surface2);border:1px solid var(--line)}
 .fw7-s li b{font-size:.95rem}.fw7-s li small{font-size:.95rem}.fw7-s li.on{background:var(--ok-soft);border-color:var(--ok)}.fw7-s li.now{border:2px solid var(--accent);background:var(--accent-soft)}.fw7-s li.miss{opacity:.55}
@@ -1684,6 +1690,23 @@ function weatherCard(){
 function exLink(id){ return id && D.explainers[id] ? ` data-ex="${id}"` : ""; }
 function seasonCard(){ const z=seasonNow(); if(!z||store.get("nw-season-hide")===TODAY+z.k) return "";
   return `<div class="season-card" id="seasonCard"><span class="si" aria-hidden="true">${z.icon}</span><span style="flex:1"><b>${esc(z.name)}の季節</b><span style="display:block;font-size:.88rem">${esc(z.greet)}</span></span><button class="fchip" id="seasonX" aria-label="閉じる">✕</button></div>`; }
+// ===== ほかのアプリとのちがいを見える形に(終わりがある・見くらべて確かめた・広告なし・記録はスマホの中) =====
+/* 報道機関の名前(出典の文から数える。役所の発表やまとめサイトは数えない) */
+const MEDIA=[["共同",/共同/g],["NHK",/NHK/g],["時事",/時事/g],["日経",/日経(?!クロステック)/g],["朝日",/朝日/g],["読売",/読売/g],["毎日",/毎日(?!放送)/g],["産経",/産経/g],["東京新聞",/東京新聞/g],["中日",/中日(?!本)/g],["ANN",/ANN|テレ朝|テレビ朝日/g],["TBS",/TBS|JNN/g],["FNN",/FNN|フジテレビ/g],["日テレ",/日テレ|NNN|日本テレビ/g],["ABEMA",/ABEMA/g],["ロイター",/ロイター/g],["AP",/(?<![A-Za-z])AP(?![A-Za-z])/g],["AFP",/AFP/g],["ブルームバーグ",/ブルームバーグ/g],["CNBC",/CNBC/g],["CNN",/CNN/g],["BBC",/BBC/g],["アルジャジーラ",/アルジャジーラ/g],["ガーディアン",/ガーディアン/g],["TASS",/TASS/g],["キーウ・ポスト",/キーウポスト|Kyiv/g],["ウクルインフォルム",/ウクルインフォルム/g],["ユーロニュース",/ユーロニュース/g],["琉球新報",/琉球新報/g],["沖縄タイムス",/沖縄タイムス/g],["北海道新聞",/北海道新聞|道新/g],["神戸新聞",/神戸新聞/g],["西日本新聞",/西日本新聞/g],["熊本日日新聞",/熊本日日/g],["北國新聞",/北國新聞/g],["河北新報",/河北新報/g],["下野新聞",/下野/g],["山陰中央新報",/山陰中央/g],["関西テレビ",/関西テレビ/g],["MBS",/MBS/g],["ABCテレビ",/ABCテレビ|ABCニュース/g],["RSK山陽放送",/RSK/g],["HBC",/HBC/g],["MBC南日本放送",/MBC/g],["ITmedia",/ITmedia/g],["Impress",/Impress/g],["日経クロステック",/日経クロステック/g],["ASCII",/ASCII/g],["マイナビニュース",/マイナビ/g],["ウェザーニュース",/ウェザーニュース/g],["tenki.jp",/tenki\.jp|日本気象協会/g],["スポニチ",/スポニチ/g],["スポーツ報知",/報知/g],["デイリー",/デイリー/g],["日刊スポーツ",/日刊スポーツ/g],["サンスポ",/サンスポ/g],["ゲキサカ",/ゲキサカ/g],["フィスコ",/フィスコ|Fisco/g],["みんかぶ",/みんかぶ/g],["オリコン",/オリコン/g],["シネマトゥデイ",/シネマトゥデイ/g],["教育新聞",/教育新聞/g]];
+function todayStats(){ const ds=[...new Set(NEWS.map(n=>n.d))].slice(0,2); let L=NEWS.filter(n=>n.d===ds[0]); if(L.length<12&&ds[1]) L=NEWS.filter(n=>ds.includes(n.d)); const d=L.length&&L[L.length-1].d!==ds[0]?ds[1]:ds[0]; const d2=ds[0]; const outlets=new Set(); let arts=0;
+  L.forEach(n=>{ const t=String(n.s||""); MEDIA.forEach(([k,re])=>{ const c=(t.match(re)||[]).length; if(c){ outlets.add(k); arts+=c; } }); });
+  return {d,d2,n:L.length,ok:L.filter(n=>n.ok).length,arts,outlets:outlets.size}; }
+function readMin(){ const t=(D.three||[]).map(x=>x.title+x.text).join("")+(D.top10||[]).map(x=>(LOOK.len||"short")==="short"?(x.s||x.title):x.title+(x.text||"")).join(""); return Math.max(2,Math.round(t.length/450)); }
+function doneCard(){ const st=todayStats(); ME.done=ME.done||{}; const done=!!ME.done[TODAY]; const cnt=Object.keys(ME.done).length+(done?0:1);
+  return `<section class="card done-c" id="doneCard" aria-label="きょうはここまで">
+    <div class="done-h"><span class="done-i" aria-hidden="true">${done?"✅":"🏁"}</span><div><b>きょうの大事なニュースは、ここまでです</b><small>${done?`読み終わり ${Object.keys(ME.done).length}日目`:"ここまで来たら、読み終わり"}。次に新しくなるのは ${esc(D.nextLabel||"次の更新")}</small></div></div>
+    <p class="done-t">このページは、<b>${st.outlets}社</b>の報道<b>${st.arts}本</b>を見くらべて、${st.d===st.d2?mdLabel(st.d):mdLabel(st.d)+"〜"+mdLabel(st.d2)}のニュース${st.n}本を確かめ、その中から選んでいます(2社以上で確かめられたもの ${st.ok}本)。</p>
+    <ul class="done-why"><li>🔍 <b>2社以上で確かめた</b>ものに✅。うわさやSNSだけの話は載せません</li><li>⏹️ <b>終わりがある</b>。下にずっと続かないので、見すぎません</li><li>🚫 <b>広告なし</b>。おすすめに広告をまぜません</li><li>🔒 <b>あなたの記録はスマホの中だけ</b>。読んだものを外に送りません</li></ul>
+  </section>`; }
+function bindDone(){ const c=document.getElementById("doneCard"); if(!c||!("IntersectionObserver" in window)) return; ME.done=ME.done||{}; if(ME.done[TODAY]) return;
+  const io=new IntersectionObserver(es=>{ if(!es.some(x=>x.isIntersecting)) return; io.disconnect(); if(ME.done[TODAY]) return; ME.done[TODAY]=1; const ks=Object.keys(ME.done).sort(); if(ks.length>120) delete ME.done[ks[0]]; saveMe();
+    const g=petEarn("done:"+TODAY,1); toast(`🏁 きょうの大事なニュースは、読み終わりです${g?"(🍙 ごはん+1)":""}。また ${D.nextLabel||"次の更新"} に`); try{ track("/done","読み終わり"); }catch(_){}
+    const h=c.querySelector(".done-i"); if(h) h.textContent="✅"; },{threshold:.6}); io.observe(c); }
 function renderToday(){
   const t=D.top10;
   const S={};
@@ -1701,6 +1724,7 @@ function renderToday(){
     </section>`;
   S.ten=`<section aria-label="今日のニュース10">
       <div class="sec-h"><h2>📰 今日のニュース10</h2><span class="seg len-seg" role="group" aria-label="長さ">${[["short","短く"],["full","くわしく"]].map(([k,l])=>`<button data-len="${k}" aria-pressed="${(LOOK.len||"short")===k}">${l}</button>`).join("")}</span></div>
+      <div class="hint rd-min">📖 ここから約${readMin()}分で、きょうの大事なニュースを読み終われます</div>
       <ol class="ten${(LOOK.len||"short")==="short"?" short":""}" style="margin-top:10px">${t.map((n,i)=>{
         const big=i<3; const link=n.ex||n.tab; const wt=newsWeight(n); const mine=isLocal(n.title+" "+(n.text||""));
         return `<li class="${big?'big':''} w${wt.lv}${mine?' mytown':''}">${pinBtn({k:"t|"+n.title,h:n.title,g:n.g,d:(NEWS[0]||{}).d,ex:n.ex},"abs")}<button class="row${link?' link':''}"${n.ex?` data-ex="${n.ex}"`:''}${n.tab?` data-tab="${n.tab}"`:''} ${link?'':'tabindex="-1"'}>
@@ -1736,10 +1760,12 @@ function renderToday(){
     ${personalCards()}
     ${navigator.onLine===false?'<div class="offline">📴 いまはオフラインです。前に読み込んだ内容を表示しています。</div>':''}
     ${body||'<div class="card"><b>表示する項目がありません</b><div class="hint">着せかえで、見たい項目をオンにしてください。</div></div>'}
+    ${body?doneCard():""}
     ${LOOK.mode==="easy"?`<button class="card ms-card" data-modesw="normal"><span class="ms-i" aria-hidden="true">📱</span><span><b>もっと使ってみる?</b><small>ふつうモードで何が増えるか見る(すぐには変わりません)→</small></span></button>`:""}
     <button class="fchip" id="lookBtnToday" style="align-self:flex-start">🎨 この画面の並びを変える</button>
     ${footer()}
   </div>`;
+  bindDone();
   const lb=document.getElementById("listenBtn"); if(lb) lb.onclick=()=>{ if(window.speechSynthesis&&window.speechSynthesis.speaking){ stopSpeak(); lb.classList.remove("on"); lb.querySelector("b").textContent="今日のニュースを聞く"; return; }
     const w=D.weather; const t=`${relDay(w.iso)}の${w.place}は${w.sky}。最高${w.hi}度、最低${w.lo}度。${w.umbrella}。では、今日のニュースです。`+D.three.map((x,i)=>`${i+1}つ目。${x.title}。${x.text}`).join("。")+"。ニュース10の見出しです。"+D.top10.map((n,i)=>`${i+1}位、${n.title}`).join("。")+"。以上です。";
     speak(t); lb.classList.add("on"); lb.querySelector("b").textContent="■ 止める"; track("/listen","聞く"); };
@@ -3453,7 +3479,7 @@ function onboard(force){ if(!force && (store.get("nw-onboard")==="1" || ME.days.
     L.push(["☀️ 今日の3行","いちばん大事なニュース3つ。時間がない日はここだけでOK"],["📰 今日のニュース","見出しを押すと、くわしい説明が開きます"],["下のボタン","押すとページが変わります(好きなボタンに変えられます)"]);
     return `<ol class="obl">${L.map(([a,b],i)=>`<li><i>${i+1}</i><span><b>${a}</b><br>${b}</span></li>`).join("")}</ol>`; };
   const steps=[
-    {t:"ようこそ!",pet:"newsboy",h:()=>`<p class="obp">毎日のニュースを、やさしい言葉でまとめたアプリです。<br><b>使いやすい方を選んでください。</b>(あとで「設定」から変えられます)</p>
+    {t:"ようこそ!",pet:"newsboy",h:()=>`<p class="obp">毎日のニュースを、やさしい言葉でまとめたアプリです。</p><ul class="ob-why"><li>🔍 2社以上の報道で<b>確かめたもの</b>だけに✅</li><li>⏹️ 1日<b>数分で読み終わる</b>(ずっと続きません)</li><li>🚫 <b>広告なし</b>・あなたの記録はスマホの中だけ</li></ul><p class="obp"><b>使いやすい方を選んでください。</b>(あとで「設定」から変えられます)</p>
       <div class="mode-cards">${[["easy","🔰","かんたん(おすすめ)","文字が大きく、天気・ニュース・聞くボタンだけ"],["normal","📱","ふつう(なれている人向け)","ペットやクイズなど、ぜんぶの機能"]].map(([k,i,n,d])=>`<button class="mode-c" data-obm="${k}" aria-pressed="${LOOK.mode===k}"><span class="mi">${i}</span><b>${n}</b><small>${d}</small></button>`).join("")}</div>`},
     {t:"好きなことを選んでね",pet:"newsboy",h:()=>{ ME.topics=ME.topics||{}; const n=myTopics().length;
       return `<p class="obp">気になることを押してください(いくつでも)。<b>選んだことのニュースには 💗 がつきます。</b>選ばなくても使えます。</p>
@@ -3889,6 +3915,7 @@ function funGrid(){ const L=FUN.filter(f=>(FUN_SET[f[0]]||FUN_ALWAYS.includes(f[
     ${hid?`<button class="fchip" id="funMore" data-hid="${hid}" aria-expanded="${funOpen?"true":"false"}" style="margin-top:8px">${funOpen?"▲ とじる":`… ほか ${hid}こ を見る`}</button>`:""}</section>`; }
 // ===== お知らせ(新しくなったところ)。機能を足したら、いちばん上に1つ足す =====
 const UPDATES=[
+  {id:"2026-10-22o",d:"2026-10-22",t:"🏁 きょうのニュースは「読み終わり」がある",L:["「きょう」のいちばん下に「ここまでです」のカードができました。読み終わるとごはん🍙。何社の報道を見くらべて確かめたかも出ます。","ニュース10の上に「約○分で読み終われます」。下にずっと続かず、広告もなく、記録はスマホの中だけです。"]},
   {id:"2026-10-22n",d:"2026-10-22",t:"✍️ ことばを見直しました",L:["アプリの中の文を全部読み直して、かたい言い方や、外国語を訳したような言い方を、ふだんのことばに直しました(例: 「記録を読み込む」→「とっておいた記録をもどす」)。","🌍 世界のいまの地名は、わかるものを日本語で出すようにしました。"]},
   {id:"2026-10-22m",d:"2026-10-22",t:"🌱 はじめての7日間",L:["はじめて開いた日から1週間、毎日ちがう小さなごほうびが出ます(7日目は🍙×3)。","1週間たったら、続ける目標(14日・30日・100日)を自分で選べます。上の記録の行に出ます。"]},
   {id:"2026-10-22l",d:"2026-10-22",t:"🌍 世界のいま",L:["世界のどこで何が起きているかを1枚の地図に。このアプリで伝えたニュースの場所(青)と、世界の地震・台風・山火事など(公的機関の発表)を重ねました。","🛟 防災のページと、地図のページから開けます。うわさやSNSの書きこみは使っていません。"]},
