@@ -1,40 +1,40 @@
 // まいにちニュース — データ(Notion「ニュース」から書き出し)
 // 自動更新でこのファイルだけを書き換える想定
 window.NEWS_DATA = {
-  updated: "2026-10-22T12:40:00+09:00",
+  updated: "2026-10-22T18:40:00+09:00",
 
-  updatedLabel: "10/22(木) 昼 12:40",
+  updatedLabel: "10/22(木) 夕方 6:40",
 
-  nextLabel: "10/22(木) 夕方 5:50ごろ",
+  nextLabel: "10/22(木) 夜 10:30ごろ",
 
-  weather: {"iso":"2026-10-22","date":"10/22(木)","place":"東京","sky":"くもり時々晴れ","hi":24,"lo":16,"umbrella":"傘はいらなそう","rain":[["朝",20],["昼",30],["夜",20]],"wear":"長そでで。夜は16℃くらいまで下がるので羽織るものを","notes":["きのうの30℃から6℃ほど下がる。24日(土)は雨で最高17〜18℃の肌寒い一日になりそう","台風30号: 22日9時に915hPa。石垣島地方は今夜遅くにも暴風警報の見込み、先島諸島は23〜24日に暴風のおそれ。石垣・宮古の空の便と船は22〜24日に多くが欠航"],"source":"tenki.jp(港区 10/21 6:00発表)・AccuWeather(10/22 6:50)・ウェザーニュース"},
+  weather: {"iso":"2026-10-22","date":"10/22(木)","place":"東京","sky":"くもり時々晴れ","hi":24,"lo":16,"umbrella":"傘はいらなそう","rain":[["朝",20],["昼",30],["夜",20]],"wear":"長そでで。夜は16℃くらいまで下がるので羽織るものを","notes":["きのうの30℃から6℃ほど下がる。24日(土)は雨で最高17〜18℃の肌寒い一日になりそう","台風30号: 22日15時に925hPaの非常に強い勢力。午後4時10分に八重山地方へ暴風警報。石垣島のあたりを23日午後〜24日未明に通る見込み。石垣・宮古の空の便と船は22〜24日に多くが欠航"],"source":"tenki.jp(港区 10/21 6:00発表)・AccuWeather(10/22 18:03)・ウェザーニュース"},
 
   three: [
-    {"label":"世界のトレンド","tone":"intl","title":"ウクライナの和平協議 11月に再開へ動く","text":"米国の特使とプーチン氏が約3時間会談。ロシアは米・ロ・ウクライナの3者協議に「原則」前向き。原油は97ドル台に下がり、ガソリン代にもつながる。","ex":"ukr"},
-    {"label":"日本のトレンド","tone":"it","title":"ネットの被害が止まらない コミックシーモア420万件","text":"電子書籍の「コミックシーモア」で最大約420万件の情報が流出。イオンのグループ13社のサイトにも不正アクセス。会社の名前をかたるあやしいメールに気をつけよう。","ex":"cyber"},
-    {"label":"世間の関心事","tone":"soc","title":"猛烈な台風30号 あすから先島に暴風のおそれ","text":"猛烈な勢力で沖縄の南へ。石垣島地方は今夜遅くにも暴風警報の見込み。石垣・宮古の空の便と船は22〜24日に多くが欠航。そのあと週末から26日ごろに西日本へ近づくおそれも。","ex":"typhoon"}
+    {"label":"世界のトレンド","tone":"intl","title":"ウクライナの和平協議 11月に再開へ動く","text":"米国の特使とプーチン氏が約3時間会談。ロシアは3者協議に「原則」前向き。ただその数時間後、キーウなどを大規模に攻撃。原油の値段(ガソリン代)にもつながる。","ex":"ukr"},
+    {"label":"日本のトレンド","tone":"it","title":"ネットの被害が止まらない コミックシーモア420万件","text":"電子書籍の「コミックシーモア」で最大約420万件の情報が流出。「PHP」の欠陥で、すき家やCoCo壱番屋などがネット注文を一時止めた。会社の名前をかたるあやしいメールに気をつけよう。","ex":"cyber"},
+    {"label":"世間の関心事","tone":"soc","title":"台風30号 八重山に暴風警報 あす先島へ","text":"沖縄の南を北上中。午後4時10分に八重山地方へ暴風警報が出た。石垣・宮古の空の便と船は22〜24日に多くが欠航。そのあと26日ごろに西日本へ近づくおそれも。","ex":"typhoon"}
   ],
 
   top10: [
-    {"g":"soc","ok":1,"icon":"🌀","title":"猛烈な台風30号、あすから先島に暴風のおそれ。空の便と船は多くが欠航","s":"台風30号、先島にあすから暴風のおそれ","text":"気象庁の22日9時の発表で915hPa、最大瞬間風速75m。宮古島・八重山地方はもう強風域。暴風警報は石垣島地方が今夜遅く、宮古島地方が23日朝に出る見込み(琉球新報・NHK・ウェザーニュース)。空の便203便・船138便が22〜24日に欠航。","point":"そのあと北東へ向きを変え、週末から26日ごろに西日本・対馬の近くへ進むおそれ(ウェザーニュース・FNN)。いちばん近づくのは石垣島地方が23日夜遅く、与那国島は24日午前の見込み(琉球新報)。","ex":"typhoon"},
-    {"g":"intl","ok":1,"icon":"🇺🇦","title":"ウクライナの和平協議、11月に再開へ。ガソリン代につながる原油は97ドル台に","s":"ウクライナ協議11月再開へ、原油も下がる","text":"米国のウィトコフ特使が21日、プーチン大統領と約3時間会談。ロシア側は米・ロ・ウクライナの3者協議の再開に「原則」応じる考えで、時期は11月中旬とした(アルジャジーラ・キーウポスト)。","point":"ウクライナ側は「遅くとも11月初めに」と求めていて、時期はまだずれている。ロシアは拘束していた米国人を解放。NY原油は0.67ドル安の97.15ドルに(共同・みんかぶ)。","ex":"ukr"},
-    {"g":"it","ok":1,"icon":"🔐","title":"電子書籍「コミックシーモア」で最大420万件が流出。イオンのサイトにも不正アクセス","s":"コミックシーモア420万件流出、イオンも","text":"運営するNTTソルマーレが21日に発表。システムの記録に残っていた会員情報などが流出した。カード情報と買った本の記録は漏れていないという。サービスは止まったまま(共同・日経・読売)。","point":"イオンは21日、グループ13社のサイトに不正アクセスがあり、いまは見られない状態と発表。お店やネット通販への影響はないとしている(共同・朝日)。会社の名前をかたるあやしいメールに注意。","ex":"cyber"},
-    {"g":"it","ok":1,"icon":"🌐","title":"米国の裁判所がメタ(フェイスブック・インスタグラムの会社)に約3兆9千億円の支払いを命令。個人情報の扱いで利用者をだましたとした。メタは控訴へ","s":"メタに約3兆9千億円の支払い命令、控訴へ","text":"米ニューメキシコ州の裁判所が、フェイスブックの個人情報の扱いが消費者を守る法律に違反したとして、250億ドル(約3兆9千億円)の支払いを命じた(共同・NHK・AP)。"},
+    {"g":"soc","ok":1,"icon":"🌀","title":"台風30号、八重山地方に暴風警報。あす午後から石垣島のあたりを通る見込み","s":"台風30号、八重山に暴風警報。あす先島へ","text":"気象庁は22日午後4時10分に八重山地方へ暴風警報を出した(琉球新報・ウェザーニュース)。15時は925hPa、最大瞬間風速70mの「非常に強い」勢力。石垣島・西表島のあたりを23日午後〜24日未明に通る見込み。空の便203便・船138便が22〜24日に欠航。","point":"先島では最大瞬間風速40〜50m、300mmをこえる大雨のおそれ。そのあと東シナ海を北上し、弱まりながら26日(月)ごろに西日本へ近づくおそれ(ウェザーニュース)。","ex":"typhoon"},
+    {"g":"eco","ok":1,"icon":"📉","title":"日経平均が1713円安。約3か月ぶりに6万3000円を割る","s":"日経平均1713円安、6万3000円割れ","text":"終値は62,907円84銭で、いちばん安い値で終わった。米国の半導体の機械メーカー「ラムリサーチ」の株が決算のあとに下がり、AI・半導体の株に売りが広がった(ウエルスアドバイザー・フィスコ・日経)。","point":"「PHP」の欠陥への心配と、円高(夕方は1ドル157円台)も重しに。円高は輸入品の値段には追い風。"},
+    {"g":"it","ok":1,"icon":"🔐","title":"「PHP」の欠陥で、すき家・ココイチなどがネット注文を一時停止","s":"PHPの欠陥でネット注文の停止が相次ぐ","text":"世界の多くのサイトで使われる「PHP」に重大な欠陥が見つかった問題で、すき家・CoCo壱番屋・大戸屋がネット注文を止め、りそな銀行は来店予約を休止。JR四国のサイトなども緊急の点検に入った(NHK・FNN)。","point":"メール配信サービス「ブラストメール」でも、全契約者の会社名や担当者の連絡先が持ち出された(ラクス発表)。会社の名前をかたるあやしいメールに注意。","ex":"cyber"},
+    {"g":"intl","ok":1,"icon":"🇺🇦","title":"ロシア、3者協議に前向きと答えた数時間後にキーウなどを大規模攻撃","s":"協議に前向きの直後、ロシアが大規模攻撃","text":"22日未明(現地)、ロシアがウクライナ各地をミサイルと無人機で攻撃。キーウ・インディペンデントは少なくとも9人死亡と報道(AP・キーウ・インディペンデント)。","ex":"ukr"},
+    {"g":"spo","ok":1,"icon":"⚾","title":"ドラフト会議、巨人が大リーグ志望の織田翔希投手(横浜高)を1位で指名。渡部海捕手は楽天、鈴木泰成投手はソフトバンクがくじで引き当てた","s":"ドラフト、巨人が織田を1位指名","text":"青学大の渡部捕手は楽天と中日、鈴木投手はソフトバンクとロッテの2球団が競合。阪神は明大の榊原七斗外野手を1位で指名(日刊スポーツ・スポニチ・中日スポーツ・西スポなど)。"},
+    {"g":"it","ok":1,"icon":"📚","title":"「コミックシーモア」で最大約420万件が流出。メール配信の「ブラストメール」でも全契約者の連絡先が持ち出された","s":"コミックシーモア420万件、ブラストメールも","text":"運営するNTTソルマーレが21日に発表(共同・日経・読売)。「ブラストメール」はラクスの子会社のサービスで、大分県・琉球新報など20以上の団体が影響を公表した(ラクス発表・テレビ新潟など)。","ex":"cyber"},
+    {"g":"pol","ok":1,"icon":"💴","title":"食料品の消費税1%法案、参院の野党6党が「特別委員会」で首相も出て話し合うよう求める。衆院は23日から委員会で本格審議","s":"消費税1%法案、参院野党が特別委を要求","text":"参院の野党6党が、法案をていねいに話し合うための特別委員会を作るよう求めた(NHK・日経・TBS)。与党は11月上旬の衆院通過をめざす。","ex":"tax"},
     {"g":"soc","ok":1,"icon":"🪪","title":"神奈川県警、免許の更新で回収した古い免許証の顔写真などを捜査に流用か。30年ほど前から続いていた疑いで、警察庁が全国を調べる","s":"神奈川県警、古い免許証の写真を捜査に流用か","text":"更新のときに回収した古い運転免許証の顔写真などを、警備部門の捜査に使っていた疑い(NHK・日経・毎日)。"},
-    {"g":"pol","ok":1,"icon":"💴","title":"食料品の消費税1%法案、23日から委員会で本格的な話し合いへ。与党は11月上旬の衆院通過をめざす","s":"消費税1%法案、23日から本格審議","text":"与党は11月上旬の衆院通過をめざし、野党は首相も出席したうえでの審議を求めている。財源と、所得に応じて配るお金のしくみが争点(NHK・時事・共同)。","ex":"tax"},
-    {"g":"it","ok":1,"icon":"🛠️","title":"「PHP」の重大な欠陥、修正版が出たあとも国内外でサイトを一時止める動きが続く。欧州では政府のサイトを止める国も","s":"PHPの欠陥、サイトを止める動きが続く","text":"多くのサイトを動かすプログラム「PHP」の修正版は21日夜11時に出たが、国内外の企業や役所でサイトを一時止める動きが続く。韓国政府も緊急対応(NHK・アルジャジーラ・SBS)。","ex":"cyber"},
-    {"g":"spo","ok":1,"icon":"⚾","title":"プロ野球ドラフト会議はきょう午後4時50分から。1位を前もって言った球団はなし","s":"ドラフト会議きょう、1位の公表なし","text":"注目は青学大の鈴木泰成投手・渡部海捕手、山梨学院高の菰田陽生投手(投打の二刀流)など。指名は12球団で120人まで(共同・ベースボールチャンネル)。"},
-    {"g":"spo","ok":1,"icon":"🤸","title":"世界体操で日本の女子団体が60年ぶりの銅メダル。ロス五輪の出場枠もとる","s":"体操女子団体、60年ぶり銅メダル","text":"オランダで21日(日本時間22日朝)。金は中国、銀は米国。日本は杉原愛子選手ら5人(NHK・共同・スポーツ報知)。"},
-    {"g":"eco","ok":1,"icon":"🚗","title":"電気自動車(EV)などを買うときの国の補助金、来年1月から減らす(共同・時事は上限125万→75万円)","s":"EVの補助金、来年1月から減額","text":"予算の残りが少なくなったためと経済産業省。共同・時事によると、EVの上限は125万円から75万円に(NHKは別の金額を伝えていて確認中)。"}
+    {"g":"it","ok":1,"icon":"🌐","title":"米国の裁判所がメタに約3兆9千億円の支払いを命令(メタは控訴へ)。メタの7〜9月決算は売上高26%増で大幅な増益","s":"メタに3.9兆円の支払い命令、決算は増益","text":"米ニューメキシコ州の裁判所が、フェイスブックの個人情報の扱いが消費者を守る法律に違反したとして、250億ドル(約3兆9千億円)の支払いを命じた(共同・NHK・AP)。"},
+    {"g":"spo","ok":1,"icon":"🤸","title":"世界体操で日本の女子団体が60年ぶりの銅メダル。ロス五輪の出場枠もとる","s":"体操女子団体、60年ぶり銅メダル","text":"オランダで21日(日本時間22日朝)。金は中国、銀は米国。日本は杉原愛子選手ら5人(NHK・共同・スポーツ報知)。"}
   ],
 
   quiz: [
-    {"q":"電子書籍の「コミックシーモア」で、流出した会員情報などは最大で約何件?","o":["約4.2万件","約42万件","約420万件","約4200万件"],"a":2,"e":"運営するNTTソルマーレが21日に発表。カード情報と買った本の記録は漏れていないという。"},
-    {"q":"世界体操で、日本の女子団体が銅メダルをとったのは何年ぶり?","o":["10年ぶり","30年ぶり","60年ぶり","100年ぶり"],"a":2,"e":"60年ぶりのメダル。ロサンゼルス五輪の出場枠もとった。"},
-    {"q":"22日9時の台風30号の中心気圧は? (数字が小さいほど強い)","o":["915hPa","955hPa","985hPa","1005hPa"],"a":0,"e":"915hPaの猛烈な勢力。石垣島地方は今夜遅くにも暴風警報が出る見込み。"}
+    {"q":"22日の日経平均は、前の日より約いくら下がった?","o":["約170円","約1700円","約1万7000円","下がっていない"],"a":1,"e":"1713円安の62,907円。終値で約3か月ぶりに6万3000円を割った。"},
+    {"q":"ドラフト会議で、大リーグ志望の織田翔希投手を1位で指名した球団は?","o":["阪神","楽天","巨人","ソフトバンク"],"a":2,"e":"巨人が単独で指名した。渡部海捕手は楽天、鈴木泰成投手はソフトバンクがくじで引き当てた。"},
+    {"q":"台風30号で、22日午後に暴風警報が出た沖縄の地方は?","o":["沖縄本島地方","大東島地方","八重山地方","奄美地方"],"a":2,"e":"午後4時10分に八重山地方(石垣島・与那国島など)に出た。"}
   ],
 
-  number: {"value":"約420万","unit":"件","caption":"電子書籍「コミックシーモア」で流出した会員情報などの数(最大)。日本の人口の約30人に1人分にあたる。","src":"NTTソルマーレ発表。共同・日経・読売で一致"},
+  number: {"value":"1713","unit":"円","caption":"きょうの日経平均の値下がりの幅。終値は62,907円で、約3か月ぶりに6万3000円を割った。","src":"ウエルスアドバイザー・フィスコ・日経で一致"},
 
   ticks: [
     ["2026-10-19T17:09:19Z",158.54],
@@ -48,7 +48,8 @@ window.NEWS_DATA = {
     ["2026-10-21T14:25:52Z",158.09],
     ["2026-10-21T22:08:00Z",158.09],
     ["2026-10-21T22:26:30Z",158.14],
-    ["2026-10-22T04:27:37Z",157.7]
+    ["2026-10-22T04:27:37Z",157.7],
+    ["2026-10-22T09:04:08Z",156.99]
   ],
 
   markets: [
@@ -64,7 +65,8 @@ window.NEWS_DATA = {
     ["2026-10-16",65324,null,101.41,"日経は7営業日ぶりに反発。原油は約1か月ぶりの高さ"],
     ["2026-10-19",64916,158.17,103.66,"日経は米のAI・半導体株安で一時1400円超安、終値407円安。円は共同の午後5時(158円16〜18銭)。原油は約1か月ぶり高値(共同・DZH・みんかぶ)"],
     ["2026-10-20",64075,158.08,101.79,"日経は841円安(64,075円42銭)、AIへの心配と原油高で半導体株安(共同・読売・日経)。円は共同の午後5時(158円07〜09銭、9銭の円高)。NY原油(11月物)は1.87ドル安、米イラン合意の報道と否定で上下(みんかぶ・ブルームバーグ・Fisco)"],
-    ["2026-10-21",64621,158.13,97.15,"日経は545円高(64,621円24銭)、3営業日ぶりの反発。米株高とAI・半導体株の買い戻し(共同・フィスコ・日経)。円は共同・NHKの午後5時(158円12〜14銭、5銭の円安)。NY原油(12月物)は0.67ドル安、ウクライナの和平協議の再開の動きで供給の心配がやわらぐ(共同・みんかぶ)"]
+    ["2026-10-21",64621,158.13,97.15,"日経は545円高(64,621円24銭)、3営業日ぶりの反発。米株高とAI・半導体株の買い戻し(共同・フィスコ・日経)。円は共同・NHKの午後5時(158円12〜14銭、5銭の円安)。NY原油(12月物)は0.67ドル安、ウクライナの和平協議の再開の動きで供給の心配がやわらぐ(共同・みんかぶ)"],
+    ["2026-10-22",62907,null,null,"日経は1713円安(62,907円84銭)、終値で約3か月ぶりに6万3000円割れ。米ラムリサーチの時間外の下落でAI・半導体株に売り、PHPの欠陥への心配・円高も(ウエルスアドバイザー・フィスコ・日経)。円は夕方157円20〜30銭(フィスコ)、共同の午後5時の値は未確認"]
   ],
 
   explainers: {
@@ -81,6 +83,18 @@ window.NEWS_DATA = {
   },
 
   news: [
+    ["2026-10-22","eco",1,"日経平均が1713円安の62,907円84銭。約3か月ぶりに6万3000円を割る。米ラムリサーチの時間外の下落でAI・半導体株に売り、PHPの欠陥への心配と円高も重し","ウエルスアドバイザー 10/22 15:56、フィスコ 15:37、トレーダーズ・ウェブ 15:52、日経(見出し)","株価・経済",""],
+    ["2026-10-22","eco",1,"円相場が大きく円高に、夕方は1ドル157円20銭台(朝は158円25銭)。米国の利上げ観測の後退とアジア株安で円買い","フィスコ 10/22 17:26、ウエルスアドバイザー 15:56","株価・経済",""],
+    ["2026-10-22","soc",1,"台風30号、気象庁が22日16時10分に八重山地方へ暴風警報。15時は925hPaの非常に強い勢力、石垣島付近を23日午後〜24日未明に通る見込み","琉球新報 10/22 16:21、ウェザーニュース 16:46、NHK 15:30・16:40","台風30号","N21"],
+    ["2026-10-22","spo",1,"プロ野球ドラフト、巨人が大リーグ志望の横浜高・織田翔希を1位で強行指名。青学大の渡部海は楽天(中日と抽選)、鈴木泰成はソフトバンク(ロッテと抽選)、阪神は明大・榊原七斗","日刊スポーツ・中日スポーツ・スポニチ・西スポ・報知など 10/22、NHK 16:57","",""],
+    ["2026-10-22","pol",1,"参院の野党6党、消費減税法案で「特別委員会」の新設を要求。首相の出席と、ていねいな審議を求める","NHK 10/22 15:21、日経(見出し)、TBS(見出し)","消費減税","N16"],
+    ["2026-10-22","it",1,"PHPの欠陥で、すき家・CoCo壱番屋・大戸屋などがネット注文を止め、りそな銀行は来店予約を休止。JR四国のサイトや首相の個人サイトも緊急メンテナンス","NHK 10/22 15:11ほか、FNNプライムオンライン 10/22、ライブドアニュース 10/22","不正アクセスとAI",""],
+    ["2026-10-22","it",1,"メール配信サービス「ブラストメール」(ラクス子会社)に不正アクセス。全契約者の会社名・担当者の連絡先などが持ち出され、一部契約者は配信先リストも。大分県・琉球新報など20以上が公表","ラクス発表(第2報)10/21、テレビ新潟・青森放送 10/21〜22","不正アクセスとAI",""],
+    ["2026-10-22","it",1,"米メタの7〜9月決算、売上高は26%増の646億ドルで大幅な増益。AIへの巨額の投資は続ける","メタ発表 10/21(米国時間)、NHK 10/22 12:17、Investing.com","",""],
+    ["2026-10-22","intl",1,"ロシアがキーウなどウクライナ各地をミサイルと無人機で大規模攻撃。3者協議に前向きと答えた数時間後で、少なくとも9人死亡(キーウ・インディペンデント)","キーウ・インディペンデント 10/22、AP 10/22","ウクライナ","N26"],
+    ["2026-10-22","intl",1,"エジプト議会のサウジへの派兵の採決は来週月曜(26日)に延期。議会の3分の2の賛成が必要","CBSニュース 10/21","サウジ・中東","N20"],
+    ["2026-10-22","pol",0,"高市首相が横浜市の原澤市長と会談、花博の成功へ連携を確認","NHK 10/22 16:49","",""],
+    ["2026-10-22","intl",0,"ウクライナの汚職対策機関が中央銀行総裁の事務所などを捜索と報道","キーウ・インディペンデント 10/22","",""],
     ["2026-10-22","spo",1,"欧州CL第3節、鈴木彩艶がフル出場のアストン・ビラが3-1で3連勝。レアル・マドリード4-1、バイエルン2-2アーセナル","フットボールチャンネル 10/22 11:04、スポーツナビ(結果表)10/22","",""],
     ["2026-10-22","intl",0,"韓国のイ大統領が「AIに聞いた」内容をSNSに投稿し、議論に","NHK 10/22 5:10","",""],
     ["2026-10-22","intl",1,"北朝鮮の金与正氏、韓国との境の拡声器を数日内に動かせる状態にすると談話","NHK 10/22 5:23、SBS(韓国)10/22 12:06","北朝鮮",""],
@@ -401,7 +415,7 @@ window.NEWS_DATA = {
     ["P10","銃殺刑の生配信は見直される／12/3の執行は実施される","中","2026-12-03","part","⚪","前半は当たり(10/16に配信中止)。後半は12/3に判定"],
     ["P6","新聞購読率が50%未満と、本文で確認される","高","2026-10-20","hit","","49.8%で初めて5割を下回った(時事・調査会)"],
     ["N23","「ふるさとチョイス」の運営会社が10/31までに漏えいの有無の調査結果を公表する","中","2026-10-31","hit","","10/20夜、会員約445万件の流出を発表(期限前に公表)"],
-    ["N21","台風30号で、10/24までに沖縄県のどこかに暴風警報が出る","中高","2026-10-24","wait","🟢","22日3時45分に905hPaの猛烈な勢力。石垣島地方は23日朝までに暴風域のおそれ(22日朝は強風注意報で、暴風警報はまだ)"],
+    ["N21","台風30号で、10/24までに沖縄県のどこかに暴風警報が出る","中高","2026-10-24","hit","","10/22 16:10に八重山地方へ暴風警報(琉球新報・ウェザーニュース)"],
     ["N17","王将事件の無罪判決に、検察が控訴する","高","2026-10-30","wait","⚪",""],
     ["N20","エジプトが10/31までに、サウジへの部隊派遣を正式に決める","中","2026-10-31","wait","🟡","議会の採決は26日に先送り"],
     ["N19","10/31時点でもNY原油が100ドル前後以上で高止まり","中","2026-10-31","wait","🔴","10/21終値は97.15ドル(0.67ドル安)。ウクライナ協議の再開の動きで100ドルを下回る"],
@@ -428,9 +442,9 @@ window.NEWS_DATA = {
   ],
 
   schedule: [
-    ["2026-10-21","2026-10-24","soc","🌀 台風30号で先島諸島など沖縄に暴風のおそれ","N21","905hPaの猛烈な勢力。先島は23〜24日に暴風のおそれ、空の便・船は22〜24日に多く欠航"],
+    ["2026-10-21","2026-10-24","soc","🌀 台風30号で先島諸島など沖縄に暴風のおそれ","N21","22日16:10に八重山地方へ暴風警報。石垣島のあたりを23日午後〜24日未明に通る見込み、空の便・船は22〜24日に多く欠航"],
     ["2026-10-22","","ent","🎮 ゲーム「ファイナルファンタジー レゾナンス」発売","","Switch・PS5・Xboxは22日、Steamは23日"],
-    ["2026-10-22","","spo","⚾ プロ野球ドラフト会議(16:50から)","",""],
+    ["2026-10-22","","spo","⚾ プロ野球ドラフト会議(巨人が織田翔希を1位指名)","",""],
     ["2026-10-22","","spo","🏀 八村選手のクリッパーズが今季の初戦(キングズ戦)","",""],
     ["2026-10-23","","pol","💴 消費減税法案、衆院の委員会で本格的な審議","N16","与党は11月上旬の衆院通過をめざす"],
     ["2026-10-24","","spo","⚾ 大リーグのワールドシリーズ開幕(レイズ対ブルワーズ、日本時間の朝9時)","","第1戦はミルウォーキー。どちらが勝っても球団初の世界一"],
@@ -507,4 +521,4 @@ window.NEWS_DATA = {
   ]
 };
 
-window.NEWS_DATA.en = {"three":[{"t":"Peace talks on Ukraine may restart in November","x":"A U.S. envoy met President Putin for about three hours. Russia said it is \"in principle\" open to talks among the U.S., Russia and Ukraine. Oil fell to about 97 dollars, which is linked to gas prices."},{"t":"Online attacks keep coming: 4.2 million records from Comic C'moA","x":"Up to about 4.2 million records leaked from the e-book service \"Comic C'moA.\" Websites of 13 AEON group companies were also hacked. Watch out for suspicious emails using company names."},{"t":"Violent Typhoon No. 30: storm winds may hit the Sakishima Islands from tomorrow","x":"It is heading south of Okinawa with violent strength. A storm warning may be issued for the Ishigaki area late tonight. Many flights and ferries to and from Ishigaki and Miyako are canceled from the 22nd to the 24th. It may also come near western Japan around the weekend to the 26th."}],"top10":[{"t":"Violent Typhoon No. 30 may bring storm winds to the Sakishima Islands from tomorrow. Many flights and ferries are canceled","x":"At 9 a.m. on the 22nd, the typhoon was 915 hPa with gusts of 75 m/s. Miyako and Yaeyama are already in the strong wind zone. A storm warning is expected for the Ishigaki area late tonight and for the Miyako area on the morning of the 23rd (Ryukyu Shimpo, NHK, Weathernews). 203 flights and 138 ferries are canceled from the 22nd to the 24th.","w":[["storm warning","暴風警報"],["cancel","欠航する"]]},{"t":"Peace talks on Ukraine may restart in November. Oil, which affects gasoline prices, fell to about 97 dollars","x":"U.S. envoy Witkoff met President Putin for about three hours on the 21st. Russia said it is \"in principle\" ready to restart three-way talks in mid-November (Al Jazeera, Kyiv Post).","w":[["peace talks","和平協議"],["in principle","原則として"]]},{"t":"Up to 4.2 million records leaked from the e-book service \"Comic C'moA.\" AEON websites were also hacked","x":"NTT Solmare announced it on the 21st. Card details and purchase records did not leak, it says. The service is still stopped (Kyodo, Nikkei, Yomiuri).","w":[["leak","流出する"],["hack","不正アクセスする"]]},{"t":"A U.S. court ordered Meta (the company behind Facebook and Instagram) to pay about 3.9 trillion yen. It said users were misled about personal data. Meta will appeal","x":"A court in New Mexico ordered Meta to pay 25 billion dollars (about 3.9 trillion yen), saying the way Facebook handled personal data broke a law that protects consumers (Kyodo, NHK, AP).","w":[["appeal","控訴する"],["personal data","個人情報"]]},{"t":"Kanagawa police may have used photos from old driver's licenses, collected at renewal, for investigations. It may have gone on for about 30 years, and the National Police Agency will check across Japan","x":"The police are suspected of using face photos and other data from old licenses collected at renewal for investigations by the security section (NHK, Nikkei, Mainichi).","w":[["driver's license","運転免許証"],["investigation","捜査"]]},{"t":"The bill to cut the tax on food to 1% will be fully debated in committee from the 23rd. The ruling parties aim to pass it in the lower house in early November","w":[["bill","法案"],["debate","審議する"]]},{"t":"Even after a fix for serious flaws in \"PHP\" came out, websites in Japan and abroad keep stopping for a while. Some European countries stopped government sites","x":"A fix for \"PHP,\" a program that runs many websites, came out at 11 p.m. on the 21st, but companies and government offices in Japan and abroad keep stopping their sites for a while. The South Korean government also took emergency steps (NHK, Al Jazeera, SBS).","w":[["flaw","欠陥"],["fix","修正"]]},{"t":"The pro baseball draft is today from 4:50 p.m. No team announced its first pick in advance","w":[["draft","ドラフト"],["pick","指名"]]},{"t":"Japan's women's gymnastics team won bronze at the world championships for the first time in 60 years and got a spot at the L.A. Olympics","w":[["bronze medal","銅メダル"],["team","団体"]]},{"t":"The government will cut subsidies for buying electric cars from January next year (Kyodo and Jiji: the limit goes from 1.25 million to 750,000 yen)","w":[["subsidy","補助金"],["electric car","電気自動車"]]}],"ex":{"saudi":"In the Middle East, an armed group and Saudi Arabia keep fighting, and oil prices are rising. This also connects to gas prices in Japan.","tax":"A plan to lower the tax on food you buy at the supermarket from 8% to 1%. It has not been decided yet.","cyber":"Bad actors keep breaking into the computers of companies and government offices and stealing information such as names and addresses.","mmx":"A Japanese probe has left for Mars. The plan is to bring back sand from a small moon near Mars.","sato":"The Hanshin Tigers agreed to let Sato, this year's \"Triple Crown\" hitter, try to play in Major League Baseball in America.","series":"Games to decide Japan's best pro baseball team start on Saturday, October 24.","yokohama":"There was an election to choose the leader (mayor) of Yokohama, and a new person was chosen.","past":"Three weeks of worries about a big typhoon and a volcano, a new governor of Okinawa and new ministers, and higher interest rates in America.","ukr":"Talks to end the war between Russia and Ukraine may be held again in November. Nothing has been decided yet.","typhoon":"A very strong typhoon is coming near the Sakishima Islands south of Okinawa. It may also head toward western Japan later."}};
+window.NEWS_DATA.en = {"three":[{"t":"Peace talks on Ukraine may restart in November","x":"A U.S. envoy met President Putin for about three hours. Russia said it is \"in principle\" open to three-way talks. But a few hours later, it launched a large attack on Kyiv and other cities. This also affects oil prices (gasoline costs)."},{"t":"Online attacks keep coming: 4.2 million records leaked from Comic C'moA","x":"Up to about 4.2 million records leaked from the e-book service Comic C'moA. Because of a flaw in \"PHP,\" Sukiya and CoCo Ichibanya stopped online orders for a while. Watch out for suspicious emails that use company names."},{"t":"Typhoon No. 30: storm warning for Yaeyama, heading to Sakishima tomorrow","x":"The typhoon is moving north to the south of Okinawa. A storm warning was issued for the Yaeyama area at 4:10 p.m. Many flights and ferries to and from Ishigaki and Miyako are canceled from the 22nd to the 24th. It may approach western Japan around the 26th."}],"top10":[{"t":"Typhoon No. 30: storm warning for the Yaeyama area. It is expected to pass near Ishigaki Island from tomorrow afternoon","x":"The weather agency issued a storm warning for the Yaeyama area at 4:10 p.m. on the 22nd. At 3 p.m. it was 925 hPa with gusts of 70 m/s, a \"very strong\" typhoon. It is expected to pass near Ishigaki and Iriomote from the afternoon of the 23rd to early on the 24th.","w":[["storm warning","暴風警報"],["pass","通る"]]},{"t":"The Nikkei average fell 1,713 yen, below 63,000 for the first time in about three months","x":"It closed at 62,907.84 yen, its lowest point of the day. Shares of the U.S. chip-equipment maker Lam Research fell after its earnings, and selling spread to AI and chip stocks.","w":[["closing price","終値"],["semiconductor","半導体"]]},{"t":"Because of a flaw in \"PHP,\" Sukiya, CoCo Ichibanya and others stopped online orders for a while","x":"After a serious flaw was found in \"PHP,\" used by many websites, Sukiya, CoCo Ichibanya and Ootoya stopped online orders, and Resona Bank paused branch reservations (NHK, FNN).","w":[["flaw","欠陥"],["online order","ネット注文"]]},{"t":"Hours after saying it was open to three-way talks, Russia launched a large attack on Kyiv and other cities","x":"Early on the 22nd (local time), Russia attacked many parts of Ukraine with missiles and drones. The Kyiv Independent reported at least nine people killed (AP, Kyiv Independent).","w":[["attack","攻撃"],["drone","無人機"]]},{"t":"In the draft, the Giants picked pitcher Shoki Oda, who hopes to play in the major leagues, in the first round. Catcher Kai Watanabe went to Rakuten and pitcher Taisei Suzuki to SoftBank by lottery","w":[["draft","ドラフト"],["lottery","くじ"]]},{"t":"Up to about 4.2 million records leaked from Comic C'moA. Contact details of all customers of the mailing service Blastmail were also taken","w":[["leak","流出する"],["customer","契約者"]]},{"t":"On the bill to cut the tax on food to 1%, six opposition parties in the upper house asked for a special committee with the prime minister present. The lower house will debate it fully in committee from the 23rd","w":[["special committee","特別委員会"],["bill","法案"]]},{"t":"Kanagawa police may have used photos from old driver's licenses, collected at renewal, for investigations. It may have gone on for about 30 years, and the National Police Agency will check across Japan","x":"The police are suspected of using face photos and other data from old licenses collected at renewal for investigations by the security section (NHK, Nikkei, Mainichi).","w":[["driver's license","運転免許証"],["investigation","捜査"]]},{"t":"A U.S. court ordered Meta to pay about 3.9 trillion yen (Meta will appeal). Meta's July-September sales rose 26%, and its profit grew sharply","w":[["appeal","控訴する"],["profit","利益"]]},{"t":"Japan's women's gymnastics team won bronze at the world championships for the first time in 60 years and got a spot at the L.A. Olympics","w":[["bronze medal","銅メダル"],["team","団体"]]}],"ex":{"saudi":"In the Middle East, an armed group and Saudi Arabia keep fighting, and oil prices are rising. This also connects to gas prices in Japan.","tax":"A plan to lower the tax on food you buy at the supermarket from 8% to 1%. It has not been decided yet.","cyber":"Bad actors keep breaking into the computers of companies and government offices and stealing information such as names and addresses.","mmx":"A Japanese probe has left for Mars. The plan is to bring back sand from a small moon near Mars.","sato":"The Hanshin Tigers agreed to let Sato, this year's \"Triple Crown\" hitter, try to play in Major League Baseball in America.","series":"Games to decide Japan's best pro baseball team start on Saturday, October 24.","yokohama":"There was an election to choose the leader (mayor) of Yokohama, and a new person was chosen.","past":"Three weeks of worries about a big typhoon and a volcano, a new governor of Okinawa and new ministers, and higher interest rates in America.","ukr":"Talks to end the war between Russia and Ukraine may be held again in November. Nothing has been decided yet.","typhoon":"A very strong typhoon is coming near the Sakishima Islands south of Okinawa. It may also head toward western Japan later."}};
