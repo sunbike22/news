@@ -1477,7 +1477,7 @@ function openTabs(){ const sh=document.getElementById("sheet");
       <ul class="tabpick">${LOOK.tabs.map((k,i)=>{ const t=TABS.find(x=>x[0]===k); if(!t) return ""; const on=!LOOK.tabOff[k]; return `<li class="${on?"":"off"}"><span style="font-size:1.4rem">${t[1]}</span><span class="nm">${esc(t[2])}<br><small class="hint">${esc(TAB_DESC[k]||"")}</small></span>
         <button class="iconbtn mv" data-tm="${i}" data-d="-1" aria-label="${esc(t[2])}を左へ" ${i===0?"disabled":""}>↑上</button>
         ${k==="my"?`<span class="hint" style="min-width:84px;text-align:center">いつも出す</span>`:`<button class="tg" data-tt="${k}" aria-pressed="${on}">${on?"✅ 出している":"⬜ かくしている"}</button>`}</li>`; }).join("")}</ul>
-      <p class="hint">↑ で左へ動きます。「マイ」には設定があるので、いつも出しておきます。</p>
+      <p class="hint">↑上 を押すと、前(左)へ動きます。「マイ」には設定があるので、いつも出しておきます。</p>
       <button class="fchip" id="tbReset">${modeName()}モードのはじめの形にもどす</button></div>`;
     sh.querySelector("#tbx").onclick=close;
     sh.querySelectorAll("[data-tt]").forEach(b=>b.onclick=()=>{ const k=b.dataset.tt; const n=LOOK.tabs.filter(x=>!LOOK.tabOff[x]).length;
@@ -2216,7 +2216,7 @@ function renderNumbers(){
       <div class="chartbox" style="height:240px"><canvas id="cl" aria-label="長い期間のグラフ"></canvas></div>
       <div class="legend-note" id="lsNote">データを読み込んでいます…</div></section>
     <h3 style="font-size:1rem;margin:4px 0 -10px">🗓️ このサイトで記録した毎日の値</h3>
-    <section class="card"><h3 style="font-size:1rem">📈 日経平均(終値・円)</h3><div class="chartbox"><canvas id="c1" aria-label="日経平均のグラフ"></canvas></div><div class="legend-note">日本の代表的な225社の株価の平均。10/15は下げ幅が過去3番目。</div></section>
+    <section class="card"><h3 style="font-size:1rem">📈 日経平均(終値・円)</h3><div class="chartbox"><canvas id="c1" aria-label="日経平均のグラフ"></canvas></div><div class="legend-note">日本の代表的な225社の株価の平均。値動きで、日本の会社の景気がざっくりわかります。</div></section>
     <section class="card"><h3 style="font-size:1rem">🛢️ NY原油(WTI・1バレルのドル)</h3><div class="chartbox"><canvas id="c3" aria-label="原油のグラフ"></canvas></div><div class="legend-note">1バレル=約159リットル。点線は100ドルの目安。</div></section>
     <section class="card"><h3 style="font-size:1rem">💴 1ドルが何円か</h3><div class="chartbox"><canvas id="c2" aria-label="円相場のグラフ"></canvas></div><div class="legend-note">数字が大きいほど円安。輸入する食べ物や燃料が高くなりやすい。</div></section>
     <section class="card"><h3 style="font-size:1rem">🗂️ 記録したニュースのジャンル(10/11〜)</h3><div class="chartbox" style="height:240px"><canvas id="c4" aria-label="ジャンル別の件数"></canvas></div></section>
@@ -2276,7 +2276,7 @@ function longChart(){
   }
   function drawTicks(){
     const note=document.getElementById("lsNote"), sum=document.getElementById("lsSum");
-    if(lsState.s!=="yen"){ sum.innerHTML=""; if(chart){chart.destroy();chart=null;} note.textContent="数時間ごとの値は、いまは「1ドル(円)」だけです。日経平均と原油は、無料で取れる確かなデータが1日ごとのためです。"; return; }
+    if(lsState.s!=="yen"){ sum.innerHTML=""; if(chart){chart.destroy();chart=null;} note.textContent="数時間ごとの値は、いまは「1ドル(円)」だけです。日経平均と原油は、無料で確かなデータが1日1回分しか取れないためです。"; return; }
     const T=(D.ticks||[]).filter(t=>Date.parse(t[0])>Date.now()-7*864e5);
     if(T.length<2){ sum.innerHTML=""; if(chart){chart.destroy();chart=null;} note.textContent="数時間ごとの記録を集めはじめたところです。1日4回(サイトの更新のたび)1点ずつ増えていきます。"; return; }
     const lab=t=>{ const d=new Date(Date.parse(t)+9*3600e3); return `${d.getUTCMonth()+1}/${d.getUTCDate()} ${d.getUTCHours()}時`; };
@@ -2285,7 +2285,7 @@ function longChart(){
     const col=css("--g-eco");
     if(chart) chart.destroy();
     chart=new Chart(document.getElementById("cl"),{type:"line",data:{labels:T.map(t=>lab(t[0])),datasets:[{data:T.map(t=>t[1]),borderColor:col,backgroundColor:col+"22",fill:true,tension:.2,pointRadius:3,borderWidth:2}]},options:{maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.raw.toFixed(2)+"円"}}},scales:{x:{grid:{display:false},ticks:{maxTicksLimit:5}},y:{grid:{color:css("--line")},ticks:{callback:v=>v.toFixed(1)+"円"}}}}}); charts.push(chart);
-    note.textContent="1ドルあたりの円(日本時間)。出典: Alpha Vantage の最新の値(すぐに変わる値)。サイトの更新(1日4回)のたびに1点ずつ記録しています。";
+    note.textContent="1ドルあたりの円(日本時間)。出典: Alpha Vantage(その時点の為替レート)。サイトの更新(1日4回)のたびに1点ずつ記録しています。";
   }
   draw();
 }
@@ -2501,9 +2501,9 @@ function openLook(){
         <div class="hint" style="margin-top:6px">モードごとに、下の「きょうの並び」とボタンを別々に覚えます。かんたんモードでも、下の一覧で「✅ 出している」にすれば、ふつうの機能を足せます。</div></section>
       <section class="lk-sec"><h3>おまかせセット</h3><div class="presets">${PRESETS.map(p=>`<button data-preset="${p[0]}"><b>${p[1]}</b><span>${esc(p[2])}</span></button>`).join("")}</div></section>
       <section class="lk-sec"><h3>ボタンと見出しの色</h3><div class="hint">ボタンや見出しの色と、画面全体の色が変わります。</div><div class="sw">${COLORS.map(c=>`<button data-col="${c[0]}" aria-pressed="${LOOK.color===c[0]}" aria-label="${c[1]}" title="${c[1]}" style="background:linear-gradient(135deg,${c[2]} 55%,${c[4]} 55%)"></button>`).join("")}</div>
-        <div class="setrow"><span style="min-width:5em">画面</span><span class="seg">${[["system","自動"],["light","明るい"],["dark","暗い"]].map(([k,l])=>`<button data-lt="${k}" aria-pressed="${th===k}">${l}</button>`).join("")}</span></div></section>
-      <section class="lk-sec"><h3>季節の飾り</h3><div class="hint">ハロウィンなどの期間中は、色と飾りが自動で変わります(テーマの色より優先)。</div>
-        <div class="setrow"><span class="seg">${[["auto","自動"],["off","オフ"]].map(([k,l])=>`<button data-lsea="${k}" aria-pressed="${LOOK.season===k}">${l}</button>`).join("")}</span></div>
+        <div class="setrow"><span style="min-width:5em">画面</span><span class="seg">${[["system","スマホに合わせる"],["light","明るい"],["dark","暗い"]].map(([k,l])=>`<button data-lt="${k}" aria-pressed="${th===k}">${l}</button>`).join("")}</span></div></section>
+      <section class="lk-sec"><h3>季節の飾り</h3><div class="hint">ハロウィンなどの期間中は、色と飾りが自動で変わります(選んだ色より先に使います)。</div>
+        <div class="setrow"><span class="seg">${[["auto","時期が来たら出す"],["off","出さない"]].map(([k,l])=>`<button data-lsea="${k}" aria-pressed="${LOOK.season===k}">${l}</button>`).join("")}</span></div>
         <div class="chips">${SEASONS.map(z=>`<button class="fchip" data-lprev="${z.k}" aria-pressed="${LOOK.preview===z.k}">${z.icon} ${esc(z.name)}をためしに見る</button>`).join("")}</div></section>
       ${EN?`<section class="lk-sec"><h3>ニュースのことば</h3><div class="hint">英語にすると、英語の勉強にも使えます(大事な英単語と発音つき)。</div><div class="setrow">${langSeg()}</div></section>`:""}
       <section class="lk-sec"><h3>空の演出</h3><div class="hint">朝・昼・夕方・夜で画面の上のほうの色が変わり、雨の日は少しくもり空の色になります。</div>
@@ -2782,10 +2782,10 @@ function firstCard(){ const f=firstDay(); const n=-daysFrom(f); /* 0=はじめ�
       <div class="fw7-g">${[14,30,100].map(g=>`<button class="fchip" data-sgoal="${g}">🔥 ${g}日</button>`).join("")}<button class="fchip" data-sgoal="0">目標なしで</button></div></section>`; }
   const set=new Set(ME.days); const cells=[]; for(let i=0;i<7;i++){ const d=new Date(Date.parse(f)+i*864e5).toISOString().slice(0,10); cells.push([d,i<n?(set.has(d)?"on":"miss"):i===n?"now":"fut",i]); }
   const amt=n===6?3:(n===2||n===4)?0:1; const g=amt?petEarn("fw7:"+TODAY,amt):0;
-  if(g) setTimeout(()=>toast(`🌱 はじめての${n+1}日目のごほうび: 🍙 ごはん+${g}`),1200);
+  if(g) setTimeout(()=>toast(`🌱 ${n+1}日目のごほうび: 🍙 ごはん+${g}`),1200);
   return `<section class="card fw7" aria-label="はじめての7日間"><div class="sec-h" style="margin:0"><h2>🌱 はじめての7日間</h2><span class="sub">${n+1}日目</span></div>
     <ol class="fw7-s">${cells.map(([d,c,i])=>`<li class="${c}"><b>${i+1}</b><small>${c==="on"||c==="now"?"✅":c==="miss"?"…":FW7[i].slice(0,2)}</small></li>`).join("")}</ol>
-    <p class="fw7-t">きょうのごほうび: <b>${FW7[n]}</b>${n<6?`。あしたは <b>${FW7[n+1]}</b>`:""}</p>
+    <p class="fw7-t">${/ごはん/.test(FW7[n])?"きょうのごほうび":"きょうのおすすめ"}: <b>${FW7[n]}</b>${n<6?`。あしたは <b>${FW7[n+1]}</b>`:""}</p>
     ${n===2?`<button class="fchip" data-tab="my">🎨 マイ で色を変える</button>`:n===4?`<button class="fchip" data-tab="explain">🔔 解説を開いて追ってみる</button>`:""}</section>`; }
 document.addEventListener("click",ev=>{ const b=ev.target.closest("[data-sgoal]"); if(!b) return; ME.sgoal=+b.dataset.sgoal||-1; saveMe(); const c=b.closest(".fw7"); if(c) c.remove(); try{ if(current==="today") go("today",{keepScroll:true}); }catch(_){} toast(ME.sgoal>0?`🔥 目標は ${ME.sgoal}日。上の記録の行に出ます`:"わかりました。いつでも マイ から目標を決められます"); });
 function sgoalTxt(){ const g=ME.sgoal; if(!(g>0)) return ""; const s=streak(); return s>=g?` 🏆`:` / ${g}日`; }
@@ -2804,7 +2804,7 @@ function personalCards(){
 
   return out.join("");
 }
-function intPickHTML(){ if(hasInterests()||store.get("nw-int-hide")==="1") return ""; return `<section class="card" aria-label="関心を選ぶ"><b>🎯 気になるジャンルを選んでください</b><p class="hint" style="margin:4px 0 10px">選ぶと「あなた向け」に並びます。読んだ解説からも少しずつ学びます。記録はこのスマホの中だけに残ります。</p><div class="chips" id="intPick">${GORDER.map(g=>`<button class="fchip" data-g="${g}" aria-pressed="false"><span class="c" style="background:var(--g-${g})"></span>${GN[g]}</button>`).join("")}</div><div style="display:flex;gap:8px;margin-top:10px"><button class="fchip" id="intSave" style="background:var(--accent-btn,var(--accent));color:var(--on-accent);border-color:var(--accent-btn,var(--accent))">決める</button><button class="fchip" id="intLater">あとで</button></div><button class="tp-open" data-topics="1" style="margin:10px 0 0"><span aria-hidden="true">💗</span><span><b>もっとこまかく選ぶ</b><small>野球・アニメ・料理・宇宙・AI など ${TOPICS.length}こ から</small></span><span aria-hidden="true">→</span></button></section>`; }
+function intPickHTML(){ if(hasInterests()||store.get("nw-int-hide")==="1") return ""; return `<section class="card" aria-label="関心を選ぶ"><b>🎯 気になるジャンルを選んでください</b><p class="hint" style="margin:4px 0 10px">選ぶと「あなた向け」に並びます。読んだ解説からも、好みを少しずつ覚えます。記録はこのスマホの中だけに残ります。</p><div class="chips" id="intPick">${GORDER.map(g=>`<button class="fchip" data-g="${g}" aria-pressed="false"><span class="c" style="background:var(--g-${g})"></span>${GN[g]}</button>`).join("")}</div><div style="display:flex;gap:8px;margin-top:10px"><button class="fchip" id="intSave" style="background:var(--accent-btn,var(--accent));color:var(--on-accent);border-color:var(--accent-btn,var(--accent))">決める</button><button class="fchip" id="intLater">あとで</button></div><button class="tp-open" data-topics="1" style="margin:10px 0 0"><span aria-hidden="true">💗</span><span><b>もっとこまかく選ぶ</b><small>野球・アニメ・料理・宇宙・AI など ${TOPICS.length}こ から</small></span><span aria-hidden="true">→</span></button></section>`; }
 function forYou(){
   const any=GORDER.some(g=>interestScore(g)>0)||myTopics().length; if(!any) return intPickHTML();
   const days=[...new Set(NEWS.map(n=>n.d))].slice(0,2); const topH=new Set(D.top10.map(t=>t.title));
@@ -3286,7 +3286,7 @@ function costumeSVG(c,dy,U){ const T=`transform="translate(0 ${dy})"`; U=U||"";
   }[c]||"";
   return `<g ${T}>${hat}</g>${item}`; }
 const MASCOT={
-  search:["detective",["さがしたいことばを入れてね。手がかりはぜったい見つかる!","ジャンルをしぼると、さがしやすいよ。","よく探されることばのボタンからでもOK!"]],
+  search:["detective",["さがしたいことばを入れてね。きっと手がかりが見つかるよ!","ジャンルをしぼると、さがしやすいよ。","よく探されることばのボタンからでもOK!"]],
   map:["explorer",["世界のどこで何が起きたか、地図でたどろう!","「🧷 捜査ボード」にすると、ぼくが探偵になるよ。","点が大きいほど、ニュースが多い場所だよ。"]],
   explain:["professor",["むずかしい話も「ひとことで言うと」から読むとわかるよ。","🕸️ つながり地図で、話の流れをたどってみよう。","点線のことばは、タップで意味が出るよ。"]],
   numbers:["banker",[()=>{ const y=lastVal(2); return y?`いまの1ドルは${y.v.toFixed(2)}円。お財布にどう響くかな?`:"お金の数字を見てみよう。"; },"🧮 もしも計算機で、旅行やガソリン代を計算してみて。","長い期間で見ると、景色がちがって見えるよ。"]],
@@ -3314,8 +3314,8 @@ function oneCard(){ const x=q1Pick(); const nw=q1News(); const wk=q1Week(); cons
   return `<section class="card q1" id="q1Card" aria-label="きょうの1問">
     <div class="sec-h" style="margin:0"><h2>🎯 きょうの1問</h2><span class="sub">1日1つだけ</span></div>${res}
     ${x?`<p class="q1-q">${esc(x.t)}</p><div class="hint">答え合わせ: ${x.d?mdLabel(x.d)+"ごろ":"決まったとき"}(予測ノート ${esc(x.no.replace(/^[NP]/,""))}番)</div>
-    ${v?`<p class="q1-my">あなたの予想: <b>${v.v==="yes"?"⭕ そうなる":"❌ ならない"}</b> 。結果が出たら、ここでお知らせします。<button class="fchip" data-q1chg="1">えらびなおす</button></p>`
-      :`<div class="q1-b"><button class="fchip q1y" data-q1v="yes">⭕ そうなる</button><button class="fchip q1n" data-q1v="no">❌ ならない</button></div>`}`:`<p class="hint">きょうの1問は、もう全部答えました。結果を待ちましょう。</p>`}
+    ${v?`<p class="q1-my">あなたの予想: <b>${v.v==="yes"?"⭕ そうなる":"❌ ならない"}</b>。結果が出たら、ここでお知らせします。<button class="fchip" data-q1chg="1">えらびなおす</button></p>`
+      :`<div class="q1-b"><button class="fchip q1y" data-q1v="yes">⭕ そうなる</button><button class="fchip q1n" data-q1v="no">❌ ならない</button></div>`}`:`<p class="hint">いま出せる問題には、ぜんぶ答えました。新しい予測が入ると、また出ます。</p>`}
     <div class="q1-wk" aria-label="この7日の1問"><span class="hint">この7日:</span> ${wk.map(([d,r])=>`<span title="${mdLabel(d)}">${r}</span>`).join("")} <button class="fchip" data-q1share="1">📤 送る</button></div>
   </section>`; }
 function q1Redraw(){ const c=document.getElementById("q1Card"); if(c){ const h=oneCard(); if(h) c.outerHTML=h; else c.remove(); } }
@@ -3348,7 +3348,7 @@ function followCard(){ const F=ME.follow||{}; const ks=Object.keys(F).filter(k=>
 function followListHTML(){ const F=ME.follow||{}; const ks=Object.keys(F).filter(k=>D.explainers[k]);
   const sug=Object.entries(D.explainers).filter(([k,e])=>e.status!=="done"&&!F[k]).slice(0,4);
   return `<section class="card" aria-label="追っているニュース"><b>🔔 追っているニュース</b>
-    <div class="hint" style="margin:4px 0 8px">追っているお話に続きが出た日と、「山場」の前の日だけ、「きょう」のいちばん上でお知らせします。ほかのニュースは、読まなくても大丈夫。</div>
+    <div class="hint" style="margin:4px 0 8px">追っているお話に続きが出た日と、「山場」の前の日だけ、「きょう」のいちばん上でお知らせします。ほかのお話は、気になったときに読めば大丈夫です。</div>
     ${ks.length?`<ul class="us">${ks.map(k=>{ const e=D.explainers[k]; const n=fwNew(k).length; return `<li><button class="fw-h" data-fwopen="${k}">${e.icon} ${esc(e.name)}</button>${n?` <span class="chip newchip">📬 ${n}</span>`:""} <small class="hint">${mdLabel(F[k].at)}から</small> <button class="fchip" data-fwx="${k}">やめる</button></li>`; }).join("")}</ul>`:`<p class="hint">まだありません。解説のページの「🔔 続きを追う」で追えます。</p>`}
     ${sug.length?`<div class="hint" style="margin-top:6px">追えるお話:</div><div class="fw-sg">${sug.map(([k,e])=>`<button class="fchip" data-fwadd="${k}">🔔 ${e.icon} ${esc(e.name)}</button>`).join("")}</div>`:""}</section>`; }
 function fwRedraw(){ const c=document.getElementById("fwCard"); const h=followCard(); if(c){ if(h) c.outerHTML=h; else c.remove(); } }
@@ -3570,7 +3570,7 @@ function backupHTML(){ const a=bakAge(); const prev=!!store.get("nwbak-prev");
       <li>ファイルが送れないときは「📋 文字にしてコピー」を押して、メモ帳などに貼っておけます。</li>
       <li>iPhoneでは、ブラウザで見るときと、画面に置いたアプリで見るときで、記録が分かれます。乗りかえるときもこの方法で移せます。</li>
       <li>ファイルの中身は記録だけです(名前や住所などは入りません)。作った人のサーバーにも送られません。</li></ol>
-      <button class="fchip" id="bakCopy">📋 文字にしてコピー(メモに貼れます)</button>${prev?' <button class="fchip" id="bakUndo">↩️ 読み込む前の記録にもどす</button>':""}</details>
+      <button class="fchip" id="bakCopy">📋 文字にしてコピー(メモに貼れます)</button>${prev?' <button class="fchip" id="bakUndo">↩️ もどす前の記録にもどす</button>':""}</details>
     <input type="file" id="bakFile" accept=".json,.txt,application/json,text/plain" hidden>
     ${gdHTML()}</section>`; }
 function bakDone(){ store.set("nw-bak-at",new Date().toISOString()); const c=document.getElementById("bakCard"); if(c){ c.outerHTML=backupHTML(); bindBackup(); } }
@@ -3579,24 +3579,24 @@ async function bakSaveFile(){ const o=bakMake(); const txt=JSON.stringify(o); co
     if(navigator.canShare&&navigator.canShare({files:[f]})){ await navigator.share({files:[f],title:"まいにちニュース帳の記録"}); bakDone(); toast("📦 保存しました"); return; } }catch(e){ if(e&&e.name==="AbortError") return; }
   try{ const u=URL.createObjectURL(new Blob([txt],{type:"application/json"})); const a=document.createElement("a"); a.href=u; a.download=name; document.body.appendChild(a); a.click(); a.remove(); setTimeout(()=>URL.revokeObjectURL(u),4000); bakDone(); toast("📦 ファイルを保存しました"); }
   catch(_){ bakCopyCode(); } }
-async function bakCopyCode(){ const code=bakCode(bakMake()); try{ await navigator.clipboard.writeText(code); bakDone(); toast("📋 コードをコピーしました。メモ帳などに貼って取っておいてください"); }catch(_){ bakSheet("copy",code); } }
+async function bakCopyCode(){ const code=bakCode(bakMake()); try{ await navigator.clipboard.writeText(code); bakDone(); toast("📋 記録を文字にしてコピーしました。メモ帳などに貼って取っておいてください"); }catch(_){ bakSheet("copy",code); } }
 function bakApply(o){ const cur=bakMake(); store.set("nwbak-prev",JSON.stringify(cur));
   bakKeys().forEach(k=>{ try{ localStorage.removeItem(k); }catch(_){} });
   Object.entries(o.data).forEach(([k,v])=>store.set(k,v)); store.set("nw-bak-at",new Date().toISOString()); store.set("nw-onboard","1");
-  toast("📥 記録を読み込みました"); setTimeout(()=>location.reload(),900); }
+  toast("📥 とっておいた記録をもどしました"); setTimeout(()=>location.reload(),900); }
 function bakSheet(mode,code){ const sh=document.getElementById("sheet");
-  sh.innerHTML=`<div class="bar"><div class="wrap"><button class="iconbtn" id="bkx" aria-label="もどる">← もどる</button><span class="ttl">${mode==="copy"?"📋 記録のコード":"📥 記録を読み込む"}</span></div></div><div class="wrap body">
-   ${mode==="copy"?`<p>下のコードを全部えらんでコピーし、メモ帳などに貼って取っておいてください。</p><textarea class="bak-ta" readonly>${esc(code)}</textarea>`
-   :`<p>保存したファイルを選ぶか、コードを貼り付けてください。<b>いまのこのスマホの記録は、読み込んだ記録に入れかわります。</b>(まちがえても「読み込む前の記録にもどす」で戻せます)</p>
+  sh.innerHTML=`<div class="bar"><div class="wrap"><button class="iconbtn" id="bkx" aria-label="もどる">← もどる</button><span class="ttl">${mode==="copy"?"📋 記録を文字にしたもの":"📥 とっておいた記録をもどす"}</span></div></div><div class="wrap body">
+   ${mode==="copy"?`<p>下の文字を全部えらんでコピーし、メモ帳などに貼って取っておいてください。</p><textarea class="bak-ta" readonly>${esc(code)}</textarea>`
+   :`<p>保存したファイルを選ぶか、記録の文字を貼り付けてください。<b>いまのこのスマホの記録は、とっておいた記録に入れかわります。</b>(まちがえても「もどす前の記録にもどす」で戻せます)</p>
      <button class="fchip" id="bkPick">📁 ファイルを選ぶ</button>
-     <textarea class="bak-ta" id="bkTa" placeholder="NWK1: から始まるコードをここに貼り付け"></textarea>
-     <button class="fchip" id="bkGo">このコードを確かめる</button><div id="bkPrev" style="margin-top:12px"></div>`}</div>`;
+     <textarea class="bak-ta" id="bkTa" placeholder="NWK1: から始まる記録の文字をここに貼り付け"></textarea>
+     <button class="fchip" id="bkGo">この文字を確かめる</button><div id="bkPrev" style="margin-top:12px"></div>`}</div>`;
   sh.hidden=false; document.body.style.overflow="hidden";
   const close=()=>{ sh.hidden=true; document.body.style.overflow=""; };
   document.getElementById("bkx").onclick=close;
   if(mode==="copy"){ const ta=sh.querySelector("textarea"); ta.focus(); ta.select(); return; }
-  const show=o=>{ const p=document.getElementById("bkPrev"); if(!o){ p.innerHTML='<div class="exp">⚠️ 読めませんでした。まいにちニュース帳で保存したファイル・コードか確かめてください。</div>'; return; }
-    p.innerHTML=`<div class="exp"><b>この記録を読み込みますか?</b><br>${bakSummary(o)}</div><button class="fchip" id="bkYes" style="margin-top:10px">✅ 読み込む</button>`;
+  const show=o=>{ const p=document.getElementById("bkPrev"); if(!o){ p.innerHTML='<div class="exp">⚠️ 読めませんでした。まいにちニュース帳で保存したファイルや文字か確かめてください。</div>'; return; }
+    p.innerHTML=`<div class="exp"><b>この記録にもどしますか?</b><br>${bakSummary(o)}</div><button class="fchip" id="bkYes" style="margin-top:10px">✅ もどす</button>`;
     document.getElementById("bkYes").onclick=()=>{ close(); bakApply(o); }; };
   document.getElementById("bkGo").onclick=()=>show(bakParse(document.getElementById("bkTa").value));
   document.getElementById("bkPick").onclick=()=>{ const inp=document.getElementById("bakFile")||Object.assign(document.createElement("input"),{type:"file"}); inp.value=""; inp.onchange=()=>{ const f=inp.files&&inp.files[0]; if(!f) return; if(f.size>5e6){ show(null); return; } f.text().then(t=>show(bakParse(t))).catch(()=>show(null)); }; inp.click(); }; }
@@ -3640,8 +3640,8 @@ function gdHTML(){ const i=gdInfo();
   if(!i||!i.on) return `<div class="gd-box" id="gdBox"><b>☁️ Googleに記録をあずける(Gmailを使っている人向け)</b><div class="hint" style="margin:4px 0 8px">Gmailと同じGoogleのアカウントでつなぐと、記録が自動であずけられます。スマホを買いかえたときは、新しいスマホで同じようにつなぐだけでもどります。<br>あずけた記録は、あなたにしか見えません(作った人にも届きません)。</div><button class="fchip" id="gdConnect">☁️ Googleにつなぐ</button><div id="gdMsg"></div></div>`;
   return `<div class="gd-box on" id="gdBox"><b>☁️ Googleドライブに自動で保存 <span class="gd-on">オン</span></b>
     <div class="bak-st" id="gdSt">${gdStatus()}</div>
-    <div class="chips" style="margin-top:8px">${gdLive()?`<button class="fchip" id="gdNow">☁️ いま保存</button>`:`<button class="fchip gd-resume" id="gdResume">☁️ 自動保存を続ける(タップ)</button>`}<button class="fchip" id="gdPull">📥 ドライブから読み込む</button></div>
-    <details class="faq plain"><summary>しくみ・やめるとき</summary><p>記録が変わると、15秒後とアプリを閉じたときに自動で保存します。Googleのルールで、ログインは1時間ほどで切れます。次に開いたときに「自動保存を続ける」を1回押してください。</p><button class="fchip" id="gdOff">つなぐのをやめる</button> <button class="fchip" id="gdDel">ドライブの記録を消す</button></details><div id="gdMsg"></div></div>`; }
+    <div class="chips" style="margin-top:8px">${gdLive()?`<button class="fchip" id="gdNow">☁️ いま保存</button>`:`<button class="fchip gd-resume" id="gdResume">☁️ 自動保存を続ける(タップ)</button>`}<button class="fchip" id="gdPull">📥 Googleにあずけた記録をもどす</button></div>
+    <details class="faq plain"><summary>しくみ・やめるとき</summary><p>記録が変わると、15秒後とアプリを閉じたときに自動で保存します。Googleのきまりで、つながりは1時間ほどで切れます。次に開いたときに「自動保存を続ける」を1回押してください。</p><button class="fchip" id="gdOff">つなぐのをやめる</button> <button class="fchip" id="gdDel">ドライブの記録を消す</button></details><div id="gdMsg"></div></div>`; }
 function gdStatus(){ const i=gdInfo()||{}; return `${i.at?`前回の保存: ${gdAgo(i.at)}`:"まだ保存していません"}${GD.dirty?(gdLive()?" ・ ⏳ もうすぐ保存します":" ・ <b>新しい記録があります。「自動保存を続ける」を押してください</b>"):""}`; }
 function gdPaint(){ const st=document.getElementById("gdSt"); if(st) st.innerHTML=gdStatus(); const bar=document.getElementById("gdBar");
   const need=gdOn()&&!gdLive()&&GD.dirty&&store.get("nw-gd-skip")!==TODAY;
@@ -3658,7 +3658,7 @@ function gdChoose(remote){ const sh=document.getElementById("sheet"); const loca
    <p>Googleドライブに、前に保存した記録がありました。</p>
    <div class="exp"><b>☁️ ドライブの記録</b><br>${bakSummary(remote)}</div><button class="fchip" id="gcRemote" style="margin:8px 0 16px">📥 ドライブの記録を使う(機種変更のとき)</button>
    <div class="exp"><b>📱 このスマホの記録</b><br>${bakSummary(local)}</div><button class="fchip" id="gcLocal" style="margin-top:8px">📤 このスマホの記録で上書き</button>
-   <p class="hint" style="margin-top:12px">どちらを選んでも、選ばなかった方は「読み込む前の記録にもどす」で1回だけ戻せます。</p></div>`;
+   <p class="hint" style="margin-top:12px">どちらを選んでも、選ばなかった方は「もどす前の記録にもどす」で1回だけ戻せます。</p></div>`;
   sh.hidden=false; document.body.style.overflow="hidden"; const close=()=>{ sh.hidden=true; document.body.style.overflow=""; };
   document.getElementById("gcx").onclick=()=>{ close(); gdRepaint(); };
   document.getElementById("gcRemote").onclick=()=>{ close(); remote.data["nw-gd"]=JSON.stringify({on:true,at:new Date().toISOString()}); bakApply(remote); };
@@ -3889,10 +3889,11 @@ function funGrid(){ const L=FUN.filter(f=>(FUN_SET[f[0]]||FUN_ALWAYS.includes(f[
     ${hid?`<button class="fchip" id="funMore" data-hid="${hid}" aria-expanded="${funOpen?"true":"false"}" style="margin-top:8px">${funOpen?"▲ とじる":`… ほか ${hid}こ を見る`}</button>`:""}</section>`; }
 // ===== お知らせ(新しくなったところ)。機能を足したら、いちばん上に1つ足す =====
 const UPDATES=[
+  {id:"2026-10-22n",d:"2026-10-22",t:"✍️ ことばを見直しました",L:["アプリの中の文を全部読み直して、かたい言い方や、外国語を訳したような言い方を、ふだんのことばに直しました(例: 「記録を読み込む」→「とっておいた記録をもどす」)。","🌍 世界のいまの地名は、わかるものを日本語で出すようにしました。"]},
   {id:"2026-10-22m",d:"2026-10-22",t:"🌱 はじめての7日間",L:["はじめて開いた日から1週間、毎日ちがう小さなごほうびが出ます(7日目は🍙×3)。","1週間たったら、続ける目標(14日・30日・100日)を自分で選べます。上の記録の行に出ます。"]},
   {id:"2026-10-22l",d:"2026-10-22",t:"🌍 世界のいま",L:["世界のどこで何が起きているかを1枚の地図に。このアプリで伝えたニュースの場所(青)と、世界の地震・台風・山火事など(公的機関の発表)を重ねました。","🛟 防災のページと、地図のページから開けます。うわさやSNSの書きこみは使っていません。"]},
   {id:"2026-10-22k",d:"2026-10-22",t:"👥 みんなの「ゆれた」マップ",L:["🛟 防災のページに、ゆれを感じた人が「ゆれた」ボタンを押した数を地図にしたページができました(P2P地震情報)。","アプリを開いている間に、急に報告が増えたらそっとお知らせします。人の報告(目安)なので、正式な震度は気象庁の発表を見てください。"]},
-  {id:"2026-10-22j",d:"2026-10-22",t:"🔔 続きを追う",L:["解説のページで「🔔 続きを追う」を押すと、そのお話に続きが出た日と、山場の前の日だけ「きょう」のいちばん上でお知らせします。","追っているお話は マイ で見たり、やめたりできます。ほかのニュースは読まなくても大丈夫です。"]},
+  {id:"2026-10-22j",d:"2026-10-22",t:"🔔 続きを追う",L:["解説のページで「🔔 続きを追う」を押すと、そのお話に続きが出た日と、山場の前の日だけ「きょう」のいちばん上でお知らせします。","追っているお話は マイ で見たり、やめたりできます。ほかのお話は、気になったときに読めば大丈夫です。"]},
   {id:"2026-10-22i",d:"2026-10-22",t:"🎯 きょうの1問",L:["ニュース10の下に、1日1つだけの予想「きょうの1問」ができました。⭕ そうなる か ❌ ならない を押すだけ。","結果が出たら、ここでお知らせします(当たりはごはん🍙)。この7日の結果を 🟩🟥 で送れます。"]},
   {id:"2026-10-22h",d:"2026-10-22",t:"📰 ニュース10がすっきり",L:["「短く」のときは、ニュース10を見出しだけの1つの表にしました。長い見出しは3行まで。押すと全部読めます。","写真と「📤 送る」は「くわしく」に切りかえると出ます。"]},
   {id:"2026-10-22g",d:"2026-10-22",t:"🧹 見やすさの直し",L:["見出しが変なところで折れないようにしました。小さすぎた文字を大きくしました。","「出す/かくす」のボタンを「✅ 出している」のように、いまの状態がわかる形にしました。","かんたんモードの解説は、大事なところだけ先に出し、残りは「📖 もっとくわしく見る」にまとめました。"]},
@@ -4023,12 +4024,12 @@ function updCard(){ const u=UPDATES[0]; const n=updUnread();
   return `<button class="lookcard" id="updBtn"><span style="font-size:1.6rem" aria-hidden="true">🔔</span><span style="min-width:0"><b>お知らせ${n>0?` <span class="newtag">NEW ${n}</span>`:""}</b><span class="hint" style="display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(mdLabel(u.d))} ${esc(u.t)}</span></span></button>`; }
 // ===== 使い方 =====
 const GUIDE = [
-  ["🚀","まずはここから",["「きょう」の<b>▶ 1分で見る</b>を押すと、今日のニュースが動くスライドで流れます。","時間がない日は<b>☀️ 今日の3行</b>だけ読めばOK。","<b>📰 今日のニュース10</b>は、その日に関心が高かった順のランキングです。下の「記録したニュース すべて」で、ほかのニュースも見られます。"]],
+  ["🚀","まずはここから",["「✨ おたのしみ」の<b>▶ 1分で見る</b>を押すと、今日のニュースが動くスライドで流れます(かんたんモードは「🔊 今日のニュースを聞く」)。","時間がない日は<b>☀️ 今日の3行</b>だけ読めばOK。","<b>📰 今日のニュース10</b>は、その日に関心が高かった順のランキングです。下の「記録したニュース すべて」で、ほかのニュースも見られます。"]],
   ["🔖","マークの見かた",["<b>✅</b> 別々の報道機関2社以上で確かめたニュース。","<b>⚠️</b> まだ1社だけ・見出しだけのニュース。続報で確かめられたら✅に変わります。","<b>NEW</b> 前に開いたあとに増えたニュース。"]],
   ["👆","さわってみよう",["<b>点線のことば</b>をタップすると、意味がその場で出ます。調べたことばは「マイ」にたまります。","<b>📍</b>を押すと、そのニュースを保存できます。保存したものは「マイ」で見られて、メモも書けます。","「くわしい解説 →」から、<b>図・Q&A・これまでの流れ</b>つきの解説が読めます。<b>🔊 聞く</b>で読み上げもできます。"]],
   ["🧭","下のタブ",["<b>📰 きょう</b> 今日のまとめ ／ <b>🔎 さがす</b> ことばやジャンルで過去のニュースを検索 ／ <b>🗺️ 地図</b> どこで起きたかを地図で","<b>💡 解説</b> 大きな話題をやさしく ／ <b>📈 数字</b> 日経平均・円・原油のグラフ(数時間ごと〜全期間) ／ <b>📅 予定</b> これからの予定と、Claudeの予測","<b>⭐ マイ</b> あなたの記録・保存・着せかえ"]],
   ["🎯","続けるとたのしいこと",["<b>🐣 ペット</b>がニュースといっしょに育ちます。クイズに正解すると🍙ごはんがもらえて、あげると大きくなります。よく読むジャンルで小物が変わり、3日あけるとすねます。","開いた日・解説・クイズ・ことば・予想で<b>ポイント</b>がたまり、レベルとバッジが上がります。","「予定」の予測に<b>あなたも予想</b>して、答え合わせができます。Claudeと的中率くらべも。","毎日の連続記録は「マイ」のカレンダーで見られます。"]],
-  ["✨","ちょっと変わった楽しみ方",["<b>🗺️ 世の中の天気図</b>(きょう)…ジャンルごとのニュースの空気を、晴れ〜あらしで。","<b>👆 知ってた?</b>(きょう)…「🤔 知らなかった / 😎 知ってた」を押すと、知らなかったジャンルを多めに出します。","<b>🍽️ 今日の話のタネ</b>(きょう)…家族や友だちと話せる問いかけ。","<b>🌙 寝る前ラジオ</b>(きょう)…3分でニュースを耳で。やさしい音つき。","<b>⚔️ クイズ対戦</b>…クイズのあとに挑戦状のリンクを送って勝負。","<b>📰 未来の新聞</b>(予定)…予測を新聞の紙面に。<b>🕸️ つながり地図</b>(解説)…話の流れを糸でたどる。","<b>🧮 もしも計算機</b>(数字)…円やガソリンが動いたら、財布はどうなる?","<b>⏳ タイムカプセル</b>(マイ)…決めた日まで開けられないメモ。"]],
+  ["✨","ちょっと変わった楽しみ方",["<b>🗺️ 世の中の天気図</b>(おたのしみ)…ジャンルごとのニュースの空気を、晴れ〜あらしで。","<b>👆 知ってた?</b>(おたのしみ)…「🤔 知らなかった / 😎 知ってた」を押すと、知らなかったジャンルを多めに出します。","<b>🍽️ 今日の話のタネ</b>(おたのしみ)…家族や友だちと話せる問いかけ。","<b>🌙 寝る前ラジオ</b>(おたのしみ)…3分でニュースを耳で。やさしい音つき。","<b>⚔️ クイズ対戦</b>…クイズのあとに挑戦状のリンクを送って勝負。","<b>📰 未来の新聞</b>(予定)…予測を新聞の紙面に。<b>🕸️ つながり地図</b>(解説)…話の流れを糸でたどる。","<b>🧮 もしも計算機</b>(数字)…円やガソリンが動いたら、財布はどうなる?","<b>⏳ タイムカプセル</b>(マイ)…決めた日まで開けられないメモ。"]],
   ["💬","聞いてみる",["右下の<b>💬</b>で「ニュース案内係」に質問できます。解説のQ&A・ことば辞典・ニュースの記録から、アプリの中で答えをさがします(質問はどこにも送りません)。","もっと深く知りたいときは「Claudeでもっと深く聞く」で、Claude(AI)に聞けます(アプリの外で開きます)。"]],
   ["🎨","自分好みにする",["「マイ」の<b>🎨 着せかえ</b>で、色・文字の大きさ・詰め具合・「きょう」の並び・下のタブの並びを変えられます。","右上の<b>「設定」</b>で、文字の大きさと明るさをすぐ変えられます。"]],
   ["📲","スマホの画面にボタンを置く",["iPhone: 画面の下の「□に↑」のマーク →「ホーム画面に追加」。","Android: 画面の右上の「︙」→「ホーム画面に追加」。","一度開いた内容は、電波がないところでも読めます。"]],
@@ -4133,6 +4134,10 @@ function worldNews(){ const since=new Date(Date.parse(TODAY)-2*864e5).toISOStrin
 function worldEv(){ const W=AL.world; if(!W||!W.ev) return []; const lim=Date.now()-3*864e5;
   return W.ev.filter(e=>{ const t=Date.parse(e[4]); return isNaN(t)||t>=lim; }).filter(e=>e[0]!=="eq"||e[5]>=5); }
 let WSEL=null;
+/* 英語の地名を、わかる範囲で日本語の国・地域名に(わからないものは英語のまま) */
+const WD_JA={"Japan":"日本","Japan region":"日本付近","Indonesia":"インドネシア","Philippines":"フィリピン","Philippine Islands region":"フィリピン付近","Vanuatu":"バヌアツ","Tonga":"トンガ","Fiji":"フィジー","Fiji region":"フィジー付近","Chile":"チリ","Peru":"ペルー","Mexico":"メキシコ","Papua New Guinea":"パプアニューギニア","Taiwan":"台湾","China":"中国","Russia":"ロシア","Alaska":"アメリカ(アラスカ)","California":"アメリカ(カリフォルニア)","Hawaii":"アメリカ(ハワイ)","Turkey":"トルコ","Türkiye":"トルコ","Iran":"イラン","Greece":"ギリシャ","Italy":"イタリア","New Zealand":"ニュージーランド","Solomon Islands":"ソロモン諸島","Ecuador":"エクアドル","Guatemala":"グアテマラ","Argentina":"アルゼンチン","Afghanistan":"アフガニスタン","India":"インド","Pakistan":"パキスタン","Nepal":"ネパール","Myanmar":"ミャンマー","Kermadec Islands region":"ケルマデック諸島付近","Mid-Atlantic Ridge":"大西洋の海底","Northern Mariana Islands":"北マリアナ諸島","Guam":"グアム","South Sandwich Islands region":"南サンドイッチ諸島付近","Kuril Islands":"千島列島","Colombia":"コロンビア","Bolivia":"ボリビア","Costa Rica":"コスタリカ","El Salvador":"エルサルバドル","Nicaragua":"ニカラグア","Panama":"パナマ","Australia":"オーストラリア","United States":"アメリカ","USA":"アメリカ","Canada":"カナダ","Brazil":"ブラジル","Madagascar":"マダガスカル","Mozambique":"モザンビーク","Somalia":"ソマリア","Ethiopia":"エチオピア","Kenya":"ケニア","Bangladesh":"バングラデシュ","Vietnam":"ベトナム","Viet Nam":"ベトナム","Thailand":"タイ","Malaysia":"マレーシア","Cuba":"キューバ","Haiti":"ハイチ","Spain":"スペイン","Portugal":"ポルトガル","France":"フランス","Algeria":"アルジェリア","Morocco":"モロッコ","Samoa":"サモア","Micronesia":"ミクロネシア","Timor Leste":"東ティモール","East Timor":"東ティモール","Sri Lanka":"スリランカ","Yemen":"イエメン","Oman":"オマーン","Saudi Arabia":"サウジアラビア","Sudan":"スーダン","Nigeria":"ナイジェリア","South Africa":"南アフリカ","Puerto Rico":"プエルトリコ","Dominican Republic":"ドミニカ共和国","Honduras":"ホンジュラス","Venezuela":"ベネズエラ","Kazakhstan":"カザフスタン","Mongolia":"モンゴル","South Korea":"韓国","North Korea":"北朝鮮","Tajikistan":"タジキスタン","Kyrgyzstan":"キルギス"};
+function wdPlace(t){ t=String(t||""); const parts=t.split(/,\s*/); for(let i=parts.length-1;i>=0;i--){ const k=parts[i].trim(); if(WD_JA[k]) return WD_JA[k]; }
+  for(const k of Object.keys(WD_JA)){ if(new RegExp("\\b"+k+"\\b").test(t)) return WD_JA[k]+"のあたり"; } return ""; }
 function openWorld(){ const sh=document.getElementById("sheet"); const back=sh.dataset.kind==="quake";
   const N=worldNews(), E=worldEv();
   sh.innerHTML=`<div class="bar"><div class="wrap"><button class="iconbtn" id="wdx" aria-label="もどる">← もどる</button><span class="ttl">🌍 世界のいま</span></div></div><div class="wrap body">
@@ -4143,7 +4148,7 @@ function openWorld(){ const sh=document.getElementById("sheet"); const back=sh.d
     <h3 style="margin:14px 0 4px;font-size:1rem">🔵 ニュースのあった場所</h3>
     ${N.length?`<ul class="us">${N.sort((a,b)=>b.L.length-a.L.length).map(x=>`<li><b>${esc(x.p[3])}</b> <span class="hint">${x.L.length}件</span></li>`).join("")}</ul>`:`<p class="hint">この3日は、場所のわかるニュースがありません。</p>`}
     <h3 style="margin:14px 0 4px;font-size:1rem">🌐 世界の災害(この3日)</h3>
-    ${E.length?`<ul class="us wd-ev">${E.slice(0,15).map(e=>`<li>${WK[e[0]]?WK[e[0]][0]:"⚠️"} <b>${WK[e[0]]?WK[e[0]][1]:"災害"}${e[0]==="eq"?" M"+e[5]:""}</b>${e[5]==="Red"?' <span class="chip" style="background:#ffe1e1;color:#a01010">赤の警報</span>':e[5]==="Orange"?' <span class="chip" style="background:#ffeccc;color:#8a4b00">オレンジの警報</span>':""} <span class="hint">${esc(e[1])}(英語の地名) ・ ${esc(e[6])}</span></li>`).join("")}</ul>`:`<p class="hint">${AL.world?"大きな災害の発表はありません。":"いま読み込めませんでした。少しして開き直してください。"}</p>`}
+    ${E.length?`<ul class="us wd-ev">${E.slice(0,15).map(e=>`<li>${WK[e[0]]?WK[e[0]][0]:"⚠️"} <b>${WK[e[0]]?WK[e[0]][1]:"災害"}${e[0]==="eq"?" M"+e[5]:""}</b>${e[5]==="Red"?' <span class="chip" style="background:#ffe1e1;color:#a01010">赤の警報</span>':e[5]==="Orange"?' <span class="chip" style="background:#ffeccc;color:#8a4b00">オレンジの警報</span>':""} ${wdPlace(e[1])?`<b>${esc(wdPlace(e[1]))}</b> `:""}<span class="hint">${esc(e[1])}(英語の表記) ・ ${esc(e[6])}</span></li>`).join("")}</ul>`:`<p class="hint">${AL.world?"大きな災害の発表はありません。":"いま読み込めませんでした。少しして開き直してください。"}</p>`}
     <p class="hint" style="margin-top:10px">出典: ニュース=このアプリの記録(報道機関2社以上)、地震=<a href="https://earthquake.usgs.gov/" target="_blank" rel="noopener">USGS(アメリカ地質調査所)</a> M5以上、災害の警報=<a href="https://www.gdacs.org/" target="_blank" rel="noopener">GDACS(国連とEU)</a>、山火事・火山・嵐=<a href="https://eonet.gsfc.nasa.gov/" target="_blank" rel="noopener">NASA EONET</a>。${AL.world&&AL.world.at?`${qhm(AL.world.at)}に取得。`:""}日本の地震・津波は気象庁の発表(🛟 防災)を見てください。</p></div>`;
   sh.hidden=false; sh.scrollTop=0; document.body.style.overflow="hidden"; track("/world","世界のいま");
   sh.querySelector("#wdx").onclick=()=>{ if(back) openQuake(); else { sh.hidden=true; sh.innerHTML=""; document.body.style.overflow=""; } };
@@ -4155,7 +4160,7 @@ function openWorld(){ const sh=document.getElementById("sheet"); const back=sh.d
     zoomable(mb,mb.querySelector("svg"),{max:8});
     mb.addEventListener("click",ev2=>{ const t=ev2.target; const sel=document.getElementById("wdSel"); if(!sel) return;
       if(t.dataset.wdn!=null){ const x=N[+t.dataset.wdn]; sel.innerHTML=`<div class="card" style="margin-top:8px"><b>🔵 ${esc(x.p[3])}</b><ul class="us">${x.L.slice(0,5).map(n=>`<li>${esc(n.h)} <small class="hint">${mdLabel(n.d)}</small></li>`).join("")}</ul></div>`; }
-      else if(t.dataset.wde!=null){ const e=E[+t.dataset.wde]; sel.innerHTML=`<div class="card" style="margin-top:8px"><b>${WK[e[0]][0]} ${WK[e[0]][1]}${e[0]==="eq"?" M"+e[5]:""}</b><p class="hint" style="margin:4px 0 0">${esc(e[1])}(英語の地名) ・ 出典: ${esc(e[6])}</p></div>`; } });
+      else if(t.dataset.wde!=null){ const e=E[+t.dataset.wde]; sel.innerHTML=`<div class="card" style="margin-top:8px"><b>${WK[e[0]][0]} ${WK[e[0]][1]}${e[0]==="eq"?" M"+e[5]:""}</b>${wdPlace(e[1])?`<p style="margin:4px 0 0"><b>${esc(wdPlace(e[1]))}</b></p>`:""}<p class="hint" style="margin:4px 0 0">${esc(e[1])}(英語の表記) ・ 出典: ${esc(e[6])}</p></div>`; } });
   }).catch(()=>{ const mb=document.getElementById("wdMap"); if(mb) mb.innerHTML='<div class="empty">地図を読み込めませんでした。下の一覧を見てください。</div>'; }); }
 document.addEventListener("click",ev=>{ if(ev.target.closest("[data-world]")) openWorld(); });
 function placeOf(n){ for(const p of PLACES){ if(p[0].test(n.h+" "+(n.th||""))) return p; } return null; }
@@ -4611,7 +4616,7 @@ document.addEventListener("click",ev=>{ if(ev.target.closest("[data-sos]")){ ev.
 // ===== 🔁 かんたん ⇄ ふつう の切りかえ(押す前に「どう変わるか」を見せてから切りかえる) =====
 const MODE_DIFF={
   normal:{t:"📱 ふつうモードにすると",plus:[["🐣","ニュースで育つペットと、クイズでごはん"],["✨","おたのしみ(今日のひとつ・ことばで世界一周・すごろく など)"],["🏅","バッジ・連続記録・今週の目標"],["📅","下のボタンに「予定」が増える"]],
-    minus:[["🔤","文字が少し小さくなる(設定でいつでも大きくできます)"],["🔊","大きな「今日のニュースを聞く」ボタンは、しまわれます"]],
+    minus:[["🔤","文字が少し小さくなる(設定でいつでも大きくできます)"],["🔊","大きな「今日のニュースを聞く」ボタンはなくなります(着せかえで出せます)"]],
     rows:["🌤️ 天気","☀️ 今日の3行","📰 ニュース10","🐣 ペット","🧠 クイズ","✨ おたのしみ…"],tabs:["きょう","解説","さがす","予定","マイ"]},
   easy:{t:"🔰 かんたんモードにすると",plus:[["🔤","文字が大きくなる"],["🔊","いちばん上に「今日のニュースを聞く」の大きなボタン"],["👀","天気・3行・ニュース・クイズだけの、すっきりした画面"]],
     minus:[["🐣","ペット・おたのしみ・バッジは画面から見えなくなる(記録は消えません)"],["📅","下のボタンの「予定」はかくれる"]],
@@ -4639,9 +4644,9 @@ const RT={ws:null,state:"off",retry:0,timer:null,last:null,lt:null};
 let EEW=null;
 function rtOn(){ return store.get("nw-rt")!=="0" && !(navigator.connection&&navigator.connection.saveData); }
 function rtPaint(){ const el=document.getElementById("rtStat"); if(el) el.outerHTML=rtStatHTML(); }
-function rtStatHTML(){ const on=rtOn(); const t=!on?"⏸️ 地震の知らせの すぐ受けとり: 止めています":RT.state==="on"?"📡 地震・津波の知らせを待っています(このページを開いている間、すぐ届きます)":"📡 地震・津波の知らせを、3分ごとに確かめています";
+function rtStatHTML(){ const on=rtOn(); const t=!on?"⏸️ 地震の知らせを すぐに受けとる設定は、いま止めています":RT.state==="on"?"📡 地震・津波の知らせを待っています(このページを開いている間、すぐ届きます)":"📡 地震・津波の知らせを、3分ごとに確かめています";
   return `<div id="rtStat" class="rt-stat ${RT.state==="on"&&on?"on":""}"><span>${t}</span>${on?"":`<button class="fchip" data-rt="1">もう一度オンにする</button>`}</div>`; }
-function rtStopHTML(){ return rtOn()?`<button class="fchip" data-rt="0" style="margin-top:10px">知らせの すぐ受けとりをやめる(通信を減らしたいとき)</button>`:""; }
+function rtStopHTML(){ return rtOn()?`<button class="fchip" data-rt="0" style="margin-top:10px">地震の知らせを すぐに受けとるのをやめる(通信を減らしたいとき)</button>`:""; }
 function rtConnect(){ if(!rtOn()||document.visibilityState!=="visible"||RT.ws||!("WebSocket" in window)) return;
   let ws; RT.state="connecting"; rtPaint();
   try{ ws=new WebSocket("wss://api.p2pquake.net/v2/ws"); }catch(_){ RT.state="off"; rtPaint(); return rtLater(); }
@@ -4674,7 +4679,7 @@ function feltRecent(min){ const lim=Date.now()-min*60e3; return FELT.reps.filter
 /* 5分で10件以上、または集計の信頼度が0.5以上で、15分に1回だけそっと知らせる */
 function feltCheck(){ const r=feltRecent(5); const ev=FELT.ev; const evOk=ev&&Date.now()-p2pT(ev.updated_at||ev.time)<5*60e3&&(ev.confidence||0)>=0.5&&(ev.count||0)>=10;
   if((r.length>=10||evOk)&&Date.now()-FELT.warned>15*60e3){ FELT.warned=Date.now(); loadP2PArea().then(()=>{ const top=feltTop(r).slice(0,2).map(x=>x[1]).join("・");
-    toast(`👥 ${top?top+" など で":""}「ゆれた」の報告が増えています(利用者の報告・目安)。正式な震度は気象庁の発表を待ってください`); }).catch(()=>{}); } }
+    toast(`👥 ${top?top+" などで":""}「ゆれた」の報告が増えています(利用者の報告・目安)。正式な震度は気象庁の発表を待ってください`); }).catch(()=>{}); } }
 let P2PA=null; function loadP2PArea(){ return P2PA?Promise.resolve(P2PA):loadScript("p2parea.js?v=1").then(()=>(P2PA=window.P2P_AREA||{})); }
 function feltTop(L){ const c={}; L.forEach(x=>{ c[x.a]=(c[x.a]||0)+1; }); return Object.entries(c).map(([a,n])=>[a,(P2PA&&P2PA[a])?P2PA[a][0]:"地域不明",n]).sort((x,y)=>y[2]-x[2]); }
 async function openFelt(){ const sh=document.getElementById("sheet"); const back=sh.dataset.kind==="quake";
@@ -4687,7 +4692,7 @@ function feltDraw(){ const box=document.getElementById("flBody"); if(!box) retur
   let span=60, L=feltRecent(60); if(L.length<3){ span=24*60; L=feltRecent(24*60); }
   const top=feltTop(L); const ev=FELT.ev; const evFresh=ev&&Date.now()-p2pT(ev.updated_at||ev.time)<60*60e3;
   box.innerHTML=`<p class="obp" style="margin-top:4px">「P2P地震情報」を使っている人が、<b>ゆれを感じて「ゆれた」ボタンを押した数</b>を、地域ごとに数えています。地震計ではなく<b>人の報告(目安)</b>なので、まちがいも入ります。<b>正式な震度は気象庁の発表</b>を見てください。</p>
-    <div class="fl-sum"><b>${span===60?"この1時間":"この24時間"}</b>の報告: <b class="num" style="font-size:1.3rem">${L.length}</b>件${evFresh?` ・ まとめの信頼度: <b>${Math.round((ev.confidence||0)*100)}%</b>(${ev.count||0}件)`:""}</div>
+    <div class="fl-sum"><b>${span===60?"この1時間":"この24時間"}</b>の報告: <b class="num" style="font-size:1.3rem">${L.length}</b>件${evFresh?` ・ 報告のたしからしさ(目安): <b>${Math.round((ev.confidence||0)*100)}%</b>(${ev.count||0}件)`:""}</div>
     <div class="wxmap" id="flMap"><div class="empty">地図を読み込んでいます…</div></div>
     ${top.length?`<h3 style="margin:12px 0 4px;font-size:1rem">多い地域</h3><ul class="wml">${top.slice(0,10).map(x=>`<li><b>${esc(x[1])}</b><span class="num">${x[2]}件</span></li>`).join("")}</ul>`:`<p class="hint">${FELT.ok===0?"いま読み込めませんでした。少しして「↻ 新しくする」を押してください。":"いまは報告がほとんどありません。"}</p>`}
     <p class="hint" style="margin-top:10px">出典: <a href="https://www.p2pquake.net/" target="_blank" rel="noopener">P2P地震情報</a>(地震感知情報)。アプリを開いている間は、新しい報告もすぐ受けとります。数え方: 1回押すと1件。SNSの書きこみは使っていません。</p>`;
@@ -4851,7 +4856,7 @@ function openQuake(refresh){ const sh=document.getElementById("sheet"); sh.datas
      <a href="https://transit.yahoo.co.jp/diainfo" target="_blank" rel="noopener">🚃 電車の運行情報<small>遅れ・運休(Yahoo!路線情報)</small></a>
    </div>
    <button class="sos-go" data-sos="1" style="margin-top:14px">🆘 こまったときは(まずすること)</button>
-   <div class="exp" style="margin-top:14px">📣 このアプリは「起きたことをわかりやすく」がお仕事です。<b>揺れる前の緊急地震速報</b>は、スマホの緊急速報(エリアメール)や防災アプリで受け取ってください。震度5弱以上・津波・特別警報は、スマホへのお知らせ(マイ→⚙️設定)でも届きます。</div>
+   <div class="exp" style="margin-top:14px">📣 このアプリは「起きたことをわかりやすく」がお仕事です。<b>ゆれる前の緊急地震速報</b>は、スマホの緊急速報(エリアメール)や防災アプリで受け取ってください。震度5弱以上・津波・特別警報は、スマホへのお知らせ(マイ→⚙️設定)でも届きます。</div>
    ${rtStopHTML()}
    <p class="hint" style="margin-top:10px">出典: 気象庁(地震情報を配っている民間のサービス「P2P地震情報」もふくむ)・国土地理院。SNSの書きこみやうわさは使っていません。</p></div>`;
   if(!refresh){ sh.hidden=false; document.body.style.overflow="hidden"; }
