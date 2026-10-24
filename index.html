@@ -146,7 +146,7 @@ main{padding-block:18px 32px}
 .ten.short li{border:0;border-radius:0;border-top:1px solid var(--line);background:none}
 .ten.short li:first-child{border-top:0}
 .ten.short .row{padding:8px 12px 8px 10px;gap:8px;grid-template-columns:26px 1fr!important}
-.ten.short .th,.ten.short .ten-ft{display:none!important}
+.ten.short .th,.ten.short .ten-ft,.ten.short .th-cr{display:none!important}
 .ten.fy.short .row{grid-template-columns:1fr!important;display:block}.ten.fy.short .row p{display:none}
 .ten.short .rank{font-size:1rem}
 .ten.short .meta{margin-bottom:0;gap:6px}
@@ -161,15 +161,33 @@ main{padding-block:18px 32px}
 .ten.short li.mytown{border-left:4px solid var(--accent)}
 .ten.short li{position:relative}.ten.short .row{padding-right:50px!important}
 .len-seg{margin-left:auto}
+.set-toc{margin-bottom:12px;padding:10px 12px;border:1px solid var(--line);border-radius:14px;background:var(--surface)}.set-toc-l{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}.set-toc:empty{display:none}
+[id^="setsec"]{scroll-margin-top:84px}
+.pin-t{display:none}
+:root[data-mode="easy"] .pin-btn.abs{width:52px!important;height:52px!important;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;border-radius:12px!important;opacity:1;background:var(--surface)!important;border:1px solid var(--line)!important;box-shadow:none!important;top:8px!important;right:8px!important}
+:root[data-mode="easy"] .pin-btn.abs .pin-t{display:block;font-size:.82rem;font-weight:700;line-height:1.1}
+:root[data-mode="easy"] .ten.short .row{padding-right:66px!important}
+:root[data-mode="easy"] .ten .row:has(> .th){padding-right:14px}
+:root[data-mode="easy"] .linkish{display:inline-flex;align-items:center;min-height:44px}
+:root[data-mode="easy"] .wx-notes>summary,:root[data-mode="easy"] details.faq>summary,:root[data-mode="easy"] .cd-i,:root[data-mode="easy"] .season-card button,:root[data-mode="easy"] .fw-h{min-height:44px}
+:root[data-mode="easy"] .wx-notes>summary,:root[data-mode="easy"] .cd-i,:root[data-mode="easy"] .fw-h{display:flex;align-items:center}
+.top::after{transition:opacity .2s}
+:root.scrolled .top::after{opacity:0!important}
+.fw-h{color:var(--accent-on-surface,var(--accent))!important;font-weight:800}
+.fw-h::after{content:" ›"}
+.wk5-l{margin:0;padding-left:22px;display:flex;flex-direction:column;gap:10px}
+.wk5-f{display:flex;flex-direction:column;gap:4px;margin-top:4px;padding-left:10px;border-left:3px solid var(--accent-soft)}
+.wk5-f span{line-height:1.5;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}
+.wk5-f i{font-style:normal;font-weight:800;font-size:.85rem;color:var(--muted);margin-right:6px}
 .chip.me-rel{background:#fff1c2;color:#6b4a00;font-weight:800}
 :root[data-theme="dark"] .chip.me-rel{background:#4a3a0c;color:#ffe08a}
 @media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .chip.me-rel{background:#4a3a0c;color:#ffe08a}}
 .linkish{border:0;background:none;padding:0;color:inherit;font-weight:800;text-decoration:underline;font:inherit;font-weight:800;cursor:pointer}
 .lf-g{display:grid;grid-template-columns:1fr 1fr;gap:8px}.lf-g .tpk{min-height:64px}
 .away{border:2px solid var(--accent);}
-.aw-l{margin:0;padding-left:22px;display:flex;flex-direction:column;gap:6px;line-height:1.55}.aw-l b{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}.aw-l small{display:block;color:var(--muted);font-size:.85rem}
+.aw-l{margin:0;padding-left:22px;display:flex;flex-direction:column;gap:6px;line-height:1.55}.aw-l i{font-style:normal;font-weight:800;color:var(--muted);margin-right:6px;font-size:.88rem}.aw-l b{font-weight:600;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:2;overflow:hidden}.aw-l small{display:block;color:var(--muted);font-size:.85rem}
 .aw-b{display:flex;gap:8px;justify-content:flex-end;margin-top:10px;flex-wrap:wrap}
-.cd-c{padding:10px 12px}.cd-row{display:flex;flex-direction:column;gap:6px}
+.cd-c{padding:10px 12px}.cd-t{display:block;font-size:.95rem;margin-bottom:6px}.cd-row{display:flex;flex-direction:column;gap:6px}
 .cd-i{display:flex;gap:10px;align-items:center;border:0;background:none;padding:0;text-align:left;color:var(--ink);font:inherit;cursor:pointer}
 .cd-i b{flex:none;min-width:4.6em;text-align:center;padding:4px 6px;border-radius:10px;background:var(--accent-soft);color:var(--accent-ink,var(--accent));font-size:.95rem}
 .cd-i span{line-height:1.5}
@@ -404,7 +422,7 @@ mark{background:#ffe066;color:#141b2d;border-radius:3px;padding:0 1px}
 .ms.new{border-color:var(--accent);background:var(--accent-soft)}
 .newchip{background:var(--accent-soft);color:var(--accent-ink,var(--accent))}
 .result{border-color:var(--ok);background:var(--ok-soft)}
-.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(92px + env(safe-area-inset-bottom,0px));z-index:90;background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:999px;font-weight:700;font-size:.9rem;box-shadow:0 8px 24px rgba(0,0,0,.25);animation:rise .4s ease both;max-width:calc(100% - 32px);text-align:center}
+.toast{position:fixed;left:50%;transform:translateX(-50%);top:calc(76px + env(safe-area-inset-top,0px));bottom:auto;z-index:90;background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:999px;font-weight:700;font-size:.9rem;box-shadow:0 8px 24px rgba(0,0,0,.25);animation:rise .4s ease both;max-width:calc(100% - 32px);text-align:center}
 .toast.out{opacity:0;transition:opacity .5s}
 /* かんたんモード: ボタンに言葉・押しやすく */
 .listen-big{display:flex;align-items:center;gap:14px;width:100%;text-align:left;border:0;cursor:pointer;border-radius:var(--radius);padding:14px 16px;background:var(--accent-btn,var(--accent));color:var(--on-accent)}
@@ -1288,7 +1306,7 @@ function mmdd(iso){ return iso.slice(5,10); }
 function seasonNow(){ if(LOOK.season==="off") return null; if(LOOK.preview){ const z=SEASONS.find(x=>x.k===LOOK.preview); if(z) return z; }
   const t=mmdd(TODAY); return SEASONS.find(z=> z.from<=z.to ? (t>=z.from&&t<=z.to) : (t>=z.from||t<=z.to)) || null; }
 function inSeason(z,iso){ const t=mmdd(iso); return z.from<=z.to ? (t>=z.from&&t<=z.to) : (t>=z.from||t<=z.to); }
-const SECS = [["weather","🌤️ 天気"],["follow","📬 追っているニュースの続報"],["quick","⏱️ 1分まとめ"],["cont","🔔 つづきがあります"],["letter","💌 ペットからの手紙"],["listen","🔊 ニュースを聞く"],["three","☀️ 今日の3行"],["ten","📰 今日のニュース10"],["one","🎯 きょうの1問"],["count","🗳️ 大事な日まで あと◯日"],["first","🌱 はじめての7日間"],["pet","🐣 ペット"],["goal","🗓️ 今週の目標"],["play","▶️ 1分で見る"],["foryou","🎯 あなた向け"],["picks","🎁 ジャンル別おすすめ"],["kw","🔖 わたしのキーワード"],["quiz","🧠 今日のクイズ"],["number","🔢 今日の数字"],["fun","✨ おたのしみ"],["other","📚 そのほかのニュース"],["english","📘 今日の英単語"],["mood","🗺️ 世の中の天気図"],["know","👆 知ってた?"],["talk","🍽️ 今日の話のタネ"],["reporter","🎙️ ペット記者"],["local","🏠 わたしの街"],["gacha","🎰 今日の1本ガチャ"],["thermo","🌡️ ニュースの温度計"],["trip2","🗺️ ペットの旅"],["assoc","🔗 ニュース連想"],["back","📅 あのとき何してた?"],["bingo","🎲 ニュースビンゴ"],["battle","⚔️ 予想くらべ"]];
+const SECS = [["weather","🌤️ 天気"],["follow","📬 追っているニュースの続報"],["quick","⏱️ 1分まとめ"],["cont","🔔 つづきがあります"],["letter","💌 ペットからの手紙"],["listen","🔊 ニュースを聞く"],["three","☀️ 今日の3行"],["ten","📰 今日のニュース10"],["one","🎯 きょうの1問"],["count","🗳️ 大事な日まで あと◯日"],["first","🌱 はじめての7日間"],["wk5","📅 今週の5大ニュース"],["pet","🐣 ペット"],["goal","🗓️ 今週の目標"],["play","▶️ 1分で見る"],["foryou","🎯 あなた向け"],["picks","🎁 ジャンル別おすすめ"],["kw","🔖 わたしのキーワード"],["quiz","🧠 今日のクイズ"],["number","🔢 今日の数字"],["fun","✨ おたのしみ"],["other","📚 そのほかのニュース"],["english","📘 今日の英単語"],["mood","🗺️ 世の中の天気図"],["know","👆 知ってた?"],["talk","🍽️ 今日の話のタネ"],["reporter","🎙️ ペット記者"],["local","🏠 わたしの街"],["gacha","🎰 今日の1本ガチャ"],["thermo","🌡️ ニュースの温度計"],["trip2","🗺️ ペットの旅"],["assoc","🔗 ニュース連想"],["back","📅 あのとき何してた?"],["bingo","🎲 ニュースビンゴ"],["battle","⚔️ 予想くらべ"]];
 const LOOK = (()=>{ let p={}; try{ p=JSON.parse(store.get("nw-look")||"{}")||{}; }catch(_){ p={}; }
   const fix=(arr,all)=>{ const a=(Array.isArray(arr)?arr:[]).filter(k=>all.includes(k)); all.forEach(k=>{ if(!a.includes(k)) a.push(k); }); return a; };
   const had=new Set(Array.isArray(p.order)?p.order:[]); p.order=fix(p.order,SECS.map(s=>s[0]));
@@ -1306,6 +1324,9 @@ const LOOK = (()=>{ let p={}; try{ p=JSON.parse(store.get("nw-look")||"{}")||{};
   if(!p.v12){ p.v12=1; p.off=p.off||{}; delete p.off.kurashi;
     if(p.cfg) Object.values(p.cfg).forEach(c=>{ if(c&&c.off) delete c.off.kurashi; });
     if(Array.isArray(p.order)) p.order=p.order.filter(k=>k!=="kurashi"); }
+  // v20: 「📅 今週の5大ニュース」(土・日・月だけ出る。読んだらその週は消える)を はじめての7日間 の下に(2026-10-24)
+  if(!p.v20){ p.v20=1; const fx=c=>{ if(!c) return; if(Array.isArray(c.order)){ c.order=c.order.filter(k=>k!=="wk5"); const t=c.order.indexOf("first"); c.order.splice(t<0?c.order.length:t+1,0,"wk5"); } if(c.off) delete c.off.wk5; };
+    fx(p); if(p.cfg){ fx(p.cfg.easy); fx(p.cfg.normal); } }
   // v19: 「🗳️ 大事な日まで あと◯日」(選挙・制度の日が7日以内のときだけ出る)を 3行 の下に(2026-10-24)
   if(!p.v19){ p.v19=1; const fx=c=>{ if(!c) return; if(Array.isArray(c.order)){ c.order=c.order.filter(k=>k!=="count"); const t=c.order.indexOf("three"); c.order.splice(t<0?0:t+1,0,"count"); } if(c.off) delete c.off.count; };
     fx(p); if(p.cfg){ fx(p.cfg.easy); fx(p.cfg.normal); } }
@@ -1346,7 +1367,7 @@ function saveLook(){ store.set("nw-look", JSON.stringify(LOOK)); }
 // ===== かんたんモード / ふつうモード =====
 // それぞれのモードが「きょうの並び・表示」「下のタブ」「文字の大きさ」を別々に覚える。かんたんモードに、ふつうの機能を足すこともできる
 const MODE_PRESET={
-  easy:()=>{ const on=["weather","follow","listen","three","count","ten","one","first","quiz"]; const order=[...on,...SECS.map(x=>x[0]).filter(k=>!on.includes(k))]; const off={}; order.forEach(k=>{ if(!on.includes(k)) off[k]=true; });
+  easy:()=>{ const on=["weather","follow","listen","three","count","ten","one","first","wk5","quiz"]; const order=[...on,...SECS.map(x=>x[0]).filter(k=>!on.includes(k))]; const off={}; order.forEach(k=>{ if(!on.includes(k)) off[k]=true; });
     return {order,off,tabs:["today","explain","search","my","plan","map","numbers","words"],tabOff:{plan:true,map:true,numbers:true,words:true},size:"l"}; },
   normal:()=>{ const off={listen:true,quick:true,picks:true,english:true,mood:true,know:true,talk:true,reporter:true,local:true,gacha:true,play:true,goal:true,kw:true};
     return {order:SECS.map(x=>x[0]),off,tabs:["today","explain","search","plan","my","map","numbers","words"],tabOff:{map:true,numbers:true,words:true},size:"m"}; }};
@@ -1714,7 +1735,7 @@ function weatherCard(){
 }
 function exLink(id){ return id && D.explainers[id] ? ` data-ex="${id}"` : ""; }
 function seasonCard(){ const z=seasonNow(); if(!z||store.get("nw-season-hide")===TODAY+z.k) return "";
-  return `<div class="season-card" id="seasonCard"><span class="si" aria-hidden="true">${z.icon}</span><span style="flex:1"><b>${esc(z.name)}の季節</b><span style="display:block;font-size:.88rem">${esc(z.greet)}</span></span><button class="fchip" id="seasonX" aria-label="閉じる">✕</button></div>`; }
+  return `<div class="season-card" id="seasonCard"><span class="si" aria-hidden="true">${z.icon}</span><span style="flex:1"><b>${esc(z.name)}の季節</b><span style="display:block;font-size:.88rem">${esc(z.greet)}</span></span><button class="fchip" id="seasonX" aria-label="とじる">✕</button></div>`; }
 // ===== ほかのアプリとのちがいを見える形に(終わりがある・見くらべて確かめた・広告なし・記録はスマホの中) =====
 /* 報道機関の名前(出典の文から数える。役所の発表やまとめサイトは数えない) */
 const MEDIA=[["共同",/共同/g],["NHK",/NHK/g],["時事",/時事/g],["日経",/日経(?!クロステック)/g],["朝日",/朝日/g],["読売",/読売/g],["毎日",/毎日(?!放送)/g],["産経",/産経/g],["東京新聞",/東京新聞/g],["中日",/中日(?!本)/g],["ANN",/ANN|テレ朝|テレビ朝日/g],["TBS",/TBS|JNN/g],["FNN",/FNN|フジテレビ/g],["日テレ",/日テレ|NNN|日本テレビ/g],["ABEMA",/ABEMA/g],["ロイター",/ロイター/g],["AP",/(?<![A-Za-z])AP(?![A-Za-z])/g],["AFP",/AFP/g],["ブルームバーグ",/ブルームバーグ/g],["CNBC",/CNBC/g],["CNN",/CNN/g],["BBC",/BBC/g],["アルジャジーラ",/アルジャジーラ/g],["ガーディアン",/ガーディアン/g],["TASS",/TASS/g],["キーウ・ポスト",/キーウポスト|Kyiv/g],["ウクルインフォルム",/ウクルインフォルム/g],["ユーロニュース",/ユーロニュース/g],["琉球新報",/琉球新報/g],["沖縄タイムス",/沖縄タイムス/g],["北海道新聞",/北海道新聞|道新/g],["神戸新聞",/神戸新聞/g],["西日本新聞",/西日本新聞/g],["熊本日日新聞",/熊本日日/g],["北國新聞",/北國新聞/g],["河北新報",/河北新報/g],["下野新聞",/下野/g],["山陰中央新報",/山陰中央/g],["関西テレビ",/関西テレビ/g],["MBS",/MBS/g],["ABCテレビ",/ABCテレビ|ABCニュース/g],["RSK山陽放送",/RSK/g],["HBC",/HBC/g],["MBC南日本放送",/MBC/g],["ITmedia",/ITmedia/g],["Impress",/Impress/g],["日経クロステック",/日経クロステック/g],["ASCII",/ASCII/g],["マイナビニュース",/マイナビ/g],["ウェザーニュース",/ウェザーニュース/g],["tenki.jp",/tenki\.jp|日本気象協会/g],["スポニチ",/スポニチ/g],["スポーツ報知",/報知/g],["デイリー",/デイリー/g],["日刊スポーツ",/日刊スポーツ/g],["サンスポ",/サンスポ/g],["ゲキサカ",/ゲキサカ/g],["フィスコ",/フィスコ|Fisco/g],["みんかぶ",/みんかぶ/g],["オリコン",/オリコン/g],["シネマトゥデイ",/シネマトゥデイ/g],["教育新聞",/教育新聞/g]];
@@ -1725,7 +1746,7 @@ function readMin(){ const t=(D.three||[]).map(x=>x.title+x.text).join("")+(D.top
 function doneCard(){ const st=todayStats(); ME.done=ME.done||{}; const done=!!ME.done[TODAY]; const cnt=Object.keys(ME.done).length+(done?0:1);
   return `<section class="card done-c" id="doneCard" aria-label="きょうはここまで">
     <div class="done-h"><span class="done-i" aria-hidden="true">${done?"✅":"🏁"}</span><div><b>きょうの大事なニュースは、ここまでです</b><small>${done?`読み終わり ${Object.keys(ME.done).length}日目`:"ここまで来たら、読み終わり"}。次に新しくなるのは ${esc(D.nextLabel||"次の更新")}</small></div></div>
-    <p class="done-t">このページは、<b>${st.outlets}社</b>の報道<b>${st.arts}本</b>を見くらべて、${st.d===st.d2?mdLabel(st.d):mdLabel(st.d)+"〜"+mdLabel(st.d2)}のニュース${st.n}本を確かめ、その中から選んでいます(2社以上で確かめられたもの ${st.ok}本)。</p>
+    <p class="done-t">このページは、<b>${st.outlets}社</b>の報道<b>${st.arts}本</b>を見くらべて、${st.d===st.d2?mdLabel(st.d):mdLabel(st.d)+"〜"+mdLabel(st.d2)}に記録したニュース${st.n}本(2社以上で確かめられたもの ${st.ok}本)から、上のニュース10を選んでいます。</p>
     <ul class="done-why"><li>🔍 <b>2社以上で確かめた</b>ものに✅。うわさやSNSだけの話は載せません</li><li>⏹️ <b>終わりがある</b>。下にずっと続かないので、見すぎません</li><li>🚫 <b>広告なし</b>。おすすめに広告をまぜません</li><li>🔒 <b>あなたの記録はスマホの中だけ</b>。読んだものを外に送りません</li></ul>
   </section>`; }
 function bindDone(){ const c=document.getElementById("doneCard"); if(!c||!("IntersectionObserver" in window)) return; ME.done=ME.done||{}; if(ME.done[TODAY]) return;
@@ -1748,7 +1769,7 @@ function whoHit(n){ const L=myLife(); if(!L.length) return []; const who=n.who||
   const t=(n.title||n.h||"")+" "+(n.text||"")+" "+(n.s&&typeof n.s==="string"&&n.title?n.s:"");
   if(LIFE_RX.all.test(t)) return ["all"]; return L.filter(k=>LIFE_RX[k]&&LIFE_RX[k].test(t)); }
 function whoChip(n){ const h=whoHit(n); if(!h.length) return ""; const why=h[0]==="all"?"みんなのくらしに関係":LIFE.filter(x=>h.includes(x[0])).map(x=>x[2]).join("・")+"の人に関係";
-  return `<span class="chip me-rel" title="${esc(why)}">🙋 あなたに関係${h[0]==="all"?"":"あり"}</span>`; }
+  return `<span class="chip me-rel" title="${esc(why)}">🙋 あなたに関係あり</span>`; }
 function openLife(){ const sh=document.getElementById("sheet"); ME.life=ME.life||{};
   const draw=()=>{ sh.innerHTML=`<div class="bar"><div class="wrap"><button class="iconbtn" id="lfx" aria-label="もどる">← もどる</button><span class="ttl">🙋 わたしに関係あるニュース</span></div></div><div class="wrap body">
     <p class="obp" style="margin-top:4px">あてはまるものを押してください(いくつでも)。ニュース10の中で、あなたのくらしに関係しそうなものに <b>🙋</b> の札がつきます。</p>
@@ -1771,11 +1792,12 @@ function awayInfo(){ const ds=[...ME.days].filter(d=>d<TODAY).sort(); const last
   const picks=[]; Object.entries(by).sort((a,b)=>b[1].length-a[1].length).slice(0,3).forEach(([k,arr])=>{ const x=arr.filter(n=>n.ok)[0]||arr[0]; picks.push({th:k,n:x,c:arr.length}); });
   if(picks.length<3){ const seenG=new Set(picks.map(p=>p.n.g)); L.filter(n=>n.ok&&!picks.some(p=>p.n===n)).forEach(n=>{ if(picks.length<3&&!seenG.has(n.g)){ seenG.add(n.g); picks.push({th:"",n,c:1}); } }); }
   return {last,gap,n:L.length,picks}; }
+function awayShown(){ return ME.awaySeen!==TODAY&&!!awayInfo(); }
 function awayCard(){ if(ME.awaySeen===TODAY) return ""; const a=awayInfo(); if(!a) return "";
   const fk=Object.keys(ME.follow||{}).filter(k=>D.explainers[k]&&fwNew(k).length);
   return `<section class="card away" id="awayCard" aria-label="いない間のまとめ"><div class="sec-h" style="margin:0"><h2>👋 おかえりなさい</h2><span class="sub">${a.gap}日ぶり</span></div>
     <p class="hint" style="margin:4px 0 8px">${mdLabel(a.last)}のあと、${a.n}本のニュースがありました。大事なところだけ3つ。</p>
-    <ol class="aw-l">${a.picks.map(p=>`<li>${p.th?`<small>${esc(p.th)}${p.c>1?`(${p.c}本)`:""}</small>`:""}<b>${esc(p.n.h)}</b> <span class="hint">${mdLabel(p.n.d)}</span></li>`).join("")}</ol>
+    <ol class="aw-l">${a.picks.map(p=>`<li><b>${p.th?`<i>${esc(p.th)}</i>`:""}${esc(p.n.h)}</b></li>`).join("")}</ol>
     ${fk.length?`<p style="margin:8px 0 0">📬 追っているお話の続き: ${fk.map(k=>`<button class="fw-h" data-fwopen="${k}">${D.explainers[k].icon} ${esc(D.explainers[k].name)}</button>`).join("・")}</p>`:""}
     <div class="aw-b"><button class="fchip" data-tab="search">🔎 ほかも見る</button><button class="fchip pet-feed" data-awayok="1">✓ わかった</button></div></section>`; }
 document.addEventListener("click",ev=>{ if(ev.target.closest("[data-awayok]")){ ME.awaySeen=TODAY; saveMe(); const c=document.getElementById("awayCard"); if(c) c.remove(); } });
@@ -1785,11 +1807,12 @@ const CD_RX=/選挙|投票|国会|法案|制度|始まる|値上げ|値下げ|�
 function cdItems(){ return D.schedule.filter(s=>s[2]!=="pred"&&!/^(\(|（)中止/.test(s[3])&&CD_RX.test(s[3]+" "+(s[5]||""))&&(s[1]||s[0])>=TODAY).sort((a,b)=>a[0].localeCompare(b[0])); }
 function cdLeft(s){ const d=daysFrom(s[0]); return d<=0?(s[1]&&s[1]>=TODAY&&s[0]<TODAY?"いま":"きょう"):d===1?"あした":`あと${d}日`; }
 function countCard(){ const L=cdItems().filter(s=>daysFrom(s[0])<=7); if(!L.length) return "";
-  return `<section class="card cd-c" aria-label="大事な日まで"><div class="cd-row">${L.slice(0,3).map(s=>`<button class="cd-i" data-tab="plan"><b class="num">${cdLeft(s)}</b><span>${esc(s[3])}</span></button>`).join("")}</div></section>`; }
+  return `<section class="card cd-c" aria-label="大事な日まで"><b class="cd-t">🗳️ 大事な日まで</b><div class="cd-row">${L.slice(0,3).map(s=>`<button class="cd-i" data-tab="plan"><b class="num">${cdLeft(s)}</b><span>${esc(s[3])}</span></button>`).join("")}</div></section>`; }
 function cdPlanHTML(){ const L=cdItems().slice(0,6); if(!L.length) return "";
   return `<section class="card cd-p" aria-label="大事な日までのカウントダウン"><b>🗳️ 大事な日まで</b><div class="hint" style="margin:2px 0 8px">選挙・国会・制度や値段が変わる日だけを集めています。</div>
     <ul class="cd-g">${L.map(s=>{ const d=daysFrom(s[0]); return `<li>${d>1?"<small>あと</small>":""}<b class="num">${d<=0?"きょう":d===1?"あした":d}</b>${d>1?"<small>日</small>":""}<span>${mdLabel(s[0])}<br>${esc(s[3])}</span></li>`; }).join("")}</ul></section>`; }
 
+window.addEventListener("scroll",()=>{ const on=window.scrollY>24; if(on!==root.classList.contains("scrolled")) root.classList.toggle("scrolled",on); },{passive:true});
 function renderToday(){
   const t=D.top10;
   const S={};
@@ -1829,7 +1852,7 @@ function renderToday(){
   S.kw=kwCard();
   S.picks=picksCard(); S.goal=goalCard(); S.letter=letterCard(); S.cont=contCard(); S.quick=quickCard();
   S.other=otherNews();
-  S.one=oneCard(); S.follow=followCard(); S.first=firstCard(); S.count=countCard();
+  S.one=oneCard(); S.follow=followCard(); S.first=firstCard(); S.count=countCard(); S.wk5=wk5Card();
   S.quiz=D.quiz&&D.quiz.length?`<section class="card quiz" aria-label="今日のクイズ" id="quiz"></section>`:"";
   S.number=`<section class="card" aria-label="今日の数字">
       <div class="sec-h"><h2>🔢 今日の数字</h2></div>
@@ -1902,7 +1925,7 @@ const isIOS=/iPhone|iPad|iPod/.test(navigator.userAgent) || (navigator.platform=
 function installCard(){
   if(isStandalone() || store.get("nw-install-hide")==="1") return "";
   const how = deferredPrompt ? "「置く」を押すと、スマホの画面にこのアプリのボタンができます。" : isIOS ? "画面のいちばん下の「□に↑」のマークを押す →「ホーム画面に追加」を押すと、スマホの画面にこのアプリのボタンができます。" : "画面の右上の「︙」を押す →「ホーム画面に追加」を押すと、スマホの画面にこのアプリのボタンができます。";
-  return `<div class="install" id="inst"><img src="icon-192.png" alt=""><span><b>📲 スマホの画面に、このアプリのボタンを置く</b><span class="hint">${how}</span></span><span style="display:flex;flex-direction:column;gap:6px">${deferredPrompt?'<button class="fchip" id="instGo">置く</button>':''}<button class="fchip" id="instX" aria-label="この案内を閉じる">閉じる</button></span></div>`;
+  return `<div class="install" id="inst"><img src="icon-192.png" alt=""><span><b>📲 スマホの画面に、このアプリのボタンを置く</b><span class="hint">${how}</span></span><span style="display:flex;flex-direction:column;gap:6px">${deferredPrompt?'<button class="fchip" id="instGo">置く</button>':''}<button class="fchip" id="instX" aria-label="この案内をとじる">✕ とじる</button></span></div>`;
 }
 function bindInstall(){
   const go1=document.getElementById("instGo"); if(go1) go1.onclick=async()=>{ try{ deferredPrompt.prompt(); await deferredPrompt.userChoice; }catch(_){} deferredPrompt=null; document.getElementById("inst")?.remove(); };
@@ -1959,7 +1982,7 @@ function openStory(fn){
   track(typeof fn==="function"?"/play/week":"/play/today","1分で見る");
   const el=document.getElementById("story"); const S=(typeof fn==="function"?fn:buildSlides)();
   el.innerHTML=`<div class="bars">${S.map(()=>"<i><b></b></i>").join("")}</div>
-    <div class="ctl"><span class="lbl" id="stLbl"></span><button class="sbtn" id="stVoice" aria-pressed="false">🔈 読み上げ</button><button class="sbtn" id="stPause" aria-label="一時停止">❚❚</button><button class="sbtn" id="stClose" aria-label="閉じる" style="width:auto;padding:0 12px">✕ とじる</button></div>
+    <div class="ctl"><span class="lbl" id="stLbl"></span><button class="sbtn" id="stVoice" aria-pressed="false">🔈 読み上げ</button><button class="sbtn" id="stPause" aria-label="一時停止">❚❚</button><button class="sbtn" id="stClose" aria-label="とじる" style="width:auto;padding:0 12px">✕ とじる</button></div>
     <div class="stage" id="stStage"><button class="tapl" aria-label="前へ"></button><button class="tapr" aria-label="次へ"></button></div>`;
   el.hidden=false; document.body.style.overflow="hidden";
   st={S,i:0,t0:0,el:0,paused:false,raf:0,voice:store.get("nw-voice")==="1"};
@@ -2074,7 +2097,7 @@ function rubyHTML(g){ const key=g.key, yomi=String((g.w&&g.w[1])||"").replace(/\
   if(!yomi||yomi===key||!/[一-龠々]/.test(key)) return esc(key);
   return `<ruby>${esc(key)}<rt>${esc(yomi)}</rt></ruby>`; }
 function applyRuby(){ root.setAttribute("data-ruby",rubyOn()?"1":"0"); }
-function showPop(i){ const w=GTERMS[i].w; if(!ME.words.includes(w[0])){ ME.words.push(w[0]); saveMe(); checkBadges(); } const p=document.getElementById("pop"); p.innerHTML=`<div style="display:flex;justify-content:space-between;gap:10px;align-items:start"><div><b>${esc(w[0])}</b> <span style="opacity:.7;font-size:.8rem">${esc(w[1])}</span></div><button class="iconbtn" id="popx" aria-label="閉じる" style="background:transparent;color:inherit;border-color:currentColor">✕</button></div><p style="margin:6px 0 0">${esc(w[2])}</p>${w[3]?`<p style="margin:6px 0 0;opacity:.85">例: ${esc(w[3])}</p>`:""}`; p.hidden=false; document.getElementById("popx").onclick=()=>p.hidden=true; }
+function showPop(i){ const w=GTERMS[i].w; if(!ME.words.includes(w[0])){ ME.words.push(w[0]); saveMe(); checkBadges(); } const p=document.getElementById("pop"); p.innerHTML=`<div style="display:flex;justify-content:space-between;gap:10px;align-items:start"><div><b>${esc(w[0])}</b> <span style="opacity:.7;font-size:.8rem">${esc(w[1])}</span></div><button class="iconbtn" id="popx" aria-label="とじる" style="background:transparent;color:inherit;border-color:currentColor">✕</button></div><p style="margin:6px 0 0">${esc(w[2])}</p>${w[3]?`<p style="margin:6px 0 0;opacity:.85">例: ${esc(w[3])}</p>`:""}`; p.hidden=false; document.getElementById("popx").onclick=()=>p.hidden=true; }
 document.addEventListener("click",e=>{ const g=e.target.closest(".gl"); if(g){ e.preventDefault(); e.stopPropagation(); showPop(+g.dataset.gi); return; } const p=document.getElementById("pop"); if(!p.hidden && !e.target.closest("#pop")) p.hidden=true; });
 
 
@@ -2572,7 +2595,7 @@ function footer(){ return `<footer class="foot">
 function bindFooter(){}
 document.getElementById("setBtn").onclick=()=>{
   const p=document.getElementById("pop"); const t=store.get("nw-theme")||"system"; const s=store.get("nw-size")||"m";
-  p.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><b>設定</b><button class="iconbtn" id="popx" aria-label="閉じる" style="background:transparent;color:inherit;border-color:currentColor;width:auto;padding:0 12px">✕ とじる</button></div>
+  p.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><b>設定</b><button class="iconbtn" id="popx" aria-label="とじる" style="background:transparent;color:inherit;border-color:currentColor;width:auto;padding:0 12px">✕ とじる</button></div>
     <div class="setrow" style="margin-bottom:10px"><span style="min-width:5em">モード<small style="display:block;font-size:.82rem;opacity:.8">押すと、どう変わるか見られます</small></span><span class="seg">${[["easy","かんたん"],["normal","ふつう"]].map(([k,l])=>`<button data-pmode="${k}" aria-pressed="${LOOK.mode===k}">${l}</button>`).join("")}</span></div>
     <div class="setrow" style="margin-bottom:10px"><span style="min-width:5em">文字の大きさ</span><span class="seg">${[["m","ふつう"],["l","大きめ"],["xl","特大"]].map(([k,l])=>`<button data-size="${k}" aria-pressed="${s===k}">${l}</button>`).join("")}</span></div>
     <div class="setrow"><span style="min-width:5em">画面の色</span><span class="seg">${[["system","スマホに合わせる"],["light","明るい"],["dark","暗い"]].map(([k,l])=>`<button data-theme="${k}" aria-pressed="${t===k}">${l}</button>`).join("")}</span></div>
@@ -2868,7 +2891,7 @@ const TIER_OLD=["s3","s7","s30","ex5","quiz","w10","vote","vote5","pet1","pet3"]
 
 // ピン留めとメモ
 function pinAttrs(o){ return `data-pk="${esc(o.k)}" data-ph="${esc(o.h)}" data-pg="${esc(o.g||"")}" data-pd="${esc(o.d||"")}" data-pex="${esc(o.ex||"")}"`; }
-function pinBtn(o,extraCls){ const on=!!ME.pins[o.k]; return `<button class="pin-btn ${extraCls||""}" ${pinAttrs(o)} aria-pressed="${on}" aria-label="${on?"保存をやめる":"保存する"}" title="あとで読む・メモ">${on?"🔖":"🏷️"}</button>`; }
+function pinBtn(o,extraCls){ const on=!!ME.pins[o.k]; return `<button class="pin-btn ${extraCls||""}" ${pinAttrs(o)} aria-pressed="${on}" aria-label="${on?"保存をやめる":"保存する"}" title="あとで読む・メモ">${on?"🔖":"🏷️"}<small class="pin-t">${on?"保存ずみ":"保存"}</small></button>`; }
 document.addEventListener("click",ev=>{ const b=ev.target.closest(".pin-btn"); if(!b) return; ev.preventDefault(); ev.stopPropagation();
   const k=b.dataset.pk; if(ME.pins[k]){ if(ME.pins[k].memo && !b.dataset.confirm){ b.dataset.confirm="1"; toast("メモがあります。もう一度押すと保存をやめます"); setTimeout(()=>delete b.dataset.confirm,3000); return; } delete ME.pins[k]; toast("保存をやめました"); }
   else { ME.pins[k]={h:b.dataset.ph,g:b.dataset.pg,d:b.dataset.pd,ex:b.dataset.pex,memo:"",at:new Date(Date.now()+9*3600e3).toISOString()}; learn(b.dataset.pg,1); track("/pin/"+(b.dataset.pg||"other"),"保存: "+(GN[b.dataset.pg]||"その他")); toast("📌 保存しました。「マイ」でメモも書けます"); }
@@ -2894,7 +2917,7 @@ const FW7=["🍙 ごはん1こ","🍙 ごはん1こ","🎨 ペットの色を変
 function firstDay(){ if(!ME.firstDay){ ME.firstDay=[...ME.days].sort()[0]||TODAY; saveMe(); } return ME.firstDay; }
 function firstCard(){ const f=firstDay(); const n=-daysFrom(f); /* 0=はじめての日 */
   if(n>=7){ if(ME.sgoal||n>14) return ""; const st=streak();
-    return `<section class="card fw7" aria-label="続ける目標"><b>🎯 続ける目標を選ぼう</b><p class="hint" style="margin:4px 0 8px">はじめての1週間、おつかれさまでした。いま ${st}日 連続です。次はどこまで続けてみますか?(あとで変えられます)</p>
+    return `<section class="card fw7" aria-label="続ける目標"><b>🔥 続ける目標を選ぼう</b><p class="hint" style="margin:4px 0 8px">${st>=5?"はじめての1週間、おつかれさまでした。":"続けるための目標を決めてみませんか。"}いま ${st}日 連続です。次はどこまで続けてみますか?(あとで変えられます)</p>
       <div class="fw7-g">${[14,30,100].map(g=>`<button class="fchip" data-sgoal="${g}">🔥 ${g}日</button>`).join("")}<button class="fchip" data-sgoal="0">目標なしで</button></div></section>`; }
   const set=new Set(ME.days); const cells=[]; for(let i=0;i<7;i++){ const d=new Date(Date.parse(f)+i*864e5).toISOString().slice(0,10); cells.push([d,i<n?(set.has(d)?"on":"miss"):i===n?"now":"fut",i]); }
   const amt=n===6?3:(n===2||n===4)?0:1; const g=amt?petEarn("fw7:"+TODAY,amt):0;
@@ -2944,6 +2967,22 @@ function bindPersonal(){
   const sh=document.getElementById("shareImg"); if(sh) sh.onclick=shareImage;
 }
 
+// ===== 📅 今週の5大ニュース(1週間でいちばん多く続いた話題5つと、その「はじまり→いま」) =====
+function wk5Data(){ const since=new Date(Date.parse(TODAY)-6*864e5).toISOString().slice(0,10); const W=NEWS.filter(n=>n.d>=since); const by={};
+  W.forEach(n=>(n.th||"").split(/[、,]/).map(t=>t.trim()).filter(Boolean).forEach(t=>(by[t]=by[t]||[]).push(n)));
+  return {since,list:Object.entries(by).filter(([t,a])=>a.length>=2).sort((a,b)=>b[1].length-a[1].length).slice(0,5).map(([t,a])=>{ const s2=a.slice().sort((x,y)=>x.d.localeCompare(y.d)); const pick=(L)=>L.filter(n=>n.ok)[0]||L[0];
+    const first=pick(s2.filter(n=>n.d===s2[0].d)); const last=pick(s2.filter(n=>n.d===s2[s2.length-1].d).reverse()); return {t,c:a.length,first,last}; })}; }
+function wk5Key(){ const d=new Date(Date.parse(TODAY)); const day=(d.getUTCDay()+6)%7; return new Date(d.getTime()-day*864e5).toISOString().slice(0,10); }
+function wk5Card(){ if(awayShown()) return ""; const wd=new Date(Date.parse(TODAY)).getUTCDay(); if(!(wd===6||wd===0||wd===1)) return ""; ME.wk5=ME.wk5||{}; const key=wd===1?new Date(Date.parse(wk5Key())-864e5).toISOString().slice(0,10):wk5Key(); if(ME.wk5[key]) return "";
+  const W=wk5Data(); if(W.list.length<3) return "";
+  return `<section class="card wk5" id="wk5Card" aria-label="今週の5大ニュース"><div class="sec-h" style="margin:0"><h2>📅 今週の${W.list.length}大ニュース</h2><span class="sub">${mdLabel(W.since)}〜</span></div>
+    <p class="hint" style="margin:4px 0 8px">この1週間、いちばん長く続いた話題です。「はじまり → いま」で流れがわかります。</p>
+    <ol class="wk5-l">${W.list.map((x,i)=>`<li><b>${esc(x.t)}</b> <small class="hint">${x.c}本</small>
+      ${i>=3?"":`<div class="wk5-f"><span><i>はじまり ${mdLabel(x.first.d)}</i>${esc(x.first.h)}</span>${x.last!==x.first?`<span><i>いま ${mdLabel(x.last.d)}</i>${esc(x.last.h)}</span>`:""}</div>`}</li>`).join("")}</ol>
+    <div class="aw-b"><button class="fchip" data-wk5play="1">▶ 1分のふりかえりを見る</button><button class="fchip pet-feed" data-wk5ok="${key}">✓ 読んだ</button></div></section>`; }
+document.addEventListener("click",ev=>{ const t=ev.target;
+  const ok=t.closest("[data-wk5ok]"); if(ok){ ME.wk5=ME.wk5||{}; ME.wk5[ok.dataset.wk5ok]=1; const ks=Object.keys(ME.wk5).sort(); if(ks.length>20) delete ME.wk5[ks[0]]; saveMe(); const g=petEarn("wk5:"+ok.dataset.wk5ok,1); toast(`📅 今週のふりかえり、おつかれさま${g?"(🍙 ごはん+1)":""}`); const c=document.getElementById("wk5Card"); if(c) c.remove(); return; }
+  if(t.closest("[data-wk5play]")){ try{ openStory(buildWeekSlides); }catch(_){} } });
 // ===== 1週間のふりかえり(スライド) =====
 function buildWeekSlides(){
   const since=new Date(Date.parse(TODAY)-6*864e5).toISOString().slice(0,10);
@@ -2955,6 +2994,7 @@ function buildWeekSlides(){
   const S=[];
   S.push({h:`${glow("#3b5bff")}<div class="kick an">1週間のふりかえり</div><h2 class="an d1">${mdLabel(since)}〜${mdLabel(TODAY)}</h2><p class="an d2">この1週間に記録したニュースは <b class="num">${W.length}件</b>。そのうち2社以上で確かめたものは <b class="num">${okW.length}件</b>。</p>`, say:`1週間のふりかえりです。記録したニュースは${W.length}件でした。`});
   if(topTh.length) S.push({h:`${glow("#ef4444")}<div class="kick an">よく出てきた話題</div><ol class="mini">${topTh.map(([t,c],i)=>`<li class="an d${i+1}"><b>${esc(t)}</b> … ${c}件</li>`).join("")}</ol><p class="an d4" style="opacity:.8">同じ話題が何日も続くと、流れが見えてきます。</p>`, say:"よく出てきた話題は、"+topTh.map(x=>x[0]).join("、")+"でした。"});
+  { const W5=wk5Data().list.slice(0,3); if(W5.length) S.push({h:`${glow("#0ea5e9")}<div class="kick an">はじまり → いま</div><ol class="mini">${W5.map((x,i)=>`<li class="an d${i+1}"><b>${esc(x.t)}</b><br><small>${mdLabel(x.first.d)} ${esc(x.first.h.slice(0,34))}${x.first.h.length>34?"…":""}</small>${x.last!==x.first?`<br><small>→ ${mdLabel(x.last.d)} ${esc(x.last.h.slice(0,34))}${x.last.h.length>34?"…":""}</small>`:""}</li>`).join("")}</ol>`, say:W5.map(x=>x.t+"。はじまりは、"+x.first.h+"。いまは、"+x.last.h).join("。")}); }
   const bars=GORDER.filter(g=>gc[g]).map(g=>`<div class="an d1" style="display:grid;grid-template-columns:7.5em 1fr 2.5em;gap:8px;align-items:center;font-size:.95rem"><span>${GN[g]}</span><span style="height:12px;border-radius:6px;background:var(--g-${g});width:${Math.max(6,gc[g]/Math.max(...Object.values(gc))*100)}%"></span><span class="num">${gc[g]}</span></div>`).join("");
   S.push({h:`${glow("#22a35a")}<div class="kick an">ジャンル別の数</div><div style="display:flex;flex-direction:column;gap:10px">${bars}</div>`, say:"ジャンル別の数です。"});
   const picks=GORDER.map(g=>okW.find(n=>n.g===g)).filter(Boolean).slice(0,5);
@@ -3458,11 +3498,11 @@ function fwNew(k){ const f=ME.follow[k], e=D.explainers[k]; if(!f||!e) return []
   if(!L.length&&last&&last!==f.last) L=[tl[tl.length-1]]; return L; }
 function fwPeak(k){ const e=D.explainers[k]; const out=[]; const y=+TODAY.slice(0,4);
   (e.next||[]).forEach(n=>{ const t=Array.isArray(n)?n.join(" "):String(n); const m=t.match(/(\d{1,2})\/(\d{1,2})/); if(!m) return; const iso=`${y}-${String(m[1]).padStart(2,"0")}-${String(m[2]).padStart(2,"0")}`; const dd=daysFrom(iso); if(dd===0||dd===1) out.push([dd,nextTxt(t)]); }); return out; }
-function followCard(){ const F=ME.follow||{}; const ks=Object.keys(F).filter(k=>D.explainers[k]); if(!ks.length) return "";
+function followCard(){ if(awayShown()) return ""; const F=ME.follow||{}; const ks=Object.keys(F).filter(k=>D.explainers[k]); if(!ks.length) return "";
   const rows=[]; ks.forEach(k=>{ const e=D.explainers[k]; const nw=fwNew(k); const pk=fwPeak(k); const end=e.status==="done";
     if(!nw.length&&!pk.length&&!end) return;
     rows.push(`<li><button class="fw-h" data-fwopen="${k}"><span aria-hidden="true">${e.icon}</span> <b>${esc(e.name)}</b></button>
-      ${nw.length?`<div class="fw-n"><span class="chip newchip">📬 続報${nw.length>1?" "+nw.length+"つ":""}</span><p class="fw-t"><b>${esc(nw[nw.length-1][0])}</b> ${esc(nw[nw.length-1][1])}</p>${nw.length>1?`<small class="hint">ほかに${nw.length-1}つ。上の名前を押すと、年表で全部見られます。</small>`:""}</div>`:""}
+      ${nw.length?`<div class="fw-n"><span class="chip newchip">📬 続報${nw.length>1?" "+nw.length+"つ":""}</span><p class="fw-t"><b>${esc(nw[nw.length-1][0])}</b> ${esc(nw[nw.length-1][1])}</p>${nw.length>1?`<small class="hint">ほかに${nw.length-1}つ。青い名前を押すと、年表で全部見られます。</small>`:""}</div>`:""}
       ${pk.map(([dd,t])=>`<div class="fw-p">📅 <b>${dd===0?"きょう":"あした"}が山場</b>: ${esc(t)}</div>`).join("")}
       ${end?`<div class="fw-p">🏁 このお話は一区切りになりました。<button class="fchip" data-fwx="${k}">追うのをやめる</button></div>`:""}
       ${nw.length?`<button class="fchip" data-fwok="${k}">✅ 読んだ</button>`:""}</li>`); });
@@ -4012,6 +4052,8 @@ function funGrid(){ const L=FUN.filter(f=>(FUN_SET[f[0]]||FUN_ALWAYS.includes(f[
     ${hid?`<button class="fchip" id="funMore" data-hid="${hid}" aria-expanded="${funOpen?"true":"false"}" style="margin-top:8px">${funOpen?"▲ とじる":`… ほか ${hid}こ を見る`}</button>`:""}</section>`; }
 // ===== お知らせ(新しくなったところ)。機能を足したら、いちばん上に1つ足す =====
 const UPDATES=[
+  {id:"2026-10-24d",d:"2026-10-24",t:"🧹 使いやすさの見直し",L:["久しぶりに開いたときは「👋 おかえりなさい」1枚にまとめ、同じ話題が何度も出ないようにしました。お知らせ(小さな吹き出し)は画面の上に出て、ボタンをかくさないようにしました。","かんたんモードの「🏷️ 保存」に文字をつけ、押しやすい大きさに。ほかの小さかったボタンも大きくしました。スクロールするとハロウィンの飾りが文字にかぶらないようにしました。","マイ→⚙️設定のいちばん上に目次をつけました。「⏱️ 読んだ時間」は「記録」に移りました。"]},
+  {id:"2026-10-24c",d:"2026-10-24",t:"📅 今週の5大ニュース",L:["土・日・月曜は「きょう」に、この1週間いちばん長く続いた話題5つが出ます。「はじまり → いま」で、話の流れがひと目でわかります。","「✓ 読んだ」でその週は消えます(ごはん🍙つき)。1分のふりかえりのスライドにも「はじまり → いま」を足しました。"]},
   {id:"2026-10-24b",d:"2026-10-24",t:"🥚 たまごのヒミツを守るように",L:["たまごの間は、4コマ・着せかえ・画像・はじめての案内などでも、たまごの絵で出るようにしました(何が生まれるかは、生まれるまでわかりません)。","色を変えるのは、生まれてからにしました。"]},
   {id:"2026-10-24a",d:"2026-10-24",t:"🙋 わたしに関係ある? ほか3つ",L:["「学生」「車に乗る」などを選ぶと、ニュース10の中で関係しそうなものに🙋の札がつきます(マイ→⚙️設定、またはニュース10の上から)。","3日以上あけて開いたときは「👋 おかえりなさい」で、いない間の大事なこと3つを出します。選挙・国会・制度や値段が変わる日は「あと◯日」で(7日以内は「きょう」、全部は「予定」)。","🎨 色の見分けにくい人向けの表示(マイ→⚙️設定): よい・悪いの色を青とオレンジにし、地図の丸などに文字もつけます。"]},
   {id:"2026-10-22o",d:"2026-10-22",t:"🏁 きょうのニュースは「読み終わり」がある",L:["「きょう」のいちばん下に「ここまでです」のカードができました。読み終わるとごはん🍙。何社の報道を見くらべて確かめたかも出ます。","ニュース10の上に「約○分で読み終われます」。下にずっと続かず、広告もなく、記録はスマホの中だけです。"]},
@@ -4199,6 +4241,7 @@ function renderMy(){
     </div>
     <section class="card"><b>📅 この4週間</b><div class="cal" aria-label="開いた日">${last28.map(d=>`<i class="${ME.days.includes(d)?"on":""}${d===TODAY?" today":""}" title="${mdLabel(d)}"></i>`).join("")}</div><div class="hint">色がついた日が、開いた日です。</div></section>
     ${monthCard()}
+    ${readTimeCard()}
     ${cardsHTML()}
     ${rankHTML()}
     <section class="card"><b>🎯 わたしの予想</b><div class="hint" style="margin:4px 0 8px">当たり ${vr.win} ・ はずれ ${vr.lose} ・ 半分 ${vr.half} ・ 結果待ち ${vr.open}</div>
@@ -4213,12 +4256,12 @@ function renderMy(){
       </ul></section>
     </div>
     <div class="mysec" data-mysec="set" ${MYTAB==="set"?"":"hidden"}>
+    <nav class="set-toc" id="setToc" aria-label="設定の目次"></nav>
     ${updCard()}
     ${installCard()}
     ${backupHTML()}
     <button class="lookcard" id="lookBtnMy"><span class="pal" aria-hidden="true" style="padding-left:5px">${COLORS.slice(1,6).map(c=>`<i style="background:${c[2]}"></i>`).join("")}</span><span><b>🎨 着せかえ</b><span class="hint" style="display:block">色・文字・画面の並び・タブを、わたし好みに</span></span></button>
     ${notifyHTML()}
-    ${readTimeCard()}
     ${voiceCard()}
     ${lifeSetHTML()}
     ${cvdCard()}
@@ -4234,6 +4277,9 @@ function renderMy(){
   main.querySelectorAll("[data-tab]").forEach(b=>b.onclick=()=>go(b.dataset.tab));
   main.querySelectorAll("#vRate [data-rate]").forEach(b=>b.onclick=()=>{ store.set("nw-rate",b.dataset.rate); main.querySelectorAll("#vRate [data-rate]").forEach(x=>x.setAttribute("aria-pressed",String(x===b))); sayJa("この速さで読み上げます"); });
   main.querySelectorAll("#vThumb [data-thumb]").forEach(b=>b.onclick=()=>{ store.set("nw-thumb",b.dataset.thumb); main.querySelectorAll("#vThumb [data-thumb]").forEach(x=>x.setAttribute("aria-pressed",String(x===b))); toast(b.dataset.thumb==="1"?"📷 写真を出します":"写真を出さないようにしました"); });
+  { const toc=main.querySelector("#setToc"); if(toc){ const box=toc.parentElement; const nm=x=>{ const h=x.getAttribute("aria-label")||((x.querySelector("h2,b,summary")||x).textContent||""); let t=h.replace(/\s+/g," ").trim().replace(/[(（].*$/,"").split(/[、・]/)[0].replace(/NEW.*$/,"").trim(); const FIX={"🔔 朝と夕方に":"🔔 朝と夕方のお知らせ","📲 スマホの画面に":"📲 アプリのボタンを置く","お知らせ":"🔔 新しくなったところ"}; t=FIX[t]||t; return t.slice(0,16); }; const L=[...box.children].filter(x=>x!==toc&&/^(SECTION|DETAILS|BUTTON|DIV)$/.test(x.tagName)&&x.id!=="obAgain"&&nm(x));
+    toc.innerHTML=`<b>⚙️ 設定の目次</b><div class="set-toc-l">${L.map((x,i)=>{ x.id=x.id||"setsec"+i; return `<button class="fchip" data-goto="${x.id}">${esc(nm(x))}</button>`; }).join("")}</div>`;
+    toc.querySelectorAll("[data-goto]").forEach(b=>b.onclick=()=>{ const t=document.getElementById(b.dataset.goto); if(t) t.scrollIntoView({behavior:"smooth",block:"start"}); }); } }
   main.querySelectorAll("#vRuby [data-ruby]").forEach(b=>b.onclick=()=>{ store.set("nw-ruby",b.dataset.ruby); applyRuby(); main.querySelectorAll("#vRuby [data-ruby]").forEach(x=>x.setAttribute("aria-pressed",String(x===b))); toast(b.dataset.ruby==="1"?"🈁 ふりがなをつけました":"ふりがなを外しました"); });
   main.querySelectorAll("#myInt [data-g]").forEach(b=>b.onclick=()=>{ const g=b.dataset.g; ME.interests[g]=!ME.interests[g]; b.setAttribute("aria-pressed",String(!!ME.interests[g])); saveMe(); });
   main.querySelectorAll("#myIntCard [data-recint]").forEach(b=>b.onclick=()=>{ applyRecInt(); main.querySelectorAll("#myInt [data-g]").forEach(x=>x.setAttribute("aria-pressed",String(!!ME.interests[x.dataset.g]))); });
@@ -4724,7 +4770,7 @@ function alertItems(){ const L=[]; const hid=(store.get("nw-alert-hide")||"").sp
     else if(r>=qr("3")&&age<3*36e5) L.push({id:"q"+q.at,lv:"mid",i:"🟡",t:`地震 最大震度${QN[q.maxi]} ${q.place}`,s:`${qhm(q.at)}ごろ(${qago(q.at)})${q.mag?` ・ M${q.mag}`:""} ・ 気象庁発表`}); });
   return L.filter(x=>!hid.includes(x.id)).slice(0,3); }
 function drawAlertBand(){ const el=document.getElementById("alertBand"); if(!el) return; const L=alertItems();
-  el.hidden=!L.length; el.innerHTML=L.map(x=>`<div class="al-band ${x.lv==="mid"?"mid":""}" role="button" tabindex="0" data-quake="1"><span class="ai" aria-hidden="true">${x.i}</span><span style="flex:1"><b>${esc(x.t)}</b><small>${esc(x.s)} ・ タップでくわしく</small></span><button class="al-x" data-alx="${esc(x.id)}" aria-label="この知らせを閉じる">✕</button></div>`).join("")
+  el.hidden=!L.length; el.innerHTML=L.map(x=>`<div class="al-band ${x.lv==="mid"?"mid":""}" role="button" tabindex="0" data-quake="1"><span class="ai" aria-hidden="true">${x.i}</span><span style="flex:1"><b>${esc(x.t)}</b><small>${esc(x.s)} ・ タップでくわしく</small></span><button class="al-x" data-alx="${esc(x.id)}" aria-label="この知らせをとじる">✕ とじる</button></div>`).join("")
     + (L.some(x=>x.lv==="high")?`<button class="sos-go" data-sos="1">🆘 こまったときは(まずすること)</button>`:""); }
 // ===== 🆘 こまったときは(大きな災害のとき、まず見る画面。文字を大きく・ボタンを4つだけ) =====
 const SOS=[["🛡️","まず身を守る","地震のときは頭を守り、机の下へ。ゆれがおさまってから火を消し、ドアを開けて出口をつくる。津波の注意が出たら、海や川から離れて高いところへ。暴風のときは建物の中にいる。",[["🗺️ 防災マップ(このアプリの中)","#bmap"]]],
@@ -4811,7 +4857,7 @@ function feltCheck(){ const r=feltRecent(5); const ev=FELT.ev; const evOk=ev&&Da
 let P2PA=null; function loadP2PArea(){ return P2PA?Promise.resolve(P2PA):loadScript("p2parea.js?v=1").then(()=>(P2PA=window.P2P_AREA||{})); }
 function feltTop(L){ const c={}; L.forEach(x=>{ c[x.a]=(c[x.a]||0)+1; }); return Object.entries(c).map(([a,n])=>[a,(P2PA&&P2PA[a])?P2PA[a][0]:"地域不明",n]).sort((x,y)=>y[2]-x[2]); }
 async function openFelt(){ const sh=document.getElementById("sheet"); const back=sh.dataset.kind==="quake";
-  sh.innerHTML=`<div class="bar"><div class="wrap"><button class="iconbtn" id="flx" aria-label="もどる">← もどる</button><span class="ttl">👥 ゆれた報告</span><button class="iconbtn" id="flr" style="margin-left:auto;width:auto;padding:0 10px">↻ 新しくする</button></div></div><div class="wrap body" id="flBody"><div class="empty">読み込んでいます…</div></div>`;
+  sh.innerHTML=`<div class="bar"><div class="wrap"><button class="iconbtn" id="flx" aria-label="もどる">← もどる</button><span class="ttl">👥 みんなの「ゆれた」</span><button class="iconbtn" id="flr" style="margin-left:auto;width:auto;padding:0 10px">↻ 新しくする</button></div></div><div class="wrap body" id="flBody"><div class="empty">読み込んでいます…</div></div>`;
   sh.hidden=false; sh.scrollTop=0; document.body.style.overflow="hidden"; track("/felt","みんなのゆれた");
   sh.querySelector("#flx").onclick=()=>{ if(back) openQuake(); else { sh.hidden=true; sh.innerHTML=""; document.body.style.overflow=""; } };
   sh.querySelector("#flr").onclick=()=>{ feltLoad(true).then(feltDraw); };
@@ -4963,7 +5009,7 @@ function openQuake(refresh){ const sh=document.getElementById("sheet"); sh.datas
   sh.innerHTML=`<div class="bar"><div class="wrap"><button class="iconbtn" id="qkx" aria-label="もどる">← もどる</button><span class="ttl">🛟 防災(地震・雨雲・警報)</span><button class="iconbtn" id="qkr" aria-label="新しくする" style="margin-left:auto;width:auto;padding:0 10px">↻ 新しくする</button></div></div><div class="wrap body">
    ${rtStatHTML()}
    <button class="fchip fl-go" data-world="1">🌍 世界のいま<small>世界の地震・台風・山火事と、ニュースのあった場所</small></button>
-   <button class="fchip fl-go" data-felt="1">👥 みんなの「ゆれた」マップ<small>いま、どこでゆれを感じた人が多いか(利用者の報告・目安)</small></button>
+   <button class="fchip fl-go" data-felt="1">👥 みんなの「ゆれた」<small>いま、どこでゆれを感じた人が多いか(利用者の報告・目安)</small></button>
    <div class="bs-go"><button class="fchip" data-bmap="rain">☔ 雨雲レーダー<small>いまと1時間先の雨</small></button><button class="fchip" data-bmap="shelter">🏃 にげる場所<small>近くの避難場所</small></button><button class="fchip" data-bmap="flood">🌊 水につかる所<small>川があふれたら</small></button><button class="fchip" data-bmap="dosha">⛰️ がけ崩れの所<small>土砂災害の区域</small></button></div>
    <p class="hint">気象庁の発表を、アプリを開いたときに直接読んでいます(ニュースの1日4回の更新を待ちません)。開いている間は、新しい知らせもすぐ受けとります。${AL.checked?`最後に確かめた時刻: ${qhm(AL.checked)}`:""}${AL.ok?"":" ・ <b>いま読み込めませんでした。下の公式ページで確かめてください。</b>"}</p>
    ${tsu?`<div class="al-band" style="cursor:default"><span class="ai">🌊</span><span><b>${esc(tsu.grade)}</b><small>${esc(tsu.areas.join("・"))}${tsu.count>tsu.areas.length?" ほか":""}</small></span></div>`:`<p>🌊 津波の警報・注意報は、いま出ていません。</p>`}
