@@ -3076,7 +3076,10 @@ const HEAD_ACC=["band","helmet","straw","chef","phones","ribbon"];
 // (同じidが2つあると、うしろのペットの色が前のペットのものを見にいってしまう)
 let petUID=0;
 function petSVG(stage,mood,acc,size,costume,kind,color){
-  const S=size||120; const egg=stage===0; const U="u"+(++petUID); const mine=!PET_KINDS[kind]; kind=PET_KINDS[kind]?kind:petKind();
+  const mine0=!PET_KINDS[kind];
+  /* 🥚 何が生まれるかヒミツ: いまの子がまだたまごなら、どこで描いても(4コマ・着せかえ・画像・案内など)たまごの絵にする */
+  let hideKind=false; if(mine0&&stage>0){ try{ if(petStage().i===0){ stage=0; hideKind=true; } }catch(_){} }
+  const S=size||120; const egg=stage===0; const U="u"+(++petUID); const mine=mine0; kind=PET_KINDS[kind]?kind:petKind();
   // 🎨 色: 引数 color(殿堂・見本)> いまの子の ME.pet.color > 種類のもとの色
   let PC=PET_COLORS.find(c=>c[0]===(color!==undefined?color:(mine?(ME.pet||{}).color:null))); if(PC&&PC[0]&&!petColorsFor(kind).includes(PC)) PC=null; // その種類にない色は もとの色で
   const K=PC&&PC[1]?[PET_KINDS[kind][0],PC[1],PC[2],[PC[3],PC[4]],PET_KINDS[kind][4]]:PET_KINDS[kind]; const KP=petKindParts(kind,stage,egg);
@@ -3087,7 +3090,7 @@ function petSVG(stage,mood,acc,size,costume,kind,color){
     : `<path d="M60 44q0-10 2-14" stroke="#3f8f3a" stroke-width="3" fill="none"/><path d="M62 31q10-10 18-4-6 9-18 4z" fill="#58b84f"/>${stage>=2?`<path d="M61 34q-10-8-17-2 6 8 17 2z" fill="#6cc763"/>`:""}`;
   // 暗い色(くろ・こげ茶)は、目を明るい色にして白目もつける(顔に灰色のマスクはのせない)
   const dk=!!(PC&&PC[6]); const ec=dk?"#ffe9a8":"#3a2a14";
-  const eyes=egg?"": mood==="happy"?`<path d="M42 70q5-6 10 0M68 70q5-6 10 0" stroke="${ec}" stroke-width="3.2" fill="none" stroke-linecap="round"/>`
+  const eyes=egg?(hideKind?`<circle cx="51" cy="50" r="2.8" fill="#6b4a22"/><circle cx="69" cy="50" r="2.8" fill="#6b4a22"/><path d="M56 56q4 3 8 0" stroke="#b08850" stroke-width="2.2" fill="none" stroke-linecap="round"/><ellipse cx="45" cy="56" rx="3.5" ry="2" fill="#ffb3b8" opacity=".6"/><ellipse cx="75" cy="56" rx="3.5" ry="2" fill="#ffb3b8" opacity=".6"/>`:""): mood==="happy"?`<path d="M42 70q5-6 10 0M68 70q5-6 10 0" stroke="${ec}" stroke-width="3.2" fill="none" stroke-linecap="round"/>`
     : mood==="sulk"?`<path d="M41 67l11 3M79 67l-11 3" stroke="${ec}" stroke-width="3" stroke-linecap="round"/>${dk?`<circle cx="47" cy="72" r="4.4" fill="#fffaf0"/><circle cx="73" cy="72" r="4.4" fill="#fffaf0"/>`:""}<circle cx="47" cy="72" r="2.6" fill="#3a2a14"/><circle cx="73" cy="72" r="2.6" fill="#3a2a14"/>`
     : `${dk?`<circle cx="47" cy="70" r="6" fill="#fffaf0"/><circle cx="73" cy="70" r="6" fill="#fffaf0"/>`:""}<circle cx="47" cy="70" r="4" fill="#3a2a14"/><circle cx="73" cy="70" r="4" fill="#3a2a14"/><circle cx="48.3" cy="68.6" r="1.3" fill="#fff"/><circle cx="74.3" cy="68.6" r="1.3" fill="#fff"/>`;
   const mouth=egg?"": mood==="happy"?`<path d="M54 79q6 7 12 0" fill="#c2453a"/>` : mood==="sulk"?`<path d="M54 82q6-5 12 0" stroke="${ec}" stroke-width="2.6" fill="none" stroke-linecap="round"/><path d="M90 50l6-4M92 56l7 0M90 62l6 4" stroke="#e5484d" stroke-width="2.4" stroke-linecap="round"/>` : `<ellipse cx="60" cy="80" rx="4" ry="3.2" fill="#c2453a"/>`;
@@ -3198,7 +3201,7 @@ function petBig(){ petHatchCheck(); const p=petInit(); const st=petStage(); cons
     ${petHall().length?`<details class="faq plain" style="margin-top:8px"><summary>🏆 殿堂(名人になった子たち)</summary><div class="pet-hall">${petHall().map(h=>`<div class="ph"><span>${petSVG(5,"happy",null,56,h.wear||null,h.kind,h.color||null)}</span><b>${esc(h.name)}</b><small>第${h.gen||1}代 ・ ${esc(mdLabel(h.at))}に名人</small></div>`).join("")}</div></details>`:""}
     <details class="faq plain" style="margin-top:6px"><summary>そだて方</summary><ul class="us"><li>🧠 クイズに正解 → 🍙 ごはん(1日${PET_DAY_MAX}こまで)。あげると そだち +5</li><li>📅 開いた日 +2 ・ 💡 解説を読む +3 ・ 📖 ことばを調べる +1</li><li>3日以上あけると、すねます。ごはんをあげると元気に。</li><li>たまご → あかちゃん → こども → おとな → ものしり → ニュース名人</li><li>🥚 たまごから生まれる子は7種類。どの子が生まれるかは、生まれるまでのお楽しみ!(生まれたあとは変わりません)</li><li>🎓 名人になったら、そのまま育てるか、新しいたまごから育てるか選べます</li></ul></details>
     ${friendOn()?`<div class="hint" style="text-align:center;margin-top:6px">🐣 ともだちの「${esc(friendName())}」が遊びに来ています <button class="gd-lk" id="frRename">名前</button></div>`:`<div class="hint" style="text-align:center;margin-top:6px">ペットが「おとな」になるか、14日開くと、ともだちがやってくるよ。</div>`}
-    <details class="faq plain" style="margin-top:8px" id="petColorBox"><summary>🎨 色を変える</summary><div class="pet-colors">${petColorsFor(petKind()).map(c=>`<button class="pc-i${((p.color||null)===c[0])?" on":""}" data-pcol="${c[0]||""}" aria-pressed="${(p.color||null)===c[0]}"><span>${petSVG(Math.max(1,st.i),"happy",null,48,null,petKind(),c[0])}</span><small>${esc(c[5])}</small></button>`).join("")}</div><div class="hint">いつでも何回でも変えられます。色は、その動物に本当にある色から選べます(けろまるは何色でも)。殿堂の子は、その子の色のまま残ります。</div></details>
+    ${st.i===0?`<p class="hint" style="margin-top:8px">🎨 色は、たまごから生まれたあとに変えられます。</p>`:`<details class="faq plain" style="margin-top:8px" id="petColorBox"><summary>🎨 色を変える</summary><div class="pet-colors">${petColorsFor(petKind()).map(c=>`<button class="pc-i${((p.color||null)===c[0])?" on":""}" data-pcol="${c[0]||""}" aria-pressed="${(p.color||null)===c[0]}"><span>${petSVG(Math.max(1,st.i),"happy",null,48,null,petKind(),c[0])}</span><small>${esc(c[5])}</small></button>`).join("")}</div><div class="hint">いつでも何回でも変えられます。色は、その動物に本当にある色から選べます(けろまるは何色でも)。殿堂の子は、その子の色のまま残ります。</div></details>`}
     <details class="faq plain" style="margin-top:8px"><summary>👕 着せかえ</summary>${wardrobeHTML()}<div class="hint">🔒の服は、書いてあることをすると着られるようになります。</div></details>
     <details class="faq plain"><summary>🏠 ${esc(petName())}の部屋</summary>${roomHTML()}</details>
     <details class="faq plain"><summary>📔 今週の日記</summary>${diaryHTML()}</details>
@@ -4009,6 +4012,7 @@ function funGrid(){ const L=FUN.filter(f=>(FUN_SET[f[0]]||FUN_ALWAYS.includes(f[
     ${hid?`<button class="fchip" id="funMore" data-hid="${hid}" aria-expanded="${funOpen?"true":"false"}" style="margin-top:8px">${funOpen?"▲ とじる":`… ほか ${hid}こ を見る`}</button>`:""}</section>`; }
 // ===== お知らせ(新しくなったところ)。機能を足したら、いちばん上に1つ足す =====
 const UPDATES=[
+  {id:"2026-10-24b",d:"2026-10-24",t:"🥚 たまごのヒミツを守るように",L:["たまごの間は、4コマ・着せかえ・画像・はじめての案内などでも、たまごの絵で出るようにしました(何が生まれるかは、生まれるまでわかりません)。","色を変えるのは、生まれてからにしました。"]},
   {id:"2026-10-24a",d:"2026-10-24",t:"🙋 わたしに関係ある? ほか3つ",L:["「学生」「車に乗る」などを選ぶと、ニュース10の中で関係しそうなものに🙋の札がつきます(マイ→⚙️設定、またはニュース10の上から)。","3日以上あけて開いたときは「👋 おかえりなさい」で、いない間の大事なこと3つを出します。選挙・国会・制度や値段が変わる日は「あと◯日」で(7日以内は「きょう」、全部は「予定」)。","🎨 色の見分けにくい人向けの表示(マイ→⚙️設定): よい・悪いの色を青とオレンジにし、地図の丸などに文字もつけます。"]},
   {id:"2026-10-22o",d:"2026-10-22",t:"🏁 きょうのニュースは「読み終わり」がある",L:["「きょう」のいちばん下に「ここまでです」のカードができました。読み終わるとごはん🍙。何社の報道を見くらべて確かめたかも出ます。","ニュース10の上に「約○分で読み終われます」。下にずっと続かず、広告もなく、記録はスマホの中だけです。"]},
   {id:"2026-10-22n",d:"2026-10-22",t:"✍️ ことばを見直しました",L:["アプリの中の文を全部読み直して、かたい言い方や、外国語を訳したような言い方を、ふだんのことばに直しました(例: 「記録を読み込む」→「とっておいた記録をもどす」)。","🌍 世界のいまの地名は、わかるものを日本語で出すようにしました。"]},
