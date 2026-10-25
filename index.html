@@ -53,7 +53,7 @@
   --g-fas:#f07ad8; --g-sci:#9fb6cc; --g-home:#e0b860; --g-food:#ff9573; --g-life:#67d3ec; --g-trip:#a5a1ff;
   --g-fas-s:#3a1636; --g-sci-s:#1f2a36; --g-home-s:#33291a; --g-food-s:#3a1d14; --g-life-s:#12303a; --g-trip-s:#24224a;
   color-scheme:dark}
-:root[data-size="l"]{--fs:18px} :root[data-size="xl"]{--fs:20px}
+:root[data-size="l"]{--fs:18px} :root[data-size="xl"]{--fs:20px} :root[data-size="xxl"]{--fs:23px}
 *{box-sizing:border-box}
 [hidden]{display:none!important}
 body{margin:0}
@@ -920,6 +920,8 @@ svg.eat{animation:petEat .7s ease both!important}
 .pp-art.done h3{padding-right:52px}
 .cap-lock{background:var(--surface2);border:1px dashed var(--line);border-radius:10px;padding:8px 12px;font-size:.9rem}
 /* もしも計算機 */
+.if-fuel{display:flex;flex-wrap:wrap;gap:4px}.if-fuel button{flex:1 1 auto}
+.if-row select{font:inherit;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:6px 8px;min-height:40px}
 .if-row{display:flex;flex-direction:column;gap:6px;padding:10px 0;border-top:1px solid var(--line)}
 .if-row label{display:flex;flex-wrap:wrap;align-items:center;gap:6px;font-size:.92rem}
 .if-row input[type=number]{width:7em;font:inherit;padding:4px 8px;border:1px solid var(--line);border-radius:8px;background:var(--surface);color:var(--ink)}
@@ -1226,6 +1228,7 @@ svg.eat{animation:petEat .7s ease both!important}
 .kt-b.now{border:2px solid var(--accent)}.kt-b.ok{background:var(--ok-soft);border-color:var(--ok)}
 .kt-cert{margin-top:8px;border:3px double #b8862b;border-radius:12px;padding:14px;text-align:center;background:var(--surface2)}
 .kt-cert b{display:block;font-size:1.6rem;margin:4px 0}.kt-cert small{color:var(--muted)}
+:root[data-size="xxl"] .top .upd{font-size:13px} :root[data-size="xxl"] .brand{font-size:16px} :root[data-size="xxl"] .top .iconbtn{font-size:15px}
 </style>
 </head>
 <body>
@@ -1410,7 +1413,7 @@ function setMode(m,fresh){ if(m!=="easy") m="normal"; if(m===LOOK.mode&&!fresh) 
   saveLook(); applySettings(); try{ drawTabs(); }catch(_){} }
 function modeName(m){ return (m||LOOK.mode)==="easy"?"かんたん":"ふつう"; }
 function applySettings(){ if(store.get("nw-cvd")==="1") root.setAttribute("data-cvd","1"); else root.removeAttribute("data-cvd"); const t=store.get("nw-theme"); if(t==="light"||t==="dark") root.setAttribute("data-theme",t); else root.removeAttribute("data-theme");
-  const s=store.get("nw-size"); if(s==="l"||s==="xl") root.setAttribute("data-size",s); else root.removeAttribute("data-size");
+  const s=store.get("nw-size"); if(s==="l"||s==="xl"||s==="xxl") root.setAttribute("data-size",s); else root.removeAttribute("data-size");
   root.setAttribute("data-color",LOOK.color); root.setAttribute("data-mode",LOOK.mode); { const z=seasonNow(); if(z) root.setAttribute("data-season",z.k); else root.removeAttribute("data-season"); try{ snow(!!z&&z.k==="xmas"); }catch(_){} }
   if(LOOK.density!=="normal") root.setAttribute("data-density",LOOK.density); else root.removeAttribute("data-density");
   const m=document.querySelector('meta[name="theme-color"]'); if(m){ const z=seasonNow(); m.setAttribute("content", z? z.light[0] : (COLORS.find(c=>c[0]===LOOK.color)||COLORS[0])[2]); }
@@ -1785,14 +1788,23 @@ function bindDone(){ const c=document.getElementById("doneCard"); if(!c||!("Inte
     const g=petEarn("done:"+TODAY,1); toast(`🏁 きょうの大事なニュースは、読み終わりです${g?"(🍙 ごはん+1)":""}。また ${D.nextLabel||"次の更新"} に`); try{ track("/done","読み終わり"); }catch(_){}
     const h=c.querySelector(".done-i"); if(h) h.textContent="✅"; },{threshold:.6}); io.observe(c); }
 // ===== 🙋 わたしに関係ある?(くらしの立場を選ぶと、関係しそうなニュースに札。立場はスマホの中だけ) =====
-const LIFE=[["student","🎒","学生"],["work","💼","働いている"],["kids","👶","子育て中"],["car","🚗","車に乗る"],["senior","🧓","年金を受けとっている"],["rent","🔑","家を借りている・一人暮らし"],["net","📱","ネットの買い物・サービスを使う"]];
+const LIFE=[["student","🎒","学生"],["work","💼","働いている"],["self","🧾","自営業・フリーランス"],["kids","👶","子育て中"],["car","🚗","車・バイクに乗る"],["train","🚃","電車・バスで通う"],["senior","🧓","年金を受けとっている"],["carer","🤝","家族の介護をしている"],["clinic","🏥","病院・薬局によく行く"],["access","♿","障がいのある人・その家族"],["rent","🔑","家を借りている・一人暮らし"],["owner","🏡","家を持っている・住宅ローン"],["invest","📈","NISA・株など投資をしている"],["farm","🌾","農業・漁業"],["pet","🐾","ペットと暮らしている"],["net","📱","ネットの買い物・サービスを使う"]];
 const LIFE_RX={all:/消費税|消費減税|物価|電気代|ガス代|電気・ガス|給付金|減税|増税|保険料|マイナ保険証|食料品/,
   student:/学生|大学|高校|受験|入試|奨学金|学費|部活|共通テスト|若者|就職活動|就活/,
   work:/賃金|給料|賃上げ|最低賃金|雇用|働き方|残業|ボーナス|年収|副業|春闘|求人|有給|社会保険/,
   kids:/子育て|保育|児童手当|育休|出産|給食|小学校|中学校|こども家庭庁|学童/,
-  car:/ガソリン|電気自動車|(?<![A-Za-z])EV(?![A-Za-z])|自動車税|運転免許|車検|高速道路|リコール|軽油/,
+  car:/ガソリン|ハイオク|バイク|電気自動車|(?<![A-Za-z])EV(?![A-Za-z])|自動車税|運転免許|車検|高速道路|リコール|軽油/,
   senior:/年金|介護|高齢者|医療費|後期高齢|シニア|認知症/,
   rent:/家賃|賃貸|一人暮らし|単身|引っ越し/,
+  self:/個人事業|フリーランス|インボイス|確定申告|中小企業|小規模事業|下請け|事業者向け/,
+  train:/電車|運休|(?<![A-Za-z])JR(?![A-Za-z])|地下鉄|私鉄|運賃|ダイヤ改正|路線バス|定期券/,
+  carer:/介護|ヘルパー|ケアマネ|デイサービス|介護休業/,
+  clinic:/医療費|病院|診療|処方|薬局|薬価|保険証|ワクチン|窓口負担/,
+  access:/障害者|障がい|バリアフリー|手話|点字|車いす|ユニバーサルデザイン|合理的配慮/,
+  owner:/住宅ローン|固定資産税|変動金利|持ち家|リフォーム|マンション価格/,
+  invest:/NISA|iDeCo|日経平均|株価|投資信託|配当|株主/,
+  farm:/農家|農業|農作物|コメの値段|米価|漁業|漁獲|水産|畜産|JA/,
+  pet:/ペット|動物病院|飼い主|犬や猫|ペットフード/,
   net:/不正アクセス|漏れた|漏えい|流出|フィッシング|あやしいメール|パスワード|なりすまし|ネット通販|個人情報/};
 function myLife(){ return Object.keys(ME.life||{}).filter(k=>ME.life[k]); }
 function whoHit(n){ const L=myLife(); if(!L.length) return []; const who=n.who||null;
@@ -2387,7 +2399,7 @@ function renderNumbers(){
     <p class="hint" style="margin:0">日付が飛んでいるのは、土日・祝日で取引がない日や、値を確認できなかった日です。</p>
     ${footer()}
   </div>`;
-  bindFooter();
+  bindFooter(); bindIf(); /* もしも計算機はグラフの部品が読めなくても動かす */
   main.querySelectorAll("[data-tab]").forEach(b=>b.addEventListener("click",()=>go(b.dataset.tab)));
   if(!window.Chart){ main.querySelectorAll(".chartbox").forEach(b=>b.innerHTML='<div class="empty">グラフを読み込んでいます…</div>');
     loadChart().then(()=>{ if(current==="numbers") go("numbers",{keepScroll:true}); }).catch(()=>{ main.querySelectorAll(".chartbox").forEach(b=>b.innerHTML='<div class="empty">グラフを読み込めませんでした。通信状態を確かめて、ページを開き直してください。</div>'); }); return; }
@@ -2399,7 +2411,6 @@ function renderNumbers(){
   mk("c1",1,css("--g-pol"),v=>Math.round(v).toLocaleString("ja-JP")+"円");
   mk("c3",3,css("--g-soc"),v=>v.toFixed(1)+"ドル",[{data:labels.map(()=>100),borderColor:css("--g-intl"),borderDash:[6,5],borderWidth:1.5,pointRadius:0,fill:false,spanGaps:true}]);
   mk("c2",2,css("--g-eco"),v=>v.toFixed(2)+"円");
-  bindIf();
   longChart();
   const cnt=GORDER.map(g=>NEWS.filter(n=>n.g===g && n.d>="2026-10-11").length);
   charts.push(new Chart(document.getElementById("c4"),{type:"bar",data:{labels:GORDER.map(g=>GN[g]),datasets:[{data:cnt,backgroundColor:GORDER.map(g=>css("--g-"+g)),borderRadius:6}]},options:{indexAxis:"y",maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.raw+"件"}}},scales:{x:{grid:{color:line},ticks:{precision:0}},y:{grid:{display:false}}}}}));
@@ -2628,7 +2639,7 @@ document.getElementById("setBtn").onclick=()=>{
   const p=document.getElementById("pop"); const t=store.get("nw-theme")||"system"; const s=store.get("nw-size")||"m";
   p.innerHTML=`<div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px"><b>設定</b><button class="iconbtn" id="popx" aria-label="とじる" style="background:transparent;color:inherit;border-color:currentColor;width:auto;padding:0 12px">✕ とじる</button></div>
     <div class="setrow" style="margin-bottom:10px"><span style="min-width:5em">モード<small style="display:block;font-size:.82rem;opacity:.8">押すと、どう変わるか見られます</small></span><span class="seg">${[["easy","かんたん"],["normal","ふつう"]].map(([k,l])=>`<button data-pmode="${k}" aria-pressed="${LOOK.mode===k}">${l}</button>`).join("")}</span></div>
-    <div class="setrow" style="margin-bottom:10px"><span style="min-width:5em">文字の大きさ</span><span class="seg">${[["m","ふつう"],["l","大きめ"],["xl","特大"]].map(([k,l])=>`<button data-size="${k}" aria-pressed="${s===k}">${l}</button>`).join("")}</span></div>
+    <div class="setrow" style="margin-bottom:10px"><span style="min-width:5em">文字の大きさ</span><span class="seg">${[["m","ふつう"],["l","大きめ"],["xl","特大"],["xxl","もっと大きく"]].map(([k,l])=>`<button data-size="${k}" aria-pressed="${s===k}">${l}</button>`).join("")}</span></div>
     <div class="setrow"><span style="min-width:5em">画面の色</span><span class="seg">${[["system","スマホに合わせる"],["light","明るい"],["dark","暗い"]].map(([k,l])=>`<button data-theme="${k}" aria-pressed="${t===k}">${l}</button>`).join("")}</span></div>
     <div style="display:flex;flex-direction:column;gap:8px;margin-top:12px"><button class="fchip" id="popTabs">🧭 下のボタン(ページ)を選ぶ</button><button class="fchip" id="popLook">🎨 色・画面の並びを変える</button><button class="fchip" id="popHelp">🔰 使い方を見る</button><button class="fchip" id="popMore">⚙️ ほかの設定(お知らせ・読み上げの速さ・ふりがな など) →</button></div>`;
   p.hidden=false;
@@ -2676,7 +2687,7 @@ function openLook(){
       <section class="lk-sec"><h3>ページのペット</h3><div class="hint">各ページに、そのページに合った服を着たペットが出ます。</div>
         <div class="setrow"><span class="seg">${[["on","出す"],["off","出さない"]].map(([k,l])=>`<button data-lmas="${k}" aria-pressed="${(LOOK.mascot!==false)===(k==="on")}">${l}</button>`).join("")}</span></div></section>
       <section class="lk-sec"><h3>文字と詰め具合</h3>
-        <div class="setrow"><span style="min-width:5em">文字</span><span class="seg">${[["m","ふつう"],["l","大きめ"],["xl","特大"]].map(([k,l])=>`<button data-ls="${k}" aria-pressed="${sz===k}">${l}</button>`).join("")}</span></div>
+        <div class="setrow"><span style="min-width:5em">文字</span><span class="seg">${[["m","ふつう"],["l","大きめ"],["xl","特大"],["xxl","もっと大きく"]].map(([k,l])=>`<button data-ls="${k}" aria-pressed="${sz===k}">${l}</button>`).join("")}</span></div>
         <div class="setrow"><span style="min-width:5em">詰め具合</span><span class="seg">${[["compact","ぎっしり"],["normal","ふつう"],["roomy","ゆったり"]].map(([k,l])=>`<button data-ld="${k}" aria-pressed="${LOOK.density===k}">${l}</button>`).join("")}</span></div>
         <div class="hint">「ぎっしり」は、ニュース10の4位以下を見出しだけにして、1画面にたくさん並べます。</div></section>
       <section class="lk-sec"><h3>「きょう」に出すもの(足す・へらす)</h3><div class="hint">右のボタンを押すと「✅ 出している」⇔「⬜ かくしている」が切りかわります。↑上・↓下で順番を変えられます。</div>
@@ -3345,21 +3356,40 @@ function capsBlock(){ ME.caps=ME.caps||[]; const L=ME.caps.slice().sort((a,b)=>a
 function bindCaps(){ document.querySelectorAll("[data-cap]").forEach(b=>b.onclick=()=>{ const m=document.getElementById("capMsg").value.trim(); if(!m){ toast("ひとこと書いてから封をしてね"); return; }
   ME.caps=ME.caps||[]; ME.caps.push({at:TODAY,open:new Date(Date.parse(TODAY)+(+b.dataset.cap)*864e5).toISOString().slice(0,10),msg:m.slice(0,200),top:D.top10.slice(0,3).map(n=>n.title)}); saveMe(); toast("🔒 タイムカプセルに封をしました"); go("my",{keepScroll:true}); }); }
 // ===== もしも計算機(ニュースの数字を自分の暮らしに置きかえる) =====
-function ifCalc(){ const y=lastVal(2); const yen=y?y.v:150;
+const IF_FUEL=[["reg","⛽","レギュラー","L",40,30],["hi","⛽","ハイオク","L",40,30],["diesel","🚚","軽油","L",50,30],["kero","🛢️","灯油","L",36,30],["ev","🔌","電気(EVの充電)","kWh",150,15]];
+const IF_CUR=[["USD","🇺🇸","ドル",1],["EUR","🇪🇺","ユーロ",1],["KRW","🇰🇷","ウォン",100],["CNY","🇨🇳","人民元",1],["TWD","🇹🇼","台湾ドル",1],["THB","🇹🇭","タイバーツ",1],["GBP","🇬🇧","ポンド",1],["AUD","🇦🇺","豪ドル",1]];
+function ifState(){ ME.ifc=ME.ifc||{fuel:"reg",cur:"USD",rate:{},amt:{}}; ME.ifc.rate=ME.ifc.rate||{}; ME.ifc.amt=ME.ifc.amt||{}; return ME.ifc; }
+function ifCalc(){ const y=lastVal(2); const S=ifState(); const fu=IF_FUEL.find(x=>x[0]===S.fuel)||IF_FUEL[0]; const cu=IF_CUR.find(x=>x[0]===S.cur)||IF_CUR[0];
+  const base=cu[0]==="USD"&&y?y.v:(+S.rate[cu[0]]||"");
   return `<section class="card" id="ifBox"><h3 style="font-size:1rem">🧮 もしも計算機</h3><div class="hint" style="margin:4px 0 10px">ニュースの数字が動いたら、わたしの財布はどうなる?(計算上の目安)</div>
-    <div class="if-row"><b>✈️ 海外旅行</b><label>旅行の予算 <input type="number" id="ifUsd" value="2000" min="0" step="100" inputmode="numeric"> ドル</label>
-      <label>1ドルが <b id="ifYv">${(yen+10).toFixed(0)}</b> 円になったら <input type="range" id="ifY" min="-30" max="30" value="10" aria-label="円の変化"></label><div class="if-out" id="ifYo"></div></div>
-    <div class="if-row"><b>⛽ ガソリン</b><label>1か月に入れる量 <input type="number" id="ifL" value="40" min="0" step="5" inputmode="numeric"> L</label>
-      <label>1Lあたり <b id="ifGv">+10</b> 円 <input type="range" id="ifG" min="-30" max="30" value="10" aria-label="ガソリンの値段の変化"></label><div class="if-out" id="ifGo"></div></div>
-    <div class="if-row"><b>🛒 食料品の消費税</b><label>1か月の食費 <input type="number" id="ifF" value="50000" min="0" step="5000" inputmode="numeric"> 円</label><div class="if-out" id="ifFo"></div></div>
-    <div class="hint">いまの1ドル: ${yen.toFixed(2)}円(${y?esc(mdLabel(y.d)):"—"})。税込みの食費を、8%→1%で計算しています。</div></section>`; }
-function bindIf(){ const $=id=>document.getElementById(id); if(!$("ifBox")) return; const y=lastVal(2); const yen=y?y.v:150; const f=n=>Math.round(n).toLocaleString("ja-JP");
-  const run=()=>{ const usd=+$("ifUsd").value||0, dy=+$("ifY").value; $("ifYv").textContent=(yen+dy).toFixed(0); const d1=usd*dy;
-    $("ifYo").innerHTML=`いま ${f(usd*yen)}円 → <b>${f(usd*(yen+dy))}円</b>(<span class="${d1>0?'dn':'up'}">${d1>=0?"+":""}${f(d1)}円</span>)`;
-    const L=+$("ifL").value||0, dg=+$("ifG").value; $("ifGv").textContent=(dg>=0?"+":"")+dg; const d2=L*dg;
-    $("ifGo").innerHTML=`1か月 <b class="${d2>0?'dn':'up'}">${d2>=0?"+":""}${f(d2)}円</b> ・ 1年で ${d2>=0?"+":""}${f(d2*12)}円`;
-    const F=+$("ifF").value||0; const d3=F/1.08*0.07; $("ifFo").innerHTML=`1か月 <b class="up">−${f(d3)}円</b> ・ 1年で −${f(d3*12)}円(法案が成立した場合)`; };
-  ["ifUsd","ifY","ifL","ifG","ifF"].forEach(id=>$(id).oninput=()=>{ petFlag("calc"); run(); }); run(); }
+    <div class="if-row"><b>✈️ 海外旅行・海外の買い物</b>
+      <label>お金の種類 <select id="ifCur">${IF_CUR.map(([k,f,n,u])=>`<option value="${k}"${k===cu[0]?" selected":""}>${f} ${esc(n)}</option>`).join("")}</select></label>
+      <label>予算 <input type="number" id="ifUsd" value="${S.amt[cu[0]]!=null?S.amt[cu[0]]:(cu[0]==="KRW"?200000:2000)}" min="0" step="${cu[0]==="KRW"?10000:100}" inputmode="numeric"> ${esc(cu[2])}</label>
+      ${cu[0]==="USD"&&y?`<div class="hint">いまの1ドル: ${y.v.toFixed(2)}円(${esc(mdLabel(y.d))}・このアプリの記録)</div>`
+        :`<label>いまのレート ${cu[3]} ${esc(cu[2])} = <input type="number" id="ifRate" value="${base}" min="0" step="0.01" inputmode="decimal" placeholder="銀行などで確認"> 円</label><div class="hint">ドル以外のレートは、このアプリに記録がないので、銀行やニュースで確かめた数字を入れてください。</div>`}
+      <label>円が <b id="ifYv">10% 安く</b> なったら <input type="range" id="ifY" min="-20" max="20" value="10" aria-label="円の変化(%)"></label><div class="if-out" id="ifYo"></div></div>
+    <div class="if-row"><b>${fu[1]} 燃料</b>
+      <div class="seg if-fuel" role="group" aria-label="燃料の種類">${IF_FUEL.map(([k,i,n])=>`<button data-iff="${k}" aria-pressed="${k===fu[0]}">${esc(n)}</button>`).join("")}</div>
+      <label>1か月に使う量 <input type="number" id="ifL" value="${S.amt[fu[0]]!=null?S.amt[fu[0]]:fu[4]}" min="0" step="5" inputmode="numeric"> ${fu[3]}</label>
+      <label>1${fu[3]}あたり <b id="ifGv">+${Math.round(fu[5]/3)}</b> 円 <input type="range" id="ifG" min="-${fu[5]}" max="${fu[5]}" value="${Math.round(fu[5]/3)}" aria-label="${esc(fu[2])}の値段の変化"></label><div class="if-out" id="ifGo"></div>
+      ${fu[0]==="kero"?`<div class="hint">灯油は冬に多く使います。18Lのポリタンク2つで36Lです。</div>`:fu[0]==="ev"?`<div class="hint">家で充電するときの電気の量です(電気代のプランで値段が変わります)。</div>`:""}</div>
+    <div class="if-row"><b>🛒 食料品の消費税</b><label>1か月の食費(外食をのぞく) <input type="number" id="ifF" value="${S.amt.food!=null?S.amt.food:50000}" min="0" step="5000" inputmode="numeric"> 円</label><div class="if-out" id="ifFo"></div>
+      <div class="hint">税込みの食費を、8%→1%で計算しています。外食・お酒は10%のままです。</div></div></section>`; }
+function bindIf(){ const $=id=>document.getElementById(id); if(!$("ifBox")) return; const y=lastVal(2); const S=ifState(); const f=n=>Math.round(n).toLocaleString("ja-JP");
+  const fu=IF_FUEL.find(x=>x[0]===S.fuel)||IF_FUEL[0]; const cu=IF_CUR.find(x=>x[0]===S.cur)||IF_CUR[0];
+  const run=()=>{ const amt=+$("ifUsd").value||0; S.amt[cu[0]]=amt; const pct=+$("ifY").value; $("ifYv").textContent=pct===0?"いまのまま":`${Math.abs(pct)}% ${pct>0?"安く":"高く"}`;
+    let rate=cu[0]==="USD"&&y?y.v:+(($("ifRate")||{}).value||0); if($("ifRate")){ S.rate[cu[0]]=rate||""; }
+    if(rate>0){ const per=rate/cu[3]; const now=amt*per, nx=now*(1+pct/100); const d1=nx-now;
+      $("ifYo").innerHTML=`いま ${f(now)}円 → <b>${f(nx)}円</b>(<span class="${d1>0?'up':'dn'}">${d1>=0?"+":""}${f(d1)}円</span>)`; }
+    else $("ifYo").innerHTML=`<span class="hint">いまのレートを入れると計算します。</span>`;
+    const L=+$("ifL").value||0; S.amt[fu[0]]=L; const dg=+$("ifG").value; $("ifGv").textContent=(dg>=0?"+":"")+dg; const d2=L*dg;
+    $("ifGo").innerHTML=`1か月 <b class="${d2>0?'up':'dn'}">${d2>=0?"+":""}${f(d2)}円</b> ・ 1年で ${d2>=0?"+":""}${f(d2*12)}円${fu[0]==="kero"?"(冬の4か月だけなら "+(d2>=0?"+":"")+f(d2*4)+"円)":""}`;
+    const F=+$("ifF").value||0; S.amt.food=F; const d3=F/1.08*0.07; $("ifFo").innerHTML=`1か月 <b class="dn">−${f(d3)}円</b> ・ 1年で −${f(d3*12)}円(法案が成立した場合)`; saveMe(); };
+  ["ifUsd","ifY","ifL","ifG","ifF","ifRate"].forEach(id=>{ const el=$(id); if(el) el.oninput=()=>{ petFlag("calc"); run(); }; });
+  $("ifCur").onchange=()=>{ S.cur=$("ifCur").value; saveMe(); ifRedraw(); };
+  document.querySelectorAll("[data-iff]").forEach(b=>b.onclick=()=>{ S.fuel=b.dataset.iff; saveMe(); ifRedraw(); });
+  run(); }
+function ifRedraw(){ const box=document.getElementById("ifBox"); if(!box) return; const t=document.createElement("div"); t.innerHTML=ifCalc(); box.replaceWith(t.firstElementChild); bindIf(); }
 // ===== 知ってた?スワイプ =====
 function knowItems(){ ME.know=ME.know||{}; return NEWS.filter(n=>n.ok && !(nkey(n) in ME.know)).slice(0,5); }
 function knowCard(){ const L=knowItems(); if(!L.length) return "";
@@ -4167,7 +4197,7 @@ function roleBlock(e){ const L=e.us||[]; if(!L.length) return ""; const mine=myL
     <p class="hint" style="margin:6px 0 0">上の「わたしたちへの影響」を、立場ごとに分けなおしたものです。新しいことは足していません。あてはまる文がない立場は出ません。</p></details>`; }
 
 // ===== 🧮 わが家の計算機(自分の毎月の金額に、ニュースに出た「◯%」をあてはめた計算上の例。記録はスマホの中だけ) =====
-const HH_ROWS=[["elec","💡","電気・ガス代"],["food","🍙","食費"],["gas","⛽","ガソリン代"],["phone","📱","スマホ・ネット代"],["rent","🏠","家賃"]];
+const HH_ROWS=[["elec","💡","電気・ガス代"],["food","🍙","食費"],["eat","🍜","外食"],["gas","⛽","車の燃料代(ガソリン・軽油など)"],["kero","🛢️","灯油・暖房"],["train","🚃","電車・バス代"],["phone","📱","スマホ・ネット代"],["rent","🏠","家賃・住宅ローン"],["daily","🧴","日用品"],["med","🏥","医療・薬代"],["kids","🎒","子どもの費用"],["pet","🐾","ペット代"],["ins","📄","保険料"]];
 function hhState(){ ME.hh=ME.hh||{}; return ME.hh; }
 function hhNews(){ const rx=/([0-9０-９]+(?:[.．][0-9０-９]+)?)\s*[%％](?:ほど|程度|前後)?(?:の)?(値上げ|値下げ|引き上げ|引き下げ|上昇|下落|上が|下が|増え|減)/g; const out=[]; const seen=new Set();
   const z=s=>s.replace(/[０-９．]/g,c=>String.fromCharCode(c.charCodeAt(0)-0xFEE0));
@@ -4184,15 +4214,17 @@ function hhCard(){ const S=hhState(); const N=hhNews();
   setTimeout(hhSum,0);
   return `<section class="card hh" id="hhBox" aria-label="わが家の計算機"><b>🧮 わが家の計算機</b>
     <div class="hint" style="margin:4px 0 8px">毎月だいたいいくら使っているかを入れて、「何%変わったら」を入れると、月と年でいくら変わるかを計算します。</div>
-    ${HH_ROWS.map(([k,ic,nm])=>{ const s=S[k]||{}; return `<div class="hh-r"><div class="hh-n">${ic} ${esc(nm)}</div>
+    ${(()=>{ const row=([k,ic,nm])=>{ const s=S[k]||{}; return `<div class="hh-r"><div class="hh-n">${ic} ${esc(nm)}</div>
       <label class="hh-f"><span>毎月</span><input type="number" inputmode="numeric" min="0" step="100" data-hh="${k}:v" value="${s.v||""}" placeholder="0"><span>円</span></label>
       <label class="hh-f"><span>変わる割合</span><input type="number" inputmode="decimal" min="-100" max="100" step="0.5" data-hh="${k}:p" value="${s.p||""}" placeholder="0"><span>%</span></label>
-      <div class="hh-o" id="hho-${k}"></div></div>`; }).join("")}
+      <div class="hh-o" id="hho-${k}"></div></div>`; };
+      const used=k=>S[k]&&(+S[k].v||+S[k].p); const main=HH_ROWS.filter((r,i)=>i<4||used(r[0])); const rest=HH_ROWS.filter(r=>!main.includes(r));
+      return main.map(row).join("")+(rest.length?`<details class="faq plain hh-more"><summary>＋ ほかの項目(${rest.map(r=>r[2].replace(/\(.*\)/,"")).join("・")})</summary>${rest.map(row).join("")}</details>`:""); })()}
     <div class="hh-sum" id="hhSum"></div>
     ${N.length?`<div class="hh-news"><div class="hint" style="margin:8px 0 4px">📰 最近のニュースに出た割合(タップすると、下で選んだ項目に入ります)</div>
       <label class="hh-f" style="margin-bottom:6px"><span>入れる先</span><select id="hhTo">${HH_ROWS.map(([k,ic,nm])=>`<option value="${k}">${ic} ${esc(nm)}</option>`).join("")}</select></label>
       ${N.map(x=>`<button class="hh-chip" data-hhp="${x.p}"><b>${x.p>0?"+":""}${x.p}%</b><small>${esc(mdLabel(x.d))} ${esc(x.h)}</small></button>`).join("")}</div>`:""}
-    <p class="hint" style="margin-top:8px">計算上の例です。ニュースの割合が、あなたの家にそのまま当てはまるとは限りません。入れた金額は、このスマホの中だけに保存します。</p></section>`; }
+    <p class="hint" style="margin-top:8px">計算上の例です。ニュースの割合が、あなたの家にそのまま当てはまるとは限りません。入れた金額は、このスマホの中だけに保存します。使わない項目は空のままで大丈夫です。</p></section>`; }
 document.addEventListener("input",e=>{ const i=e.target.closest("[data-hh]"); if(!i) return; const [k,f]=i.dataset.hh.split(":"); const S=hhState(); S[k]=S[k]||{}; const v=i.value===""?"":Math.max(f==="p"?-100:0,Math.min(f==="p"?100:9999999,+i.value)); S[k][f]=v; saveMe(); hhSum(); });
 document.addEventListener("click",e=>{ const b=e.target.closest("[data-hhp]"); if(!b) return; const k=(document.getElementById("hhTo")||{}).value||"food"; const S=hhState(); S[k]=S[k]||{}; S[k].p=+b.dataset.hhp; saveMe();
   const inp=document.querySelector(`[data-hh="${k}:p"]`); if(inp) inp.value=S[k].p; hhSum(); toast(`${(HH_ROWS.find(x=>x[0]===k)||[,"",""])[2]}に ${S[k].p}% を入れました`); });
@@ -4245,6 +4277,7 @@ document.addEventListener("click",e=>{ const box=e.target.closest("#ktBox"); if(
   inn.innerHTML=ktHTML(); box.scrollIntoView({block:"nearest"}); });
 // ===== お知らせ(新しくなったところ)。機能を足したら、いちばん上に1つ足す =====
 const UPDATES=[
+  {id:"2026-10-25c",d:"2026-10-25",t:"🧮 いろいろな暮らしに合わせられるように",L:["もしも計算機の燃料を、レギュラー・ハイオク・軽油・灯油・電気(EVの充電)から選べるようにしました。海外旅行は、ドルのほかにユーロ・ウォン・人民元など8つのお金で計算できます。","「🙋 わたしに関係あるニュース」の立場を16こに増やしました(自営業・電車やバスで通う・家族の介護・病院によく行く・障がいのある人とその家族・持ち家・投資・農業や漁業・ペットなど)。文字の大きさに「もっと大きく」を足しました。"]},
   {id:"2026-10-25b",d:"2026-10-25",t:"📖 新しい読み方が4つ増えました",L:["「✨ おたのしみ」に、📖 連載で読む(大きな話題を1日1話ずつ)、🕳️ 見出しの穴うめ、🧮 わが家の計算機、🎓 ニュース検定(3級から1級まで)を足しました。","解説ページの「わたしたちへの影響」の下で、🧑‍🤝‍🧑 立場ごとに(学生・働いている人・子育て中など)分けて見られます。どれも、もとの記事や解説に書いてあることだけを使っています。"]},
   {id:"2026-10-25a",d:"2026-10-25",t:"📌 暮らしと趣味の「話題」が増えます",L:["料理・ファッション・インテリア・旅行・ライフスタイル・スポーツ・科学などの話題を、会社の発表やレシピのサイト、お役所の資料、研究の発表などからも集めるようにしました。","こうした話題には「📌 話題」の印がつきます(2社で確かめた✅のニュースとは分けています)。「🎯 あなた向け」や「さがす」に出ます。"]},
   {id:"2026-10-24d",d:"2026-10-24",t:"🧹 使いやすさの見直し",L:["久しぶりに開いたときは「👋 おかえりなさい」1枚にまとめ、同じ話題が何度も出ないようにしました。お知らせ(小さな吹き出し)は画面の上に出て、ボタンをかくさないようにしました。","かんたんモードの「🏷️ 保存」に文字をつけ、押しやすい大きさに。ほかの小さかったボタンも大きくしました。スクロールするとハロウィンの飾りが文字にかぶらないようにしました。","マイ→⚙️設定のいちばん上に目次をつけました。「⏱️ 読んだ時間」は「記録」に移りました。"]},
@@ -5237,7 +5270,7 @@ document.addEventListener("click",ev=>{ const x=ev.target.closest("[data-alx]");
 document.addEventListener("keydown",ev=>{ if((ev.key==="Enter"||ev.key===" ")&&ev.target.matches&&ev.target.matches(".al-band[data-quake]")){ ev.preventDefault(); openQuake(); } });
 try{ loadAlerts(); setInterval(()=>{ if(document.visibilityState==="visible") loadAlerts(); },3*60*1000); document.addEventListener("visibilitychange",()=>{ if(document.visibilityState==="visible") loadAlerts(); }); }catch(_){}
 // テスト用の手がかり(localhost で動かしたときだけ。本番では出さない)
-if(/^(localhost|127\.0\.0\.1)$/.test(location.hostname)) window.NW_TEST={petSVG,PET_KINDS,PET_COLORS,petColorsFor,WEAR,petStage,petXP,petKind,petHall,petName,petRestart,get ME(){return ME;},get LOOK(){return LOOK;},TOPIC_GROUPS,FUN,SECS,openFun,openEx,fillQs,hhNews,ktQs,serialChapters};
+if(/^(localhost|127\.0\.0\.1)$/.test(location.hostname)) window.NW_TEST={petSVG,PET_KINDS,PET_COLORS,petColorsFor,WEAR,petStage,petXP,petKind,petHall,petName,petRestart,get ME(){return ME;},get LOOK(){return LOOK;},TOPIC_GROUPS,FUN,SECS,openFun,openEx,fillQs,hhNews,ktQs,serialChapters,go,openLife};
 const h=(location.hash||"").slice(1);
 if(h==="quake"){ go("today"); setTimeout(openQuake,50); } else if(D.explainers[h]){ go("explain"); openEx(h); }
 else if(h.startsWith("t=")) openTHash(h);
