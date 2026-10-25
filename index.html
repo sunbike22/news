@@ -585,7 +585,7 @@ mark{background:#ffe066;color:#141b2d;border-radius:3px;padding:0 1px}
 .memo{width:100%;font:inherit;font-size:.92rem;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:8px 10px;resize:vertical}
 
 /* install */
-.install{display:grid;grid-template-columns:48px 1fr auto;gap:12px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:12px 14px}
+.install{display:grid;grid-template-columns:48px 1fr;gap:10px 12px;align-items:center;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:12px 14px}
 .install img{width:48px;height:48px;border-radius:12px}
 .install b{display:block}
 .install .hint{display:block}
@@ -1301,6 +1301,9 @@ ul.ex-rel{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;
 @media print{body.printing-sm>*:not(#sheet){display:none!important}body.printing-sm #sheet{position:static!important;overflow:visible!important;background:#fff}body.printing-sm .no-print{display:none!important}body.printing-sm .shimen{--sm-paper:#fff;--sm-ink:#000;--sm-rule:#000;box-shadow:none}body.printing-sm{padding:0}}
 /* iPhone で入力欄を押したときに画面が勝手に拡大されないよう、入力欄の文字は16px以上 */
 @supports (-webkit-touch-callout:none){input,select,textarea{font-size:max(16px,1em)!important}}
+.mk .m{display:flex;flex-direction:column;justify-content:flex-start;align-items:flex-start}
+.rd-acts{display:flex;flex-wrap:wrap;gap:6px;margin:-4px 0 4px}.mk-stale{display:block;font-size:.82rem}
+.install>span:last-child{grid-column:1/-1;flex-direction:row!important;justify-content:flex-end}
 </style>
 </head>
 <body>
@@ -1968,7 +1971,8 @@ function renderToday(){
     </section>`;
   S.ten=`<section aria-label="今日のニュース10">
       <div class="sec-h"><h2>📰 今日のニュース10</h2><span class="seg len-seg" role="group" aria-label="長さ">${[["short","短く"],["full","くわしく"]].map(([k,l])=>`<button data-len="${k}" aria-pressed="${(LOOK.len||"short")===k}">${l}</button>`).join("")}</span></div>
-      <div class="hint rd-min">📖 ここから約${readMin()}分で、きょうの大事なニュースを読み終われます ・ <button class="linkish" data-shimen="1">🗞️ 新聞の形で読む</button>${ME.lifeSet?"":` ・ <button class="linkish" data-lifeopen="1">🙋 自分に関係あるものに印をつける</button>`}</div>
+      <div class="hint rd-min">📖 ここから約${readMin()}分で、きょうの大事なニュースを読み終われます</div>
+      <div class="rd-acts"><button class="fchip" data-shimen="1">🗞️ 新聞の形で読む</button>${ME.lifeSet?"":`<button class="fchip" data-lifeopen="1">🙋 自分に関係あるものに印</button>`}</div>
       <ol class="ten${(LOOK.len||"short")==="short"?" short":""}" style="margin-top:10px">${t.map((n,i)=>{
         const big=i<3; const link=n.ex||n.tab; const wt=newsWeight(n); const mine=isLocal(n.title+" "+(n.text||""));
         return `<li class="${big?'big':''} w${wt.lv}${mine?' mytown':''}">${pinBtn({k:"t|"+n.title,h:n.title,g:n.g,d:(NEWS[0]||{}).d,ex:n.ex},"abs")}<button class="row${link?' link':''}"${n.ex?` data-ex="${n.ex}"`:''}${n.tab?` data-tab="${n.tab}"`:''} ${link?'':'tabindex="-1"'}>
@@ -2051,7 +2055,7 @@ function marketsMini(){
   return `<div class="mk" style="margin-top:12px">
     <button class="m" data-tab="numbers" style="text-align:left;cursor:pointer"><div class="k">📈 日経平均</div><div class="val num">${n?n.v.toLocaleString("ja-JP")+"<u>円</u>":"—"}</div>${diff(n,0)} <span class="hint">${n?mdLabel(n.d):""}</span></button>
     <button class="m" data-tab="numbers" style="text-align:left;cursor:pointer"><div class="k">💴 1ドル</div><div class="val num">${y?y.v.toFixed(2)+"<u>円</u>":"—"}</div>${diff(y,2)} <span class="hint">${y?mdLabel(y.d):""}</span></button>
-    <button class="m" data-tab="numbers" style="text-align:left;cursor:pointer"><div class="k">🛢️ NY原油</div><div class="val num">${o?o.v.toFixed(2)+"<u>ドル</u>":"—"}</div>${diff(o,2)} <span class="hint">${o?mdLabel(o.d):""}</span></button>
+    <button class="m" data-tab="numbers" style="text-align:left;cursor:pointer"><div class="k">🛢️ NY原油</div><div class="val num">${o?o.v.toFixed(2)+"<u>ドル</u>":"—"}</div>${diff(o,2)} <span class="hint">${o?mdLabel(o.d):""}</span>${o&&D.markets.length&&o.d<D.markets[D.markets.length-1][0]?`<span class="hint mk-stale">最新は確認中</span>`:""}</button>
   </div>`;
 }
 
@@ -2167,7 +2171,7 @@ function renderSearch(){ sLim=20;
       :`<div class="quick" aria-label="よく探されることば">${["台風","原油","消費税","不正アクセス","日経平均","AI"].map(w=>`<button class="fchip" data-w="${w}">${w}</button>`).join("")}</div>`; })()}
     <div><div class="hint" style="margin-bottom:6px">ジャンル(いくつでも選べる)</div><div class="chips" id="gf">${GORDER.map(g=>`<button class="fchip" data-g="${g}" aria-pressed="${sState.g.has(g)}"><span class="c" style="background:var(--g-${g})"></span>${GN[g]}</button>`).join("")}</div></div>
     <div class="setrow"><label class="hint" for="th">テーマ</label><select id="th" class="fchip" style="padding:6px 10px"><option value="">すべて</option>${THEMES.map(t=>`<option ${sState.th===t?"selected":""}>${esc(t)}</option>`).join("")}</select>
-      <button class="fchip" id="okf" aria-pressed="${sState.ok}">✅ 複数社で確認したものだけ</button>${NEW_KEYS.size?`<button class="fchip" id="newf" aria-pressed="${sState.onlyNew}">🆕 新着だけ(${NEW_KEYS.size})</button>`:""}<button class="fchip" id="toWords">📖 ことば辞典</button></div>
+      <button class="fchip" id="okf" aria-pressed="${sState.ok}">✅ 複数社で確認したものだけ</button>${NEW_KEYS.size?`<button class="fchip" id="newf" aria-pressed="${sState.onlyNew}">🆕 新着だけ(${NEW_KEYS.size})</button>`:""}</div>
     <div id="sres"></div>
   </div>`;
   const q=document.getElementById("q");
@@ -2177,7 +2181,7 @@ function renderSearch(){ sLim=20;
   main.querySelectorAll("[data-g]").forEach(b=>b.onclick=()=>{const g=b.dataset.g; sState.g.has(g)?sState.g.delete(g):sState.g.add(g); b.setAttribute("aria-pressed",String(sState.g.has(g))); draw();});
   document.getElementById("th").onchange=e=>{sState.th=e.target.value; draw();};
   const nf=document.getElementById("newf"); if(nf) nf.onclick=e=>{sState.onlyNew=!sState.onlyNew; e.currentTarget.setAttribute("aria-pressed",String(sState.onlyNew)); draw();};
-  document.getElementById("toWords").onclick=()=>go("words"); document.getElementById("toWords2").onclick=()=>go("words"); main.querySelectorAll(".jump [data-tab]").forEach(b=>b.onclick=()=>go(b.dataset.tab));
+  document.getElementById("toWords2").onclick=()=>go("words"); main.querySelectorAll(".jump [data-tab]").forEach(b=>b.onclick=()=>go(b.dataset.tab));
   document.getElementById("okf").onclick=e=>{sState.ok=!sState.ok; e.currentTarget.setAttribute("aria-pressed",String(sState.ok)); draw();};
   draw();
   function hl(s, terms){ let out=esc(s); terms.forEach(t=>{ if(!t) return; const re=new RegExp(esc(t).replace(/[.*+?^${}()|[\]\\]/g,"\\$&"),"gi"); out=out.replace(re,m=>`<mark>${m}</mark>`); }); return out; }
@@ -4426,6 +4430,7 @@ function openShimen(){ const sh=document.getElementById("sheet"); const w=D.weat
 document.addEventListener("click",e=>{ const b=e.target.closest("[data-shimen]"); if(!b) return; e.preventDefault(); openShimen(); });
 // ===== お知らせ(新しくなったところ)。機能を足したら、いちばん上に1つ足す =====
 const UPDATES=[
+  {id:"2026-10-26b",d:"2026-10-26",t:"🧹 見やすさの整理",L:["「今日のニュース10」の上の「新聞の形で読む」「自分に関係あるものに印」をボタンにして押しやすくしました。設定の目次に絵をそろえ、「アプリのボタンを置く」の案内を読みやすくしました。","NY原油の値が数日前のままのときは「最新は確認中」と出るようにしました。"]},
   {id:"2026-10-26a",d:"2026-10-26",t:"← もどる で、ひとつ前の画面にもどるように",L:["連載・解説・おたのしみなどで、上に重ねて開いた画面の「← もどる」を押すと、いきなり最初の画面ではなく、ひとつ前の画面(読んでいた場所のまま)にもどるようにしました。"]},
   {id:"2026-10-25e",d:"2026-10-25",t:"🗞️ 新聞の形で読めるように",L:["「今日のニュース10」の上の「🗞️ 新聞の形で読む」で、今日の3行・今日の数字・ニュース10を、紙の新聞のような1枚で読めます。「🖨️ 印刷」で紙にもできます。","「さがす」に「🔥 この2日でよく出ていることば」を出しました。押すと、そのことばのニュースが集まります。"]},
   {id:"2026-10-25d",d:"2026-10-25",t:"📖 解説のページを読みやすくしました",L:["上に写真と大きな見出し、そのすぐ下に「ひとことで言うと」。このページの中身(4コマ・くわしく・影響・疑問・流れ・これから)へ1タップで飛べるボタンと、どこまで読んだかがわかる細い線をつけました。","大事な文には蛍光ペンの線、長い文は2文ずつに区切り、「わたしたちへの影響」は1つずつのカードにしました。4コマの文字が上の「もどる」に重なっていたのも直しました。"]},
@@ -4657,7 +4662,7 @@ function renderMy(){
   main.querySelectorAll("[data-tab]").forEach(b=>b.onclick=()=>go(b.dataset.tab));
   main.querySelectorAll("#vRate [data-rate]").forEach(b=>b.onclick=()=>{ store.set("nw-rate",b.dataset.rate); main.querySelectorAll("#vRate [data-rate]").forEach(x=>x.setAttribute("aria-pressed",String(x===b))); sayJa("この速さで読み上げます"); });
   main.querySelectorAll("#vThumb [data-thumb]").forEach(b=>b.onclick=()=>{ store.set("nw-thumb",b.dataset.thumb); main.querySelectorAll("#vThumb [data-thumb]").forEach(x=>x.setAttribute("aria-pressed",String(x===b))); toast(b.dataset.thumb==="1"?"📷 写真を出します":"写真を出さないようにしました"); });
-  { const toc=main.querySelector("#setToc"); if(toc){ const box=toc.parentElement; const nm=x=>{ const h=x.getAttribute("aria-label")||((x.querySelector("h2,b,summary")||x).textContent||""); let t=h.replace(/\s+/g," ").trim().replace(/[(（].*$/,"").split(/[、・]/)[0].replace(/NEW.*$/,"").trim(); const FIX={"🔔 朝と夕方に":"🔔 朝と夕方のお知らせ","📲 スマホの画面に":"📲 アプリのボタンを置く","お知らせ":"🔔 新しくなったところ"}; t=FIX[t]||t; return t.slice(0,16); }; const L=[...box.children].filter(x=>x!==toc&&/^(SECTION|DETAILS|BUTTON|DIV)$/.test(x.tagName)&&x.id!=="obAgain"&&nm(x));
+  { const toc=main.querySelector("#setToc"); if(toc){ const box=toc.parentElement; const nm=x=>{ const h=x.getAttribute("aria-label")||((x.querySelector("h2,b,summary")||x).textContent||""); let t=h.replace(/\s+/g," ").trim().replace(/[(（].*$/,"").split(/[、・]/)[0].replace(/NEW.*$/,"").trim(); const FIX={"🔔 朝と夕方に":"🔔 朝と夕方のお知らせ","📲 スマホの画面に":"📲 アプリのボタンを置く","お知らせ":"🔔 新しくなったところ","読み上げ":"🔊 読み上げ・ふりがな","わたしに関係あるニュース":"🙋 わたしに関係あるニュース","色の見分けやすさ":"👁️ 色の見分けやすさ","記録について":"🔒 記録について"}; t=FIX[t]||t; return t.slice(0,16); }; const L=[...box.children].filter(x=>x!==toc&&/^(SECTION|DETAILS|BUTTON|DIV)$/.test(x.tagName)&&x.id!=="obAgain"&&nm(x));
     toc.innerHTML=`<b>⚙️ 設定の目次</b><div class="set-toc-l">${L.map((x,i)=>{ x.id=x.id||"setsec"+i; return `<button class="fchip" data-goto="${x.id}">${esc(nm(x))}</button>`; }).join("")}</div>`;
     toc.querySelectorAll("[data-goto]").forEach(b=>b.onclick=()=>{ const t=document.getElementById(b.dataset.goto); if(t) t.scrollIntoView({behavior:"smooth",block:"start"}); }); } }
   main.querySelectorAll("#vRuby [data-ruby]").forEach(b=>b.onclick=()=>{ store.set("nw-ruby",b.dataset.ruby); applyRuby(); main.querySelectorAll("#vRuby [data-ruby]").forEach(x=>x.setAttribute("aria-pressed",String(x===b))); toast(b.dataset.ruby==="1"?"🈁 ふりがなをつけました":"ふりがなを外しました"); });
