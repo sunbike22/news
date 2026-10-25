@@ -161,6 +161,7 @@ main{padding-block:18px 32px}
 .ten.short li.mytown{border-left:4px solid var(--accent)}
 .ten.short li{position:relative}.ten.short .row{padding-right:50px!important}
 .len-seg{margin-left:auto}
+.badge-info{display:inline-flex;align-items:center;gap:2px;font-size:.82rem;font-weight:800;color:var(--muted);border:1px dashed var(--line);border-radius:999px;padding:0 8px}
 .set-toc{margin-bottom:12px;padding:10px 12px;border:1px solid var(--line);border-radius:14px;background:var(--surface)}.set-toc-l{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}.set-toc:empty{display:none}
 [id^="setsec"]{scroll-margin-top:84px}
 .pin-t{display:none}
@@ -1895,7 +1896,7 @@ function otherNews(){
   const day=NEWS[0]&&NEWS[0].d; if(!day) return "";
   const L=NEWS.filter(n=>n.d===day); if(!L.length) return "";
   return `<section aria-label="今日のほかのニュース"><details class="faq plain"><summary>📚 ${mdLabel(day)}に記録したニュース すべて(${L.length}件)</summary>
-    <div style="display:flex;flex-direction:column;gap:12px;padding:10px 0 14px">${GORDER.filter(g=>L.some(n=>n.g===g)).map(g=>`<div><span class="chip ${g}">${GN[g]}</span><ul class="us" style="margin-top:6px">${L.filter(n=>n.g===g).map(n=>`<li>${esc(n.h)} ${n.ok?'<span class="badge-ok">✅</span>':'<span class="badge-one">⚠️</span>'}</li>`).join("")}</ul></div>`).join("")}</div></details>
+    <div style="display:flex;flex-direction:column;gap:12px;padding:10px 0 14px">${GORDER.filter(g=>L.some(n=>n.g===g)).map(g=>`<div><span class="chip ${g}">${GN[g]}</span><ul class="us" style="margin-top:6px">${L.filter(n=>n.g===g).map(n=>`<li>${esc(n.h)} ${n.info?'<span class="badge-info">📌</span>':n.ok?'<span class="badge-ok">✅</span>':'<span class="badge-one">⚠️</span>'}</li>`).join("")}</ul></div>`).join("")}</div></details>
     <div class="hint" style="margin-top:6px">上のニュース10は、この中から関心の高い順に選んだランキングです。</div></section>`;
 }
 function lastVal(i){ for(let k=D.markets.length-1;k>=0;k--){ if(D.markets[k][i]!=null){ let prev=null; for(let j=k-1;j>=0;j--){ if(D.markets[j][i]!=null){prev=D.markets[j][i];break;} } return {v:D.markets[k][i],d:D.markets[k][0],prev}; } } return null; }
@@ -2015,7 +2016,7 @@ function tick(){ st.raf=requestAnimationFrame(now=>{ if(!st||st.paused) return; 
 function closeStory(){ if(st) cancelAnimationFrame(st.raf); st=null; stopSpeak(); const el=document.getElementById("story"); el.hidden=true; el.innerHTML=""; document.body.style.overflow=""; document.removeEventListener("keydown",storyKeys); document.getElementById("playBtn")?.focus(); }
 
 // ===== さがす =====
-const NEWS = D.news.map(r=>({d:r[0],g:r[1],ok:r[2],h:r[3],s:r[4],th:r[5],p:r[6]})).sort((a,b)=>b.d.localeCompare(a.d));
+const NEWS = D.news.map(r=>({d:r[0],g:r[1],ok:r[2]===1?1:0,info:r[2]===2,h:r[3],s:r[4],th:r[5],p:r[6]})).sort((a,b)=>b.d.localeCompare(a.d));
 const THEMES = [...new Set(NEWS.flatMap(n=>n.th?n.th.split(/[、,]/):[]).filter(Boolean))];
 const sState={q:"",g:new Set(),th:"",ok:false,onlyNew:false};
 let sLim=20;
@@ -2057,7 +2058,7 @@ function renderSearch(){ sLim=20;
       ${wHits.length?`<div><div class="hint" style="margin-bottom:6px">📖 ことば</div><div class="words">${wHits.map(wordCard).join("")}</div></div>`:""}
       <div class="sec-h"><h2 style="font-size:1rem">📰 ニュース <span class="num">${list.length}</span>件</h2>${(sState.q||sState.g.size||sState.th||sState.ok||sState.onlyNew)?'<button class="fchip" id="clr">条件をリセット</button>':''}</div>
       ${histo}
-      ${list.length? `<div class="res">${Object.keys(groups).sort().reverse().map(d=>`<section class="day"><h3>${mdLabel(d)}${d.slice(0,4)!==TODAY.slice(0,4)?" "+d.slice(0,4):""}</h3><ul>${groups[d].map(n=>`<li class="item">${pinBtn({k:nkey(n),h:n.h,g:n.g,d:n.d},"abs")}<div class="meta"><span class="chip ${n.g}">${GN[n.g]}</span>${n.ok?'<span class="badge-ok">✅</span>':'<span class="badge-one">⚠️ 1社</span>'}${n.p?`<span class="chip">🎯 ${esc(n.p)}</span>`:""}${isNew(n)?'<span class="chip newchip">🆕</span>':''}</div><div class="h">${hl(n.h,terms)}</div><div class="s">出典: ${hl(n.s,terms)}</div></li>`).join("")}</ul></section>`).join("")}</div>${ordered.length>sLim?`<button class="fchip more-btn" id="sMore">もっと見る(あと${ordered.length-sLim}件)</button>`:""}`
+      ${list.length? `<div class="res">${Object.keys(groups).sort().reverse().map(d=>`<section class="day"><h3>${mdLabel(d)}${d.slice(0,4)!==TODAY.slice(0,4)?" "+d.slice(0,4):""}</h3><ul>${groups[d].map(n=>`<li class="item">${pinBtn({k:nkey(n),h:n.h,g:n.g,d:n.d},"abs")}<div class="meta"><span class="chip ${n.g}">${GN[n.g]}</span>${n.info?'<span class="badge-info">📌 話題</span>':n.ok?'<span class="badge-ok">✅</span>':'<span class="badge-one">⚠️ 1社</span>'}${n.p?`<span class="chip">🎯 ${esc(n.p)}</span>`:""}${isNew(n)?'<span class="chip newchip">🆕</span>':''}</div><div class="h">${hl(n.h,terms)}</div><div class="s">出典: ${hl(n.s,terms)}</div></li>`).join("")}</ul></section>`).join("")}</div>${ordered.length>sLim?`<button class="fchip more-btn" id="sMore">もっと見る(あと${ordered.length-sLim}件)</button>`:""}`
         : `<div class="empty">見つかりませんでした。<br>ことばを短くするか、ジャンルの選択を外してみてください。</div>`}`;
     document.getElementById("sres").innerHTML=html;
     const sm=document.getElementById("sMore"); if(sm) sm.onclick=()=>{ sLim+=30; const y=window.scrollY; draw(); window.scrollTo({top:y}); };
@@ -2185,7 +2186,7 @@ function openEx(k){
       <details class="faq plain"><summary>リストで見る</summary><ol class="tl">${e.timeline.map(([d,t])=>`<li${isNewTl(d,seenAt)?' class="fresh"':""}><b>${esc(d)}</b>${esc(t)}${isNewTl(d,seenAt)?' <i class="tl-new">🆕</i>':""}</li>`).join("")}</ol></details></div>
     ${orderQuizHTML(e,k)}
     ${e.next.length?`<div class="blk"><h3>🔭 次の山場</h3><ul class="us">${e.next.map(n=>`<li>${esc(nextTxt(n))}</li>`).join("")}</ul></div>`:""}
-    ${rel.length?`<div class="blk"><h3>🗞️ 関係するニュースの記録</h3><div class="res"><ul style="list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px">${rel.map(n=>`<li class="item"><div class="meta"><span class="hint">${mdLabel(n.d)}</span>${n.ok?'<span class="badge-ok">✅</span>':'<span class="badge-one">⚠️ 1社</span>'}</div><div class="h">${esc(n.h)}</div></li>`).join("")}</ul></div></div>`:""}
+    ${rel.length?`<div class="blk"><h3>🗞️ 関係するニュースの記録</h3><div class="res"><ul style="list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px">${rel.map(n=>`<li class="item"><div class="meta"><span class="hint">${mdLabel(n.d)}</span>${n.info?'<span class="badge-info">📌 話題</span>':n.ok?'<span class="badge-ok">✅</span>':'<span class="badge-one">⚠️ 1社</span>'}</div><div class="h">${esc(n.h)}</div></li>`).join("")}</ul></div></div>`:""}
     ${askBlock(k)}
     <div class="src">📰 出典: ${esc(e.src)}</div>
     ${exNavHTML(k)}
@@ -2486,7 +2487,7 @@ function guideAnswerHTML(q,focus){
     parts.push(`<div class="gd-a"><b>${d.t==="word"?"📖 "+esc(d.q):d.t==="faq"?"Q. "+esc(d.q):"💡 "+esc(d.q)}</b><br>${esc(d.t==="ex"&&d.hit?d.hit:d.a)}<div class="hint">${from}${d.k&&d.k!==focus?` <button class="gd-lk" data-gex="${d.k}">解説を読む →</button>`:""}</div></div>`); }
   r.words.forEach(w=>parts.push(`<div class="gd-a"><b>📖 ${esc(w.q)}</b><br>${esc(w.a)}</div>`));
   if(r.plans.length && (I.when||!r.best)) parts.push(`<div class="gd-a"><b>📅 これからの予定</b><ul class="us" style="margin:4px 0 0">${r.plans.map(s=>`<li>${esc(mdLabel(s[0]))} ${esc(s[3])}</li>`).join("")}</ul></div>`);
-  if(r.news.length) parts.push(`<div class="gd-a"><b>📰 関係するニュース</b><ul class="us" style="margin:4px 0 0">${r.news.map(n=>`<li>${esc(mdLabel(n.d))} ${esc(n.h)} ${n.ok?"✅":"⚠️"}</li>`).join("")}</ul></div>`);
+  if(r.news.length) parts.push(`<div class="gd-a"><b>📰 関係するニュース</b><ul class="us" style="margin:4px 0 0">${r.news.map(n=>`<li>${esc(mdLabel(n.d))} ${esc(n.h)} ${n.info?"📌":n.ok?"✅":"⚠️"}</li>`).join("")}</ul></div>`);
   if(!parts.length) parts.push(`<div class="gd-a">このアプリの中には、ぴったりの答えが見つかりませんでした。ことばを短くして聞きなおすか、下のボタンでClaudeに聞いてみてください。</div>`);
   if(r.best&&r.best.g) learn(r.best.g,1);
   track("/ask/"+(r.best?(r.best.k||"word"):(I.today?"today":I.weather?"weather":I.market?"market":"none")),"案内係");
@@ -2955,7 +2956,7 @@ function forYou(){
   const L=NEWS.filter(n=>(days.includes(n.d)||(n.d>=since7&&topicHit(n))) && sc(n)>0 && !topH.has(n.h) && !dup(n.h)).sort((a,b)=>(sc(b)-sc(a)) || b.d.localeCompare(a.d) || b.ok-a.ok).slice(0,5);
   if(!L.length) return "";
   return `<section aria-label="あなた向け"><div class="sec-h"><h2>🎯 あなた向け</h2><button class="fchip" data-topics="1">💗 好きなことを変える</button></div>
-    <ul class="ten fy${(LOOK.len||"short")==="short"?" short":""}" style="margin-top:10px">${L.map(n=>`<li>${pinBtn({k:nkey(n),h:n.h,g:n.g,d:n.d},"abs")}<div class="row"><span><span class="meta"><span class="chip ${n.g}">${GN[n.g]}</span>${topicChip(n)}${isNew(n)?'<span class="chip newchip">🆕</span>':''}${n.ok?'<span class="badge-ok">✅</span>':'<span class="badge-one">⚠️ 1社</span>'}<span class="hint">${mdLabel(n.d)}</span></span><h3>${esc(n.h)}</h3></span></div></li>`).join("")}</ul></section>`;
+    <ul class="ten fy${(LOOK.len||"short")==="short"?" short":""}" style="margin-top:10px">${L.map(n=>`<li>${pinBtn({k:nkey(n),h:n.h,g:n.g,d:n.d},"abs")}<div class="row"><span><span class="meta"><span class="chip ${n.g}">${GN[n.g]}</span>${topicChip(n)}${isNew(n)?'<span class="chip newchip">🆕</span>':''}${n.info?'<span class="badge-info">📌 話題</span>':n.ok?'<span class="badge-ok">✅</span>':'<span class="badge-one">⚠️ 1社</span>'}<span class="hint">${mdLabel(n.d)}</span></span><h3>${esc(n.h)}</h3></span></div></li>`).join("")}</ul></section>`;
 }
 function bindPersonal(){
   const nb=document.getElementById("newBtn"); if(nb) nb.onclick=()=>{ sState.onlyNew=true; go("search"); };
@@ -3666,7 +3667,7 @@ function localCard(){ const pf=ME.pref;
   const seen=new Set(); const far=NEWS.filter(n=>!isLocal(n.h+" "+(n.th||""))).map(n=>({n,p:placeOf(n)})).filter(x=>{ if(!x.p||seen.has(x.p[3])) return false; seen.add(x.p[3]); return true; })
     .map(x=>Object.assign(x,{km:kmFrom(x.p[1],x.p[2])})).filter(x=>x.km!=null&&x.km>=30).sort((a,b)=>a.km-b.km).slice(0,4);
   return `<section class="card" aria-label="わたしの街"><div class="sec-h"><h2>🏠 ${esc(pf)}のニュース</h2><button class="gd-lk" id="prefChg">変える</button></div>
-    ${L.length?`<ul class="us" style="margin-top:6px">${L.map(n=>`<li>${esc(mdLabel(n.d))} ${esc(n.h)} ${n.ok?"✅":"⚠️"}</li>`).join("")}</ul>`:`<p class="hint" style="margin:6px 0 0">最近の記録には、${esc(pf)}のニュースはまだありません。出てきたら、ここと「ニュース10」に🏠の印がつきます。</p>`}
+    ${L.length?`<ul class="us" style="margin-top:6px">${L.map(n=>`<li>${esc(mdLabel(n.d))} ${esc(n.h)} ${n.info?"📌":n.ok?"✅":"⚠️"}</li>`).join("")}</ul>`:`<p class="hint" style="margin:6px 0 0">最近の記録には、${esc(pf)}のニュースはまだありません。出てきたら、ここと「ニュース10」に🏠の印がつきます。</p>`}
     ${far.length?`<h3 style="font-size:.98rem;margin:14px 0 4px">📏 ${esc(pf)}からの近さ</h3>
       <ul class="dist">${far.map(x=>`<li><b>${esc(x.p[3])}</b><span class="dbar"><i style="width:${Math.max(6,Math.min(100,Math.round(x.km/200)))}%"></i></span><span class="num">約${x.km.toLocaleString("ja-JP")}km</span></li>`).join("")}</ul>
       <div class="hint">ニュースに出てきた場所と、${esc(pf)}の県庁所在地との、だいたいの直線きょりです。</div>`:""}</section>`; }
@@ -4052,6 +4053,7 @@ function funGrid(){ const L=FUN.filter(f=>(FUN_SET[f[0]]||FUN_ALWAYS.includes(f[
     ${hid?`<button class="fchip" id="funMore" data-hid="${hid}" aria-expanded="${funOpen?"true":"false"}" style="margin-top:8px">${funOpen?"▲ とじる":`… ほか ${hid}こ を見る`}</button>`:""}</section>`; }
 // ===== お知らせ(新しくなったところ)。機能を足したら、いちばん上に1つ足す =====
 const UPDATES=[
+  {id:"2026-10-25a",d:"2026-10-25",t:"📌 暮らしと趣味の「話題」が増えます",L:["料理・ファッション・インテリア・旅行・ライフスタイル・スポーツ・科学などの話題を、会社の発表やレシピのサイト、お役所の資料、研究の発表などからも集めるようにしました。","こうした話題には「📌 話題」の印がつきます(2社で確かめた✅のニュースとは分けています)。「🎯 あなた向け」や「さがす」に出ます。"]},
   {id:"2026-10-24d",d:"2026-10-24",t:"🧹 使いやすさの見直し",L:["久しぶりに開いたときは「👋 おかえりなさい」1枚にまとめ、同じ話題が何度も出ないようにしました。お知らせ(小さな吹き出し)は画面の上に出て、ボタンをかくさないようにしました。","かんたんモードの「🏷️ 保存」に文字をつけ、押しやすい大きさに。ほかの小さかったボタンも大きくしました。スクロールするとハロウィンの飾りが文字にかぶらないようにしました。","マイ→⚙️設定のいちばん上に目次をつけました。「⏱️ 読んだ時間」は「記録」に移りました。"]},
   {id:"2026-10-24c",d:"2026-10-24",t:"📅 今週の5大ニュース",L:["土・日・月曜は「きょう」に、この1週間いちばん長く続いた話題5つが出ます。「はじまり → いま」で、話の流れがひと目でわかります。","「✓ 読んだ」でその週は消えます(ごはん🍙つき)。1分のふりかえりのスライドにも「はじまり → いま」を足しました。"]},
   {id:"2026-10-24b",d:"2026-10-24",t:"🥚 たまごのヒミツを守るように",L:["たまごの間は、4コマ・着せかえ・画像・はじめての案内などでも、たまごの絵で出るようにしました(何が生まれるかは、生まれるまでわかりません)。","色を変えるのは、生まれてからにしました。"]},
@@ -4193,7 +4195,7 @@ function updCard(){ const u=UPDATES[0]; const n=updUnread();
 // ===== 使い方 =====
 const GUIDE = [
   ["🚀","まずはここから",["「✨ おたのしみ」の<b>▶ 1分で見る</b>を押すと、今日のニュースが動くスライドで流れます(かんたんモードは「🔊 今日のニュースを聞く」)。","時間がない日は<b>☀️ 今日の3行</b>だけ読めばOK。","<b>📰 今日のニュース10</b>は、その日に関心が高かった順のランキングです。下の「記録したニュース すべて」で、ほかのニュースも見られます。"]],
-  ["🔖","マークの見かた",["<b>✅</b> 別々の報道機関2社以上で確かめたニュース。","<b>⚠️</b> まだ1社だけ・見出しだけのニュース。続報で確かめられたら✅に変わります。","<b>NEW</b> 前に開いたあとに増えたニュース。"]],
+  ["🔖","マークの見かた",["<b>✅</b> 別々の報道機関2社以上で確かめたニュース。","<b>⚠️</b> まだ1社だけ・見出しだけのニュース。続報で確かめられたら✅に変わります。","<b>📌 話題</b> 旬のレシピ・新しい商品・イベント・お役所の発表・研究など、暮らしや趣味の話題。会社や役所の発表、専門のサイトから集めています(ニュース10・今日の3行には入りません)。","<b>NEW</b> 前に開いたあとに増えたニュース。"]],
   ["👆","さわってみよう",["<b>点線のことば</b>をタップすると、意味がその場で出ます。調べたことばは「マイ」にたまります。","<b>📍</b>を押すと、そのニュースを保存できます。保存したものは「マイ」で見られて、メモも書けます。","「くわしい解説 →」から、<b>図・Q&A・これまでの流れ</b>つきの解説が読めます。<b>🔊 聞く</b>で読み上げもできます。"]],
   ["🧭","下のタブ",["<b>📰 きょう</b> 今日のまとめ ／ <b>🔎 さがす</b> ことばやジャンルで過去のニュースを検索 ／ <b>🗺️ 地図</b> どこで起きたかを地図で","<b>💡 解説</b> 大きな話題をやさしく ／ <b>📈 数字</b> 日経平均・円・原油のグラフ(数時間ごと〜全期間) ／ <b>📅 予定</b> これからの予定と、Claudeの予測","<b>⭐ マイ</b> あなたの記録・保存・着せかえ"]],
   ["🎯","続けるとたのしいこと",["<b>🐣 ペット</b>がニュースといっしょに育ちます。クイズに正解すると🍙ごはんがもらえて、あげると大きくなります。よく読むジャンルで小物が変わり、3日あけるとすねます。","開いた日・解説・クイズ・ことば・予想で<b>ポイント</b>がたまり、レベルとバッジが上がります。","「予定」の予測に<b>あなたも予想</b>して、答え合わせができます。Claudeと的中率くらべも。","毎日の連続記録は「マイ」のカレンダーで見られます。"]],
@@ -4347,7 +4349,7 @@ let WORLD=null;
 let WORLDP=null;
 function getWorld(){ if(WORLD) return Promise.resolve(WORLD); if(!WORLDP) WORLDP=(async()=>{ await loadScript("https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"); await loadScript("https://cdn.jsdelivr.net/npm/topojson-client@3.1.0/dist/topojson-client.min.js");
   const topo=await (await fetch("https://cdn.jsdelivr.net/npm/world-atlas@2.0.2/countries-50m.json")).json(); WORLD=topojson.feature(topo,topo.objects.countries); return WORLD; })().catch(e=>{ WORLDP=null; throw e; }); return WORLDP; }
-function newsItem(n){ return `<li class="item"><div class="meta"><span class="chip ${n.g}">${GN[n.g]}</span>${n.ok?'<span class="badge-ok">✅</span>':'<span class="badge-one">⚠️ 1社</span>'}<span class="hint">${mdLabel(n.d)}</span></div><div class="h">${esc(n.h)}</div></li>`; }
+function newsItem(n){ return `<li class="item"><div class="meta"><span class="chip ${n.g}">${GN[n.g]}</span>${n.info?'<span class="badge-info">📌 話題</span>':n.ok?'<span class="badge-ok">✅</span>':'<span class="badge-one">⚠️ 1社</span>'}<span class="hint">${mdLabel(n.d)}</span></div><div class="h">${esc(n.h)}</div></li>`; }
 // ===== 指で拡大・縮小・移動(地図と捜査ボードで共通に使う) =====
 // wrap=外のわく(はみ出しをかくす)、inner=中身(動かす)。
 // ・2本指でひろげる/つまむ=拡大縮小、2本指でなぞる=移動
@@ -4547,7 +4549,7 @@ function renderBoard(recentDays){
       const links=[...auto,...B.links].filter(e=>e.a===n.id||e.b===n.id).map(e=>{ const o=find(e.a===n.id?e.b:e.a); return {o,t:e.t,mine:B.links.includes(e)}; }).filter(x=>x.o);
       const nm=o=>o.g?o.g.p[3]:"📝 "+(o.u.text||"メモ").slice(0,12);
       const linkHTML=links.length?`<div class="chips" style="margin-top:8px">${links.map(l=>`<button class="fchip" data-go="${esc(l.o.id)}">🧵 ${esc(nm(l.o))}${l.t?` ・ ${esc(l.t)}`:""}</button>`).join("")}</div>`:"";
-      if(n.g){ det.innerHTML=`<div class="bd-card"><b>📌 ${esc(n.g.p[3])}(${n.g.list.length}件)</b><ul class="us" style="margin-top:4px">${n.g.list.slice(0,6).map(x=>`<li>${esc(mdLabel(x.d))} ${esc(x.h)} ${x.ok?"✅":"⚠️"}</li>`).join("")}</ul>${n.g.list.length>6?`<div class="hint">ほか${n.g.list.length-6}件</div>`:""}${linkHTML}<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px"><button class="fchip" data-linkfrom="${esc(n.id)}">🧵 ここから糸を引く</button><button class="fchip" data-clear="1">✕ 選ぶのをやめる</button></div></div>`; }
+      if(n.g){ det.innerHTML=`<div class="bd-card"><b>📌 ${esc(n.g.p[3])}(${n.g.list.length}件)</b><ul class="us" style="margin-top:4px">${n.g.list.slice(0,6).map(x=>`<li>${esc(mdLabel(x.d))} ${esc(x.h)} ${x.info?"📌":x.ok?"✅":"⚠️"}</li>`).join("")}</ul>${n.g.list.length>6?`<div class="hint">ほか${n.g.list.length-6}件</div>`:""}${linkHTML}<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px"><button class="fchip" data-linkfrom="${esc(n.id)}">🧵 ここから糸を引く</button><button class="fchip" data-clear="1">✕ 選ぶのをやめる</button></div></div>`; }
       else { det.innerHTML=`<div class="bd-card"><b>📝 あなたのメモ</b><textarea class="memo" id="bdTxt" rows="3" maxlength="120" placeholder="気づいたこと・つながりそうなこと">${esc(n.u.text||"")}</textarea>${linkHTML}<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px"><button class="fchip" data-linkfrom="${esc(n.id)}">🧵 ここから糸を引く</button><button class="fchip" id="bdDel">🗑 はがす</button><button class="fchip" data-clear="1">✕ とじる</button></div></div>`;
         const t=document.getElementById("bdTxt"); t.oninput=()=>{ n.u.text=t.value.slice(0,120); saveMe(); const el=bd.querySelector(`[data-id="${CSS.escape(n.id)}"] .mtx`); if(el) el.textContent=n.u.text||"(タップして書く)"; };
         document.getElementById("bdDel").onclick=()=>{ B.notes=B.notes.filter(x=>x.id!==n.id); B.links=B.links.filter(e=>e.a!==n.id&&e.b!==n.id); saveMe(); BD.sel=null; show(); }; }
