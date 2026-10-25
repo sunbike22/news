@@ -1196,6 +1196,36 @@ svg.eat{animation:petEat .7s ease both!important}
 .gd-lk{border:0;background:none;color:var(--accent-on-surface,var(--accent));font-weight:700;cursor:pointer;padding:0 2px;font-size:.88rem}
 .gd-deep{align-self:flex-start}
 .gd-in{position:sticky;bottom:calc(8px + env(safe-area-inset-bottom,0px));box-shadow:0 4px 16px rgba(0,0,0,.12)}
+/* 新しい読ませ方(連載・穴うめ・立場・計算機・検定) */
+.sr-chips{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:10px}
+.sr-chips button:disabled{opacity:.55;cursor:default}
+.sr-ttl small{color:var(--muted);font-size:.86rem}.sr-ttl h2{margin:2px 0 8px;font-size:1.3rem}
+.sr-body p{margin:0 0 8px;line-height:1.8}
+.sr-nav{display:flex;justify-content:space-between;align-items:center;gap:8px;margin:12px 0;flex-wrap:wrap}
+.sr-wait{font-weight:700;color:var(--muted);font-size:.92rem}
+.sr-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.sr-pick{width:100%;display:flex;align-items:center;gap:10px;text-align:left;border:1px solid var(--line);background:var(--surface2);color:var(--ink);border-radius:12px;padding:10px 12px;cursor:pointer;min-height:52px;font:inherit}
+.sr-pick small{display:block;color:var(--muted);font-size:.84rem}.sr-ic{font-size:1.5rem}
+.sr-new{margin-left:auto;font-style:normal;font-size:.82rem;font-weight:700;background:var(--accent-soft);color:var(--accent-ink,var(--accent));border-radius:99px;padding:2px 8px;white-space:nowrap}
+.fill-h{font-size:1.12rem;line-height:1.7;letter-spacing:.02em}
+.role .role-r{margin-top:8px}.role .role-r b{font-size:.95rem}.role .us{margin-top:4px}
+.role-me{font-size:.82rem;background:var(--accent-soft);color:var(--accent-ink,var(--accent));border-radius:99px;padding:1px 8px;margin-left:4px}
+.hh-r{border-top:1px solid var(--line);padding:10px 0;display:grid;grid-template-columns:1fr;gap:6px}
+.hh-n{grid-column:1/-1;font-weight:700}
+.hh-f{display:flex;align-items:center;gap:6px;font-size:.86rem;color:var(--muted)}
+.hh-f>span:first-child{min-width:5.6em}
+.hh-f input,.hh-f select{flex:1;min-width:0;font:inherit;font-size:1rem;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:8px;min-height:44px}
+.hh-o{grid-column:1/-1;font-weight:700;color:var(--accent-on-surface,var(--accent))}
+.hh-o:empty{display:none}
+.hh-sum{margin-top:8px;padding:10px 12px;border-radius:10px;background:var(--surface2);font-size:.95rem}
+.hh-chip{display:block;width:100%;text-align:left;margin-top:6px;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:10px;padding:8px 10px;cursor:pointer;font:inherit;font-size:.9rem;min-height:44px}
+.hh-chip small{display:block;color:var(--muted);font-size:.82rem;margin-top:2px}
+.kt-lv{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.kt-b{border:1px solid var(--line);border-radius:10px;padding:8px;background:var(--surface2);display:flex;flex-direction:column;gap:2px}
+.kt-b small{font-size:.82rem;color:var(--muted)}
+.kt-b.now{border:2px solid var(--accent)}.kt-b.ok{background:var(--ok-soft);border-color:var(--ok)}
+.kt-cert{margin-top:8px;border:3px double #b8862b;border-radius:12px;padding:14px;text-align:center;background:var(--surface2)}
+.kt-cert b{display:block;font-size:1.6rem;margin:4px 0}.kt-cert small{color:var(--muted)}
 </style>
 </head>
 <body>
@@ -2167,7 +2197,7 @@ function openEx(k){
   sh.innerHTML=`<div class="bar"><div class="wrap"><button class="iconbtn" id="shx" aria-label="もどる">← もどる</button><span class="ttl">${e.icon} ${esc(e.name)}</span>${pinBtn({k:"ex|"+k,h:"解説: "+e.name,g:e.g,d:TODAY,ex:k},"iconbtn")}<button class="iconbtn" id="shshare" aria-label="この解説を送る">📤 送る</button></div></div>
   <div class="wrap body">
     <div class="hint">最終更新 ${esc(e.updated)} ・ ⏱️ 全部で約${e.min}分 ・ ${hardChip(e)} ・ 点線のことばはタップで意味が出ます</div>
-    <div class="ex-acts"><button class="chat-go" id="exChat">💬 話しながら読む</button><button class="fchip" id="exSpeak">🔊 聞く</button>${e.status!=="done"||fwOn(k)?fwBtn(k):""}</div>
+    <div class="ex-acts"><button class="chat-go" id="exChat">💬 話しながら読む</button><button class="fchip" id="exSpeak">🔊 聞く</button><button class="fchip" data-serial="${k}">📖 連載で読む</button>${e.status!=="done"||fwOn(k)?fwBtn(k):""}</div>
     ${PHOTOS[k]?photoBlock(k):ILL[k]?`<div><div class="ill">${ILL[k]}</div><div class="credit">イラスト: 自作(イメージ)</div></div>`:""}
     <div class="kid"><div class="l">🧒 ひとことで言うと</div><h2>${esc(e.kid)}</h2>${EN&&EN.ex&&EN.ex[k]&&langMode()!=="ja"?`<p class="enx" lang="en" style="margin:6px 0 0">${esc(EN.ex[k])} <span class="ensay" role="button" tabindex="0" data-say="${esc(EN.ex[k])}">🔊</span></p>`:""}</div>
     ${mangaHTML(e.manga)}
@@ -2178,7 +2208,7 @@ function openEx(k){
     <div class="blk"><h3>🖼️ 動く図でわかる <button class="fplay" id="fplay">▶ もう一度</button></h3><div class="flow" id="flow">${flow}</div></div>
     ${e.calc?calcBlock():""}
     ${LOOK.mode==="easy"?`</details>`:""}
-    <div class="blk"><h3>🙋 わたしたちへの影響</h3><ul class="us">${e.us.map(u=>`<li>${glossify(bold(u))}</li>`).join("")}</ul></div>
+    <div class="blk"><h3>🙋 わたしたちへの影響</h3><ul class="us">${e.us.map(u=>`<li>${glossify(bold(u))}</li>`).join("")}</ul>${roleBlock(e)}</div>
     <div class="blk"><h3>❓ よくある疑問</h3>${e.faq.map(([q,a],i)=>`<details class="faq"><summary>${esc(q)}</summary><p>${glossify(esc(a))}</p></details>`).join("")}</div>
     <div class="blk"><h3>📅 これまでの流れ</h3>
       <div class="htl-wrap" aria-label="年表(横にスクロール)"><div class="htl">${e.timeline.map(([d,t],i)=>`<div class="htl-i${i===e.timeline.length-1?" now":""}${isNewTl(d,seenAt)?" fresh":""}"><span class="htl-d">${esc(d)}${isNewTl(d,seenAt)?' <i class="tl-new">🆕</i>':""}</span><span class="htl-dot"></span><span class="htl-t">${esc(t)}</span></div>`).join("")}${(e.next||[]).slice(0,3).map(x=>{ const t=Array.isArray(x)?x.join(" "):String(x); const m=t.match(/^(\S+)\s+(.*)$/); return `<div class="htl-i fut"><span class="htl-d">${esc(m?m[1]:"これから")}</span><span class="htl-dot"></span><span class="htl-t">${esc(m?m[2]:t)}</span></div>`; }).join("")}</div></div>
@@ -3977,7 +4007,7 @@ function funSetHTML(key){ const L=FUN_SET[key]; if(!L) return "";
   const body=cur[2]()||`<div class="empty">今日はまだありません。</div>`;
   return `<div class="seg fun-seg" role="group" aria-label="見るもの">${L.map(([k,n])=>`<button data-funsel="${key}:${k}" aria-pressed="${k===cur[0]}">${esc(n)}</button>`).join("")}</div>
     <div id="funSetBody" style="margin-top:10px">${body}</div>`; }
-const FUN=[["picks","🎁","ジャンル別おすすめ",()=>picksCard()],["play","▶️","1分で見る",null,()=>openStory()],["radio","🌙","寝る前ラジオ",null,()=>openRadio()],["goal","🗓️","今週の目標",()=>goalCard()],["kw","🔖","わたしのキーワード",()=>kwCard()],["pick","🎰","今日のひとつ",()=>funSetHTML("pick")],["english","📘","今日の英単語",()=>englishCard()],["lang","🌍","ことばで世界一周",()=>langCard()],["air","🌡️","世の中の空気",()=>funSetHTML("air")],["local","🏠","わたしの街",()=>localCard()],["trip2","🗺️","ペットの旅",()=>travelCard()],["assoc","🔗","ニュース連想",()=>assocCard()],["back","📅","あのとき何してた?",()=>backCard()],["bingo","🎲","ニュースビンゴ",()=>bingoCard()],["battle","⚔️","予想くらべ",()=>battleCard()]];
+const FUN=[["picks","🎁","ジャンル別おすすめ",()=>picksCard()],["play","▶️","1分で見る",null,()=>openStory()],["radio","🌙","寝る前ラジオ",null,()=>openRadio()],["goal","🗓️","今週の目標",()=>goalCard()],["kw","🔖","わたしのキーワード",()=>kwCard()],["pick","🎰","今日のひとつ",()=>funSetHTML("pick")],["english","📘","今日の英単語",()=>englishCard()],["lang","🌍","ことばで世界一周",()=>langCard()],["air","🌡️","世の中の空気",()=>funSetHTML("air")],["local","🏠","わたしの街",()=>localCard()],["trip2","🗺️","ペットの旅",()=>travelCard()],["assoc","🔗","ニュース連想",()=>assocCard()],["back","📅","あのとき何してた?",()=>backCard()],["bingo","🎲","ニュースビンゴ",()=>bingoCard()],["battle","⚔️","予想くらべ",()=>battleCard()],["serial","📖","連載で読む",()=>serialCard()],["fill","🕳️","見出しの穴うめ",()=>fillCard()],["hh","🧮","わが家の計算機",()=>hhCard()],["kentei","🎓","ニュース検定",()=>ktCard()]];
 const FUN_SHOW=6; let funOpen=false;
 function englishCard(){ if(!EN) return ""; const W=[]; (EN.top10||[]).forEach((e,i)=>(e.w||[]).forEach(w=>W.push([w[0],w[1],D.top10[i]&&D.top10[i].title]))); if(!W.length) return "";
   return `<section class="card" aria-label="今日の英単語"><b>📘 今日の英単語</b><div class="hint" style="margin:4px 0 8px">今日のニュースに出てきた英語。🔊で発音が聞けます。</div>
@@ -4043,7 +4073,7 @@ function lgBindQuiz(box){ const g=box.querySelector("[data-lgans]"); if(!g) retu
     const sub=document.querySelector("#lgBody .sec-h .sub"); if(sub) sub.textContent="おぼえた "+Object.keys(ME.langSeen).length+"語";
     const say=document.getElementById("lgSay"); if(say) say.textContent=ok?"せいかい! その調子!":"おしい! 「"+g.dataset.lgja+"」だったよ。";
     setTimeout(()=>{ const q=document.getElementById("lgQ"); if(q){ q.innerHTML=lgQuizHTML(); lgBindQuiz(q.parentElement); } },1200); }); }
-const FUN_ALWAYS=["lang"]; // きょうの設定と関係なく、いつもおたのしみに出す入口
+const FUN_ALWAYS=["lang","serial","fill","hh","kentei"]; // きょうの設定と関係なく、いつもおたのしみに出す入口
 function funGrid(){ const L=FUN.filter(f=>(FUN_SET[f[0]]||FUN_ALWAYS.includes(f[0]))?true:f[0]==="radio"?LOOK.off.play:LOOK.off[f[0]]); if(!L.length) return "";
   const dot=k=>(k==="gacha"&&(ME.gacha||{}).d!==TODAY)||(k==="picks"&&PK&&ME.pickSeen!==PK.updated);
   const S2=L.slice().sort((a,b)=>(dot(b[0])?1:0)-(dot(a[0])?1:0)); const hid=Math.max(0,S2.length-FUN_SHOW);
@@ -4051,8 +4081,171 @@ function funGrid(){ const L=FUN.filter(f=>(FUN_SET[f[0]]||FUN_ALWAYS.includes(f[
   return `<section aria-label="おたのしみ" id="funSec"${funOpen?' class="open"':''}><div class="sec-h"><h2>✨ おたのしみ</h2><span class="sub">タップで開く</span></div>
     <div class="fun-grid">${S2.slice(0,FUN_SHOW).map(f=>t(f,false)).join("")}${S2.slice(FUN_SHOW).map(f=>t(f,true)).join("")}</div>
     ${hid?`<button class="fchip" id="funMore" data-hid="${hid}" aria-expanded="${funOpen?"true":"false"}" style="margin-top:8px">${funOpen?"▲ とじる":`… ほか ${hid}こ を見る`}</button>`:""}</section>`; }
+// ===== 📖 連載で読む(解説を1日1話ずつ。解説に書いてあることだけを、話ごとに分けて出す) =====
+function serialChapters(k){ const e=D.explainers[k]; if(!e) return []; const C=[]; const tl=e.timeline||[]; const mo=e.more||[];
+  const add=(t,body)=>{ body=body.filter(b=>b[1]&&(!Array.isArray(b[1])||b[1].length)); if(body.length) C.push({t,body}); };
+  add("はじまり",[["p",e.kid],["p",mo[0]]]);
+  if(tl.length>=4){ const h=Math.ceil(tl.length/2); add("これまで",[["tl",tl.slice(0,h)]]); add("いま",[["tl",tl.slice(h)],["p",mo[1]]]); }
+  else add("これまで",[["tl",tl],["p",mo[1]]]);
+  add("わたしたちへの影響",[["ul",e.us||[]]]);
+  add("よくある疑問",[["faq",(e.faq||[]).slice(0,4)]]);
+  add("これから",[["nx",e.next||[]]]);
+  return C; }
+function serialState(k){ ME.serial=ME.serial||{}; return ME.serial[k]||(ME.serial[k]={n:0,d:""}); }
+function serialAvail(k){ const C=serialChapters(k); const s=serialState(k); return Math.min(C.length,s.n+(s.d!==TODAY?1:0)); }
+function serialPart(b){ if(b[0]==="p") return `<p>${glossify(esc(b[1]))}</p>`;
+  if(b[0]==="ul") return `<ul class="us">${b[1].map(u=>`<li>${glossify(bold(u))}</li>`).join("")}</ul>`;
+  if(b[0]==="nx") return `<ul class="us">${b[1].map(n=>`<li>${esc(nextTxt(Array.isArray(n)?n.join(" "):n))}</li>`).join("")}</ul>`;
+  if(b[0]==="tl") return `<ol class="tl">${b[1].map(([d,t])=>`<li><b>${esc(d)}</b>${esc(t)}</li>`).join("")}</ol>`;
+  if(b[0]==="faq") return b[1].map(([q,a])=>`<details class="faq"><summary>${esc(q)}</summary><p>${glossify(esc(a))}</p></details>`).join("");
+  return ""; }
+function openSerial(k,ch){ const e=D.explainers[k]; const C=serialChapters(k); if(!e||!C.length) return; const s=serialState(k);
+  const av=Math.max(1,serialAvail(k)); const i=ch==null?av-1:Math.max(0,Math.min(ch,av-1));
+  if(i>=s.n){ s.n=i+1; s.d=TODAY; saveMe(); if(petEarn("serial|"+k+"|"+s.n,1)) setTimeout(()=>toast(`📖 第${s.n}話を読みました 🍙+1`),300); }
+  const av2=serialAvail(k); const c=C[i]; const last=i===C.length-1; const sh=document.getElementById("sheet");
+  sh.innerHTML=`<div class="bar"><div class="wrap"><button class="iconbtn" id="srx" aria-label="もどる">← もどる</button><span class="ttl">📖 ${esc(e.name)}</span></div></div><div class="wrap body">
+    <div class="sr-chips" role="group" aria-label="話を選ぶ">${C.map((x,j)=>`<button class="fchip" data-srch="${j}" aria-pressed="${j===i}"${j>=av2?" disabled":""}>${j>=av2?"🔒 ":""}第${j+1}話</button>`).join("")}</div>
+    <div class="sr-ttl"><small>${e.icon} 連載 ・ 第${i+1}話 / 全${C.length}話</small><h2>${esc(c.t)}</h2></div>
+    <div class="blk sr-body">${c.body.map(serialPart).join("")}</div>
+    <div class="sr-nav">${i>0?`<button class="fchip" data-srch="${i-1}">← 第${i}話</button>`:"<span></span>"}
+      ${last?`<button class="chat-go" id="srEx">✅ 完結! 解説のページで全部読む</button>`:i+1<av2?`<button class="chat-go" data-srch="${i+1}">第${i+2}話へ ▶</button>`:`<span class="sr-wait">📅 第${i+2}話は あした読めます</span>`}</div>
+    <p class="hint">解説に書いてあることだけを、1日1話ずつに分けています。新しい話は1日に1つずつ読めます(前の話はいつでも読みなおせます)。</p></div>`;
+  sh.hidden=false; sh.scrollTop=0; document.body.style.overflow="hidden";
+  const close=()=>{ sh.hidden=true; sh.innerHTML=""; document.body.style.overflow=""; };
+  sh.querySelector("#srx").onclick=close; sh.querySelector("#srx").focus();
+  sh.querySelectorAll("[data-srch]").forEach(b=>b.onclick=()=>openSerial(k,+b.dataset.srch));
+  const ex=sh.querySelector("#srEx"); if(ex) ex.onclick=()=>{ close(); openEx(k); };
+  track("/serial/"+k,"連載で読む"); }
+function serialCard(){ const L=Object.entries(D.explainers).filter(([k])=>serialChapters(k).length>=3);
+  if(!L.length) return ""; L.sort((a,b)=>(a[1].status==="done")-(b[1].status==="done"));
+  return `<section class="card" aria-label="連載で読む"><b>📖 連載で読む</b><div class="hint" style="margin:4px 0 8px">大きな話題を、1日1話ずつ読めます。毎日1話ずつ新しい話が読めるようになります。</div>
+    <ul class="sr-list">${L.map(([k,e])=>{ const C=serialChapters(k); const s=serialState(k); const av=serialAvail(k); const nw=av>s.n;
+      return `<li><button class="sr-pick" data-serial="${k}"><span class="sr-ic">${e.icon}</span><span><b>${esc(e.name)}</b><small>${s.n>=C.length?"✅ 読み終わり":s.n?`第${s.n}話まで読んだ ・ 全${C.length}話`:`全${C.length}話`}${e.status==="done"?" ・ 一区切り":""}</small></span>${nw?`<i class="sr-new">新しい話</i>`:""}</button></li>`; }).join("")}</ul></section>`; }
+document.addEventListener("click",e=>{ const b=e.target.closest("[data-serial]"); if(!b) return; e.preventDefault(); openSerial(b.dataset.serial); });
+
+// ===== 🕳️ 見出しの穴うめ(今日のニュース10の見出しの一部をかくして、先に考えてから読む) =====
+// 答えも、ちがう選択肢も、今日のほかの見出しにあることばだけを使う(作ったことばは入れない)
+function fillQs(){ const rx=/[一-龠々]{2,}|[ァ-ヴー]{3,}/g; const r=seeded("fill"+TODAY); const GW=D.glossary.map(g=>g[0].replace(/\(.*?\)/g,""));
+  const kata=t=>/^[ァ-ヴー]+$/.test(t);
+  const all=[...new Set([...D.top10.map(n=>n.s||n.title||""),...D.three.map(t=>t.t||t.title||"")].flatMap(h=>h.match(rx)||[]))];
+  const Q=[]; const order=D.top10.map((n,i)=>[n,i]).filter(([n])=>n.title).sort(()=>r()-.5);
+  for(const [n,i] of order){ if(Q.length>=3) break; const h=n.s||n.title;
+    const toks=(h.match(rx)||[]).filter(t=>t.length<=8&&h.split(t).length===2); if(!toks.length) continue;
+    const ans=toks.find(t=>GW.some(g=>g&&(g===t||(t.length>=3&&g.includes(t)))))||[...toks].sort((a,b)=>b.length-a.length)[0];
+    const pool=all.filter(t=>t!==ans&&!h.includes(t)&&!t.includes(ans)&&!ans.includes(t)&&kata(t)===kata(ans)&&Math.abs(t.length-ans.length)<=2);
+    if(pool.length<3) continue; const o=[...pool].sort(()=>r()-.5).slice(0,3); const a=Math.floor(r()*4); o.splice(a,0,ans);
+    Q.push({h:h.replace(ans,"□".repeat(Math.min(ans.length,4))),o,a,i}); }
+  return Q; }
+function fillState(){ if(!ME.fill||ME.fill.d!==TODAY) ME.fill={d:TODAY,i:0,res:[]}; return ME.fill; }
+function fillHTML(){ const Q=fillQs(); if(!Q.length) return `<div class="empty">今日は問題を作れませんでした。</div>`; const S=fillState();
+  const dots=`<span class="dots">${Q.map((_,k)=>`<i class="${S.res[k]===true?"r":S.res[k]===false?"w":""}${k===S.i?" c":""}"></i>`).join("")}</span>`;
+  if(S.i>=Q.length){ const sc=S.res.filter(Boolean).length;
+    return `<div class="qn"><span>🕳️ 見出しの穴うめ</span>${dots}</div><div class="qq">${Q.length}問中 ${sc}問 正解!</div>
+      <ul class="us">${Q.map(q=>{ const n=D.top10[q.i]; return `<li>${esc(n.s||n.title)}</li>`; }).join("")}</ul>
+      <p class="hint" style="margin:6px 0 0">問題は毎日、今日のニュース10から入れかわります。</p>`; }
+  const q=Q[S.i]; const done=S.res[S.i]!=null; const n=D.top10[q.i];
+  return `<div class="qn"><span>🕳️ 見出しの穴うめ ・ ${S.i+1}問目</span>${dots}</div>
+    <div class="qq fill-h">${esc(q.h)}</div><div class="hint" style="margin:-4px 0 8px">□に入ることばはどれ? 先に考えてから選んでね</div>
+    <div class="opts">${q.o.map((o,k)=>`<button class="opt${done&&k===q.a?" right":done&&S.pick===k?" wrong":""}" data-fillo="${k}"${done?" disabled":""}>${done&&k===q.a?"⭕ ":done&&S.pick===k?"❌ ":""}${esc(o)}</button>`).join("")}</div>
+    ${done?`<div class="exp"><b>${esc(n.title)}</b> ${n.ok?'<span class="badge-ok">✅</span>':'<span class="badge-one">⚠️ 1社</span>'}${n.text?`<br><span class="hint">${glossify(esc(String(n.text).split("。")[0]))}。</span>`:""}</div>
+      <button class="chat-go" data-fillnext="1" style="margin-top:10px">${S.i+1<Q.length?"つぎの問題 ▶":"結果を見る ▶"}</button>`:""}`; }
+function fillCard(){ return fillQs().length?`<section class="card quiz" id="fillBox" aria-label="見出しの穴うめ">${fillHTML()}</section>`:""; }
+document.addEventListener("click",e=>{ const box=e.target.closest("#fillBox"); if(!box) return;
+  const o=e.target.closest("[data-fillo]"); const nx=e.target.closest("[data-fillnext]"); if(!o&&!nx) return; const S=fillState(); const Q=fillQs();
+  if(o&&S.res[S.i]==null){ const k=+o.dataset.fillo; S.pick=k; S.res[S.i]=k===Q[S.i].a; saveMe(); }
+  if(nx){ S.i++; S.pick=null; saveMe(); if(S.i>=Q.length&&S.res.length===Q.length&&S.res.every(Boolean)&&petEarn("fill|"+TODAY,1)) toast("🕳️ 全問正解! 🍙+1"); track("/fun/fill/next","見出しの穴うめ"); }
+  box.innerHTML=fillHTML(); });
+
+// ===== 🧑‍🤝‍🧑 立場ごとに見る(解説の「わたしたちへの影響」を、くらしの立場ごとに分けなおすだけ) =====
+function roleBlock(e){ const L=e.us||[]; if(!L.length) return ""; const mine=myLife(); const plain=s=>String(s).replace(/\*\*/g,"");
+  const R=LIFE.map(([k,ic,nm])=>[k,ic,nm,L.filter(u=>LIFE_RX[k]&&LIFE_RX[k].test(plain(u)))]).filter(x=>x[3].length);
+  const all=L.filter(u=>LIFE_RX.all.test(plain(u))); if(!R.length&&!all.length) return "";
+  R.sort((a,b)=>(mine.includes(b[0])?1:0)-(mine.includes(a[0])?1:0));
+  const row=(ic,nm,list,me)=>`<div class="role-r"><b>${ic} ${esc(nm)}には${me?' <span class="role-me">あなた</span>':""}</b><ul class="us">${list.map(u=>`<li>${glossify(bold(u))}</li>`).join("")}</ul></div>`;
+  return `<details class="faq plain role"><summary>🧑‍🤝‍🧑 立場ごとに見る</summary>
+    ${all.length?row("👪","みんな",all,false):""}${R.map(([k,ic,nm,l])=>row(ic,nm,l,mine.includes(k))).join("")}
+    <p class="hint" style="margin:6px 0 0">上の「わたしたちへの影響」を、立場ごとに分けなおしたものです。新しいことは足していません。あてはまる文がない立場は出ません。</p></details>`; }
+
+// ===== 🧮 わが家の計算機(自分の毎月の金額に、ニュースに出た「◯%」をあてはめた計算上の例。記録はスマホの中だけ) =====
+const HH_ROWS=[["elec","💡","電気・ガス代"],["food","🍙","食費"],["gas","⛽","ガソリン代"],["phone","📱","スマホ・ネット代"],["rent","🏠","家賃"]];
+function hhState(){ ME.hh=ME.hh||{}; return ME.hh; }
+function hhNews(){ const rx=/([0-9０-９]+(?:[.．][0-9０-９]+)?)\s*[%％](?:ほど|程度|前後)?(?:の)?(値上げ|値下げ|引き上げ|引き下げ|上昇|下落|上が|下が|増え|減)/g; const out=[]; const seen=new Set();
+  const z=s=>s.replace(/[０-９．]/g,c=>String.fromCharCode(c.charCodeAt(0)-0xFEE0));
+  const scan=(t,h,d)=>{ let m; rx.lastIndex=0; while((m=rx.exec(t))){ const p=parseFloat(z(m[1])); if(!(p>0&&p<=100)) continue; const up=/値上げ|引き上げ|上昇|上が|増え/.test(m[2]); const key=h+p; if(seen.has(key)) continue; seen.add(key); out.push({p:up?p:-p,w:m[0],h,d}); } };
+  D.top10.forEach(n=>scan((n.title||"")+" "+(n.text||""),n.s||n.title,TODAY));
+  NEWS.filter(n=>n.d>=dayShift(TODAY,-7)).forEach(n=>scan(n.h||"",n.h,n.d));
+  return out.slice(0,6); }
+function dayShift(iso,dd){ const t=new Date(iso+"T12:00:00"); t.setDate(t.getDate()+dd); return t.toISOString().slice(0,10); }
+function hhCalcRow(k){ const S=hhState()[k]||{}; const v=+S.v||0; const p=+S.p||0; return Math.round(v*p/100); }
+function hhSum(){ const yen=x=>(x>0?"+":x<0?"−":"±")+Math.abs(x).toLocaleString("ja-JP")+"円"; let t=0;
+  HH_ROWS.forEach(([k])=>{ const d=hhCalcRow(k); t+=d; const o=document.getElementById("hho-"+k); if(o) o.textContent=hhState()[k]&&+hhState()[k].v&&+hhState()[k].p?`月 ${yen(d)} ・ 年 ${yen(d*12)}`:""; });
+  const s=document.getElementById("hhSum"); if(s) s.innerHTML=t?`ぜんぶで <b>月 ${yen(t)}</b> ・ 年 ${yen(t*12)}`:"金額と「変わる割合」を入れると、ここに合計が出ます。"; }
+function hhCard(){ const S=hhState(); const N=hhNews();
+  setTimeout(hhSum,0);
+  return `<section class="card hh" id="hhBox" aria-label="わが家の計算機"><b>🧮 わが家の計算機</b>
+    <div class="hint" style="margin:4px 0 8px">毎月だいたいいくら使っているかを入れて、「何%変わったら」を入れると、月と年でいくら変わるかを計算します。</div>
+    ${HH_ROWS.map(([k,ic,nm])=>{ const s=S[k]||{}; return `<div class="hh-r"><div class="hh-n">${ic} ${esc(nm)}</div>
+      <label class="hh-f"><span>毎月</span><input type="number" inputmode="numeric" min="0" step="100" data-hh="${k}:v" value="${s.v||""}" placeholder="0"><span>円</span></label>
+      <label class="hh-f"><span>変わる割合</span><input type="number" inputmode="decimal" min="-100" max="100" step="0.5" data-hh="${k}:p" value="${s.p||""}" placeholder="0"><span>%</span></label>
+      <div class="hh-o" id="hho-${k}"></div></div>`; }).join("")}
+    <div class="hh-sum" id="hhSum"></div>
+    ${N.length?`<div class="hh-news"><div class="hint" style="margin:8px 0 4px">📰 最近のニュースに出た割合(タップすると、下で選んだ項目に入ります)</div>
+      <label class="hh-f" style="margin-bottom:6px"><span>入れる先</span><select id="hhTo">${HH_ROWS.map(([k,ic,nm])=>`<option value="${k}">${ic} ${esc(nm)}</option>`).join("")}</select></label>
+      ${N.map(x=>`<button class="hh-chip" data-hhp="${x.p}"><b>${x.p>0?"+":""}${x.p}%</b><small>${esc(mdLabel(x.d))} ${esc(x.h)}</small></button>`).join("")}</div>`:""}
+    <p class="hint" style="margin-top:8px">計算上の例です。ニュースの割合が、あなたの家にそのまま当てはまるとは限りません。入れた金額は、このスマホの中だけに保存します。</p></section>`; }
+document.addEventListener("input",e=>{ const i=e.target.closest("[data-hh]"); if(!i) return; const [k,f]=i.dataset.hh.split(":"); const S=hhState(); S[k]=S[k]||{}; const v=i.value===""?"":Math.max(f==="p"?-100:0,Math.min(f==="p"?100:9999999,+i.value)); S[k][f]=v; saveMe(); hhSum(); });
+document.addEventListener("click",e=>{ const b=e.target.closest("[data-hhp]"); if(!b) return; const k=(document.getElementById("hhTo")||{}).value||"food"; const S=hhState(); S[k]=S[k]||{}; S[k].p=+b.dataset.hhp; saveMe();
+  const inp=document.querySelector(`[data-hh="${k}:p"]`); if(inp) inp.value=S[k].p; hhSum(); toast(`${(HH_ROWS.find(x=>x[0]===k)||[,"",""])[2]}に ${S[k].p}% を入れました`); });
+
+// ===== 🎓 まいにちニュース検定(ことば辞典から10問。8問正解で合格。1日1回まで) =====
+const KT_LV=[["3級","ことばを見て、意味を選ぶ"],["2級","説明を見て、ことばを選ぶ"],["1級","むずかしいことばも入って、両方まざる"]];
+let KT_RUN=null;
+function ktState(){ ME.kt=ME.kt||{lv:0,d:"",at:{}}; return ME.kt; }
+function ktQs(lv){ const W=D.glossary.filter(w=>w[0]&&w[2]); if(W.length<8) return []; const r=seeded("kt"+lv+TODAY);
+  const nm=w=>w[0].replace(/\(.*?\)/g,"").trim(); const cut=t=>{ const x=String(t).split("。")[0]; return x.length>44?x.slice(0,42)+"…":x; };
+  let pool=[...W].sort(()=>r()-.5); if(lv===2) pool=pool.sort((a,b)=>wordRarity(b[0])-wordRarity(a[0]));
+  return pool.slice(0,Math.min(10,pool.length)).map((w,i)=>{ const type=lv===0?0:lv===1?1:i%2; const others=W.filter(o=>o!==w&&nm(o)!==nm(w)).sort(()=>r()-.5).slice(0,3); const a=Math.floor(r()*4);
+    if(type===0){ const o=others.map(x=>cut(x[2])); o.splice(a,0,cut(w[2])); return {q:`「${nm(w)}」の意味は?`,o,a,one:true,e:`${nm(w)}: ${w[2]}`}; }
+    const o=others.map(nm); o.splice(a,0,nm(w)); return {q:`「${cut(w[2]).split(nm(w)).join("〇〇")}」ということばは?`,o,a,one:false,e:`${nm(w)}: ${w[2]}`}; }); }
+function ktHTML(){ const S=ktState(); const lv=Math.min(S.lv,2); const all3=S.lv>=3; const R=KT_RUN;
+  if(R){ const q=R.q[R.i]; if(!q){ return ktResultHTML(); }
+    const done=R.res[R.i]!=null; const dots=`<span class="dots">${R.q.map((_,k)=>`<i class="${R.res[k]===true?"r":R.res[k]===false?"w":""}${k===R.i?" c":""}"></i>`).join("")}</span>`;
+    return `<div class="qn"><span>🎓 ${KT_LV[R.lv][0]} ・ ${R.i+1}/${R.q.length}問</span>${dots}</div><div class="qq">${esc(q.q)}</div>
+      <div class="opts${q.one?" one":""}">${q.o.map((o,k)=>`<button class="opt${done&&k===q.a?" right":done&&R.pick===k?" wrong":""}" data-kto="${k}"${done?" disabled":""}>${done&&k===q.a?"⭕ ":done&&R.pick===k?"❌ ":""}${esc(o)}</button>`).join("")}</div>
+      ${done?`<div class="exp">${glossify(esc(q.e))}</div><button class="chat-go" data-ktnext="1" style="margin-top:10px">${R.i+1<R.q.length?"つぎへ ▶":"結果を見る ▶"}</button>`:""}`; }
+  const tried=S.d===TODAY;
+  return `<div class="kt-lv">${KT_LV.map(([n,d],i)=>`<div class="kt-b${S.lv>i?" ok":i===lv&&!all3?" now":""}"><b>${S.lv>i?"🏅":i===lv&&!all3?"▶":"🔒"} ${n}</b><small>${esc(d)}</small>${S.at&&S.at[i]?`<small>合格 ${esc(mdLabel(S.at[i]))}</small>`:""}</div>`).join("")}</div>
+    ${all3?`<p style="margin:8px 0 0"><b>🎉 1級まで、ぜんぶ合格しています!</b></p>`:""}
+    ${tried?`<p class="hint" style="margin:10px 0 0">きょうは もう挑戦しました。あしたは別の問題が出ます。</p>`
+      :`<button class="chat-go" data-ktgo="1" style="margin-top:10px">${all3?"🎓 1級にもう一度ちょうせん":`🎓 ${KT_LV[lv][0]}にちょうせん(10問)`}</button>`}
+    ${S.lv>0?`<button class="fchip" data-ktcert="${S.lv-1}" style="margin-top:10px">🖼️ 合格証を画像で保存(${KT_LV[S.lv-1][0]})</button>`:""}
+    <p class="hint" style="margin-top:8px">問題は「ことば辞典」から出ます。8問正解で合格。挑戦は1日1回です。</p>`; }
+function ktResultHTML(){ const R=KT_RUN; const sc=R.res.filter(Boolean).length; const pass=sc>=8; const S=ktState();
+  return `<div class="qq">${R.q.length}問中 ${sc}問 正解</div>${pass?`<div class="kt-cert"><div>🎓 まいにちニュース検定</div><b>${KT_LV[R.lv][0]} 合格</b><small>${esc(mdLabel(TODAY))}</small></div>
+    <button class="fchip" data-ktcert="${R.lv}" style="margin-top:10px">🖼️ 合格証を画像で保存</button>`:`<p>あと${8-sc}問で合格でした。あしたまた挑戦してね。</p>`}
+    <button class="chat-go" data-ktend="1" style="margin-top:10px">もどる</button>`; }
+function ktCard(){ return D.glossary.length>=8?`<section class="card quiz" id="ktBox" aria-label="まいにちニュース検定"><b>🎓 まいにちニュース検定</b><div id="ktIn" style="margin-top:8px">${ktHTML()}</div></section>`:""; }
+function ktCert(lv){ const W=1080,H=760; const c=document.createElement("canvas"); c.width=W; c.height=H; const x=c.getContext("2d");
+  x.fillStyle="#fffaf0"; x.fillRect(0,0,W,H); x.strokeStyle="#b8862b"; x.lineWidth=14; x.strokeRect(30,30,W-60,H-60); x.lineWidth=3; x.strokeRect(54,54,W-108,H-108);
+  x.fillStyle="#3a2a12"; x.textAlign="center"; const f=s=>`bold ${s}px "Hiragino Sans","Yu Gothic",sans-serif`;
+  x.font=f(48); x.fillText("合 格 証",W/2,170); x.font=f(40); x.fillText("まいにちニュース検定",W/2,260);
+  x.font=f(110); x.fillStyle="#b8452b"; x.fillText(KT_LV[lv][0],W/2,420); x.fillStyle="#3a2a12";
+  x.font=f(34); x.fillText("ニュースのことばを よく知っていることを みとめます",W/2,510);
+  const at=(ktState().at||{})[lv]||TODAY; x.font=f(32); x.fillText(at.replace(/-/g,"/"),W/2,590);
+  x.font=f(26); x.fillStyle="#7a6a50"; x.fillText("まいにちニュース帳",W/2,660);
+  const a=document.createElement("a"); a.href=c.toDataURL("image/png"); a.download=`news-kentei-${KT_LV[lv][0]}.png`; document.body.appendChild(a); a.click(); a.remove(); toast("🖼️ 合格証を保存しました"); }
+document.addEventListener("click",e=>{ const box=e.target.closest("#ktBox"); if(!box) return; const S=ktState(); const inn=box.querySelector("#ktIn");
+  const t=e.target.closest("[data-ktgo],[data-kto],[data-ktnext],[data-ktend],[data-ktcert]"); if(!t) return;
+  if(t.dataset.ktcert!=null){ ktCert(+t.dataset.ktcert); return; }
+  if(t.dataset.ktgo&&S.d!==TODAY){ const lv=Math.min(S.lv,2); S.d=TODAY; saveMe(); KT_RUN={lv,q:ktQs(lv),i:0,res:[],pick:null}; track("/fun/kentei/"+lv,"ニュース検定"); }
+  else if(t.dataset.kto!=null&&KT_RUN&&KT_RUN.res[KT_RUN.i]==null){ const k=+t.dataset.kto; KT_RUN.pick=k; KT_RUN.res[KT_RUN.i]=k===KT_RUN.q[KT_RUN.i].a; }
+  else if(t.dataset.ktnext&&KT_RUN){ KT_RUN.i++; KT_RUN.pick=null;
+    if(KT_RUN.i>=KT_RUN.q.length){ const sc=KT_RUN.res.filter(Boolean).length; if(sc>=8&&S.lv===KT_RUN.lv){ S.lv++; S.at=S.at||{}; S.at[KT_RUN.lv]=TODAY; saveMe(); petEarn("kt|"+KT_RUN.lv,1); setTimeout(()=>toast(`🎓 ${KT_LV[KT_RUN?KT_RUN.lv:0][0]} 合格! 🍙+1`),200); } } }
+  else if(t.dataset.ktend){ KT_RUN=null; }
+  inn.innerHTML=ktHTML(); box.scrollIntoView({block:"nearest"}); });
 // ===== お知らせ(新しくなったところ)。機能を足したら、いちばん上に1つ足す =====
 const UPDATES=[
+  {id:"2026-10-25b",d:"2026-10-25",t:"📖 新しい読み方が4つ増えました",L:["「✨ おたのしみ」に、📖 連載で読む(大きな話題を1日1話ずつ)、🕳️ 見出しの穴うめ、🧮 わが家の計算機、🎓 ニュース検定(3級から1級まで)を足しました。","解説ページの「わたしたちへの影響」の下で、🧑‍🤝‍🧑 立場ごとに(学生・働いている人・子育て中など)分けて見られます。どれも、もとの記事や解説に書いてあることだけを使っています。"]},
   {id:"2026-10-25a",d:"2026-10-25",t:"📌 暮らしと趣味の「話題」が増えます",L:["料理・ファッション・インテリア・旅行・ライフスタイル・スポーツ・科学などの話題を、会社の発表やレシピのサイト、お役所の資料、研究の発表などからも集めるようにしました。","こうした話題には「📌 話題」の印がつきます(2社で確かめた✅のニュースとは分けています)。「🎯 あなた向け」や「さがす」に出ます。"]},
   {id:"2026-10-24d",d:"2026-10-24",t:"🧹 使いやすさの見直し",L:["久しぶりに開いたときは「👋 おかえりなさい」1枚にまとめ、同じ話題が何度も出ないようにしました。お知らせ(小さな吹き出し)は画面の上に出て、ボタンをかくさないようにしました。","かんたんモードの「🏷️ 保存」に文字をつけ、押しやすい大きさに。ほかの小さかったボタンも大きくしました。スクロールするとハロウィンの飾りが文字にかぶらないようにしました。","マイ→⚙️設定のいちばん上に目次をつけました。「⏱️ 読んだ時間」は「記録」に移りました。"]},
   {id:"2026-10-24c",d:"2026-10-24",t:"📅 今週の5大ニュース",L:["土・日・月曜は「きょう」に、この1週間いちばん長く続いた話題5つが出ます。「はじまり → いま」で、話の流れがひと目でわかります。","「✓ 読んだ」でその週は消えます(ごはん🍙つき)。1分のふりかえりのスライドにも「はじまり → いま」を足しました。"]},
@@ -5044,7 +5237,7 @@ document.addEventListener("click",ev=>{ const x=ev.target.closest("[data-alx]");
 document.addEventListener("keydown",ev=>{ if((ev.key==="Enter"||ev.key===" ")&&ev.target.matches&&ev.target.matches(".al-band[data-quake]")){ ev.preventDefault(); openQuake(); } });
 try{ loadAlerts(); setInterval(()=>{ if(document.visibilityState==="visible") loadAlerts(); },3*60*1000); document.addEventListener("visibilitychange",()=>{ if(document.visibilityState==="visible") loadAlerts(); }); }catch(_){}
 // テスト用の手がかり(localhost で動かしたときだけ。本番では出さない)
-if(/^(localhost|127\.0\.0\.1)$/.test(location.hostname)) window.NW_TEST={petSVG,PET_KINDS,PET_COLORS,petColorsFor,WEAR,petStage,petXP,petKind,petHall,petName,petRestart,get ME(){return ME;},get LOOK(){return LOOK;},TOPIC_GROUPS,FUN,SECS};
+if(/^(localhost|127\.0\.0\.1)$/.test(location.hostname)) window.NW_TEST={petSVG,PET_KINDS,PET_COLORS,petColorsFor,WEAR,petStage,petXP,petKind,petHall,petName,petRestart,get ME(){return ME;},get LOOK(){return LOOK;},TOPIC_GROUPS,FUN,SECS,openFun,openEx,fillQs,hhNews,ktQs,serialChapters};
 const h=(location.hash||"").slice(1);
 if(h==="quake"){ go("today"); setTimeout(openQuake,50); } else if(D.explainers[h]){ go("explain"); openEx(h); }
 else if(h.startsWith("t=")) openTHash(h);
