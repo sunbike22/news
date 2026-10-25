@@ -1229,6 +1229,50 @@ svg.eat{animation:petEat .7s ease both!important}
 .kt-cert{margin-top:8px;border:3px double #b8862b;border-radius:12px;padding:14px;text-align:center;background:var(--surface2)}
 .kt-cert b{display:block;font-size:1.6rem;margin:4px 0}.kt-cert small{color:var(--muted)}
 :root[data-size="xxl"] .top .upd{font-size:13px} :root[data-size="xxl"] .brand{font-size:16px} :root[data-size="xxl"] .top .iconbtn{font-size:15px}
+/* 解説ページ: 読みやすさ(2026-10-25) */
+.sheet .bar{z-index:30}
+.mg-p{isolation:isolate}
+.ex-prog{height:3px;background:transparent}.ex-prog i{display:block;height:100%;width:0;background:var(--accent);transition:width .1s linear}
+.exv{--hl:#ffe58a;gap:22px}
+:root[data-theme="dark"] .exv{--hl:rgba(255,214,0,.30)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .exv{--hl:rgba(255,214,0,.30)}}
+.ex-hero{position:relative;border-radius:18px;overflow:hidden;padding:18px 16px 14px;background:linear-gradient(135deg,var(--accent-soft),var(--surface));border:1px solid var(--line);color:var(--ink)}
+.ex-hero[data-g="pol"]{background:linear-gradient(135deg,var(--g-pol-s),var(--surface))}.ex-hero[data-g="eco"]{background:linear-gradient(135deg,var(--g-eco-s),var(--surface))}
+.ex-hero[data-g="soc"]{background:linear-gradient(135deg,var(--g-soc-s),var(--surface))}.ex-hero[data-g="it"]{background:linear-gradient(135deg,var(--g-it-s),var(--surface))}
+.ex-hero[data-g="intl"]{background:linear-gradient(135deg,var(--g-intl-s),var(--surface))}.ex-hero[data-g="spo"]{background:linear-gradient(135deg,var(--g-spo-s),var(--surface))}
+.ex-hero[data-g="sci"]{background:linear-gradient(135deg,var(--g-sci-s),var(--surface))}.ex-hero[data-g="ent"]{background:linear-gradient(135deg,var(--g-ent-s),var(--surface))}
+.ex-hero.has-img{background:#1b2232;color:#fff;min-height:200px;display:flex;flex-direction:column;justify-content:flex-end;border:0}
+.ex-hero-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0}
+.ex-hero.has-img::after{content:"";position:absolute;inset:0;z-index:1;background:linear-gradient(180deg,rgba(10,14,24,.35) 0%,rgba(10,14,24,.72) 40%,rgba(10,14,24,.92) 100%)}
+.ex-hero.has-img .ex-ttl,.ex-hero.has-img .ex-now{text-shadow:0 1px 3px rgba(0,0,0,.6)}
+.ex-hero-in,.ex-meta{position:relative;z-index:2}
+.ex-hero-in{display:flex;gap:12px;align-items:flex-start}
+.ex-hero-ic{font-size:2.4rem;line-height:1}
+.ex-st{display:inline-block;font-size:.82rem;font-weight:700;padding:2px 10px;border-radius:99px;background:var(--surface);color:var(--ink);border:1px solid var(--line)}
+.ex-hero.has-img .ex-st{background:rgba(255,255,255,.92);color:#1b2232;border:0}
+.ex-ttl{font-family:var(--f-display);font-weight:400;font-size:1.45rem;line-height:1.35;margin:6px 0 2px;letter-spacing:.01em}
+.ex-now{margin:4px 0 0;font-size:.98rem;line-height:1.6;font-weight:700;opacity:.92}
+.ex-meta{display:flex;flex-wrap:wrap;gap:6px 12px;margin-top:12px;font-size:.86rem;opacity:.95}
+.ex-hero.has-img .hard{color:#fff}
+.ex-cr{font-size:.82rem;color:var(--muted);margin-top:-14px}
+.exv .kid{padding:18px 18px 16px;border-left:6px solid #f2b705}
+.exv .kid h2{font-size:1.3rem;line-height:1.6}
+.ex-toc{display:flex;gap:6px;overflow-x:auto;padding:2px 0 6px;scrollbar-width:none;align-items:center}
+.ex-toc::-webkit-scrollbar{display:none}
+.ex-toc-l{font-size:.82rem;color:var(--muted);white-space:nowrap;font-weight:700}
+.ex-toc button{white-space:nowrap;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:99px;padding:8px 12px;font:inherit;font-size:.88rem;font-weight:700;cursor:pointer;min-height:40px}
+.exv .blk:not(.card){border-top:1px solid var(--line);padding-top:20px}
+.exv .blk:not(.card)>h3{font-size:1.2rem;font-weight:800;line-height:1.35;padding-left:12px;border-left:5px solid var(--accent);margin-bottom:12px}
+.exv .blk:not(.card) p,.exv ul.us>li{font-size:1.03rem;line-height:1.9}
+.ex-lead{font-size:1.1rem!important;font-weight:800;line-height:1.8!important;margin-bottom:10px!important}
+mark.hl,.exv .us-cards b{background:linear-gradient(transparent 55%,var(--hl) 55%);color:inherit;padding:0 1px}
+.ex-p{margin:0 0 10px!important}
+.exv ul.us-cards{list-style:none;padding:0;gap:10px}
+.exv ul.us-cards>li{display:flex;gap:12px;align-items:flex-start;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:12px 14px}
+.us-ic{font-size:1.5rem;line-height:1.3;flex:none}
+.exv details.faq p{border-left:3px solid var(--accent-soft);padding-left:12px;margin:0 0 12px;line-height:1.85}
+.exv .src{font-size:.84rem;line-height:1.7}
+ul.ex-rel{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
 </style>
 </head>
 <body>
@@ -2199,6 +2243,29 @@ function bindOrderQuiz(sh){ const box=sh.querySelector("#oq"); if(!box) return; 
         const e=D.explainers[k]; const T=(e.timeline||[]).filter(x=>x[1]&&x[1].length<=46); box.querySelectorAll(".oq-it").forEach(x=>{ const it=T.find(y=>y[1]===x.textContent.replace(/^\d/,"").trim()); if(it) x.insertAdjacentHTML("beforeend",`<small class="oq-d">${esc(it[0])}</small>`); }); }
       else if(msg) msg.textContent=`${next}番目まで正解。次は${next+1}番目`; }
     else { b.classList.add("ng"); setTimeout(()=>b.classList.remove("ng"),500); if(msg) msg.textContent="ちがうみたい。もっと前に起きたことがあるよ"; } }); }
+// ===== 解説ページの見た目(上の見出し・目次・読みやすい段落) =====
+function exHeroHTML(k,e){ const ph=PHOTOS[k]; const st=e.status==="done"?"✅ 一区切り":"🔥 いま動いている";
+  return `<header class="ex-hero${ph?" has-img":""}" data-g="${esc(e.g||"")}">
+    ${ph?`<img class="ex-hero-img" src="${ph[0]}" alt="" loading="lazy" onerror="this.closest('.ex-hero').classList.remove('has-img');this.remove()">`:""}
+    <div class="ex-hero-in"><span class="ex-hero-ic" aria-hidden="true">${e.icon}</span>
+      <div><span class="ex-st">${st}</span><h1 class="ex-ttl">${esc(e.name)}</h1>${e.now?`<p class="ex-now">${esc(e.now)}</p>`:""}</div></div>
+    <div class="ex-meta"><span>📅 ${esc(e.updated)} 更新</span><span>⏱️ 約${e.min}分で読めます</span>${hardChip(e)}</div>
+  </header>
+  ${ph?`<div class="ex-cr">📷 イメージ写真: ${esc(ph[1])} / <a href="https://unsplash.com/?utm_source=mainichi_news&utm_medium=referral" target="_blank" rel="noopener">Unsplash</a></div>`
+    :ILL[k]?`<div><div class="ill">${ILL[k]}</div><div class="credit">イラスト: 自作(イメージ)</div></div>`:""}`; }
+function exTocHTML(e){ const L=[e.manga&&["ex-mg","🎨 4コマ"],["ex-more","💡 くわしく"],(e.us||[]).length&&["ex-us","🙋 わたしへの影響"],(e.faq||[]).length&&["ex-faq","❓ 疑問"],(e.timeline||[]).length&&["ex-tl","📅 流れ"],(e.next||[]).length&&["ex-nx","🔭 これから"]].filter(Boolean);
+  return `<nav class="ex-toc" aria-label="このページの中身"><span class="ex-toc-l">このページ</span>${L.map(([id,t])=>`<button data-exj="${id}">${t}</button>`).join("")}</nav>
+    <div class="hint" style="margin-top:-8px">点線のことばは、タップすると意味が出ます。</div>`; }
+function exParas(t){ const S=String(t||"").split(/(?<=。)/).map(x=>x.trim()).filter(Boolean); const P=[]; for(let i=0;i<S.length;i+=2) P.push(S.slice(i,i+2).join(""));
+  return P.map(x=>`<p class="ex-p">${glossify(esc(x))}</p>`).join(""); }
+function exUsLi(u){ const m=/^(\p{Extended_Pictographic}[️‍\p{Extended_Pictographic}]*)\s*([\s\S]*)$/u.exec(String(u));
+  return m?`<li><span class="us-ic" aria-hidden="true">${m[1]}</span><span>${glossify(bold(m[2]))}</span></li>`:`<li><span class="us-ic" aria-hidden="true">・</span><span>${glossify(bold(u))}</span></li>`; }
+function bindExRead(sh){ const bar=sh.querySelector("#exProg"); const head=sh.querySelector(".bar");
+  const upd=()=>{ if(!bar) return; const max=sh.scrollHeight-sh.clientHeight; bar.style.width=(max>0?Math.min(100,sh.scrollTop/max*100):0)+"%"; };
+  sh.addEventListener("scroll",upd,{passive:true}); upd();
+  sh.querySelectorAll("[data-exj]").forEach(b=>b.onclick=()=>{ const t=sh.querySelector("#"+b.dataset.exj); if(!t) return;
+    const ex=t.closest("details.exmore"); if(ex&&!ex.open) ex.open=true;
+    const y=t.getBoundingClientRect().top-sh.getBoundingClientRect().top+sh.scrollTop-(head?head.offsetHeight:0)-8; sh.scrollTo({top:y,behavior:matchMedia("(prefers-reduced-motion: reduce)").matches?"auto":"smooth"}); }); }
 function openEx(k){
   try{ NEWS.filter(n=>n.ex===k||(D.explainers[k]&&(n.h||"").includes((D.explainers[k].name||"").slice(0,4)))).slice(0,3).forEach(travelAdd); const t0=D.top10.find(x=>x.ex===k); if(t0) travelAdd({h:t0.title,th:""}); }catch(_){}
   if(D.explainers[k]) track("/ex/"+k,"解説: "+D.explainers[k].name);
@@ -2206,36 +2273,36 @@ function openEx(k){
   if(!ME.readEx[k]) learn(e.g,2); const seenAt=ME.readEx[k]; ME.readEx[k]=TODAY; saveMe(); setTimeout(checkBadges,800);
   const rel = NEWS.filter(n=>{ const map={saudi:"サウジ・中東",tax:"消費減税",cyber:"不正アクセスとAI"}; if(map[k]) return (n.th||"").includes(map[k]); if(k==="sato") return /佐藤輝明/.test(n.h); if(k==="series") return /日本シリーズ|CS/.test(n.h); if(k==="yokohama") return /横浜市長/.test(n.h); if(k==="past") return n.d<"2026-10-04"; return false; }).slice(0,8);
   const flow = e.flow.map((f,i)=>`${i>0?`<div class="farrow">⬇️ ${f.via?`<b>${esc(f.via)}</b>`:""}</div>`:""}<div class="fstep"><span class="fi">${f.i}</span><span><b>${esc(f.t)}</b>${f.s?`<small>${esc(f.s)}</small>`:""}</span></div>`).join("");
-  sh.innerHTML=`<div class="bar"><div class="wrap"><button class="iconbtn" id="shx" aria-label="もどる">← もどる</button><span class="ttl">${e.icon} ${esc(e.name)}</span>${pinBtn({k:"ex|"+k,h:"解説: "+e.name,g:e.g,d:TODAY,ex:k},"iconbtn")}<button class="iconbtn" id="shshare" aria-label="この解説を送る">📤 送る</button></div></div>
-  <div class="wrap body">
-    <div class="hint">最終更新 ${esc(e.updated)} ・ ⏱️ 全部で約${e.min}分 ・ ${hardChip(e)} ・ 点線のことばはタップで意味が出ます</div>
-    <div class="ex-acts"><button class="chat-go" id="exChat">💬 話しながら読む</button><button class="fchip" id="exSpeak">🔊 聞く</button><button class="fchip" data-serial="${k}">📖 連載で読む</button>${e.status!=="done"||fwOn(k)?fwBtn(k):""}</div>
-    ${PHOTOS[k]?photoBlock(k):ILL[k]?`<div><div class="ill">${ILL[k]}</div><div class="credit">イラスト: 自作(イメージ)</div></div>`:""}
+  sh.innerHTML=`<div class="bar"><div class="wrap"><button class="iconbtn" id="shx" aria-label="もどる">← もどる</button><span class="ttl">${e.icon} ${esc(e.name)}</span>${pinBtn({k:"ex|"+k,h:"解説: "+e.name,g:e.g,d:TODAY,ex:k},"iconbtn")}<button class="iconbtn" id="shshare" aria-label="この解説を送る">📤 送る</button></div><div class="ex-prog" aria-hidden="true"><i id="exProg"></i></div></div>
+  <div class="wrap body exv">
+    ${exHeroHTML(k,e)}
     <div class="kid"><div class="l">🧒 ひとことで言うと</div><h2>${esc(e.kid)}</h2>${EN&&EN.ex&&EN.ex[k]&&langMode()!=="ja"?`<p class="enx" lang="en" style="margin:6px 0 0">${esc(EN.ex[k])} <span class="ensay" role="button" tabindex="0" data-say="${esc(EN.ex[k])}">🔊</span></p>`:""}</div>
-    ${mangaHTML(e.manga)}
+    <div class="ex-acts"><button class="chat-go" id="exChat">💬 話しながら読む</button><button class="fchip" id="exSpeak">🔊 聞く</button><button class="fchip" data-serial="${k}">📖 連載で読む</button>${e.status!=="done"||fwOn(k)?fwBtn(k):""}</div>
+    ${exTocHTML(e)}
+    ${e.manga?`<div id="ex-mg">${mangaHTML(e.manga)}</div>`:""}
     ${LOOK.mode==="easy"?`<details class="faq plain exmore"><summary>📖 もっとくわしく見る(くわしい説明・出てくる人・動く図)</summary>`:""}
-    <div class="blk"><h3>💡 もう少しくわしく</h3><p><b>${glossify(esc(e.more[0]))}</b></p><p style="margin-top:6px">${glossify(esc(e.more[1]))}</p></div>
+    <div class="blk" id="ex-more"><h3>💡 もう少しくわしく</h3><p class="ex-lead"><mark class="hl">${glossify(esc(e.more[0]))}</mark></p>${exParas(e.more[1])}</div>
     ${castBlock(e)}
     ${e.stats?`<div class="stats">${e.stats.map(([k2,v])=>`<div class="stat"><div class="v num">${esc(v)}</div><div class="k">${esc(k2)}</div></div>`).join("")}</div>`:""}
     <div class="blk"><h3>🖼️ 動く図でわかる <button class="fplay" id="fplay">▶ もう一度</button></h3><div class="flow" id="flow">${flow}</div></div>
     ${e.calc?calcBlock():""}
     ${LOOK.mode==="easy"?`</details>`:""}
-    <div class="blk"><h3>🙋 わたしたちへの影響</h3><ul class="us">${e.us.map(u=>`<li>${glossify(bold(u))}</li>`).join("")}</ul>${roleBlock(e)}</div>
-    <div class="blk"><h3>❓ よくある疑問</h3>${e.faq.map(([q,a],i)=>`<details class="faq"><summary>${esc(q)}</summary><p>${glossify(esc(a))}</p></details>`).join("")}</div>
-    <div class="blk"><h3>📅 これまでの流れ</h3>
+    <div class="blk" id="ex-us"><h3>🙋 わたしたちへの影響</h3><ul class="us us-cards">${e.us.map(u=>exUsLi(u)).join("")}</ul>${roleBlock(e)}</div>
+    <div class="blk" id="ex-faq"><h3>❓ よくある疑問</h3>${e.faq.map(([q,a],i)=>`<details class="faq"><summary>${esc(q)}</summary><p>${glossify(esc(a))}</p></details>`).join("")}</div>
+    <div class="blk" id="ex-tl"><h3>📅 これまでの流れ</h3>
       <div class="htl-wrap" aria-label="年表(横にスクロール)"><div class="htl">${e.timeline.map(([d,t],i)=>`<div class="htl-i${i===e.timeline.length-1?" now":""}${isNewTl(d,seenAt)?" fresh":""}"><span class="htl-d">${esc(d)}${isNewTl(d,seenAt)?' <i class="tl-new">🆕</i>':""}</span><span class="htl-dot"></span><span class="htl-t">${esc(t)}</span></div>`).join("")}${(e.next||[]).slice(0,3).map(x=>{ const t=Array.isArray(x)?x.join(" "):String(x); const m=t.match(/^(\S+)\s+(.*)$/); return `<div class="htl-i fut"><span class="htl-d">${esc(m?m[1]:"これから")}</span><span class="htl-dot"></span><span class="htl-t">${esc(m?m[2]:t)}</span></div>`; }).join("")}</div></div>
       <div class="hint">← 横にスクロールできます。点線の先は「これからの予定」</div>
       <details class="faq plain"><summary>リストで見る</summary><ol class="tl">${e.timeline.map(([d,t])=>`<li${isNewTl(d,seenAt)?' class="fresh"':""}><b>${esc(d)}</b>${esc(t)}${isNewTl(d,seenAt)?' <i class="tl-new">🆕</i>':""}</li>`).join("")}</ol></details></div>
     ${orderQuizHTML(e,k)}
-    ${e.next.length?`<div class="blk"><h3>🔭 次の山場</h3><ul class="us">${e.next.map(n=>`<li>${esc(nextTxt(n))}</li>`).join("")}</ul></div>`:""}
-    ${rel.length?`<div class="blk"><h3>🗞️ 関係するニュースの記録</h3><div class="res"><ul style="list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px">${rel.map(n=>`<li class="item"><div class="meta"><span class="hint">${mdLabel(n.d)}</span>${n.info?'<span class="badge-info">📌 話題</span>':n.ok?'<span class="badge-ok">✅</span>':'<span class="badge-one">⚠️ 1社</span>'}</div><div class="h">${esc(n.h)}</div></li>`).join("")}</ul></div></div>`:""}
+    ${e.next.length?`<div class="blk" id="ex-nx"><h3>🔭 次の山場</h3><ul class="us">${e.next.map(n=>`<li>${esc(nextTxt(n))}</li>`).join("")}</ul></div>`:""}
+    ${rel.length?`<div class="blk" id="ex-rel"><h3>🗞️ 関係するニュースの記録</h3><div class="res">${(()=>{ const li=n=>`<li class="item"><div class="meta"><span class="hint">${mdLabel(n.d)}</span>${n.info?'<span class="badge-info">📌 話題</span>':n.ok?'<span class="badge-ok">✅</span>':'<span class="badge-one">⚠️ 1社</span>'}</div><div class="h">${esc(n.h)}</div></li>`; const ul=L=>`<ul class="ex-rel">${L.map(li).join("")}</ul>`; return ul(rel.slice(0,3))+(rel.length>3?`<details class="faq plain"><summary>ほかに ${rel.length-3}件 見る</summary>${ul(rel.slice(3))}</details>`:""); })()}</div></div>`:""}
     ${askBlock(k)}
     <div class="src">📰 出典: ${esc(e.src)}</div>
     ${exNavHTML(k)}
     <button class="iconbtn" id="shx2" style="align-self:flex-start">← 一覧にもどる</button>
   </div>`;
   sh.hidden=false; sh.scrollTop=0; document.body.style.overflow="hidden";
-  bindOrderQuiz(sh); bindExNav(sh,k);
+  bindOrderQuiz(sh); bindExNav(sh,k); bindExRead(sh);
   const close=()=>{ try{ window.speechSynthesis&&window.speechSynthesis.cancel(); }catch(_){} sh.hidden=true; sh.innerHTML=""; document.body.style.overflow=""; document.removeEventListener("keydown",esck); try{ history.replaceState(null,"","#"+(current||"today")); }catch(_){} };
   const esck=ev=>{ if(ev.key==="Escape") close(); };
   document.addEventListener("keydown",esck);
@@ -4277,6 +4344,7 @@ document.addEventListener("click",e=>{ const box=e.target.closest("#ktBox"); if(
   inn.innerHTML=ktHTML(); box.scrollIntoView({block:"nearest"}); });
 // ===== お知らせ(新しくなったところ)。機能を足したら、いちばん上に1つ足す =====
 const UPDATES=[
+  {id:"2026-10-25d",d:"2026-10-25",t:"📖 解説のページを読みやすくしました",L:["上に写真と大きな見出し、そのすぐ下に「ひとことで言うと」。このページの中身(4コマ・くわしく・影響・疑問・流れ・これから)へ1タップで飛べるボタンと、どこまで読んだかがわかる細い線をつけました。","大事な文には蛍光ペンの線、長い文は2文ずつに区切り、「わたしたちへの影響」は1つずつのカードにしました。4コマの文字が上の「もどる」に重なっていたのも直しました。"]},
   {id:"2026-10-25c",d:"2026-10-25",t:"🧮 いろいろな暮らしに合わせられるように",L:["もしも計算機の燃料を、レギュラー・ハイオク・軽油・灯油・電気(EVの充電)から選べるようにしました。海外旅行は、ドルのほかにユーロ・ウォン・人民元など8つのお金で計算できます。","「🙋 わたしに関係あるニュース」の立場を16こに増やしました(自営業・電車やバスで通う・家族の介護・病院によく行く・障がいのある人とその家族・持ち家・投資・農業や漁業・ペットなど)。文字の大きさに「もっと大きく」を足しました。"]},
   {id:"2026-10-25b",d:"2026-10-25",t:"📖 新しい読み方が4つ増えました",L:["「✨ おたのしみ」に、📖 連載で読む(大きな話題を1日1話ずつ)、🕳️ 見出しの穴うめ、🧮 わが家の計算機、🎓 ニュース検定(3級から1級まで)を足しました。","解説ページの「わたしたちへの影響」の下で、🧑‍🤝‍🧑 立場ごとに(学生・働いている人・子育て中など)分けて見られます。どれも、もとの記事や解説に書いてあることだけを使っています。"]},
   {id:"2026-10-25a",d:"2026-10-25",t:"📌 暮らしと趣味の「話題」が増えます",L:["料理・ファッション・インテリア・旅行・ライフスタイル・スポーツ・科学などの話題を、会社の発表やレシピのサイト、お役所の資料、研究の発表などからも集めるようにしました。","こうした話題には「📌 話題」の印がつきます(2社で確かめた✅のニュースとは分けています)。「🎯 あなた向け」や「さがす」に出ます。"]},
