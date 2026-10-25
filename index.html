@@ -1273,6 +1273,34 @@ mark.hl,.exv .us-cards b{background:linear-gradient(transparent 55%,var(--hl) 55
 .exv details.faq p{border-left:3px solid var(--accent-soft);padding-left:12px;margin:0 0 12px;line-height:1.85}
 .exv .src{font-size:.84rem;line-height:1.7}
 ul.ex-rel{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
+/* 📰 新聞の形で読む */
+.shimen{--sm-paper:#fbf8f1;--sm-ink:#1d1a14;--sm-rule:#1d1a14;background:var(--sm-paper);color:var(--sm-ink);border-radius:6px;padding:16px 14px;box-shadow:0 1px 0 var(--line);font-family:"Hiragino Mincho ProN","Yu Mincho","YuMincho","Noto Serif JP","BIZ UDMincho",serif;line-height:1.85}
+:root[data-theme="dark"] .shimen{--sm-paper:#1f1d18;--sm-ink:#efe9dc;--sm-rule:#efe9dc}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]) .shimen{--sm-paper:#1f1d18;--sm-ink:#efe9dc;--sm-rule:#efe9dc}}
+.sm-mast{text-align:center;border-bottom:3px double var(--sm-rule);padding-bottom:8px;margin-bottom:8px}
+.sm-logo{font-size:1.65rem;font-weight:900;letter-spacing:.08em}
+.sm-date{font-size:.86rem;font-family:var(--f-body)}
+.sm-wx{font-size:.88rem;font-family:var(--f-body);border-bottom:1px solid var(--sm-rule);padding:4px 0 8px;margin-bottom:10px}
+.sm-kicker{font-family:var(--f-body);font-size:.82rem;font-weight:700;letter-spacing:.06em;opacity:.8}
+.sm-top h2{font-size:1.65rem;line-height:1.4;margin:4px 0 8px;font-weight:900}
+.sm-top p,.sm-sub p,.sm-it p,.sm-num p{margin:0;font-size:1rem}
+.sm-sub{display:grid;gap:12px;margin-top:12px;padding-top:10px;border-top:1px solid var(--sm-rule)}
+.sm-sub h3{font-size:1.2rem;line-height:1.45;margin:2px 0 4px;font-weight:800}
+.sm-num{margin-top:12px;border:2px solid var(--sm-rule);padding:10px 12px}
+.sm-num b{display:block;font-size:2rem;line-height:1.2}.sm-num small{font-size:1rem;margin-left:4px}
+.sm-sec{font-size:1.15rem;margin:16px 0 8px;padding:4px 0;border-top:3px solid var(--sm-rule);border-bottom:1px solid var(--sm-rule);letter-spacing:.08em}
+.sm-cols{display:grid;gap:0}
+.sm-it{padding:10px 0;border-bottom:1px solid color-mix(in srgb,var(--sm-rule) 35%,transparent)}
+.sm-it h3{font-size:1.1rem;line-height:1.5;margin:4px 0;font-weight:800}
+.sm-meta{display:flex;gap:8px;align-items:center;font-family:var(--f-body);font-size:.82rem;flex-wrap:wrap}
+.sm-no{display:inline-grid;place-items:center;width:22px;height:22px;border:1.5px solid var(--sm-rule);border-radius:50%;font-weight:800}
+.sm-g{font-weight:700}.sm-ok,.sm-one{font-weight:700}
+.sm-foot{margin-top:14px;font-size:.82rem;font-family:var(--f-body);opacity:.8}
+.sm-btn{margin-left:auto;margin-right:6px;white-space:nowrap}
+@media (min-width:620px){.sm-cols{grid-template-columns:1fr 1fr;column-gap:20px}.sm-sub{grid-template-columns:1fr 1fr}}
+@media print{body.printing-sm>*:not(#sheet){display:none!important}body.printing-sm #sheet{position:static!important;overflow:visible!important;background:#fff}body.printing-sm .no-print{display:none!important}body.printing-sm .shimen{--sm-paper:#fff;--sm-ink:#000;--sm-rule:#000;box-shadow:none}body.printing-sm{padding:0}}
+/* iPhone で入力欄を押したときに画面が勝手に拡大されないよう、入力欄の文字は16px以上 */
+@supports (-webkit-touch-callout:none){input,select,textarea{font-size:max(16px,1em)!important}}
 </style>
 </head>
 <body>
@@ -1917,7 +1945,7 @@ function renderToday(){
     </section>`;
   S.ten=`<section aria-label="今日のニュース10">
       <div class="sec-h"><h2>📰 今日のニュース10</h2><span class="seg len-seg" role="group" aria-label="長さ">${[["short","短く"],["full","くわしく"]].map(([k,l])=>`<button data-len="${k}" aria-pressed="${(LOOK.len||"short")===k}">${l}</button>`).join("")}</span></div>
-      <div class="hint rd-min">📖 ここから約${readMin()}分で、きょうの大事なニュースを読み終われます${ME.lifeSet?"":` ・ <button class="linkish" data-lifeopen="1">🙋 自分に関係あるものに印をつける</button>`}</div>
+      <div class="hint rd-min">📖 ここから約${readMin()}分で、きょうの大事なニュースを読み終われます ・ <button class="linkish" data-shimen="1">🗞️ 新聞の形で読む</button>${ME.lifeSet?"":` ・ <button class="linkish" data-lifeopen="1">🙋 自分に関係あるものに印をつける</button>`}</div>
       <ol class="ten${(LOOK.len||"short")==="short"?" short":""}" style="margin-top:10px">${t.map((n,i)=>{
         const big=i<3; const link=n.ex||n.tab; const wt=newsWeight(n); const mine=isLocal(n.title+" "+(n.text||""));
         return `<li class="${big?'big':''} w${wt.lv}${mine?' mytown':''}">${pinBtn({k:"t|"+n.title,h:n.title,g:n.g,d:(NEWS[0]||{}).d,ex:n.ex},"abs")}<button class="row${link?' link':''}"${n.ex?` data-ex="${n.ex}"`:''}${n.tab?` data-tab="${n.tab}"`:''} ${link?'':'tabindex="-1"'}>
@@ -2112,7 +2140,8 @@ function renderSearch(){ sLim=20;
     ${mascot("search")}
     <div class="jump"><button class="jmp" data-tab="map"><span>🗺️</span>地図で見る</button><button class="jmp" data-tab="numbers"><span>📈</span>株・円・原油</button><button class="jmp" id="toWords2"><span>📖</span>ことば辞典</button></div>
     <label class="sbox" for="q"><span aria-hidden="true">🔎</span><input id="q" type="search" placeholder="ことばで探す(例: 台風、原油)" autocomplete="off" value="${esc(sState.q)}"><button class="iconbtn" id="qx" aria-label="入力を消す">✕</button></label>
-    <div class="quick" aria-label="よく探されることば">${["台風","原油","消費税","不正アクセス","北朝鮮","日経平均","阪神","AI"].map(w=>`<button class="fchip" data-w="${w}">${w}</button>`).join("")}</div>
+    ${(()=>{ const T=trendWords(8); return T.length?`<div><div class="hint" style="margin-bottom:6px">🔥 この2日でよく出ていることば(タップで探す)</div><div class="quick" aria-label="この2日でよく出ていることば">${T.map(([w,,n])=>`<button class="fchip" data-w="${esc(w)}">${esc(w)} <small class="hint">${n}件</small></button>`).join("")}</div></div>`
+      :`<div class="quick" aria-label="よく探されることば">${["台風","原油","消費税","不正アクセス","日経平均","AI"].map(w=>`<button class="fchip" data-w="${w}">${w}</button>`).join("")}</div>`; })()}
     <div><div class="hint" style="margin-bottom:6px">ジャンル(いくつでも選べる)</div><div class="chips" id="gf">${GORDER.map(g=>`<button class="fchip" data-g="${g}" aria-pressed="${sState.g.has(g)}"><span class="c" style="background:var(--g-${g})"></span>${GN[g]}</button>`).join("")}</div></div>
     <div class="setrow"><label class="hint" for="th">テーマ</label><select id="th" class="fchip" style="padding:6px 10px"><option value="">すべて</option>${THEMES.map(t=>`<option ${sState.th===t?"selected":""}>${esc(t)}</option>`).join("")}</select>
       <button class="fchip" id="okf" aria-pressed="${sState.ok}">✅ 複数社で確認したものだけ</button>${NEW_KEYS.size?`<button class="fchip" id="newf" aria-pressed="${sState.onlyNew}">🆕 新着だけ(${NEW_KEYS.size})</button>`:""}<button class="fchip" id="toWords">📖 ことば辞典</button></div>
@@ -4342,8 +4371,37 @@ document.addEventListener("click",e=>{ const box=e.target.closest("#ktBox"); if(
     if(KT_RUN.i>=KT_RUN.q.length){ const sc=KT_RUN.res.filter(Boolean).length; if(sc>=8&&S.lv===KT_RUN.lv){ S.lv++; S.at=S.at||{}; S.at[KT_RUN.lv]=TODAY; saveMe(); petEarn("kt|"+KT_RUN.lv,1); setTimeout(()=>toast(`🎓 ${KT_LV[KT_RUN?KT_RUN.lv:0][0]} 合格! 🍙+1`),200); } } }
   else if(t.dataset.ktend){ KT_RUN=null; }
   inn.innerHTML=ktHTML(); box.scrollIntoView({block:"nearest"}); });
+// ===== 🔥 いま増えていることば(この2日の見出しに、その前の7日よりよく出ることば。記録から数えるだけ) =====
+const TREND_STOP=new Set(["日本","政府","発表","開始","予定","今日","明日","前年","全国","東京","方針","検討","可能","影響","問題","発生","対応","記録","結果","会見","関係","今年","来年","世界","大会","選手","試合","公開","発売","億円","兆円","万円","以上","以下","最大","初め","見通","会社","企業","国内","海外","市場","状況","理由","必要","一部","全体","前日","午前","午後","時点","注意","確認","呼びかけ","ニュース","オンライン"]);
+function trendWords(n){ const rx=/[一-龠々]{1,4}[ァ-ヴー]{3,9}|[一-龠々]{2,6}|[ァ-ヴー]{3,9}|(?<![A-Za-z])[A-Z]{2,5}(?![A-Za-z])/g; const d2=dayShift(TODAY,-1), d9=dayShift(TODAY,-8);
+  const R={},B={}; NEWS.forEach(x=>{ if(x.d<d9) return; const T=new Set((x.h||"").match(rx)||[]); T.forEach(t=>{ if(TREND_STOP.has(t)) return; if(x.d>=d2) R[t]=(R[t]||0)+1; else B[t]=(B[t]||0)+1; }); });
+  let L=Object.keys(R).filter(t=>R[t]>=2&&R[t]/2>=1.5*((B[t]||0)/7)+.5).map(t=>[t,R[t]/2-(B[t]||0)/7,R[t]]).sort((a,b)=>b[1]-a[1]||b[2]-a[2]);
+  const out=[]; for(const x of L){ if(out.some(o=>o[0].includes(x[0])||x[0].includes(o[0]))) continue; out.push(x); if(out.length>=(n||8)) break; } return out; }
+
+// ===== 📰 新聞の形で読む(今日の3行・数字・ニュース10を、紙の新聞のような1枚に。印刷もできる) =====
+function openShimen(){ const sh=document.getElementById("sheet"); const w=D.weather||{}; const T=D.three||[]; const N=D.number||null; const top=T[0];
+  const bd=n=>n.ok?'<span class="sm-ok">✅ 2社以上で確認</span>':'<span class="sm-one">⚠️ 1社の報道</span>';
+  const gl=g=>`<span class="sm-g" style="color:var(--g-${g}-t,var(--g-${g}))">${esc(GN[g]||"")}</span>`;
+  sh.innerHTML=`<div class="bar no-print"><div class="wrap"><button class="iconbtn" id="smx" aria-label="もどる">← もどる</button><span class="ttl">📰 新聞の形で読む</span><button class="iconbtn" id="smpr">🖨️ 印刷</button></div></div>
+  <div class="wrap body"><article class="shimen" lang="ja">
+    <header class="sm-mast"><div class="sm-logo">まいにちニュース帳</div><div class="sm-date">${esc(D.updatedLabel||"")} ・ 確かめてから載せる、やさしいニュース</div></header>
+    ${w.sky?`<div class="sm-wx">${esc(w.place||"東京")}の天気 ${esc(w.date||"")} : <b>${esc(w.sky)}</b> 最高${esc(w.hi)}℃ / 最低${esc(w.lo)}℃${w.umbrella?` ・ ${esc(w.umbrella)}`:""}</div>`:""}
+    ${top?`<section class="sm-top"><div class="sm-kicker">${esc(top.label||"")}</div><h2>${esc(top.title||top.t||"")}</h2><p>${esc(top.text||top.x||"")}</p></section>`:""}
+    ${T.length>1?`<div class="sm-sub">${T.slice(1).map(t=>`<section><div class="sm-kicker">${esc(t.label||"")}</div><h3>${esc(t.title||t.t||"")}</h3><p>${esc(t.text||t.x||"")}</p></section>`).join("")}</div>`:""}
+    ${N&&N.value?`<aside class="sm-num"><div class="sm-kicker">今日の数字</div><b>${esc(N.value)}<small>${esc(N.unit||"")}</small></b><p>${esc(N.caption||"")}</p></aside>`:""}
+    <h2 class="sm-sec">今日のニュース10</h2>
+    <div class="sm-cols">${D.top10.map((n,i)=>`<section class="sm-it"><div class="sm-meta"><span class="sm-no">${i+1}</span>${gl(n.g)}${bd(n)}</div><h3>${esc(n.title)}</h3>${n.text?`<p>${esc(n.text)}</p>`:""}</section>`).join("")}</div>
+    <footer class="sm-foot">出典は、アプリの各ニュースの「🕒 日付・報道機関」と解説ページにあります。記事の文章は写さず、要点をまとめています。</footer>
+  </article></div>`;
+  sh.hidden=false; sh.scrollTop=0; document.body.style.overflow="hidden";
+  const close=()=>{ sh.hidden=true; sh.innerHTML=""; document.body.style.overflow=""; document.body.classList.remove("printing-sm"); };
+  sh.querySelector("#smx").onclick=close; sh.querySelector("#smx").focus();
+  sh.querySelector("#smpr").onclick=()=>{ document.body.classList.add("printing-sm"); setTimeout(()=>{ try{ window.print(); }catch(_){} setTimeout(()=>document.body.classList.remove("printing-sm"),500); },50); };
+  track("/shimen","新聞の形で読む"); }
+document.addEventListener("click",e=>{ const b=e.target.closest("[data-shimen]"); if(!b) return; e.preventDefault(); openShimen(); });
 // ===== お知らせ(新しくなったところ)。機能を足したら、いちばん上に1つ足す =====
 const UPDATES=[
+  {id:"2026-10-25e",d:"2026-10-25",t:"🗞️ 新聞の形で読めるように",L:["「今日のニュース10」の上の「🗞️ 新聞の形で読む」で、今日の3行・今日の数字・ニュース10を、紙の新聞のような1枚で読めます。「🖨️ 印刷」で紙にもできます。","「さがす」に「🔥 この2日でよく出ていることば」を出しました。押すと、そのことばのニュースが集まります。"]},
   {id:"2026-10-25d",d:"2026-10-25",t:"📖 解説のページを読みやすくしました",L:["上に写真と大きな見出し、そのすぐ下に「ひとことで言うと」。このページの中身(4コマ・くわしく・影響・疑問・流れ・これから)へ1タップで飛べるボタンと、どこまで読んだかがわかる細い線をつけました。","大事な文には蛍光ペンの線、長い文は2文ずつに区切り、「わたしたちへの影響」は1つずつのカードにしました。4コマの文字が上の「もどる」に重なっていたのも直しました。"]},
   {id:"2026-10-25c",d:"2026-10-25",t:"🧮 いろいろな暮らしに合わせられるように",L:["もしも計算機の燃料を、レギュラー・ハイオク・軽油・灯油・電気(EVの充電)から選べるようにしました。海外旅行は、ドルのほかにユーロ・ウォン・人民元など8つのお金で計算できます。","「🙋 わたしに関係あるニュース」の立場を16こに増やしました(自営業・電車やバスで通う・家族の介護・病院によく行く・障がいのある人とその家族・持ち家・投資・農業や漁業・ペットなど)。文字の大きさに「もっと大きく」を足しました。"]},
   {id:"2026-10-25b",d:"2026-10-25",t:"📖 新しい読み方が4つ増えました",L:["「✨ おたのしみ」に、📖 連載で読む(大きな話題を1日1話ずつ)、🕳️ 見出しの穴うめ、🧮 わが家の計算機、🎓 ニュース検定(3級から1級まで)を足しました。","解説ページの「わたしたちへの影響」の下で、🧑‍🤝‍🧑 立場ごとに(学生・働いている人・子育て中など)分けて見られます。どれも、もとの記事や解説に書いてあることだけを使っています。"]},
@@ -5338,9 +5396,9 @@ document.addEventListener("click",ev=>{ const x=ev.target.closest("[data-alx]");
 document.addEventListener("keydown",ev=>{ if((ev.key==="Enter"||ev.key===" ")&&ev.target.matches&&ev.target.matches(".al-band[data-quake]")){ ev.preventDefault(); openQuake(); } });
 try{ loadAlerts(); setInterval(()=>{ if(document.visibilityState==="visible") loadAlerts(); },3*60*1000); document.addEventListener("visibilitychange",()=>{ if(document.visibilityState==="visible") loadAlerts(); }); }catch(_){}
 // テスト用の手がかり(localhost で動かしたときだけ。本番では出さない)
-if(/^(localhost|127\.0\.0\.1)$/.test(location.hostname)) window.NW_TEST={petSVG,PET_KINDS,PET_COLORS,petColorsFor,WEAR,petStage,petXP,petKind,petHall,petName,petRestart,get ME(){return ME;},get LOOK(){return LOOK;},TOPIC_GROUPS,FUN,SECS,openFun,openEx,fillQs,hhNews,ktQs,serialChapters,go,openLife};
+if(/^(localhost|127\.0\.0\.1)$/.test(location.hostname)) window.NW_TEST={petSVG,PET_KINDS,PET_COLORS,petColorsFor,WEAR,petStage,petXP,petKind,petHall,petName,petRestart,get ME(){return ME;},get LOOK(){return LOOK;},TOPIC_GROUPS,FUN,SECS,openFun,openEx,fillQs,hhNews,ktQs,serialChapters,go,openLife,trendWords,openShimen};
 const h=(location.hash||"").slice(1);
-if(h==="quake"){ go("today"); setTimeout(openQuake,50); } else if(D.explainers[h]){ go("explain"); openEx(h); }
+if(h==="quake"){ go("today"); setTimeout(openQuake,50); } else if(h==="shimen"){ go("today"); setTimeout(openShimen,50); } else if(D.explainers[h]){ go("explain"); openEx(h); }
 else if(h.startsWith("t=")) openTHash(h);
 else go(TABS.some(t=>t[0]===h)?h:"today");
 // 送られてきたリンク(#t=…)で開いたら、そのニュースまで連れていく。アプリを開いたままリンクを押したときも
