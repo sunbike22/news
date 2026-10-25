@@ -1332,6 +1332,29 @@ ul.ex-rel{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;
 "use strict";
 const D = window.NEWS_DATA;
 const main = document.getElementById("main");
+// ===== 上に重なる画面(#sheet)の「← もどる」を、ひとつ前の画面にもどす =====
+// 画面の上で別の画面を開いたら、前の画面(中身・押せるところ・どこまで読んだか)をそのまま取っておき、
+// 「← もどる」で順にもどす。前後の解説・連載の話の切りかえ(横の移動)は SH_SIDE=true にして取っておかない。
+let SH_SIDE=false; const SH_STACK=[]; let SH_PEND=false;
+(function(){ const SH=document.getElementById("sheet"); if(!SH) return;
+  const iH=Object.getOwnPropertyDescriptor(Element.prototype,"innerHTML"); const hd=Object.getOwnPropertyDescriptor(HTMLElement.prototype,"hidden");
+  // 同じ画面の描きなおし(タイトルが同じ)は取っておかない
+  window.shTitle=v=>{ const m=/class="ttl"[^>]*>([\s\S]*?)<\/span>/.exec(v||""); if(!m) return null; const d=document.createElement("div"); iH.set.call(d,m[1]); return d.textContent.trim(); };
+  const restore=()=>{ SH_PEND=false; const p=SH_STACK.pop(); if(!p){ hd.set.call(SH,true); return; }
+    try{ window.speechSynthesis&&window.speechSynthesis.cancel(); }catch(_){}
+    iH.set.call(SH,""); SH.appendChild(p.frag); hd.set.call(SH,false); document.body.style.overflow="hidden";
+    SH.scrollTop=p.top; requestAnimationFrame(()=>{ SH.scrollTop=p.top; document.body.style.overflow="hidden"; });
+    const f=SH.querySelector(".bar .iconbtn"); if(f) try{ f.focus({preventScroll:true}); }catch(_){}
+    try{ SH.dispatchEvent(new CustomEvent("sheetback")); }catch(_){} };
+  Object.defineProperty(SH,"hidden",{configurable:true,get(){ return hd.get.call(SH); },
+    set(v){ if(v&&!hd.get.call(SH)&&SH_STACK.length){ if(!SH_PEND){ SH_PEND=true; queueMicrotask(()=>{ if(SH_PEND) restore(); }); } return; } hd.set.call(SH,v); }});
+  Object.defineProperty(SH,"innerHTML",{configurable:true,get(){ return iH.get.call(SH); },
+    set(v){ if(SH_PEND&&!v){ restore(); return; }
+      if(!v){ iH.set.call(SH,v); return; }
+      if(hd.get.call(SH)) SH_STACK.length=0;                       // 閉じた状態から開いた=新しく始める
+      else if(SH.firstChild&&!SH_SIDE&&shTitle(v)!==null&&shTitle(v)!==((SH.querySelector(".bar .ttl")||{}).textContent||"").trim()){ const frag=document.createDocumentFragment(); const top=SH.scrollTop; while(SH.firstChild) frag.appendChild(SH.firstChild); SH_STACK.push({frag,top}); if(SH_STACK.length>8) SH_STACK.shift(); }
+      SH_SIDE=false; iH.set.call(SH,v); }});
+})();
 const GN = {pol:"政治",eco:"経済",soc:"社会・災害",it:"情報・IT",intl:"国際",spo:"スポーツ",sci:"科学・健康",ent:"エンタメ",fas:"ファッション",home:"インテリア・DIY",food:"レシピ・料理",life:"ライフスタイル",trip:"旅行",pred:"予測の判定"};
 const GORDER = ["pol","eco","soc","it","intl","spo","sci","ent","fas","home","food","life","trip"];
 const WD = ["日","月","火","水","木","金","土"];
@@ -2252,12 +2275,12 @@ function exKeys(){ return Object.entries(D.explainers).filter(([,e])=>e&&e.name)
 function exNavHTML(k){ const K=exKeys(); const i=K.indexOf(k); if(i<0||K.length<2) return "";
   const pv=K[(i-1+K.length)%K.length], nx=K[(i+1)%K.length];
   return `<div class="ex-nav"><button class="fchip" data-exgo="${esc(pv)}">← ${esc(D.explainers[pv].icon)} ${esc(D.explainers[pv].name)}</button><button class="fchip" data-exgo="${esc(nx)}">${esc(D.explainers[nx].icon)} ${esc(D.explainers[nx].name)} →</button></div><div class="hint" style="text-align:center">← 画面を横にスワイプしても、前後の解説に移れます →</div>`; }
-function bindExNav(sh,k){ sh.querySelectorAll("[data-exgo]").forEach(b=>b.onclick=()=>{ openEx(b.dataset.exgo); });
+function bindExNav(sh,k){ sh.querySelectorAll("[data-exgo]").forEach(b=>b.onclick=()=>{ SH_SIDE=true; openEx(b.dataset.exgo); });
   // 横スワイプ(年表や地図など、横に動かすものの上では反応しない)
   let st=null; const K=exKeys(); const i=K.indexOf(k); if(i<0||K.length<2) return;
   sh.addEventListener("touchstart",e=>{ if(e.touches.length!==1||e.target.closest(".htl-wrap,.zwrap,.tspark,.chat,textarea,input,.mg,.flow,.board-wrap")){ st=null; return; } st={x:e.touches[0].clientX,y:e.touches[0].clientY,t:Date.now()}; },{passive:true});
   sh.addEventListener("touchend",e=>{ if(!st) return; const t=e.changedTouches[0]; const dx=t.clientX-st.x, dy=t.clientY-st.y; const ok=Math.abs(dx)>90&&Math.abs(dy)<60&&Date.now()-st.t<700; st=null; if(!ok) return;
-    const to=dx<0?K[(i+1)%K.length]:K[(i-1+K.length)%K.length]; openEx(to); toast((dx<0?"次":"前")+"の解説へ"); },{passive:true}); }
+    const to=dx<0?K[(i+1)%K.length]:K[(i-1+K.length)%K.length]; SH_SIDE=true; openEx(to); toast((dx<0?"次":"前")+"の解説へ"); },{passive:true}); }
 // ===== 🧩 ならべかえ: 年表から4つを取り出して、起きた順にタップ(解説に書いてあることだけ) =====
 function orderQuizHTML(e,k){ const T=(e.timeline||[]).filter(x=>x[1]&&x[1].length<=46); if(T.length<4) return "";
   const r=seeded("oq"+k+TODAY); const idx=[...T.keys()]; const pick=[]; while(pick.length<4&&idx.length){ pick.push(idx.splice(Math.floor(r()*idx.length),1)[0]); }
@@ -4239,7 +4262,7 @@ function openSerial(k,ch){ const e=D.explainers[k]; const C=serialChapters(k); i
   sh.hidden=false; sh.scrollTop=0; document.body.style.overflow="hidden";
   const close=()=>{ sh.hidden=true; sh.innerHTML=""; document.body.style.overflow=""; };
   sh.querySelector("#srx").onclick=close; sh.querySelector("#srx").focus();
-  sh.querySelectorAll("[data-srch]").forEach(b=>b.onclick=()=>openSerial(k,+b.dataset.srch));
+  sh.querySelectorAll("[data-srch]").forEach(b=>b.onclick=()=>{ SH_SIDE=true; openSerial(k,+b.dataset.srch); });
   const ex=sh.querySelector("#srEx"); if(ex) ex.onclick=()=>{ close(); openEx(k); };
   track("/serial/"+k,"連載で読む"); }
 function serialCard(){ const L=Object.entries(D.explainers).filter(([k])=>serialChapters(k).length>=3);
@@ -4248,6 +4271,8 @@ function serialCard(){ const L=Object.entries(D.explainers).filter(([k])=>serial
     <ul class="sr-list">${L.map(([k,e])=>{ const C=serialChapters(k); const s=serialState(k); const av=serialAvail(k); const nw=av>s.n;
       return `<li><button class="sr-pick" data-serial="${k}"><span class="sr-ic">${e.icon}</span><span><b>${esc(e.name)}</b><small>${s.n>=C.length?"✅ 読み終わり":s.n?`第${s.n}話まで読んだ ・ 全${C.length}話`:`全${C.length}話`}${e.status==="done"?" ・ 一区切り":""}</small></span>${nw?`<i class="sr-new">新しい話</i>`:""}</button></li>`; }).join("")}</ul></section>`; }
 document.addEventListener("click",e=>{ const b=e.target.closest("[data-serial]"); if(!b) return; e.preventDefault(); openSerial(b.dataset.serial); });
+// もどってきたとき、連載の一覧の「第◯話まで読んだ」を新しくする
+document.getElementById("sheet").addEventListener("sheetback",()=>{ const L=document.querySelector("#sheet .sr-list"); const sec=L&&L.closest("section"); if(!sec) return; const t=document.createElement("div"); t.innerHTML=serialCard(); if(t.firstElementChild) sec.replaceWith(t.firstElementChild); });
 
 // ===== 🕳️ 見出しの穴うめ(今日のニュース10の見出しの一部をかくして、先に考えてから読む) =====
 // 答えも、ちがう選択肢も、今日のほかの見出しにあることばだけを使う(作ったことばは入れない)
@@ -4401,6 +4426,7 @@ function openShimen(){ const sh=document.getElementById("sheet"); const w=D.weat
 document.addEventListener("click",e=>{ const b=e.target.closest("[data-shimen]"); if(!b) return; e.preventDefault(); openShimen(); });
 // ===== お知らせ(新しくなったところ)。機能を足したら、いちばん上に1つ足す =====
 const UPDATES=[
+  {id:"2026-10-26a",d:"2026-10-26",t:"← もどる で、ひとつ前の画面にもどるように",L:["連載・解説・おたのしみなどで、上に重ねて開いた画面の「← もどる」を押すと、いきなり最初の画面ではなく、ひとつ前の画面(読んでいた場所のまま)にもどるようにしました。"]},
   {id:"2026-10-25e",d:"2026-10-25",t:"🗞️ 新聞の形で読めるように",L:["「今日のニュース10」の上の「🗞️ 新聞の形で読む」で、今日の3行・今日の数字・ニュース10を、紙の新聞のような1枚で読めます。「🖨️ 印刷」で紙にもできます。","「さがす」に「🔥 この2日でよく出ていることば」を出しました。押すと、そのことばのニュースが集まります。"]},
   {id:"2026-10-25d",d:"2026-10-25",t:"📖 解説のページを読みやすくしました",L:["上に写真と大きな見出し、そのすぐ下に「ひとことで言うと」。このページの中身(4コマ・くわしく・影響・疑問・流れ・これから)へ1タップで飛べるボタンと、どこまで読んだかがわかる細い線をつけました。","大事な文には蛍光ペンの線、長い文は2文ずつに区切り、「わたしたちへの影響」は1つずつのカードにしました。4コマの文字が上の「もどる」に重なっていたのも直しました。"]},
   {id:"2026-10-25c",d:"2026-10-25",t:"🧮 いろいろな暮らしに合わせられるように",L:["もしも計算機の燃料を、レギュラー・ハイオク・軽油・灯油・電気(EVの充電)から選べるようにしました。海外旅行は、ドルのほかにユーロ・ウォン・人民元など8つのお金で計算できます。","「🙋 わたしに関係あるニュース」の立場を16こに増やしました(自営業・電車やバスで通う・家族の介護・病院によく行く・障がいのある人とその家族・持ち家・投資・農業や漁業・ペットなど)。文字の大きさに「もっと大きく」を足しました。"]},
@@ -4515,7 +4541,7 @@ function openFun(k){ const f=FUN.find(x=>x[0]===k); if(!f) return; if(f[4]){ f[4
   const close=()=>{ sh.hidden=true; sh.innerHTML=""; document.body.style.overflow=""; go("today",{keepScroll:true}); };
   sh.querySelector("#fnx").onclick=close; sh.hidden=false; sh.scrollTop=0; document.body.style.overflow="hidden";
   bindKnow(); bindTalk(); bindReporter(); bindGacha(); bindLocal(); bindAssoc(); bindBattle(); bindKw(); if(k==="picks"&&PK){ ME.pickSeen=PK.updated; saveMe(); bindPicks(true); }
-  sh.querySelectorAll("[data-ex]").forEach(b=>b.onclick=()=>{ sh.hidden=true; openEx(b.dataset.ex); });
+  sh.querySelectorAll("[data-ex]").forEach(b=>b.onclick=()=>{ openEx(b.dataset.ex); });
   sh.querySelectorAll("[data-mood]").forEach(b=>b.onclick=()=>{ close(); sState.q=""; sState.th=""; sState.ok=false; sState.onlyNew=false; sState.g=new Set([b.dataset.mood]); go("search"); });
   sh.querySelectorAll("[data-funsel]").forEach(b=>b.onclick=()=>{ const [set,sub]=b.dataset.funsel.split(":"); FUN_SEL[set]=sub; openFun(set); });
   track("/fun/"+k,"おたのしみ"); }
