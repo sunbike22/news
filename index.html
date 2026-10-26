@@ -2576,14 +2576,14 @@ function longChart(){
     const note=document.getElementById("lsNote"), sum=document.getElementById("lsSum");
     if(lsState.s!=="yen"){ sum.innerHTML=""; if(chart){chart.destroy();chart=null;} note.textContent="数時間ごとの値は、いまは「1ドル(円)」だけです。日経平均と原油は、無料で確かなデータが1日1回分しか取れないためです。"; return; }
     const T=(D.ticks||[]).filter(t=>Date.parse(t[0])>Date.now()-7*864e5);
-    if(T.length<2){ sum.innerHTML=""; if(chart){chart.destroy();chart=null;} note.textContent="数時間ごとの記録を集めはじめたところです。1日4回(サイトの更新のたび)1点ずつ増えていきます。"; return; }
+    if(T.length<2){ sum.innerHTML=""; if(chart){chart.destroy();chart=null;} note.textContent="数時間ごとの記録を集めはじめたところです。1日5回(サイトの更新のたび)1点ずつ増えていきます。"; return; }
     const lab=t=>{ const d=new Date(Date.parse(t)+9*3600e3); return `${d.getUTCMonth()+1}/${d.getUTCDate()} ${d.getUTCHours()}時`; };
     const first=T[0][1], last=T[T.length-1][1], diff=last-first;
     sum.innerHTML=`<div><span class="hint">この間の変化</span><b class="${diff>=0?'up':'dn'}">${diff>=0?"▲":"▼"}${Math.abs(diff).toFixed(2)}円</b></div><div><span class="hint">いま</span><b>${last.toFixed(2)}円</b><small class="hint">${lab(T[T.length-1][0])}</small></div><div><span class="hint">記録した点</span><b>${T.length}点</b><small class="hint">直近7日</small></div>`;
     const col=css("--g-eco");
     if(chart) chart.destroy();
     chart=new Chart(document.getElementById("cl"),{type:"line",data:{labels:T.map(t=>lab(t[0])),datasets:[{data:T.map(t=>t[1]),borderColor:col,backgroundColor:col+"22",fill:true,tension:.2,pointRadius:3,borderWidth:2}]},options:{maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.raw.toFixed(2)+"円"}}},scales:{x:{grid:{display:false},ticks:{maxTicksLimit:5}},y:{grid:{color:css("--line")},ticks:{callback:v=>v.toFixed(1)+"円"}}}}}); charts.push(chart);
-    note.textContent="1ドルあたりの円(日本時間)。出典: Alpha Vantage(その時点の為替レート)。サイトの更新(1日4回)のたびに1点ずつ記録しています。";
+    note.textContent="1ドルあたりの円(日本時間)。出典: Alpha Vantage(その時点の為替レート)。サイトの更新(1日5回)のたびに1点ずつ記録しています。";
   }
   draw();
 }
@@ -2753,7 +2753,7 @@ function renderWords(){
 // ===== フッター・設定 =====
 function footer(){ return `<footer class="foot">
   <div><b>このページについて</b> 毎日のニュースを、複数の報道機関で確かめてやさしくまとめています。✅=別々の2社以上で確認 ／ ⚠️=1社だけ・見出しだけ。SNSだけの情報やうわさは載せていません。</div>
-  <div>更新は1日4回(朝6:50・昼12:30・夕方5:50・夜10:30ごろ)。次の更新: ${esc(D.nextLabel)}</div>
+  <div>更新は1日5回(朝6:50・昼12:30・午後3:00・夕方5:50・夜10:30ごろ)。次の更新: ${esc(D.nextLabel)}</div>
   <details><summary style="cursor:pointer">✏️ 訂正の記録</summary><ul class="us" style="margin-top:6px">${D.corrections.map(c=>`<li>${esc(c[0])} ${esc(c[1])}</li>`).join("")}</ul></details>
   <div>まとめ: Claude(AI)。記事の文章はそのまま写さず、要点と出典を載せています。</div>
 </footer>`; }
@@ -4430,6 +4430,7 @@ function openShimen(){ const sh=document.getElementById("sheet"); const w=D.weat
 document.addEventListener("click",e=>{ const b=e.target.closest("[data-shimen]"); if(!b) return; e.preventDefault(); openShimen(); });
 // ===== お知らせ(新しくなったところ)。機能を足したら、いちばん上に1つ足す =====
 const UPDATES=[
+  {id:"2026-10-27a",d:"2026-10-27",t:"🕒 更新が1日5回に",L:["ニュースの更新に、午後3時ごろの回を足しました(朝・昼・午後・夕方・夜)。","1回ごとに見くらべる報道機関の数もふやしています。"]},
   {id:"2026-10-26b",d:"2026-10-26",t:"🧹 見やすさの整理",L:["「今日のニュース10」の上の「新聞の形で読む」「自分に関係あるものに印」をボタンにして押しやすくしました。設定の目次に絵をそろえ、「アプリのボタンを置く」の案内を読みやすくしました。","NY原油の値が数日前のままのときは「最新は確認中」と出るようにしました。"]},
   {id:"2026-10-26a",d:"2026-10-26",t:"← もどる で、ひとつ前の画面にもどるように",L:["連載・解説・おたのしみなどで、上に重ねて開いた画面の「← もどる」を押すと、いきなり最初の画面ではなく、ひとつ前の画面(読んでいた場所のまま)にもどるようにしました。"]},
   {id:"2026-10-25e",d:"2026-10-25",t:"🗞️ 新聞の形で読めるように",L:["「今日のニュース10」の上の「🗞️ 新聞の形で読む」で、今日の3行・今日の数字・ニュース10を、紙の新聞のような1枚で読めます。「🖨️ 印刷」で紙にもできます。","「さがす」に「🔥 この2日でよく出ていることば」を出しました。押すと、そのことばのニュースが集まります。"]},
@@ -4586,7 +4587,7 @@ const GUIDE = [
   ["💬","聞いてみる",["右下の<b>💬</b>で「ニュース案内係」に質問できます。解説のQ&A・ことば辞典・ニュースの記録から、アプリの中で答えをさがします(質問はどこにも送りません)。","もっと深く知りたいときは「Claudeでもっと深く聞く」で、Claude(AI)に聞けます(アプリの外で開きます)。"]],
   ["🎨","自分好みにする",["「マイ」の<b>🎨 着せかえ</b>で、色・文字の大きさ・詰め具合・「きょう」の並び・下のタブの並びを変えられます。","右上の<b>「設定」</b>で、文字の大きさと明るさをすぐ変えられます。"]],
   ["📲","スマホの画面にボタンを置く",["iPhone: 画面の下の「□に↑」のマーク →「ホーム画面に追加」。","Android: 画面の右上の「︙」→「ホーム画面に追加」。","一度開いた内容は、電波がないところでも読めます。"]],
-  ["🔒","記録について",["あなたの記録・保存・着せかえは、<b>このスマホ(ブラウザ)の中だけ</b>に保存されます。ほかの人や作った人には見えません。",...(STATS.on&&STATS.code?["サイトをよくするため、<b>どの画面・解説・ジャンルが何回開かれたか</b>だけを数えています(だれが見たかはわかりません)。質問の文章やメモは送りません。"]:[]),"更新は1日4回(朝・昼・夕方・夜)です。"]]
+  ["🔒","記録について",["あなたの記録・保存・着せかえは、<b>このスマホ(ブラウザ)の中だけ</b>に保存されます。ほかの人や作った人には見えません。",...(STATS.on&&STATS.code?["サイトをよくするため、<b>どの画面・解説・ジャンルが何回開かれたか</b>だけを数えています(だれが見たかはわかりません)。質問の文章やメモは送りません。"]:[]),"更新は1日5回(朝・昼・午後・夕方・夜)です。"]]
 ];
 function guideBlock(){
   return `<details class="faq plain" id="guide"><summary>📘 このアプリの使い方</summary>
@@ -5024,7 +5025,7 @@ document.getElementById("bellBtn").onclick=openUpdates; markBell();
 document.getElementById("gdFab").onclick=openGuide;
 
 // (1時間ごとの天気は下の loadAlerts のあとに)
-// ===== 地震・津波・特別警報(気象庁発表)。1日4回の更新を待たずに、開いたときに直接読む =====
+// ===== 地震・津波・特別警報(気象庁発表)。ニュースの更新を待たずに、開いたときに直接読む =====
 // alert.json は GitHub Actions が10分ごとに気象庁から作る(alerts ブランチ)。地震は P2P地震情報からも直接読み、早い方を使う。
 const ALERT_URL="https://raw.githubusercontent.com/sunbike22/news/alerts/alert.json";
 const P2P_URL="https://api.p2pquake.net/v2/history?codes=551&codes=552&limit=12";
@@ -5396,7 +5397,7 @@ function openQuake(refresh){ const sh=document.getElementById("sheet"); sh.datas
    <button class="fchip fl-go" data-world="1">🌍 世界のいま<small>世界の地震・台風・山火事と、ニュースのあった場所</small></button>
    <button class="fchip fl-go" data-felt="1">👥 みんなの「ゆれた」<small>いま、どこでゆれを感じた人が多いか(利用者の報告・目安)</small></button>
    <div class="bs-go"><button class="fchip" data-bmap="rain">☔ 雨雲レーダー<small>いまと1時間先の雨</small></button><button class="fchip" data-bmap="shelter">🏃 にげる場所<small>近くの避難場所</small></button><button class="fchip" data-bmap="flood">🌊 水につかる所<small>川があふれたら</small></button><button class="fchip" data-bmap="dosha">⛰️ がけ崩れの所<small>土砂災害の区域</small></button></div>
-   <p class="hint">気象庁の発表を、アプリを開いたときに直接読んでいます(ニュースの1日4回の更新を待ちません)。開いている間は、新しい知らせもすぐ受けとります。${AL.checked?`最後に確かめた時刻: ${qhm(AL.checked)}`:""}${AL.ok?"":" ・ <b>いま読み込めませんでした。下の公式ページで確かめてください。</b>"}</p>
+   <p class="hint">気象庁の発表を、アプリを開いたときに直接読んでいます(ニュースの更新を待ちません)。開いている間は、新しい知らせもすぐ受けとります。${AL.checked?`最後に確かめた時刻: ${qhm(AL.checked)}`:""}${AL.ok?"":" ・ <b>いま読み込めませんでした。下の公式ページで確かめてください。</b>"}</p>
    ${tsu?`<div class="al-band" style="cursor:default"><span class="ai">🌊</span><span><b>${esc(tsu.grade)}</b><small>${esc(tsu.areas.join("・"))}${tsu.count>tsu.areas.length?" ほか":""}</small></span></div>`:`<p>🌊 津波の警報・注意報は、いま出ていません。</p>`}
    ${sp.map(x=>`<div class="al-band" style="cursor:default;margin-top:8px"><span class="ai">⚠️</span><span><b>特別警報</b><small>${esc(x.who||"")} ${esc(x.text||"")}</small></span></div>`).join("")}
    <h3 style="margin:18px 0 6px">⚠️ ${esc(prefNow())}への気象庁のよびかけ</h3>

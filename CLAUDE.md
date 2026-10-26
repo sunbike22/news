@@ -1,7 +1,7 @@
 # まいにちニュース帳 — Claude Code 向けのルール帳
 
 毎日のニュースを、やさしい言葉でまとめたウェブサイト。GitHub Pages で公開している。
-元のデータは Notion の「ニュース」ページとデータベース。1日4回の自動更新でまとめている。
+元のデータは Notion の「ニュース」ページとデータベース。1日5回(朝・昼・午後・夕方・夜)の自動更新でまとめている(2026-10-27〜。午後14:49の回とサイト更新15:25を追加)。
 
 ## ファイル
 - `index.html` — 見た目と動き(HTML・CSS・JavaScript を1ファイルに)。外部ライブラリは Chart.js・地図用の d3/topojson(jsDelivr。どれも使うページを開いたときだけ `loadScript`/`loadChart` で読む。最初の表示を軽くするため、head で読み込まない)、Google Fonts(見出し用の Dela Gothic One だけ。本文はスマホに入っている文字)、閲覧数の GoatCounter(gc.zgo.at)だけ。データの読み込み先は、地震・警報の raw.githubusercontent.com(alerts ブランチ)と api.p2pquake.net、地域の天気の api.open-meteo.com(わたしの街が東京以外のときだけ)、ドライブ保存の accounts.google.com・www.googleapis.com(見る人がつないだときだけ)。
