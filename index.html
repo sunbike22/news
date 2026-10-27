@@ -55,9 +55,12 @@
   color-scheme:dark}
 :root[data-size="l"]{--fs:18px} :root[data-size="xl"]{--fs:20px} :root[data-size="xxl"]{--fs:23px}
 *{box-sizing:border-box}
+/* ボタン・札・見出しは、ことばの途中で折り返さない(「1本ガ/チャ」「読み上/げ」のようにならない)。折り返すのは空白のところだけ。それでも入らないときだけ、ことばの途中で折る(2026-10-27) */
+.toast,.seg button,.fchip,.chip,.sub,.jmp,.sbtn,.iconbtn,.tabs button,h2,h3,.ttl,.wx-sky,[class^="res-"],[class*=" res-"]{word-break:keep-all;overflow-wrap:break-word}
+.fchip,.chip,.jmp{max-width:100%}
 [hidden]{display:none!important}
 body{margin:0}
-html{-webkit-text-size-adjust:100%}
+html{-webkit-text-size-adjust:100%;font-size:var(--fs)} /* rem で書いた文字も「文字の大きさ」の設定で大きくなるように(2026-10-27) */
 body{background:var(--bg);color:var(--ink);font-family:var(--f-body);font-size:var(--fs);line-height:1.7;margin:0;padding-bottom:calc(76px + env(safe-area-inset-bottom,0px))}
 body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:30;background:var(--surface)}
 button{font:inherit;color:inherit}
@@ -91,7 +94,7 @@ h1,h2,h3{line-height:1.35;margin:0;word-break:auto-phrase;text-wrap:pretty;line-
 
 main{padding-block:18px 32px}
 .view{display:flex;flex-direction:column;gap:22px}
-.sec-h{display:flex;align-items:baseline;gap:10px;justify-content:space-between}
+.sec-h{display:flex;flex-wrap:wrap;align-items:baseline;gap:4px 10px;justify-content:space-between}
 .sec-h h2{font-size:1.2rem}
 .sec-h .sub{font-size:.86rem;color:var(--muted)}
 .hint{font-size:.88rem;color:var(--muted)}
@@ -131,11 +134,11 @@ main{padding-block:18px 32px}
 .zc button{min-width:42px;height:40px;padding:0 10px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font-size:1rem;font-weight:800;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center}
 .zc button.zre{font-size:.86rem}
 .zc button[disabled]{opacity:.4;cursor:default}
-.wx-top{display:grid;grid-template-columns:auto 1fr auto;gap:12px;align-items:center}
+.wx-top{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:12px;align-items:center}
 .wx-ic{font-size:2.6rem;line-height:1}
 .wx-place{font-size:.88rem;color:var(--muted);font-weight:700}
 .wx-sky{font-size:1.2rem;font-weight:800;line-height:1.3}
-.wx-t{text-align:right;line-height:1.1}.wx-t b{display:block;font-size:2rem;color:#e5484d}.wx-t span{font-size:1.1rem;color:#3b82f6;font-weight:700}
+.wx-t{text-align:right;line-height:1.1}.wx-t b{display:block;font-size:min(2rem,38px);color:#e5484d}.wx-t span{font-size:1.1rem;color:#3b82f6;font-weight:700}
 .wx-um{font-weight:700;font-size:1.02rem;background:var(--accent-soft);border-radius:10px;padding:6px 10px}
 .wx-kit{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:.92rem}
 .wx-kit b{font-weight:800}
@@ -803,8 +806,8 @@ details.faq p{margin:10px 0 12px}
 .story .bars i{flex:1;height:4px;border-radius:2px;background:rgba(255,255,255,.25);overflow:hidden}
 .story .bars i b{display:block;height:100%;width:0;background:#fff}
 .story .ctl{display:flex;align-items:center;gap:8px;padding:4px max(14px,env(safe-area-inset-right,0px)) 0 max(14px,env(safe-area-inset-left,0px))}
-.story .ctl .lbl{font-size:.86rem;opacity:.75;margin-right:auto}
-.story .sbtn{border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.08);color:#fff;border-radius:999px;height:36px;min-width:36px;padding:0 12px;cursor:pointer;font-size:.9rem}
+.story .ctl .lbl{font-size:13px;opacity:.75;margin-right:auto;white-space:nowrap}
+.story .sbtn{border:1px solid rgba(255,255,255,.3);background:rgba(255,255,255,.08);color:#fff;border-radius:999px;height:36px;min-width:36px;padding:0 12px;cursor:pointer;font-size:14px;white-space:nowrap}
 .story .stage{flex:1;position:relative;overflow:hidden}
 .story .slide{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;gap:14px;padding:24px max(26px,env(safe-area-inset-right,0px)) 24px max(26px,env(safe-area-inset-left,0px));max-width:680px;margin:0 auto}
 .story .kick{font-size:.9rem;letter-spacing:.12em;opacity:.75;font-weight:700}
@@ -825,7 +828,8 @@ details.faq p{margin:10px 0 12px}
 
 .foot{font-size:.86rem;color:var(--muted);display:flex;flex-direction:column;gap:6px;border-top:1px solid var(--line);padding-top:14px}
 .setrow{display:flex;gap:8px;flex-wrap:wrap;align-items:center}
-.seg{display:inline-flex;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.seg{display:inline-flex;flex-wrap:wrap;max-width:100%;border:1px solid var(--line);border-radius:10px;overflow:hidden}
+.fun-seg{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));width:100%}
 .seg button{border:0;background:var(--surface);padding:6px 12px;cursor:pointer;font-size:.9rem}
 .seg button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
@@ -985,7 +989,7 @@ svg.eat{animation:petEat .7s ease both!important}
 .ten li.w2 .row{padding-top:14px;padding-bottom:14px}.ten li.w3{}.ten li.w3 h3{font-size:1.12rem}
 .ten li.mytown{border-left:4px solid var(--accent)}
 .wc-b em{display:block;margin-top:4px;font-style:normal;color:#ffd34d}
-.sugo{display:grid;grid-template-columns:repeat(8,1fr);gap:4px}
+.sugo{display:grid;grid-template-columns:repeat(8,minmax(0,1fr));gap:4px}
 .sg{position:relative;aspect-ratio:1;border-radius:8px;background:var(--surface2);border:1px solid var(--line);display:grid;place-items:center}
 .sg small{position:absolute;top:1px;left:3px;font-size:.82rem;font-weight:800;line-height:1;color:var(--muted)}
 .sg.done{background:var(--accent-soft)}.sg.here{border:2px solid var(--accent)}.sg.goal{font-size:1.2rem}
@@ -1046,7 +1050,7 @@ svg.eat{animation:petEat .7s ease both!important}
 .oq-it .oq-no{position:absolute;left:10px;top:50%;transform:translateY(-50%);width:22px;height:22px;border-radius:999px;background:var(--g-eco);color:#fff;font-weight:800;font-size:.82rem;display:flex;align-items:center;justify-content:center}
 .oq-it .oq-d{display:block;color:var(--muted);font-size:.82rem;margin-top:2px}
 .ex-nav{display:flex;gap:8px;justify-content:space-between;margin-top:6px}
-.ex-nav .fchip{flex:1;min-height:44px;white-space:normal;line-height:1.3}
+.ex-nav .fchip{flex:1;min-width:0;min-height:44px;white-space:normal;line-height:1.3;word-break:normal}
 /* 🌍 ことばで世界一周 */
 .lg-head{display:flex;align-items:center;gap:12px;margin-bottom:8px}
 .lg-head .lg-av{flex:none;width:72px;height:72px}
@@ -1216,11 +1220,11 @@ svg.eat{animation:petEat .7s ease both!important}
 .fill-h{font-size:1.12rem;line-height:1.7;letter-spacing:.02em}
 .role .role-r{margin-top:8px}.role .role-r b{font-size:.95rem}.role .us{margin-top:4px}
 .role-me{font-size:.82rem;background:var(--accent-soft);color:var(--accent-ink,var(--accent));border-radius:99px;padding:1px 8px;margin-left:4px}
-.hh-r{border-top:1px solid var(--line);padding:10px 0;display:grid;grid-template-columns:1fr;gap:6px}
+.hh-r{border-top:1px solid var(--line);padding:10px 0;display:grid;grid-template-columns:minmax(0,1fr);gap:6px}
 .hh-n{grid-column:1/-1;font-weight:700}
 .hh-f{display:flex;align-items:center;gap:6px;font-size:.86rem;color:var(--muted)}
 .hh-f>span:first-child{min-width:5.6em}
-.hh-f input,.hh-f select{flex:1;min-width:0;font:inherit;font-size:1rem;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:8px;min-height:44px}
+.hh-f input,.hh-f select{flex:1;min-width:0;width:0;font:inherit;font-size:1rem;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:8px;min-height:44px}
 .hh-o{grid-column:1/-1;font-weight:700;color:var(--accent-on-surface,var(--accent))}
 .hh-o:empty{display:none}
 .hh-sum{margin-top:8px;padding:10px 12px;border-radius:10px;background:var(--surface2);font-size:.95rem}
@@ -1232,7 +1236,8 @@ svg.eat{animation:petEat .7s ease both!important}
 .kt-b.now{border:2px solid var(--accent)}.kt-b.ok{background:var(--ok-soft);border-color:var(--ok)}
 .kt-cert{margin-top:8px;border:3px double #b8862b;border-radius:12px;padding:14px;text-align:center;background:var(--surface2)}
 .kt-cert b{display:block;font-size:1.6rem;margin:4px 0}.kt-cert small{color:var(--muted)}
-:root[data-size="xxl"] .top .upd{font-size:13px} :root[data-size="xxl"] .brand{font-size:16px} :root[data-size="xxl"] .top .iconbtn{font-size:15px}
+/* 上のヘッダーは文字の大きさの設定によらず同じ大きさ(大きくすると「設定」が画面の外に出る) */
+:root[data-size] .top .upd{font-size:13px} :root[data-size] .brand{font-size:16px} :root[data-size] .top .iconbtn{font-size:15px}
 /* 解説ページ: 読みやすさ(2026-10-25) */
 .sheet .bar{z-index:30}
 .mg-p{isolation:isolate}
@@ -4436,6 +4441,7 @@ function openShimen(){ const sh=document.getElementById("sheet"); const w=D.weat
 document.addEventListener("click",e=>{ const b=e.target.closest("[data-shimen]"); if(!b) return; e.preventDefault(); openShimen(); });
 // ===== お知らせ(新しくなったところ)。機能を足したら、いちばん上に1つ足す =====
 const UPDATES=[
+  {id:"2026-10-27d",d:"2026-10-27",t:"🔠 「文字の大きさ」がアプリ全体に効くように",L:["「大きく」「もっと大きく」にしても、カードの見出しやボタンの文字が大きくならないところがありました。いまはアプリ中の文字が大きくなります。","ボタンの名前がことばの途中で折り返す(「1本ガ/チャ」など)のも直しました。"]},
   {id:"2026-10-27c",d:"2026-10-27",t:"👆 「知ってた?」の文字の重なりを直しました",L:["見出しが長いとき、カードの文字が下のボタンに重なっていました。カードの高さを見出しに合わせて伸ばすようにしました。"]},
   {id:"2026-10-27b",d:"2026-10-27",t:"🗺️ ペットの旅を直しました",L:["秋田・山形・青森・岩手・宮城・福島・新潟・東北が「世界」に入っていたのを、「日本」に直しました。","日本の場所は北から南の順に並びます。"]},
   {id:"2026-10-27a",d:"2026-10-27",t:"🕒 更新が1日5回に",L:["ニュースの更新に、午後3時ごろの回を足しました(朝・昼・午後・夕方・夜)。","1回ごとに見くらべる報道機関の数もふやしています。"]},
