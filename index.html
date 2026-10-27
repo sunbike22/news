@@ -124,11 +124,18 @@ main{padding-block:18px 32px}
 .wx .wx-more{display:none}.wx.open .wx-more{display:flex;flex-direction:column;gap:8px}
 .wx-sum{display:flex;flex-wrap:wrap;gap:6px 10px;align-items:center}
 .wx-tg{align-self:flex-start}
+.notes .nt-list{display:flex;flex-direction:column;margin-top:4px}
+.nt{border-top:1px solid var(--line)}.nt:first-child{border-top:0}
+.nt>summary{list-style:none;display:flex;align-items:center;gap:10px;min-height:48px;padding:6px 0;cursor:pointer}.nt>summary::-webkit-details-marker{display:none}
+.nt>summary .nt-i{font-size:1.3rem;width:1.6em;text-align:center;flex:none}.nt>summary b{flex:1 0 auto;min-width:0;max-width:62%}.nt>summary small{color:var(--muted);font-size:.84rem;flex:1 1 0;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.nt>summary::after{content:"▸";color:var(--muted);transition:transform .2s}.nt[open]>summary::after{transform:rotate(90deg)}
+.nt-b{padding:0 0 10px}.nt-b>section.card,.nt-b>.card{border:0;padding:0;box-shadow:none;background:none;margin:0}.nt-b .season-card{margin:0}
+.wx-foot{display:flex;gap:6px;flex-wrap:wrap;align-items:center;justify-content:space-between}.wx-foot .qk-open{margin-left:auto}
 .wm-svg{display:block;width:100%;height:auto}
 /* 指で拡大縮小・移動できる入れもの */
 .zwrap{position:relative;overflow:hidden;touch-action:pan-y}
 .zwrap.zoomed{touch-action:none;cursor:grab}
-.zwrap > .zin{transform-origin:50% 50%;will-change:transform}
+.zwrap > .zin{transform-origin:50% 50%} /* will-change を付けると、大きくしたときに文字や線がにじむ(1倍のまま拡大される)ので付けない。2026-10-28 */
 .zc{display:flex;align-items:center;gap:6px;flex-wrap:wrap;margin:8px 0 0}
 .zc .zt{font-size:.82rem;color:var(--muted);flex:1;min-width:120px}
 .zc button{min-width:42px;height:40px;padding:0 10px;border-radius:10px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font-size:1rem;font-weight:800;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center}
@@ -303,6 +310,8 @@ main{padding-block:18px 32px}
 @media (prefers-reduced-motion: reduce){#sky .snow,#sky .hana{display:none}}
 .wx-kit .kit{display:inline-flex;align-items:center;gap:3px;background:var(--surface2);border:1px solid var(--line);border-radius:999px;padding:2px 9px;font-weight:700}
 .wx-kit .kit i{font-style:normal;font-size:1.05rem}
+/* たたんでいるときは注意のよびかけを2行まで(開くか、押すと全文) */
+.wx:not(.open) .wx-info{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .wx-warn{display:flex;flex-direction:column;gap:2px;background:var(--warn-soft);border:1px solid var(--warn);border-radius:12px;padding:9px 11px;cursor:pointer}
 .wx-warn.sp{background:var(--g-intl-s);border-color:var(--g-intl)}
 .wx-warn b{font-size:1rem}.wx-warn small{font-size:.86rem;line-height:1.5}
@@ -386,8 +395,8 @@ main{padding-block:18px 32px}
 .bignum{display:flex;flex-direction:column;gap:6px}
 .bignum .v{font-family:var(--f-display);font-size:clamp(2.4rem,9vw,3.4rem);line-height:1.05;color:var(--g-eco)}
 .bignum .v small{font-size:1.1rem}
-.mk{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-.mk .m{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 12px;min-width:0}
+.mk{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}:root[data-size="xl"] .mk,:root[data-size="xxl"] .mk{grid-template-columns:repeat(2,minmax(0,1fr))}
+.mk .m{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 8px;min-width:0;overflow-wrap:anywhere}
 .mk .m .k{font-size:.82rem;color:var(--muted)}
 .mk .m .val{font-weight:700;font-size:1rem;letter-spacing:-.01em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .mk .m .val u{font-size:.8rem;font-weight:700;text-decoration:none;margin-left:1px}
@@ -772,13 +781,18 @@ details.faq p{margin:10px 0 12px}
 
 /* plan */
 .plan{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
-.plan li{display:grid;grid-template-columns:64px 1fr;gap:12px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 12px;align-items:center}
+.plan li{display:grid;grid-template-columns:64px minmax(0,1fr) auto;gap:10px;background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:10px 12px;align-items:center}
 .plan .d{text-align:center;line-height:1.2}
 .plan .d .md{font-family:var(--f-display);font-size:1.15rem}
 .plan .d .wd{font-size:.82rem;color:var(--muted)}
 .plan .left{font-size:.82rem;font-weight:700;color:var(--accent)}
 .plan .tx{font-weight:700;font-size:.95rem}
 .plan .pmm{font-size:.9rem;color:var(--muted);margin-top:2px}
+.plan .ics{flex-direction:column;gap:0;padding:4px 8px;min-width:44px;min-height:44px;line-height:1.1;font-size:1.1rem}.plan .ics small{font-size:.7rem;font-weight:700}
+.cd-fold{margin-bottom:10px}
+.pref-l text{fill:var(--muted);font-weight:700;opacity:0;pointer-events:none;paint-order:stroke;stroke:var(--map-sea);stroke-width:2px;transition:opacity .2s}.mapsvg svg.z2 .pref-l text{opacity:.95}
+.map-rg{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}.map-rg::-webkit-scrollbar{display:none}.map-rg .fchip{flex:none}
+.s-fold{margin-top:-2px}
 .score{display:grid;grid-template-columns:140px 1fr;gap:16px;align-items:center}
 .donut{position:relative;width:140px;height:140px}
 .donut .c{position:absolute;inset:0;display:grid;place-items:center;text-align:center;line-height:1.1}
@@ -1447,7 +1461,7 @@ function mmdd(iso){ return iso.slice(5,10); }
 function seasonNow(){ if(LOOK.season==="off") return null; if(LOOK.preview){ const z=SEASONS.find(x=>x.k===LOOK.preview); if(z) return z; }
   const t=mmdd(TODAY); return SEASONS.find(z=> z.from<=z.to ? (t>=z.from&&t<=z.to) : (t>=z.from||t<=z.to)) || null; }
 function inSeason(z,iso){ const t=mmdd(iso); return z.from<=z.to ? (t>=z.from&&t<=z.to) : (t>=z.from||t<=z.to); }
-const SECS = [["weather","🌤️ 天気"],["follow","📬 追っているニュースの続報"],["quick","⏱️ 1分まとめ"],["cont","🔔 つづきがあります"],["letter","💌 ペットからの手紙"],["listen","🔊 ニュースを聞く"],["three","☀️ 今日の3行"],["ten","📰 今日のニュース10"],["one","🎯 きょうの1問"],["count","🗳️ 大事な日まで あと◯日"],["first","🌱 はじめての7日間"],["wk5","📅 今週の5大ニュース"],["pet","🐣 ペット"],["goal","🗓️ 今週の目標"],["play","▶️ 1分で見る"],["foryou","🎯 あなた向け"],["picks","🎁 ジャンル別おすすめ"],["kw","🔖 わたしのキーワード"],["quiz","🧠 今日のクイズ"],["number","🔢 今日の数字"],["fun","✨ おたのしみ"],["other","📚 そのほかのニュース"],["english","📘 今日の英単語"],["mood","🗺️ 世の中の天気図"],["know","👆 知ってた?"],["talk","🍽️ 今日の話のタネ"],["reporter","🎙️ ペット記者"],["local","🏠 わたしの街"],["gacha","🎰 今日の1本ガチャ"],["thermo","🌡️ ニュースの温度計"],["trip2","🗺️ ペットの旅"],["assoc","🔗 ニュース連想"],["back","📅 あのとき何してた?"],["bingo","🎲 ニュースビンゴ"],["battle","⚔️ 予想くらべ"]];
+const SECS = [["weather","🌤️ 天気"],["notes","📌 きょうの小さな知らせ"],["follow","📬 追っているニュースの続報"],["quick","⏱️ 1分まとめ"],["cont","🔔 つづきがあります"],["letter","💌 ペットからの手紙"],["listen","🔊 ニュースを聞く"],["three","☀️ 今日の3行"],["ten","📰 今日のニュース10"],["one","🎯 きょうの1問"],["count","🗳️ 大事な日まで あと◯日"],["first","🌱 はじめての7日間"],["wk5","📅 今週の5大ニュース"],["pet","🐣 ペット"],["goal","🗓️ 今週の目標"],["play","▶️ 1分で見る"],["foryou","🎯 あなた向け"],["picks","🎁 ジャンル別おすすめ"],["kw","🔖 わたしのキーワード"],["quiz","🧠 今日のクイズ"],["number","🔢 今日の数字"],["fun","✨ おたのしみ"],["other","📚 そのほかのニュース"],["english","📘 今日の英単語"],["mood","🗺️ 世の中の天気図"],["know","👆 知ってた?"],["talk","🍽️ 今日の話のタネ"],["reporter","🎙️ ペット記者"],["local","🏠 わたしの街"],["gacha","🎰 今日の1本ガチャ"],["thermo","🌡️ ニュースの温度計"],["trip2","🗺️ ペットの旅"],["assoc","🔗 ニュース連想"],["back","📅 あのとき何してた?"],["bingo","🎲 ニュースビンゴ"],["battle","⚔️ 予想くらべ"]];
 const LOOK = (()=>{ let p={}; try{ p=JSON.parse(store.get("nw-look")||"{}")||{}; }catch(_){ p={}; }
   const fix=(arr,all)=>{ const a=(Array.isArray(arr)?arr:[]).filter(k=>all.includes(k)); all.forEach(k=>{ if(!a.includes(k)) a.push(k); }); return a; };
   const had=new Set(Array.isArray(p.order)?p.order:[]); p.order=fix(p.order,SECS.map(s=>s[0]));
@@ -1502,16 +1516,20 @@ const LOOK = (()=>{ let p={}; try{ p=JSON.parse(store.get("nw-look")||"{}")||{};
   // v6: 天気をいちばん上に(2026-10-20)
   if(!p.v6){ p.v6=1; p.order=["weather",...p.order.filter(k=>k!=="weather")]; }
   if(!p.v5){ p.v5=1; p.tabs=["today","explain","search","plan","my","map","numbers"]; p.tabOff=Object.assign({},p.tabOff,{map:true,numbers:true}); }
+  // v21: 「きょう」を短く(2026-10-28)。**いちばん最後に置く**(古い移行が count・one などをあとから入れ直すため)。手紙・1問・大事な日・はじめての7日間・5大ニュース・つづき・続報 は「📌 きょうの小さな知らせ」の中に1行ずつ(押すと開く)。並びは 天気→聞く→3行→知らせ→ニュース10→数字→クイズ→ペット→おたのしみ→そのほか。自分で順番を変えた人も、いったんこの形に
+  if(!p.v21){ p.v21=1; const HEAD=["weather","listen","three","notes","ten","number","quiz","pet","fun","other"]; const IN=["letter","one","count","first","wk5","cont","follow"];
+    const fx=c=>{ if(!c) return; if(Array.isArray(c.order)){ c.order=[...HEAD,...c.order.filter(k=>!HEAD.includes(k))]; } c.off=c.off||{}; IN.forEach(k=>c.off[k]=true); delete c.off.notes; };
+    fx(p); if(p.cfg){ fx(p.cfg.easy); fx(p.cfg.normal); } }
   if(!COLORS.some(c=>c[0]===p.color)) p.color="blue"; if(p.season!=="off") p.season="auto"; if(typeof p.preview!=="string") p.preview=""; if(!["compact","normal","roomy"].includes(p.density)) p.density="normal";
   return p; })();
 function saveLook(){ store.set("nw-look", JSON.stringify(LOOK)); }
 // ===== かんたんモード / ふつうモード =====
 // それぞれのモードが「きょうの並び・表示」「下のタブ」「文字の大きさ」を別々に覚える。かんたんモードに、ふつうの機能を足すこともできる
 const MODE_PRESET={
-  easy:()=>{ const on=["weather","follow","listen","three","count","ten","one","first","wk5","quiz"]; const order=[...on,...SECS.map(x=>x[0]).filter(k=>!on.includes(k))]; const off={}; order.forEach(k=>{ if(!on.includes(k)) off[k]=true; });
+  easy:()=>{ const on=["weather","listen","three","notes","ten","quiz"]; const order=[...on,...SECS.map(x=>x[0]).filter(k=>!on.includes(k))]; const off={}; order.forEach(k=>{ if(!on.includes(k)) off[k]=true; });
     return {order,off,tabs:["today","explain","search","my","plan","map","numbers","words"],tabOff:{plan:true,map:true,numbers:true,words:true},size:"l"}; },
-  normal:()=>{ const off={listen:true,quick:true,picks:true,english:true,mood:true,know:true,talk:true,reporter:true,local:true,gacha:true,play:true,goal:true,kw:true};
-    return {order:SECS.map(x=>x[0]),off,tabs:["today","explain","search","plan","my","map","numbers","words"],tabOff:{map:true,numbers:true,words:true},size:"m"}; }};
+  normal:()=>{ const off={listen:true,quick:true,picks:true,english:true,mood:true,know:true,talk:true,reporter:true,local:true,gacha:true,play:true,goal:true,kw:true,letter:true,one:true,count:true,first:true,wk5:true,cont:true,follow:true};
+    const HEAD=["weather","notes","three","ten","number","quiz","pet","fun","other"]; return {order:[...HEAD,...SECS.map(x=>x[0]).filter(k=>!HEAD.includes(k))],off,tabs:["today","explain","search","plan","my","map","numbers","words"],tabOff:{map:true,numbers:true,words:true},size:"m"}; }};
 function modeSnap(){ return {order:LOOK.order.slice(),off:Object.assign({},LOOK.off),tabs:LOOK.tabs.slice(),tabOff:Object.assign({},LOOK.tabOff),size:store.get("nw-size")||"m"}; }
 function setMode(m,fresh){ if(m!=="easy") m="normal"; if(m===LOOK.mode&&!fresh) return;
   LOOK.cfg[LOOK.mode]=modeSnap(); LOOK.mode=m; const c=(!fresh&&LOOK.cfg[m])||MODE_PRESET[m]();
@@ -1856,22 +1874,25 @@ function wxMust(){ let lv=-1; try{ lv=Math.max(-1,...myWarn().map(x=>+x.lv)); }c
 function weatherCard(){
   const w=D.weather; const lab=relDay(w.iso); const notes=w.notes||[]; const severe=notes.some(n=>/警報|台風|大雨|暴風|大雪|猛暑|熱中症/.test(n));
   const must=wxMust(); const open=LOOK.wxOpen===true; /* 警報があっても勝手に開かない(よびかけの行は閉じていても出る)。開くのは自分で押したときだけ */
+  /* たたんだ形は3行(天気と気温・警報のよびかけ・傘のひとこと)。ボタン・持ち物・降水・⚠️気をつけること は「くわしく」の中(2026-10-28 に整理) */
+  const sum=wxSumLine(); const notesHTML=notes.length?`<details class="wx-notes" id="wxNotes"${wxNotesOpen?" open":""}><summary>⚠️ 気をつけること(${notes.length})</summary>${notes.map(n=>`<div class="note">${esc(n)}</div>`).join("")}<div class="hint">出典: ${esc(w.source)}</div></details>`:"";
   return `<section class="card wx${open?" open":""}" id="wxCard" aria-label="天気">
     <div class="wx-top"><span class="wx-ic" aria-hidden="true">${skyIcon(w.sky)}</span>
       <div class="wx-main"><div class="wx-place">${esc(lab)}の${esc(w.place)}</div><div class="wx-sky">${esc(w.sky)}</div></div>
       <div class="wx-t num" aria-label="最高${w.hi}度 最低${w.lo}度"><b>${w.hi}°</b><span>${w.lo}°</span></div></div>
     ${warnLine()}
-    ${open?"":wxSumLine()}
+    ${open?"":sum}
+    ${open||severe?notesHTML:""}
     <div class="wx-more">
       <div class="wx-um">☔ ${esc(w.umbrella)}</div>
       ${kitLine()}
       <div class="wx-rain">${w.rain.map(([t,p])=>`<span><small>${esc(t)}</small><b class="num">${p}%</b></span>`).join("")}<span class="wx-wear">👕 ${esc(w.wear)}</span></div>
       ${notes.length?"":`<div class="hint">出典: ${esc(w.source)}</div>`}
       <div class="wx-strip" id="wxStrip" role="button" tabindex="0" data-wxh="1" aria-label="1時間ごとの天気を開く">${wxStripHTML()}</div>
+      ${open||severe?"":notesHTML}
+      <div class="wx-btns"><button class="fchip" data-wxh="1">🕐 1時間ごと</button><button class="fchip" data-wxmap="1">🗾 全国の天気</button><button class="fchip" data-radar="1">☔ 雨雲</button></div>
     </div>
-    ${notes.length?`<details class="wx-notes" id="wxNotes"${wxNotesOpen?" open":""}><summary>⚠️ 気をつけること(${notes.length})</summary>${notes.map(n=>`<div class="note">${esc(n)}</div>`).join("")}<div class="hint">出典: ${esc(w.source)}</div></details>`:""}
-    ${must?"":`<button class="fchip wx-tg" data-wxtg="1" aria-expanded="${open?"true":"false"}" aria-controls="wxCard">${open?"▲ とじる":"▼ くわしく"}</button>`}
-    <div class="wx-btns"><button class="fchip" data-wxh="1">🕐 1時間ごと</button><button class="fchip" data-wxmap="1">🗾 全国の天気</button><button class="fchip" data-radar="1">☔ 雨雲</button><button class="fchip qk-open" data-quake="1">🛟 地震・防災${qkLatestLabel()}</button></div>
+    <div class="wx-foot">${must?"":`<button class="fchip wx-tg" data-wxtg="1" aria-expanded="${open?"true":"false"}" aria-controls="wxCard">${open?"▲ とじる":"▼ くわしく(1時間ごと・雨雲・持ち物)"}</button>`}<button class="fchip qk-open" data-quake="1">🛟 防災${qkLatestLabel()}</button></div>
   </section>`;
 }
 function exLink(id){ return id && D.explainers[id] ? ` data-ex="${id}"` : ""; }
@@ -1959,10 +1980,23 @@ function cdLeft(s){ const d=daysFrom(s[0]); return d<=0?(s[1]&&s[1]>=TODAY&&s[0]
 function countCard(){ const L=cdItems().filter(s=>daysFrom(s[0])<=7); if(!L.length) return "";
   return `<section class="card cd-c" aria-label="大事な日まで"><b class="cd-t">🗳️ 大事な日まで</b><div class="cd-row">${L.slice(0,3).map(s=>`<button class="cd-i" data-tab="plan"><b class="num">${cdLeft(s)}</b><span>${esc(s[3])}</span></button>`).join("")}</div></section>`; }
 function cdPlanHTML(){ const L=cdItems().slice(0,6); if(!L.length) return "";
-  return `<section class="card cd-p" aria-label="大事な日までのカウントダウン"><b>🗳️ 大事な日まで</b><div class="hint" style="margin:2px 0 8px">選挙・国会・制度や値段が変わる日だけを集めています。</div>
+  return `<section class="cd-p" aria-label="大事な日までのカウントダウン" style="padding:4px 0 10px">
     <ul class="cd-g">${L.map(s=>{ const d=daysFrom(s[0]); return `<li>${d>1?"<small>あと</small>":""}<b class="num">${d<=0?"きょう":d===1?"あした":d}</b>${d>1?"<small>日</small>":""}<span>${mdLabel(s[0])}<br>${esc(s[3])}</span></li>`; }).join("")}</ul></section>`; }
 
 window.addEventListener("scroll",()=>{ const on=window.scrollY>24; if(on!==root.classList.contains("scrolled")) root.classList.toggle("scrolled",on); },{passive:true});
+/* 📌 きょうの小さな知らせ(2026-10-28): 「きょう」に大きなカードを並べず、1行ずつたたんで出す。押すと その場で開く(中身は元のカードそのまま。並びで個別にオンにしたものは外す) */
+const NOTE_LBL={letter:"💌 ペットからの手紙",one:"🎯 きょうの1問",count:"🗳️ 大事な日まで",first:"🌱 はじめての7日間",wk5:"📅 今週の5大ニュース",cont:"🔔 つづきがあります",follow:"📬 追っているニュース",season:"",pick:"🎯 気になるジャンルを選ぶ"};
+function noteSub(k,html){ try{ if(k==="count"){ const L=cdItems().filter(s=>daysFrom(s[0])<=7); if(L.length){ const s0=L[0]; return `${cdLeft(s0)} ${s0[3]}`; } }
+    if(k==="one"){ const x=q1Pick(); return x?(ME.votes[x.no]?"答えずみ":"1日1つ・予想してみよう"):""; }
+    if(k==="first"){ const n=-daysFrom(firstDay()); return n<7?`${n+1}日目`:"続ける目標を選ぶ"; }
+    if(k==="wk5") return "土日月だけ・はじまり→いま"; if(k==="letter") return "週のはじめに1通"; if(k==="cont") return `${contItems().length}件`; if(k==="follow") return "続報・山場"; }catch(_){} return ""; }
+function notesCard(S){ const rows=[];
+  const z=seasonNow(); if(z&&store.get("nw-season-hide")!==TODAY+z.k) rows.push(`<details class="nt"><summary><span class="nt-i">${z.icon}</span><b>${esc(z.name)}の季節</b><small>${esc(z.greet).slice(0,22)}</small></summary><div class="nt-b">${seasonCard()}</div></details>`);
+  ["letter","one","count","first","wk5","cont","follow"].forEach(k=>{ if(!LOOK.off[k]) return; const h=S[k]; if(!h) return; const sub=noteSub(k,h); const [ic,...rest]=NOTE_LBL[k].split(" ");
+    rows.push(`<details class="nt" data-nt="${k}"><summary><span class="nt-i">${ic}</span><b>${rest.join(" ")}</b>${sub?`<small>${esc(sub)}</small>`:""}</summary><div class="nt-b">${h}</div></details>`); });
+  const pk=intPickHTML(); if(pk&&!LOOK.off.foryou&&!(GORDER.some(g=>interestScore(g)>0)||myTopics().length)) rows.push(`<details class="nt"><summary><span class="nt-i">🎯</span><b>気になるジャンルを選ぶ</b><small>選ぶと「あなた向け」が出ます</small></summary><div class="nt-b">${pk}</div></details>`);
+  if(!rows.length) return "";
+  return `<section class="card notes" aria-label="きょうの小さな知らせ"><div class="sec-h"><h2>📌 きょうの小さな知らせ</h2><span class="sub">押すと開きます</span></div><div class="nt-list">${rows.join("")}</div></section>`; }
 function renderToday(){
   const t=D.top10;
   const S={};
@@ -2004,6 +2038,7 @@ function renderToday(){
   S.picks=picksCard(); S.goal=goalCard(); S.letter=letterCard(); S.cont=contCard(); S.quick=quickCard();
   S.other=otherNews();
   S.one=oneCard(); S.follow=followCard(); S.first=firstCard(); S.count=countCard(); S.wk5=wk5Card();
+  S.notes=notesCard(S);
   S.quiz=D.quiz&&D.quiz.length?`<section class="card quiz" aria-label="今日のクイズ" id="quiz"></section>`:"";
   S.number=`<section class="card" aria-label="今日の数字">
       <div class="sec-h"><h2>🔢 今日の数字</h2></div>
@@ -2013,7 +2048,7 @@ function renderToday(){
   const body=LOOK.order.filter(k=>!LOOK.off[k]).map(k=>S[k]||"").join("");
   main.innerHTML = `<div class="view">
     ${vsCard()}
-    ${seasonCard()}
+    ${LOOK.off.notes?seasonCard():""}
     ${personalCards()}
     ${awayCard()}
     ${navigator.onLine===false?'<div class="offline">📴 いまはオフラインです。前に読み込んだ内容を表示しています。</div>':''}
@@ -2084,7 +2119,7 @@ function bindInstall(){
 }
 if("serviceWorker" in navigator){ window.addEventListener("load",()=>{ navigator.serviceWorker.register("sw.js").catch(()=>{});
   // オフラインの準備: 少し待ってから、解説の写真とグラフ・地図の部品を保存してもらう(データ節約モードのときはしない)
-  setTimeout(()=>{ try{ if(navigator.connection&&navigator.connection.saveData) return; navigator.serviceWorker.ready.then(r=>{ if(!r.active) return; const urls=[...Object.values(typeof PHOTOS!=="undefined"?PHOTOS:{}).map(x=>x[0]),"https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.js","https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js","https://cdn.jsdelivr.net/npm/topojson-client@3.1.0/dist/topojson-client.min.js","https://cdn.jsdelivr.net/npm/world-atlas@2.0.2/countries-50m.json","history.json"]; r.active.postMessage({type:"warm",urls}); }); }catch(_){} },6000); });
+  setTimeout(()=>{ try{ if(navigator.connection&&navigator.connection.saveData) return; navigator.serviceWorker.ready.then(r=>{ if(!r.active) return; const urls=[...Object.values(typeof PHOTOS!=="undefined"?PHOTOS:{}).map(x=>x[0]),"https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.js","https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js","https://cdn.jsdelivr.net/npm/topojson-client@3.1.0/dist/topojson-client.min.js","https://cdn.jsdelivr.net/npm/world-atlas@2.0.2/countries-50m.json","jp-pref.json?v=1","history.json"]; r.active.postMessage({type:"warm",urls}); }); }catch(_){} },6000); });
   navigator.serviceWorker.addEventListener("message",e=>{ if(e.data&&e.data.type==="warmed") store.set("nw-off-at",String(e.data.at)); }); }
 
 // ===== クイズ =====
@@ -2180,9 +2215,12 @@ function renderSearch(){ sLim=20;
     <label class="sbox" for="q"><span aria-hidden="true">🔎</span><input id="q" type="search" placeholder="ことばで探す(例: 台風、原油)" autocomplete="off" value="${esc(sState.q)}"><button class="iconbtn" id="qx" aria-label="入力を消す">✕</button></label>
     ${(()=>{ const T=trendWords(8); return T.length?`<div><div class="hint" style="margin-bottom:6px">🔥 この2日でよく出ていることば(タップで探す)</div><div class="quick" aria-label="この2日でよく出ていることば">${T.map(([w,,n])=>`<button class="fchip" data-w="${esc(w)}">${esc(w)} <small class="hint">${n}件</small></button>`).join("")}</div></div>`
       :`<div class="quick" aria-label="よく探されることば">${["台風","原油","消費税","不正アクセス","日経平均","AI"].map(w=>`<button class="fchip" data-w="${w}">${w}</button>`).join("")}</div>`; })()}
+    <details class="faq plain s-fold"${(sState.g.size||sState.th||sState.ok||sState.onlyNew)?" open":""}><summary>🎛️ しぼりこむ(ジャンル・テーマ・確認ずみ)${(()=>{ const n=sState.g.size+(sState.th?1:0)+(sState.ok?1:0)+(sState.onlyNew?1:0); return n?` <span class="chip">${n}</span>`:""; })()}</summary>
+    <div style="padding:6px 0 12px;display:flex;flex-direction:column;gap:10px">
     <div><div class="hint" style="margin-bottom:6px">ジャンル(いくつでも選べる)</div><div class="chips" id="gf">${GORDER.map(g=>`<button class="fchip" data-g="${g}" aria-pressed="${sState.g.has(g)}"><span class="c" style="background:var(--g-${g})"></span>${GN[g]}</button>`).join("")}</div></div>
     <div class="setrow"><label class="hint" for="th">テーマ</label><select id="th" class="fchip" style="padding:6px 10px"><option value="">すべて</option>${THEMES.map(t=>`<option ${sState.th===t?"selected":""}>${esc(t)}</option>`).join("")}</select>
       <button class="fchip" id="okf" aria-pressed="${sState.ok}">✅ 複数社で確認したものだけ</button>${NEW_KEYS.size?`<button class="fchip" id="newf" aria-pressed="${sState.onlyNew}">🆕 新着だけ(${NEW_KEYS.size})</button>`:""}</div>
+    </div></details>
     <div id="sres"></div>
   </div>`;
   const q=document.getElementById("q");
@@ -2204,7 +2242,7 @@ function renderSearch(){ sLim=20;
     // 日ごとの件数の小さなグラフ
     const byDay={}; list.forEach(n=>byDay[n.d]=(byDay[n.d]||0)+1);
     const days=Object.keys(byDay).sort(); const max=Math.max(1,...Object.values(byDay));
-    const histo = days.length>1? `<div class="card"><div class="hint">見つかった${list.length}件の日付の分布</div><div class="hist" aria-hidden="true">${days.map(d=>`<i style="height:${Math.max(6,byDay[d]/max*100)}%" title="${mdLabel(d)} ${byDay[d]}件"></i>`).join("")}</div><div class="hist-l"><span>${mdLabel(days[0])}</span><span>${mdLabel(days[days.length-1])}</span></div></div>`:"";
+    const histo = days.length>1&&(sState.q||sState.g.size||sState.th)? `<div class="card"><div class="hint">見つかった${list.length}件の日付の分布</div><div class="hist" aria-hidden="true">${days.map(d=>`<i style="height:${Math.max(6,byDay[d]/max*100)}%" title="${mdLabel(d)} ${byDay[d]}件"></i>`).join("")}</div><div class="hist-l"><span>${mdLabel(days[0])}</span><span>${mdLabel(days[days.length-1])}</span></div></div>`:"";
     const ordered=list.slice().sort((a,b)=>b.d.localeCompare(a.d)); const shown=ordered.slice(0,sLim); const groups={}; shown.forEach(n=>(groups[n.d]=groups[n.d]||[]).push(n));
     const html = `
       ${exHits.length?`<div><div class="hint" style="margin-bottom:6px">💡 解説ページ</div><div class="exgrid">${exHits.map(([k,e])=>exCard(k,e)).join("")}</div></div>`:""}
@@ -2704,7 +2742,8 @@ const RL={hit:["✅ 当たり","res-hit"],miss:["❌ 外れ","res-miss"],part:["
 /* 「(🎯N20 確度: 中)」→「(予測ノート20番・当たりそう度: 中)」 */
 function nextTxt(t){ return String(t).replace(/🎯\s*N(\d+)\s*確度[:：]\s*/g,"予測ノート$1番・当たりそう度: "); }
 function planLi(s){ const dd=daysFrom(s[0]); const x=md(s[0]); const left= dd<=0? (s[1]&&s[1]>=TODAY?"いま":"今日") : dd===1?"明日":`あと${dd}日`;
-      return `<li><div class="d"><div class="md num">${x.m}/${x.d}</div><div class="wd">${x.w}曜${s[1]?"〜":""}</div></div><div><span class="left">${left}</span> <span class="chip ${s[2]}">${GN[s[2]]||""}</span>${s[4]?` <span class="chip">🎯 予測ノート${esc(String(s[4]).replace(/^N/,""))}番</span>`:""}<div class="tx">${esc(s[3])}</div>${s[5]?`<div class="pmm">${esc(s[5])}</div>`:""}<button class="fchip ics" data-i="${D.schedule.indexOf(s)}">📅 カレンダーに追加</button></div></li>`; }
+      return `<li><div class="d"><div class="md num">${x.m}/${x.d}</div><div class="wd">${x.w}曜${s[1]?"〜":""}</div></div><div><span class="left">${left}</span> <span class="chip ${s[2]}">${GN[s[2]]||""}</span>${s[4]?` <span class="chip">🎯 予測ノート${esc(String(s[4]).replace(/^N/,""))}番</span>`:""}<div class="tx">${esc(s[3])}</div>${s[5]?`<div class="pmm">${esc(s[5])}</div>`:""}</div><button class="fchip ics" data-i="${D.schedule.indexOf(s)}" aria-label="カレンダーに追加" title="カレンダーに追加">📅<small>追加</small></button></li>`; }
+let planView="plan"; /* 予定タブの切りかえ(予定/予測)。2026-10-28 に長かった予定タブを2つに分けた */
 let pLim=5;
 function renderPlan(){ pLim=5;
   const up=D.schedule.filter(s=>(s[1]||s[0])>=TODAY).sort((a,b)=>a[0].localeCompare(b[0]));
@@ -2712,26 +2751,33 @@ function renderPlan(){ pLim=5;
   const near=up.filter(s=>daysFrom(s[0])<=7); const upNear=near.length>=3?near:up.slice(0,Math.min(up.length,5)); const upFar=up.slice(upNear.length);
   const n={hit:0,miss:0,part:0,wait:0}; PRED.forEach(p=>n[p.r]++);
   const judged=n.hit+n.miss+n.part; const rate=judged?Math.round((n.hit*100+n.part*50)/judged):0;
+  const pv=planView;
   main.innerHTML=`<div class="view">
-    <div class="sec-h"><h2>📅 これからの予定</h2><span class="sub">近い順</span></div>
+    <div class="sec-h"><h2>${pv==="plan"?"📅 これからの予定":"🎯 予測と、あなたの予想"}</h2><span class="seg plan-seg" role="group" aria-label="予定か予測か">${[["plan","📅 予定"],["pred","🎯 予測"]].map(([k,l])=>`<button data-pv="${k}" aria-pressed="${pv===k}">${l}</button>`).join("")}</span></div>
+    <div id="pvPlan"${pv==="plan"?"":" hidden"}>
     ${mascot("plan")}
-    ${cdPlanHTML()}
+    <details class="faq plain cd-fold"><summary>🗳️ 大事な日まで(選挙・制度・値段が変わる日)</summary>${cdPlanHTML()}</details>
     <ul class="plan">${upNear.map(planLi).join("") || '<li><div></div><div class="hint">登録された予定はありません</div></li>'}</ul>
     ${upFar.length?`<details class="faq plain"><summary>その先の予定(${upFar.length}件)</summary><ul class="plan" style="margin:10px 0 12px">${upFar.map(planLi).join("")}</ul></details>`:""}
     ${past.length?`<details class="faq plain"><summary>終わった予定(${past.length}件)</summary><ul class="us" style="margin:10px 0 12px">${past.map(s=>`<li>${mdLabel(s[0])} ${esc(s[3])}</li>`).join("")}</ul></details>`:""}
-    <button class="lookcard" id="paperBtn"><span style="font-size:1.8rem" aria-hidden="true">📰</span><span><b>未来の新聞(予想版)</b><span class="hint" style="display:block">Claudeの予測とあなたの予想を、未来の新聞の紙面に</span></span></button>
-    ${followListHTML()}
-    ${myPredHTML()}
-    <div class="sec-h" style="margin-top:6px"><h2>🎯 予測と、あなたの予想</h2><span class="sub">当たり100点・一部50点・外れ0点</span></div>
+    </div>
+    <div id="pvPred"${pv==="pred"?"":" hidden"}>
+    <div class="hint" style="margin:-4px 0 8px">Claudeの予測に、あなたも「当たる/外れる」を予想できます(当たり100点・一部50点・外れ0点)。</div>
     <section class="card score">
       <div class="donut"><canvas id="dn" width="140" height="140" aria-label="予測の内訳"></canvas><div class="c"><div><b class="num">${rate}%</b><br><span>的中率(${judged}件)</span></div></div></div>
       <div class="tally"><span class="res-hit">✅ 当たり ${n.hit}</span><span class="res-miss">❌ 外れ ${n.miss}</span><span class="res-part">🔶 一部 ${n.part}</span><span class="res-wait">⏳ 判定待ち ${n.wait}</span><span class="hint" style="grid-column:1/-1">予測は「当たったかどうか」を後で正直に記録するためのものです。</span></div>
     </section>
     <div class="chips" id="pf"><button class="fchip" data-f="wait" aria-pressed="true">⏳ 判定待ち</button><button class="fchip" data-f="done" aria-pressed="false">決着した予測</button></div>
     <div class="pred" id="plist"></div>
+    <details class="faq plain" style="margin-top:12px"><summary>🔮 わたしの予想ノート・追っているニュース・未来の新聞</summary><div style="display:flex;flex-direction:column;gap:12px;padding:10px 0 14px">
+      <button class="lookcard" id="paperBtn"><span style="font-size:1.8rem" aria-hidden="true">📰</span><span><b>未来の新聞(予想版)</b><span class="hint" style="display:block">Claudeの予測とあなたの予想を、未来の新聞の紙面に</span></span></button>
+      ${followListHTML()}
+      ${myPredHTML()}</div></details>
+    </div>
     ${footer()}
   </div>`;
   document.getElementById("paperBtn").onclick=openPaper; bindMyPred();
+  main.querySelectorAll("[data-pv]").forEach(b=>b.onclick=()=>{ planView=b.dataset.pv; go("plan"); });
   bindFooter();
   const drawP=f=>{ const L=PRED.filter(p=>f==="wait"?p.r==="wait":p.r!=="wait").sort((a,b)=>(a.d||"9").localeCompare(b.d||"9"));
     document.getElementById("plist").innerHTML=L.slice(0,pLim).map(p=>`<div class="pr"><span class="no">${esc(p.no)}</span><span><b>${esc(p.t)}</b></span>${p.r==="wait"?voteRow(p):ME.votes[p.no]?`<span class="r">あなたの予想: ${ME.votes[p.no].v==="yes"?"当たる":"外れる"}</span>`:""}<span class="r"><span class="${RL[p.r][1]}">${RL[p.r][0]}</span> ・ 確度: ${esc(p.c)} ・ 判定日: ${p.d?mdLabel(p.d)+(p.r==="wait"&&daysFrom(p.d)>=0?`(あと${daysFrom(p.d)}日)`:""):"次の発表時"}${p.now?" ・ いま "+esc(p.now):""}${p.m?`<br>${esc(p.m)}`:""}</span></div>`).join("")+(L.length>pLim?`<button class="fchip more-btn" id="pMore">もっと見る(あと${L.length-pLim}件)</button>`:""); const pm=document.getElementById("pMore"); if(pm) pm.onclick=()=>{ pLim+=10; drawP(f); }; };
@@ -3121,7 +3167,7 @@ function personalCards(){
 }
 function intPickHTML(){ if(hasInterests()||store.get("nw-int-hide")==="1") return ""; return `<section class="card" aria-label="関心を選ぶ"><b>🎯 気になるジャンルを選んでください</b><p class="hint" style="margin:4px 0 10px">選ぶと「あなた向け」に並びます。読んだ解説からも、好みを少しずつ覚えます。記録はこのスマホの中だけに残ります。</p><div class="chips" id="intPick">${GORDER.map(g=>`<button class="fchip" data-g="${g}" aria-pressed="false"><span class="c" style="background:var(--g-${g})"></span>${GN[g]}</button>`).join("")}</div><div style="display:flex;gap:8px;margin-top:10px"><button class="fchip" id="intSave" style="background:var(--accent-btn,var(--accent));color:var(--on-accent);border-color:var(--accent-btn,var(--accent))">決める</button><button class="fchip" id="intLater">あとで</button></div><button class="tp-open" data-topics="1" style="margin:10px 0 0"><span aria-hidden="true">💗</span><span><b>もっとこまかく選ぶ</b><small>野球・アニメ・料理・宇宙・AI など ${TOPICS.length}こ から</small></span><span aria-hidden="true">→</span></button></section>`; }
 function forYou(){
-  const any=GORDER.some(g=>interestScore(g)>0)||myTopics().length; if(!any) return intPickHTML();
+  const any=GORDER.some(g=>interestScore(g)>0)||myTopics().length; if(!any) return LOOK.off.notes?intPickHTML():"";
   const days=[...new Set(NEWS.map(n=>n.d))].slice(0,2); const topH=new Set(D.top10.map(t=>t.title));
   const bg=t=>{ const z=String(t).replace(/[\s、。「」『』()()・!?!?:：,.\-—…]/g,""); const S2=new Set(); for(let i=0;i<z.length-1;i++) S2.add(z.slice(i,i+2)); return S2; };
   const seen=[...D.top10.map(t=>bg(t.title)),...(D.three||[]).map(t=>bg(t.title))];
@@ -4443,6 +4489,8 @@ function openShimen(){ const sh=document.getElementById("sheet"); const w=D.weat
 document.addEventListener("click",e=>{ const b=e.target.closest("[data-shimen]"); if(!b) return; e.preventDefault(); openShimen(); });
 // ===== お知らせ(新しくなったところ)。機能を足したら、いちばん上に1つ足す =====
 const UPDATES=[
+  {id:"2026-10-28c",d:"2026-10-28",t:"🗾 地図をくわしく: 都道府県の線と、地方ごとのボタン",L:["日本の地図に都道府県の線が入り、2本指で大きくすると県の名前も出ます。","上の「北海道・東北・関東…」のボタンで、その地方にすぐ寄れます。","大きくすると、近くでまとまっていたピン(東京・横浜・さいたま など)が別々に分かれます。"]},
+  {id:"2026-10-28b",d:"2026-10-28",t:"🧹 「きょう」「予定」「さがす」をすっきりさせました",L:["天気カードは3行にたたみ、「▼ くわしく」で1時間ごと・雨雲・持ち物が開きます。","ペットからの手紙・きょうの1問・大事な日・5大ニュース・つづき は「📌 きょうの小さな知らせ」に1行ずつ入れました(押すと開きます。「この画面の並びを変える」で前のように出すこともできます)。","予定タブは「📅 予定 / 🎯 予測」の切りかえに。さがすタブのしぼりこみは「🎛️ しぼりこむ」にたたみました。"]},
   {id:"2026-10-28a",d:"2026-10-28",t:"🔎 さがすの「もっと見る」で画面が横にずれるのを直しました",L:["古いニュースの札に長い文が入っていて、画面が横に動いてしまっていました。札には予測の番号だけを出すようにしました。"]},
   {id:"2026-10-27d",d:"2026-10-27",t:"🔠 「文字の大きさ」がアプリ全体に効くように",L:["「大きく」「もっと大きく」にしても、カードの見出しやボタンの文字が大きくならないところがありました。いまはアプリ中の文字が大きくなります。","ボタンの名前がことばの途中で折り返す(「1本ガ/チャ」など)のも直しました。","一時、「今日の3行」の文字が折り返さずに画面の右へ切れていたのも直しました。"]},
   {id:"2026-10-27c",d:"2026-10-27",t:"👆 「知ってた?」の文字の重なりを直しました",L:["見出しが長いとき、カードの文字が下のボタンに重なっていました。カードの高さを見出しに合わせて伸ばすようにしました。"]},
@@ -4771,7 +4819,8 @@ function zoomable(wrap,inner,opt){
   const apply=()=>{ clamp(); inner.style.transform=`translate(${tx}px,${ty}px) scale(${s})`;
     wrap.classList.toggle("zoomed",s>1.01);
     if(ZC){ const zi=ZC.querySelector("[data-zin]"), zo=ZC.querySelector("[data-zout]");
-      if(zi) zi.disabled=s>=MAX-.001; if(zo) zo.disabled=s<=MIN+.001; } };
+      if(zi) zi.disabled=s>=MAX-.001; if(zo) zo.disabled=s<=MIN+.001; }
+    if(o.onZoom){ clearTimeout(apply._t); apply._t=setTimeout(()=>o.onZoom(s,tx,ty),60); } };
   // (cx,cy)=わくの中での位置。そこを動かさずに倍率を ns にする
   const zoomAt=(ns,cx,cy)=>{ const w=wrap.clientWidth,h=wrap.clientHeight;
     const px=cx-w/2, py=cy-h/2, o1=s; ns=Math.max(MIN,Math.min(MAX,ns));
@@ -4822,15 +4871,23 @@ function zoomable(wrap,inner,opt){
   zc.querySelector("[data-zout]").onclick=()=>zoomAt(s/1.5,wrap.clientWidth/2,wrap.clientHeight/2);
   zc.querySelector("[data-zre]").onclick=reset;
   apply();
-  return {reset,zoomAt,get scale(){return s;}};
+  /* (x,y)=中身の等倍での位置 を、わくのまん中に ns 倍で出す(地域ボタンで使う) */
+  const focus=(x,y,ns)=>{ const w=wrap.clientWidth,h=wrap.clientHeight; s=Math.max(MIN,Math.min(MAX,ns)); tx=-(x-w/2)*s; ty=-(y-h/2)*s; apply(); };
+  return {reset,zoomAt,focus,get scale(){return s;}};
 }
+/* 日本の都道府県の輪郭(jp-pref.json = 地球地図日本(国土地理院)を dataofjapan/land が都道府県ごとにしたものを軽くした。地図タブを開いたときだけ読む。2026-10-28) */
+let JPP=null, JPPP=null;
+function getJpPref(){ if(JPP) return Promise.resolve(JPP); if(!JPPP) JPPP=fetch("jp-pref.json?v=1").then(r=>r.json()).then(t=>{ JPP=topojson.feature(t,t.objects.japan); return JPP; }).catch(e=>{ JPPP=null; throw e; }); return JPPP; }
+/* 地域ボタン(日本): 地域の名前・中心・倍率 */
+const JP_REGIONS=[["北海道",143.2,43.4,2.6],["東北",140.7,39.3,2.6],["関東",139.7,35.8,5],["中部",137.5,36.2,2.8],["近畿",135.6,34.7,4.5],["中国・四国",133.3,34.3,3.4],["九州",130.8,32.6,3.2],["沖縄",127.8,26.4,3.0]];
 function renderMap(){
   const recentDays=[...new Set(NEWS.map(n=>n.d))].slice(0,7);
   main.innerHTML=`<div class="view">
     <div class="sec-h"><h2>🗺️ ニュースの地図</h2><span class="sub">直近7日分</span></div>
     <div class="seg map-seg" role="group" aria-label="地図の種類"><button data-v="japan" aria-pressed="${mapState.view==="japan"}">🗾 日本</button><button data-v="world" aria-pressed="${mapState.view==="world"}">🌏 世界</button><button data-v="board" aria-pressed="${mapState.view==="board"}">🧷 捜査ボード</button></div>
+    ${mapState.view==="japan"?`<div class="map-rg" aria-label="地域をえらぶ"><button class="fchip" data-rg="all" aria-pressed="true">全国</button>${JP_REGIONS.map((r,i)=>`<button class="fchip" data-rg="${i}" aria-pressed="false">${r[0]}</button>`).join("")}</div>`:""}
     <div class="card mapbox"><div id="map" class="mapsvg"><div class="empty">地図を読み込んでいます…</div></div></div>
-    <p class="hint" style="margin:0">丸をタップすると、その場所のニュースが下に出ます。</p>
+    <p class="hint" style="margin:0">丸をタップすると、その場所のニュースが下に出ます。${mapState.view==="japan"?"大きくすると、近い場所がわかれて県の名前も出ます。":""}</p>
     <button class="fchip fl-go" data-world="1">🌍 世界のいま<small>世界の地震・台風・山火事も重ねて見る</small></button>
     <div id="mapList"></div>
     ${mapState.view==="board"?"":mascot("map")}
@@ -4842,33 +4899,45 @@ function renderMap(){
   const items=NEWS.filter(n=>recentDays.includes(n.d)).map(n=>({n,p:placeOf(n)})).filter(x=>x.p);
   const JP=[0,139.75,36.2,"日本(国内)"];
   const groups={}; items.forEach(x=>{ let pp=x.p; if(mapState.view==="world" && pp[1]>122 && pp[1]<147 && pp[2]>24 && pp[2]<46) pp=JP; const k=pp[3]; (groups[k]=groups[k]||{p:pp,list:[]}).list.push(x.n); });
-  getWorld().then(world=>{
-    const el=document.getElementById("map"); if(!el) return; const W=el.clientWidth||360, H=Math.round(W*(mapState.view==="japan"?1.05:0.62));
-    const proj = mapState.view==="japan" ? d3.geoMercator().fitExtent([[10,10],[W-10,H-10]],{type:"MultiPoint",coordinates:[[123,24],[146,45.5]]}) : d3.geoNaturalEarth1().fitExtent([[6,6],[W-6,H-6]],{type:"Sphere"});
+  const isJp=mapState.view==="japan";
+  getWorld().then(world=>Promise.all([world, isJp?getJpPref().catch(()=>null):null])).then(([world,jp])=>{ /* 都道府県は topojson が読めてから */
+    const el=document.getElementById("map"); if(!el) return; const W=el.clientWidth||360, H=Math.round(W*(isJp?1.05:0.62));
+    const proj = isJp ? d3.geoMercator().fitExtent([[10,10],[W-10,H-10]],{type:"MultiPoint",coordinates:[[123,24],[146,45.5]]}) : d3.geoNaturalEarth1().fitExtent([[6,6],[W-6,H-6]],{type:"Sphere"});
     const path=d3.geoPath(proj);
-    // 近い場所はまとめる(重ならないように)
-    const pts=Object.values(groups).map(g=>({g,xy:proj([g.p[1],g.p[2]])})).filter(x=>x.xy&&x.xy[0]>=0&&x.xy[0]<=W&&x.xy[1]>=0&&x.xy[1]<=H).sort((a,b)=>b.g.list.length-a.g.list.length);
-    const cl=[]; pts.forEach(x=>{ const c=cl.find(c=>Math.hypot(c.x-x.xy[0],c.y-x.xy[1])<30); if(c){ c.gs.push(x.g); } else cl.push({x:x.xy[0],y:x.xy[1],gs:[x.g]}); });
-    cl.forEach((c,i)=>{ c.id="c"+i; c.n=c.gs.reduce((a,g)=>a+g.list.length,0); c.name=c.gs[0].p[3]+(c.gs.length>1?"ほか":""); });
-    const others=Object.values(groups).filter(g=>!cl.some(c=>c.gs.includes(g)));
-    const svg=d3.create("svg").attr("viewBox",`0 0 ${W} ${H}`).attr("width","100%").attr("role","img").attr("aria-label",mapState.view==="japan"?"日本の地図":"世界の地図");
+    const allPts=Object.values(groups).map(g=>({g,xy:proj([g.p[1],g.p[2]])})).filter(x=>x.xy&&x.xy[0]>=0&&x.xy[0]<=W&&x.xy[1]>=0&&x.xy[1]<=H).sort((a,b)=>b.g.list.length-a.g.list.length);
+    const others=Object.values(groups).filter(g=>!allPts.some(x=>x.g===g));
+    const svg=d3.create("svg").attr("viewBox",`0 0 ${W} ${H}`).attr("width","100%").attr("role","img").attr("aria-label",isJp?"日本の地図":"世界の地図");
     svg.append("rect").attr("width",W).attr("height",H).attr("fill","var(--map-sea)");
-    svg.append("g").selectAll("path").data(world.features).join("path").attr("d",path).attr("fill",d=>d.id==="392"?"var(--map-jp)":"var(--map-land)").attr("stroke","var(--map-line)").attr("stroke-width",.6);
-    const g=svg.append("g");
-    cl.slice().reverse().forEach(c=>{ const r=10+Math.min(8,c.n*0.8); const col=css("--g-"+c.gs[0].list[0].g)||"#c42b2b";
-      const node=g.append("g").attr("class","pin"+(mapState.sel===c.id?" on":"")).attr("tabindex",0).attr("role","button").attr("aria-label",`${c.name} ${c.n}件`).style("cursor","pointer");
-      node.append("circle").attr("cx",c.x).attr("cy",c.y).attr("r",r).attr("fill",col).attr("stroke","#fff").attr("stroke-width",2.5);
-      node.append("text").attr("x",c.x).attr("y",c.y+4).attr("text-anchor","middle").attr("font-size",12).attr("font-weight",800).attr("fill","#fff").text(c.n);
-      node.append("text").attr("class","plabel").attr("x",c.x).attr("y",c.y+r+13).attr("text-anchor","middle").text(c.name.replace(/\(.*?\)/,""));
-      const pick=()=>{ mapState.sel=c.id; svg.selectAll(".pin").classed("on",false); node.classed("on",true); drawList(); document.getElementById("mapList").scrollIntoView({behavior:"smooth",block:"start"}); };
-      node.on("click",pick).on("keydown",ev=>{ if(ev.key==="Enter"||ev.key===" "){ ev.preventDefault(); pick(); } }); });
+    if(isJp&&jp){
+      svg.append("g").selectAll("path").data(world.features.filter(d=>d.id!=="392")).join("path").attr("d",path).attr("fill","var(--map-land)").attr("stroke","var(--map-line)").attr("stroke-width",.6);
+      const pg=svg.append("g").attr("class","prefs"); pg.selectAll("path").data(jp.features).join("path").attr("d",path).attr("fill","var(--map-jp)").attr("stroke","var(--map-line)").attr("stroke-width",.5).append("title").text(d=>d.properties.n);
+      /* 県の名前(大きくしたときだけ見える) */
+      const lg=svg.append("g").attr("class","pref-l"); lg.selectAll("text").data(jp.features).join("text").attr("transform",d=>{ const c=path.centroid(d); return `translate(${c[0].toFixed(1)},${c[1].toFixed(1)})`; }).attr("text-anchor","middle").text(d=>d.properties.n.replace(/[都府県]$/,"")); }
+    else svg.append("g").selectAll("path").data(world.features).join("path").attr("d",path).attr("fill",d=>d.id==="392"?"var(--map-jp)":"var(--map-land)").attr("stroke","var(--map-line)").attr("stroke-width",.6);
+    const g=svg.append("g").attr("class","pins");
+    let cl=[], zs=1;
+    /* 近い場所はまとめる。倍率に合わせてまとめ直す(大きくすると分かれる) */
+    function cluster(scale){ const th=scale<1.05?30:18/scale; const out=[]; allPts.forEach(x=>{ const c=out.find(c=>Math.hypot(c.x-x.xy[0],c.y-x.xy[1])<th); if(c){ c.gs.push(x.g); } else out.push({x:x.xy[0],y:x.xy[1],gs:[x.g]}); });
+      out.forEach((c,i)=>{ c.id=c.gs.map(x=>x.p[3]).join("|"); c.n=c.gs.reduce((a,g)=>a+g.list.length,0); c.name=c.gs[0].p[3]+(c.gs.length>1?"ほか":""); }); return out; }
+    function drawPins(scale){ zs=scale; cl=cluster(scale); const k=1/scale; g.selectAll("*").remove();
+      if(mapState.sel&&!cl.some(c=>c.id===mapState.sel)){ const hit=cl.find(c=>c.gs.some(gp=>mapState.sel.split("|").includes(gp.p[3]))); mapState.sel=hit?hit.id:null; }
+      cl.slice().reverse().forEach(c=>{ const r=(10+Math.min(8,c.n*0.8))*(scale>=4?0.72:scale>=2.2?0.85:1); const col=css("--g-"+c.gs[0].list[0].g)||"#c42b2b";
+        const node=g.append("g").attr("class","pin"+(mapState.sel===c.id?" on":"")).attr("tabindex",0).attr("role","button").attr("aria-label",`${c.name} ${c.n}件`).style("cursor","pointer").attr("transform",`translate(${c.x.toFixed(1)},${c.y.toFixed(1)}) scale(${k.toFixed(3)})`);
+        node.append("circle").attr("r",r).attr("fill",col).attr("stroke","#fff").attr("stroke-width",2.5);
+        node.append("text").attr("y",4).attr("text-anchor","middle").attr("font-size",12).attr("font-weight",800).attr("fill","#fff").text(c.n);
+        node.append("text").attr("class","plabel").attr("y",r+13).attr("text-anchor","middle").text(c.name.replace(/\(.*?\)/,""));
+        const pick=()=>{ mapState.sel=c.id; svg.selectAll(".pin").classed("on",false); node.classed("on",true); drawList(); document.getElementById("mapList").scrollIntoView({behavior:"smooth",block:"start"}); };
+        node.on("click",pick).on("keydown",ev=>{ if(ev.key==="Enter"||ev.key===" "){ ev.preventDefault(); pick(); } }); });
+      svg.classed("z2",scale>=2.2).classed("z3",scale>=4); svg.select(".pref-l").attr("font-size",(11/scale).toFixed(2)); }
     el.innerHTML=""; el.appendChild(svg.node());
-    zoomable(el,svg.node(),{max:8,hint:"🔍 2本指でひろげると拡大(ダブルタップでも)。大きくしたら指でなぞって動かせます"});
+    const Z=zoomable(el,svg.node(),{max:10,hint:"🔍 2本指でひろげると拡大(ダブルタップでも)。大きくすると近い場所が分かれます",onZoom:(sc)=>{ if(Math.abs(sc-zs)>0.15){ drawPins(sc); drawList(); } if(isJp) main.querySelectorAll("[data-rg]").forEach(b=>{ if(sc<1.05) b.setAttribute("aria-pressed",String(b.dataset.rg==="all")); }); }});
+    drawPins(1);
     if(!mapState.sel && cl[0]) mapState.sel=cl[0].id;
+    main.querySelectorAll("[data-rg]").forEach(b=>b.onclick=()=>{ main.querySelectorAll("[data-rg]").forEach(x=>x.setAttribute("aria-pressed",String(x===b))); if(b.dataset.rg==="all"){ Z.reset(); return; } const r=JP_REGIONS[+b.dataset.rg]; const [x,y]=proj([r[1],r[2]]); Z.focus(x,y,r[3]); });
     function drawList(){ const box=document.getElementById("mapList"); if(!box) return; const c=cl.find(x=>x.id===mapState.sel);
-      const chips=`<div class="map-chips">${cl.map(x=>`<button class="fchip" data-cl="${x.id}" aria-pressed="${x.id===mapState.sel}">${esc(x.name.replace(/\(.*?\)/,""))} <b>${x.n}</b></button>`).join("")}</div>`;
+      const chips=`<div class="map-chips">${cl.map(x=>`<button class="fchip" data-cl="${esc(x.id)}" aria-pressed="${x.id===mapState.sel}">${esc(x.name.replace(/\(.*?\)/,""))} <b>${x.n}</b></button>`).join("")}</div>`;
       const listOf=gp=>{ const L=gp.list; const more=L.length>5; return `<section class="map-sec"><h3>📍 ${esc(gp.p[3])}<small> ${L.length}件</small></h3><ul class="mlist">${L.slice(0,5).map(n=>newsItem(n)).join("")}</ul>${more?`<details class="faq plain"><summary>あと${L.length-5}件を見る</summary><ul class="mlist">${L.slice(5).map(n=>newsItem(n)).join("")}</ul></details>`:""}</section>`; };
-      box.innerHTML = chips + (c? c.gs.map(listOf).join("") : "") + (others.length?`<p class="hint">この地図の外: ${others.map(o=>`${esc(o.p[3])}(${o.list.length})`).join("・")} → 「${mapState.view==="japan"?"🌏 世界":"🗾 日本"}」で見られます</p>`:"");
+      box.innerHTML = chips + (c? c.gs.map(listOf).join("") : "") + (others.length?`<p class="hint">この地図の外: ${others.map(o=>`${esc(o.p[3])}(${o.list.length})`).join("・")} → 「${isJp?"🌏 世界":"🗾 日本"}」で見られます</p>`:"")+(isJp?`<p class="hint">地図: 地球地図日本(国土地理院)・Natural Earth</p>`:"");
       box.querySelectorAll("[data-cl]").forEach(b=>b.onclick=()=>{ mapState.sel=b.dataset.cl; svg.selectAll(".pin").classed("on",false); drawList(); }); }
     drawList();
   }).catch(()=>{ const el=document.getElementById("map"); if(el) el.innerHTML='<div class="empty">地図を読み込めませんでした。通信状態を確かめて、開き直してください。</div>'; });
