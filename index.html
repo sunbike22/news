@@ -311,7 +311,7 @@ main{padding-block:18px 32px}
 .wx-kit .kit{display:inline-flex;align-items:center;gap:3px;background:var(--surface2);border:1px solid var(--line);border-radius:999px;padding:2px 9px;font-weight:700}
 .wx-kit .kit i{font-style:normal;font-size:1.05rem}
 /* たたんでいるときは注意のよびかけを2行まで(開くか、押すと全文) */
-.wx:not(.open) .wx-info{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+.wx:not(.open) .wx-info .wi-t{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 .wx-warn{display:flex;flex-direction:column;gap:2px;background:var(--warn-soft);border:1px solid var(--warn);border-radius:12px;padding:9px 11px;cursor:pointer}
 .wx-warn.sp{background:var(--g-intl-s);border-color:var(--g-intl)}
 .wx-warn b{font-size:1rem}.wx-warn small{font-size:.86rem;line-height:1.5}
@@ -1858,7 +1858,7 @@ const WARN_LV=[["ℹ️","注意のよびかけ"],["⚠️","警戒のよびか�
 function warnLine(){ const A=myWarn(); if(!A.length) return `<div id="wxWarn"></div>`;
   const top=A.slice().sort((a,b)=>b.lv-a.lv)[0]; const [ic,nm]=WARN_LV[top.lv]||WARN_LV[0];
   const pf=prefNow(); const txt=String(top.text||"").replace(/^【[^】]*】/,"").replace(new RegExp("^"+pf+"(では|地方では)、?"),"").replace(new RegExp("^"+prefShort(pf)+"(県|都|府|地方)?(では)?、?"),"");
-  if(top.lv===0) return `<div id="wxWarn"><div class="wx-info" role="button" tabindex="0" data-quake="1">${ic} <b>${esc(prefNow())}に${esc(nm)}</b> ${esc(txt)} <span class="hint">気象庁発表</span></div></div>`;
+  if(top.lv===0) return `<div id="wxWarn"><div class="wx-info" role="button" tabindex="0" data-quake="1"><span class="wi-t">${ic} <b>${esc(prefNow())}に${esc(nm)}</b> ${esc(txt)} <span class="hint">気象庁発表</span></span></div></div>`;
   return `<div id="wxWarn"><div class="wx-warn ${top.lv>=2?"sp":""}" role="button" tabindex="0" data-quake="1"><b>${ic} ${esc(prefNow())}に${esc(nm)}が出ています</b><small>${esc(txt)}</small><small class="hint">気象庁発表 ・ タップでくわしく</small></div></div>`; }
 // たたんでいるときの1行(傘＋持ち物を2つまで)
 function wxSumLine(){ const w=D.weather||{}; const bits=[];
@@ -4489,6 +4489,7 @@ function openShimen(){ const sh=document.getElementById("sheet"); const w=D.weat
 document.addEventListener("click",e=>{ const b=e.target.closest("[data-shimen]"); if(!b) return; e.preventDefault(); openShimen(); });
 // ===== お知らせ(新しくなったところ)。機能を足したら、いちばん上に1つ足す =====
 const UPDATES=[
+  {id:"2026-10-28d",d:"2026-10-28",t:"🔍 地図を大きくしてもくっきり・捜査ボードを読みやすく",L:["地図を指で大きくすると、iPhoneなどで絵がぼやけていました。指を止めると、その大きさで描きなおしてくっきり見えるようにしました。","捜査ボードの糸は、同じテーマの場所を近いものから1本ずつつなぐだけにしました(前は全部の組み合わせで、線と文字が重なって読めませんでした)。糸の名前は、メモを押したときに出ます。","天気のよびかけ欄で、3行目の文字が半分見えていたのを直しました。"]},
   {id:"2026-10-28c",d:"2026-10-28",t:"🗾 地図をくわしく: 都道府県の線と、地方ごとのボタン",L:["日本の地図に都道府県の線が入り、2本指で大きくすると県の名前も出ます。","上の「北海道・東北・関東…」のボタンで、その地方にすぐ寄れます。","大きくすると、近くでまとまっていたピン(東京・横浜・さいたま など)が別々に分かれます。"]},
   {id:"2026-10-28b",d:"2026-10-28",t:"🧹 「きょう」「予定」「さがす」をすっきりさせました",L:["天気カードは3行にたたみ、「▼ くわしく」で1時間ごと・雨雲・持ち物が開きます。","ペットからの手紙・きょうの1問・大事な日・5大ニュース・つづき は「📌 きょうの小さな知らせ」に1行ずつ入れました(押すと開きます。「この画面の並びを変える」で前のように出すこともできます)。","予定タブは「📅 予定 / 🎯 予測」の切りかえに。さがすタブのしぼりこみは「🎛️ しぼりこむ」にたたみました。"]},
   {id:"2026-10-28a",d:"2026-10-28",t:"🔎 さがすの「もっと見る」で画面が横にずれるのを直しました",L:["古いニュースの札に長い文が入っていて、画面が横に動いてしまっていました。札には予測の番号だけを出すようにしました。"]},
@@ -4810,13 +4811,21 @@ function zoomable(wrap,inner,opt){
   if(!wrap||!inner) return null;
   const o=opt||{}, MIN=o.min||1, MAX=o.max||6;
   let s=1,tx=0,ty=0,moved=false,lastTap=0,ZC=null;
+  /* くっきり: 中身がSVGなら、指を止めたあとで CSS の拡大をやめ、viewBox を見えている所に合わせて描きなおす(iPhoneでは CSS の拡大だと前の画像を引きのばしてぼやけるため。2026-10-28) */
+  const SV=(inner instanceof SVGSVGElement)&&o.crisp!==false; let vb0=null, crisp=false, crT=0;
+  const unCrisp=()=>{ if(crisp){ inner.setAttribute("viewBox",vb0); crisp=false; } };
+  const doCrisp=()=>{ if(!SV||s<=1.01||pts.size) return; const W=inner.clientWidth||wrap.clientWidth, H=inner.clientHeight||wrap.clientHeight; if(!W||!H) return;
+    if(!crisp) vb0=inner.getAttribute("viewBox"); if(!vb0) return; const [vx,vy,vw,vh]=vb0.split(/[\s,]+/).map(Number); if(!vw||!vh) return;
+    const k=Math.max(vw/W,vh/H), dx=(W-vw/k)/2, dy=(H-vh/k)/2, x0=W/2-(W/2+tx)/s, y0=H/2-(H/2+ty)/s;
+    inner.setAttribute("viewBox",[vx+(x0-dx)*k, vy+(y0-dy)*k, W/s*k, H/s*k].map(v=>+v.toFixed(3)).join(" ")); inner.style.transform="none"; crisp=true; };
   const pts=new Map(); let g0=null;
   wrap.classList.add("zwrap"); inner.classList.add("zin");
   const clamp=()=>{ s=Math.max(MIN,Math.min(MAX,s));
     const w=wrap.clientWidth,h=wrap.clientHeight;
     const mx=Math.max(0,(w*s-w)/2), my=Math.max(0,(h*s-h)/2);
     tx=Math.max(-mx,Math.min(mx,tx)); ty=Math.max(-my,Math.min(my,ty)); };
-  const apply=()=>{ clamp(); inner.style.transform=`translate(${tx}px,${ty}px) scale(${s})`;
+  const apply=()=>{ clamp(); unCrisp(); inner.style.transform=`translate(${tx}px,${ty}px) scale(${s})`; inner.dataset.zs=s.toFixed(3);
+    if(SV){ clearTimeout(crT); crT=setTimeout(doCrisp,200); }
     wrap.classList.toggle("zoomed",s>1.01);
     if(ZC){ const zi=ZC.querySelector("[data-zin]"), zo=ZC.querySelector("[data-zout]");
       if(zi) zi.disabled=s>=MAX-.001; if(zo) zo.disabled=s<=MIN+.001; }
@@ -4851,7 +4860,7 @@ function zoomable(wrap,inner,opt){
       if(Math.abs(e.clientX-px)+Math.abs(e.clientY-py)>1) moved=true; apply(); e.preventDefault(); }
   });
   // 指をはなしたら「動かした」をすぐ消す(次のタップを飲みこまないように。click はこのあとに来る)
-  const up=e=>{ pts.delete(e.pointerId); if(pts.size<2) g0=null; if(!pts.size) setTimeout(()=>{ moved=false; },0); };
+  const up=e=>{ pts.delete(e.pointerId); if(pts.size<2) g0=null; if(!pts.size){ setTimeout(()=>{ moved=false; },0); if(SV){ clearTimeout(crT); crT=setTimeout(doCrisp,200); } } };
   wrap.addEventListener("pointerup",up); wrap.addEventListener("pointercancel",up); wrap.addEventListener("pointerleave",up);
   // 動かしたあとの指はなしを「押した」と数えない(＋−⟲のボタンは別)
   wrap.addEventListener("click",e=>{ if(moved&&!e.target.closest(".zc")){ e.stopPropagation(); e.preventDefault(); } moved=false; },true);
@@ -4968,14 +4977,18 @@ function renderBoard(recentDays){
   items.forEach(x=>{ let pp=x.p; if(isJ){ if(!inJP(pp)) return; } else if(inJP(pp)) pp=JP; (G[pp[3]]=G[pp[3]]||{p:pp,list:[],th:new Set()}).list.push(x.n); String(x.n.th||"").split(/[,、]/).map(t=>t.trim()).filter(Boolean).forEach(t=>G[pp[3]].th.add(t)); });
   const groups=Object.values(G);
   getWorld().then(world=>{
-    const bd=document.getElementById("board"); if(!bd) return; const BW=isJ?900:1100,BH=isJ?1000:620; const B=bdStore();
+    const bd=document.getElementById("board"); if(!bd) return; const BW=isJ?1000:1100,BH=isJ?1200:620; const B=bdStore();
     if(!groups.length){ bd.innerHTML=`<div class="empty" style="padding:40px;color:#2a2116">この範囲には、まだ場所のわかるニュースがありません。</div>`; return; }
     const proj=isJ?d3.geoMercator().fitExtent([[30,30],[BW-30,BH-30]],{type:"MultiPoint",coordinates:[[123.5,24],[146,45.6]]}):d3.geoNaturalEarth1().fitExtent([[20,20],[BW-20,BH-20]],{type:"Sphere"}); const path=d3.geoPath(proj);
     const notes=groups.map(g=>{ const [x,y]=proj([g.p[1],g.p[2]]); return {id:"p:"+g.p[3],g,px:x,py:y,x:x-66,y:y-100,w:140,h:88}; });
     for(let it=0;it<300;it++){ notes.forEach((a,i)=>notes.forEach((b,j)=>{ if(i>=j) return; const dx=(a.x+a.w/2)-(b.x+b.w/2), dy=(a.y+a.h/2)-(b.y+b.h/2); const ox=(a.w+18)-Math.abs(dx), oy=(a.h+22)-Math.abs(dy); if(ox>0&&oy>0){ if(ox<oy){ const m=(dx>=0?1:-1)*ox/2; a.x+=m; b.x-=m; } else { const m=(dy>=0?1:-1)*oy/2; a.y+=m; b.y-=m; } } }));
       notes.forEach(a=>{ a.x=Math.max(8,Math.min(BW-a.w-8,a.x)); a.y=Math.max(14,Math.min(BH-a.h-8,a.y)); }); }
-    const auto=[]; for(let i=0;i<notes.length;i++) for(let j=i+1;j<notes.length;j++){ const sh=[...notes[i].g.th].filter(t=>notes[j].g.th.has(t)); if(sh.length) auto.push({a:notes[i].id,b:notes[j].id,t:sh[0]}); }
-    if(isJ){ for(let i=0;i<notes.length;i++) for(let j=i+1;j<notes.length;j++){ if(auto.some(e=>(e.a===notes[i].id&&e.b===notes[j].id))) continue; const gi=new Set(notes[i].g.list.map(n=>n.g)); const sg=[...new Set(notes[j].g.list.map(n=>n.g))].find(g=>gi.has(g)); if(sg) auto.push({a:notes[i].id,b:notes[j].id,t:GN[sg],weak:1}); } }
+    /* 糸は「同じテーマの場所を、近いものから1本ずつ」つなぐ(全部の組み合わせだと8か所で28本になり読めなかった=2026-10-28)。同じ2か所には1本だけ */
+    const auto=[]; const linked=(a,b)=>auto.some(e=>(e.a===a&&e.b===b)||(e.a===b&&e.b===a));
+    const tree=(arr,t,weak)=>{ const inT=[arr[0]], rest=arr.slice(1); while(rest.length){ let bt=null; inT.forEach(a=>rest.forEach(b=>{ const d=Math.hypot(a.px-b.px,a.py-b.py); if(!bt||d<bt.d) bt={a,b,d}; })); inT.push(bt.b); rest.splice(rest.indexOf(bt.b),1); if(!linked(bt.a.id,bt.b.id)) auto.push({a:bt.a.id,b:bt.b.id,t,weak}); } };
+    const byKey=f=>{ const M={}; notes.forEach(n=>f(n).forEach(k=>(M[k]=M[k]||[]).push(n))); return Object.entries(M).filter(x=>x[1].length>1).sort((x,y)=>y[1].length-x[1].length); };
+    byKey(n=>[...n.g.th]).forEach(([t,a])=>tree(a,t,0));
+    if(isJ) byKey(n=>[...new Set(n.g.list.map(x=>x.g))]).forEach(([g,a])=>tree(a,GN[g],1));
     const jp=isJ?null:notes.find(n=>n.g.p[3]==="日本");
     if(jp) notes.forEach(n=>{ if(n===jp) return; [...n.g.th].forEach(T=>{ if(auto.some(e=>[e.a,e.b].includes(n.id)&&[e.a,e.b].includes(jp.id))) return;
       const ex=Object.values(D.explainers).find(e=>gdScore(gdQuery(T),e.name+" "+(e.now||"")+" "+e.kid)>=0.5); if(ex&&(ex.flow||[]).some(f=>/日本|暮らし|ガソリン|家計/.test(f.t))) auto.push({a:n.id,b:jp.id,t:T+"→日本"}); }); });
@@ -4985,7 +4998,9 @@ function renderBoard(recentDays){
     const sag=(x1,y1,x2,y2)=>{ const mx=(x1+x2)/2,my=(y1+y2)/2+Math.min(70,Math.hypot(x2-x1,y2-y1)*.14); return {d:`M${x1} ${y1} Q ${mx} ${my} ${x2} ${y2}`,lx:(x1+2*mx+x2)/4,ly:(y1+2*my+y2)/4}; };
     function drawStrings(){ const svg=bd.querySelector(".bd-str"); const L=[...auto.map(e=>({...e,k:"auto"})),...B.links.map((e,i)=>({...e,k:"mine",i}))];
       svg.innerHTML=L.map(e=>{ const A=find(e.a),Bn=find(e.b); if(!A||!Bn) return ""; const [x1,y1]=ctr(A),[x2,y2]=ctr(Bn); const q=sag(x1,y1,x2,y2); const hot=BD.sel&&(e.a===BD.sel||e.b===BD.sel); const dim=BD.sel&&!hot;
-        return `<g class="str ${e.k}${e.weak?" weak":""}${hot?" hot":""}${dim?" dim":""}"><path d="${q.d}"/>${e.t?`<text x="${q.lx}" y="${q.ly}" text-anchor="middle">${esc(e.t)}</text>`:""}</g>`; }).join(""); }
+        if(e.weak&&!hot) return ""; /* 同じジャンルの点線は、メモを押したときだけ */
+        const lbl=e.t&&(hot||e.k==="mine"||(!BD.sel&&L.filter(x=>!x.weak).length<=6)); /* 糸の名前は、押したメモの糸だけ(多いと読めないため) */
+        return `<g class="str ${e.k}${e.weak?" weak":""}${hot?" hot":""}${dim?" dim":""}"><path d="${q.d}"/>${lbl?`<text x="${q.lx}" y="${q.ly}" text-anchor="middle">${esc(e.t)}</text>`:""}</g>`; }).join(""); }
     function drawNotes(){ const layer=bd.querySelector(".bd-notes");
       layer.innerHTML=notes.map((n,i)=>{ const top=n.g.list[0]; return `<button class="note${BD.sel===n.id?" on":""}" data-id="${esc(n.id)}" style="left:${n.x}px;top:${n.y}px;width:${n.w}px;height:${n.h}px;--tape:var(--g-${top.g});--r:${((i*37)%7)-3}deg"><i class="pinhead"></i><b>${esc(n.g.p[3])}</b><span>${esc(top.h)}</span><small>${n.g.list.length}件${n.g.th.size?" ・ "+esc([...n.g.th][0]):""}</small></button>`; }).join("")
         + B.notes.map(u=>`<div class="note mine${BD.sel===u.id?" on":""}" data-id="${esc(u.id)}" role="button" tabindex="0" style="left:${u.x}px;top:${u.y}px;width:130px;height:78px;--r:${u.r||0}deg"><i class="pinhead blue"></i><span class="mtx">${esc(u.text||"(タップして書く)")}</span><small>あなたのメモ ・ 動かせます</small></div>`).join(""); }

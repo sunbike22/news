@@ -34,23 +34,23 @@ await p.waitForTimeout(600);
 await p.evaluate(()=>{const e=document.getElementById("tab-map")||document.querySelector('.jump [data-tab="map"]')||[...document.querySelectorAll("button")].find(x=>/地図/.test(x.textContent));e&&e.click();});
 await p.waitForTimeout(2800);
 if(!(await p.$("#map"))){ console.log("地図タブを開けなかった"); await b.close(); process.exit(1); }
-const t0=await p.evaluate(()=>{const s=document.querySelector("#map svg");return s?s.style.transform:"なし";});
+const t0=await p.evaluate(()=>(s=>s?("scale("+(s.dataset.zs||1)+") "+(s.getAttribute("viewBox")||"")+" "+s.style.transform):"なし")(document.querySelector("#map svg")));
 await pinch(p,"#map",60,240);
-const t1=await p.evaluate(()=>{const s=document.querySelector("#map svg");return s?s.style.transform:"なし";});
+const t1=await p.evaluate(()=>(s=>s?("scale("+(s.dataset.zs||1)+") "+(s.getAttribute("viewBox")||"")+" "+s.style.transform):"なし")(document.querySelector("#map svg")));
 const sc=t=>{const m=/scale\(([\d.]+)\)/.exec(t||"");return m?+m[1]:0;};
 ok("世界地図: 2本指でひろげると大きくなる", sc(t1)>sc(t0)+0.2, sc(t0)+"→"+sc(t1).toFixed(2));
 // 1本指で動く
 await p.waitForTimeout(500);
-const before=await p.evaluate(()=>document.querySelector("#map svg").style.transform);
+const before=await p.evaluate(()=>(s=>s?("scale("+(s.dataset.zs||1)+") "+(s.getAttribute("viewBox")||"")+" "+s.style.transform):"なし")(document.querySelector("#map svg")));
 await p.evaluate(()=>{const w=document.getElementById("map");const r=w.getBoundingClientRect();
   const mk=(t,x,y)=>w.dispatchEvent(new PointerEvent(t,{pointerId:9,clientX:x,clientY:y,bubbles:true,isPrimary:true,pointerType:"touch"}));
   mk("pointerdown",r.left+60,r.top+60); mk("pointermove",r.left+120,r.top+100); mk("pointerup",r.left+120,r.top+100);});
 await p.waitForTimeout(250);
-const after=await p.evaluate(()=>document.querySelector("#map svg").style.transform);
+const after=await p.evaluate(()=>(s=>s?("scale("+(s.dataset.zs||1)+") "+(s.getAttribute("viewBox")||"")+" "+s.style.transform):"なし")(document.querySelector("#map svg")));
 ok("世界地図: 大きいとき1本指で動かせる", before!==after, after.slice(0,42));
 // ⟲ でもどる
 await p.evaluate(()=>document.querySelector("[data-zre]").click()); await p.waitForTimeout(250);
-ok("世界地図: ⟲で元の大きさにもどる", sc(await p.evaluate(()=>document.querySelector("#map svg").style.transform))<=1.01);
+ok("世界地図: ⟲で元の大きさにもどる", sc(await p.evaluate(()=>(s=>s?("scale("+(s.dataset.zs||1)+") "+(s.getAttribute("viewBox")||"")+" "+s.style.transform):"なし")(document.querySelector("#map svg"))))<=1.01);
 // 等倍のときページがスクロールできるか(touch-action)
 ok("世界地図: 等倍ならページをスクロールできる", (await p.evaluate(()=>getComputedStyle(document.getElementById("map")).touchAction))!=="none");
 // 丸をタップしたら今までどおり選べる
@@ -61,7 +61,7 @@ ok("世界地図: 丸をタップして選べる(今までどおり)", pick==="�
 // --- 日本地図
 await p.evaluate(()=>{const b=document.querySelector('[data-v="japan"]');b&&b.click();}); await p.waitForTimeout(2200);
 await pinch(p,"#map",60,220);
-ok("日本地図: 2本指でひろげると大きくなる", sc(await p.evaluate(()=>{const s=document.querySelector("#map svg");return s?s.style.transform:"";}))>1.2);
+ok("日本地図: 2本指でひろげると大きくなる", sc(await p.evaluate(()=>{return (s=>s?("scale("+(s.dataset.zs||1)+") "+(s.getAttribute("viewBox")||"")+" "+s.style.transform):"なし")(document.querySelector("#map svg"));}))>1.2);
 
 // --- 捜査ボード
 await p.evaluate(()=>{const b=document.querySelector('[data-v="board"]');b&&b.click();}); await p.waitForTimeout(2600);
@@ -88,10 +88,10 @@ console.log("天気地図の状態:",JSON.stringify(await p.evaluate(()=>{const 
  window.__wl=[]; ["pointerdown","pointermove"].forEach(t=>box.addEventListener(t,e=>{ if(window.__wl.length<6) window.__wl.push(t+" "+e.pointerType); },true));
  const r=box.getBoundingClientRect();
  return {zc:(box.parentNode.querySelector(".zc")||{querySelectorAll:()=>[]}).querySelectorAll("button").length, zin:!!box.querySelector("svg.zin"), x:Math.round(r.left+r.width/2), y:Math.round(r.top+r.height/2), top:Math.round(r.top)};})));
-const w0=await p.evaluate(()=>{const s=document.querySelector("#wxMapBox svg");return s?s.style.transform:"なし";});
+const w0=await p.evaluate(()=>{return (s=>s?("scale("+(s.dataset.zs||1)+") "+(s.getAttribute("viewBox")||"")+" "+s.style.transform):"なし")(document.querySelector("#wxMapBox svg"));});
 await pinch(p,"#wxMapBox",60,220);
 console.log("うけとったイベント:",(await p.evaluate(()=>window.__wl||[])).join(" | ")||"なし");
-const w1=await p.evaluate(()=>{const s=document.querySelector("#wxMapBox svg");return s?s.style.transform:"なし";});
+const w1=await p.evaluate(()=>{return (s=>s?("scale("+(s.dataset.zs||1)+") "+(s.getAttribute("viewBox")||"")+" "+s.style.transform):"なし")(document.querySelector("#wxMapBox svg"));});
 ok("全国の天気: 2本指でひろげると大きくなる", sc(w1)>sc(w0)+0.2, sc(w0)+"→"+sc(w1).toFixed(2));
 await p.evaluate(()=>document.querySelectorAll(".toast").forEach(t=>t.remove()));
 await p.screenshot({path:S+"/zoom_wx.png"});

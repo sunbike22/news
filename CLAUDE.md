@@ -270,3 +270,6 @@
 - さがすタブのしぼりこみ(ジャンル・テーマ・確認ずみ)は `details.s-fold`(しぼりこみ中だけ開いておく)。ジャンルの棒グラフも、しぼりこみ中だけ。
 - 🗾 **地図の都道府県**: `jp-pref.json`(47都道府県の topojson、`objects.japan`、`properties:{n,id}`。元は 地球地図日本(国土地理院)を dataofjapan/land で GeoJSON にしたもの を topojson-simplify で 91KB に。出典は地図の下に「地図: 地球地図日本(国土地理院)」と書く)。`getJpPref()` は `getWorld()` のあと(topojson が読めてから)に呼ぶ。線は `.prefs`、県名は `.pref-l`(`svg.z2`=2倍以上のときだけ見える)。地方ボタンは `JP_REGIONS`(名前・中心の経度緯度・倍率)→ `Z.focus(x,y,scale)`。ピンのまとめは `cluster(scale)`(しきい値 `scale<1.05?30:18/scale`)で、拡大するほど分かれる(`drawPins(scale)`。`zoomable` の `onZoom` が60msに1回呼ぶ。ピンは `scale(1/scale)` で大きさを保つ)。`.zin` に `will-change:transform` は付けない(拡大した文字がぼやける)。
 - `.mk`(今日の数字の3つの札)は xl・xxl では2列(3列だと「NY原油」が切れる)。
+- **地図を拡大してもくっきり**(2026-10-28): `zoomable` の中身が `<svg>` のときは、指を止めて200ms後に CSS の拡大をやめ、`viewBox` を見えている範囲に合わせる(`doCrisp`。動かし始めたら `unCrisp` で元の viewBox+CSS にもどす)。iPhoneは CSS の transform の拡大だと前の画像を引きのばしてぼやけるため。いまの倍率は `svg.dataset.zs`(テストはこれを見る)。やめたいときは `{crisp:false}`。
+- **捜査ボードの糸**(2026-10-28): 同じテーマの場所は、近いものから1本ずつつなぐ(最小の木。全部の組み合わせはしない)。同じ2か所には1本だけ。日本のときの「同じジャンル」の点線と、糸の名前は、メモを押したときだけ(糸が6本以下なら名前を出す)。日本の板は 1000×1200。
+- 天気のよびかけ欄(`.wx-info`)を2行で切るときは、中の `.wi-t` に line-clamp をかける(枠に padding があると、外側で切っても3行目が余白に見える)。
