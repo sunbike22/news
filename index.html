@@ -791,7 +791,7 @@ details.faq p{margin:10px 0 12px}
 .plan .ics{flex-direction:column;gap:0;padding:4px 8px;min-width:44px;min-height:44px;line-height:1.1;font-size:1.1rem}.plan .ics small{font-size:.7rem;font-weight:700}
 .cd-fold{margin-bottom:10px}
 .pref-l text{fill:var(--muted);font-weight:700;opacity:0;pointer-events:none;paint-order:stroke;stroke:var(--map-sea);stroke-width:2px;transition:opacity .2s}.mapsvg svg.z2 .pref-l text{opacity:.95}
-.map-rg{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}.map-rg::-webkit-scrollbar{display:none}.map-rg .fchip{flex:none}
+.mapsvg .pin-leg{stroke:var(--ink);fill:var(--ink);opacity:.55;pointer-events:none}.map-rg{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}.map-rg::-webkit-scrollbar{display:none}.map-rg .fchip{flex:none}
 .s-fold{margin-top:-2px}
 .score{display:grid;grid-template-columns:140px 1fr;gap:16px;align-items:center}
 .donut{position:relative;width:140px;height:140px}
@@ -4489,7 +4489,7 @@ function openShimen(){ const sh=document.getElementById("sheet"); const w=D.weat
 document.addEventListener("click",e=>{ const b=e.target.closest("[data-shimen]"); if(!b) return; e.preventDefault(); openShimen(); });
 // ===== お知らせ(新しくなったところ)。機能を足したら、いちばん上に1つ足す =====
 const UPDATES=[
-  {id:"2026-10-28d",d:"2026-10-28",t:"🔍 地図を大きくしてもくっきり・捜査ボードを読みやすく",L:["地図を指で大きくすると、iPhoneなどで絵がぼやけていました。指を止めると、その大きさで描きなおしてくっきり見えるようにしました。","捜査ボードの糸は、同じテーマの場所を近いものから1本ずつつなぐだけにしました(前は全部の組み合わせで、線と文字が重なって読めませんでした)。糸の名前は、メモを押したときに出ます。","天気のよびかけ欄で、3行目の文字が半分見えていたのを直しました。"]},
+  {id:"2026-10-28d",d:"2026-10-28",t:"🔍 地図を大きくしてもくっきり・捜査ボードを読みやすく",L:["地図を指で大きくすると、iPhoneなどで絵がぼやけていました。指を止めると、その大きさで描きなおしてくっきり見えるようにしました。","捜査ボードの糸は、同じテーマの場所を近いものから1本ずつつなぐだけにしました(前は全部の組み合わせで、線と文字が重なって読めませんでした)。糸の名前は、メモを押したときに出ます。","天気のよびかけ欄で、3行目の文字が半分見えていたのを直しました。","地図の丸が近くて重なるときは、少しずらして元の場所へ細い線を引くようにしました(関東に寄ると、東京・横浜・千葉が別々に押せます)。"]},
   {id:"2026-10-28c",d:"2026-10-28",t:"🗾 地図をくわしく: 都道府県の線と、地方ごとのボタン",L:["日本の地図に都道府県の線が入り、2本指で大きくすると県の名前も出ます。","上の「北海道・東北・関東…」のボタンで、その地方にすぐ寄れます。","大きくすると、近くでまとまっていたピン(東京・横浜・さいたま など)が別々に分かれます。"]},
   {id:"2026-10-28b",d:"2026-10-28",t:"🧹 「きょう」「予定」「さがす」をすっきりさせました",L:["天気カードは3行にたたみ、「▼ くわしく」で1時間ごと・雨雲・持ち物が開きます。","ペットからの手紙・きょうの1問・大事な日・5大ニュース・つづき は「📌 きょうの小さな知らせ」に1行ずつ入れました(押すと開きます。「この画面の並びを変える」で前のように出すこともできます)。","予定タブは「📅 予定 / 🎯 予測」の切りかえに。さがすタブのしぼりこみは「🎛️ しぼりこむ」にたたみました。"]},
   {id:"2026-10-28a",d:"2026-10-28",t:"🔎 さがすの「もっと見る」で画面が横にずれるのを直しました",L:["古いニュースの札に長い文が入っていて、画面が横に動いてしまっていました。札には予測の番号だけを出すようにしました。"]},
@@ -4930,8 +4930,14 @@ function renderMap(){
       out.forEach((c,i)=>{ c.id=c.gs.map(x=>x.p[3]).join("|"); c.n=c.gs.reduce((a,g)=>a+g.list.length,0); c.name=c.gs[0].p[3]+(c.gs.length>1?"ほか":""); }); return out; }
     function drawPins(scale){ zs=scale; cl=cluster(scale); const k=1/scale; g.selectAll("*").remove();
       if(mapState.sel&&!cl.some(c=>c.id===mapState.sel)){ const hit=cl.find(c=>c.gs.some(gp=>mapState.sel.split("|").includes(gp.p[3]))); mapState.sel=hit?hit.id:null; }
-      cl.slice().reverse().forEach(c=>{ const r=(10+Math.min(8,c.n*0.8))*(scale>=4?0.72:scale>=2.2?0.85:1); const col=css("--g-"+c.gs[0].list[0].g)||"#c42b2b";
-        const node=g.append("g").attr("class","pin"+(mapState.sel===c.id?" on":"")).attr("tabindex",0).attr("role","button").attr("aria-label",`${c.name} ${c.n}件`).style("cursor","pointer").attr("transform",`translate(${c.x.toFixed(1)},${c.y.toFixed(1)}) scale(${k.toFixed(3)})`);
+      /* 丸と名前が重なるときは、画面の上で少しずつ押しのけ(最大48px)、元の場所へ細い線を引く(2026-10-28。関東に寄っても東京・横浜・千葉が別々に押せるように) */
+      cl.forEach(c=>{ c.r=(10+Math.min(8,c.n*0.8))*(scale>=4?0.72:scale>=2.2?0.85:1); c.bw=Math.max(c.r*2,c.name.replace(/\(.*?\)/,"").length*11+8)+4; c.bh=c.r*2+18; c.sx=c.x*scale; c.sy=c.y*scale; c.ox=c.sx; c.oy=c.sy; });
+      for(let it=0;it<80;it++){ let any=false; cl.forEach((a,i)=>cl.forEach((b,j)=>{ if(i>=j) return; const dx=b.sx-a.sx, dy=(b.sy+8)-(a.sy+8); const ox=(a.bw+b.bw)/2-Math.abs(dx), oy=(a.bh+b.bh)/2-Math.abs(dy); if(ox<=0||oy<=0) return; any=true;
+          if(ox<oy){ const m=(dx>=0?1:-1)*(ox/2+.5); a.sx-=m; b.sx+=m; } else { const m=(dy>=0?1:-1)*(oy/2+.5); a.sy-=m; b.sy+=m; } }));
+        cl.forEach(c=>{ const dx=c.sx-c.ox, dy=c.sy-c.oy, d=Math.hypot(dx,dy); if(d>48){ c.sx=c.ox+dx*48/d; c.sy=c.oy+dy*48/d; } }); if(!any) break; }
+      cl.forEach(c=>{ c.px=c.sx/scale; c.py=c.sy/scale; if(Math.hypot(c.sx-c.ox,c.sy-c.oy)>3){ g.append("line").attr("class","pin-leg").attr("x1",c.x).attr("y1",c.y).attr("x2",c.px).attr("y2",c.py).attr("stroke-width",(1.4/scale).toFixed(3)); g.append("circle").attr("class","pin-leg").attr("cx",c.x).attr("cy",c.y).attr("r",(2.6/scale).toFixed(3)); } });
+      cl.slice().reverse().forEach(c=>{ const r=c.r; const col=css("--g-"+c.gs[0].list[0].g)||"#c42b2b";
+        const node=g.append("g").attr("class","pin"+(mapState.sel===c.id?" on":"")).attr("tabindex",0).attr("role","button").attr("aria-label",`${c.name} ${c.n}件`).style("cursor","pointer").attr("transform",`translate(${c.px.toFixed(2)},${c.py.toFixed(2)}) scale(${k.toFixed(3)})`);
         node.append("circle").attr("r",r).attr("fill",col).attr("stroke","#fff").attr("stroke-width",2.5);
         node.append("text").attr("y",4).attr("text-anchor","middle").attr("font-size",12).attr("font-weight",800).attr("fill","#fff").text(c.n);
         node.append("text").attr("class","plabel").attr("y",r+13).attr("text-anchor","middle").text(c.name.replace(/\(.*?\)/,""));
