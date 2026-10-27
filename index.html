@@ -101,7 +101,7 @@ main{padding-block:18px 32px}
 .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:16px}
 
 /* chips */
-.chip{display:inline-flex;align-items:center;gap:4px;font-size:.82rem;font-weight:700;padding:2px 9px;border-radius:999px;white-space:nowrap;background:var(--g-pred-s);color:var(--g-pred-t,var(--g-pred))}
+.chip{display:inline-flex;align-items:center;gap:4px;font-size:.82rem;font-weight:700;padding:2px 9px;border-radius:999px;white-space:nowrap;max-width:100%;overflow:hidden;background:var(--g-pred-s);color:var(--g-pred-t,var(--g-pred))}
 .chip.pol{background:var(--g-pol-s);color:var(--g-pol-t,var(--g-pol))} .chip.eco{background:var(--g-eco-s);color:var(--g-eco-t,var(--g-eco))} .chip.soc{background:var(--g-soc-s);color:var(--g-soc-t,var(--g-soc))}
 .chip.it{background:var(--g-it-s);color:var(--g-it-t,var(--g-it))} .chip.intl{background:var(--g-intl-s);color:var(--g-intl-t,var(--g-intl))} .chip.spo{background:var(--g-spo-s);color:var(--g-spo-t,var(--g-spo))} .chip.ent{background:var(--g-ent-s);color:var(--g-ent-t,var(--g-ent))}
 .chip.fas{background:var(--g-fas-s);color:var(--g-fas-t,var(--g-fas))} .chip.sci{background:var(--g-sci-s);color:var(--g-sci-t,var(--g-sci))} .chip.home{background:var(--g-home-s);color:var(--g-home-t,var(--g-home))} .chip.food{background:var(--g-food-s);color:var(--g-food-t,var(--g-food))} .chip.life{background:var(--g-life-s);color:var(--g-life-t,var(--g-life))} .chip.trip{background:var(--g-trip-s);color:var(--g-trip-t,var(--g-trip))}
@@ -2166,7 +2166,9 @@ function tick(){ st.raf=requestAnimationFrame(now=>{ if(!st||st.paused) return; 
 function closeStory(){ if(st) cancelAnimationFrame(st.raf); st=null; stopSpeak(); const el=document.getElementById("story"); el.hidden=true; el.innerHTML=""; document.body.style.overflow=""; document.removeEventListener("keydown",storyKeys); document.getElementById("playBtn")?.focus(); }
 
 // ===== さがす =====
-const NEWS = D.news.map(r=>({d:r[0],g:r[1],ok:r[2]===1?1:0,info:r[2]===2,h:r[3],s:r[4],th:r[5],p:r[6]})).sort((a,b)=>b.d.localeCompare(a.d));
+/* 予測の欄は「N12・N24」のような番号だけにする(説明の文が入っていると札が横に長くなり、画面が横にずれた=2026-10-28) */
+const predIds=v=>{ v=String(v||""); if(/対象外|^なし/.test(v)) return ""; return [...new Set(v.match(/\b[A-Z]{1,2}\d{1,3}\b/g)||[])].join("・"); };
+const NEWS = D.news.map(r=>({d:r[0],g:r[1],ok:r[2]===1?1:0,info:r[2]===2,h:r[3],s:r[4],th:r[5],p:predIds(r[6])})).sort((a,b)=>b.d.localeCompare(a.d));
 const THEMES = [...new Set(NEWS.flatMap(n=>n.th?n.th.split(/[、,]/):[]).filter(Boolean))];
 const sState={q:"",g:new Set(),th:"",ok:false,onlyNew:false};
 let sLim=20;
@@ -4441,6 +4443,7 @@ function openShimen(){ const sh=document.getElementById("sheet"); const w=D.weat
 document.addEventListener("click",e=>{ const b=e.target.closest("[data-shimen]"); if(!b) return; e.preventDefault(); openShimen(); });
 // ===== お知らせ(新しくなったところ)。機能を足したら、いちばん上に1つ足す =====
 const UPDATES=[
+  {id:"2026-10-28a",d:"2026-10-28",t:"🔎 さがすの「もっと見る」で画面が横にずれるのを直しました",L:["古いニュースの札に長い文が入っていて、画面が横に動いてしまっていました。札には予測の番号だけを出すようにしました。"]},
   {id:"2026-10-27d",d:"2026-10-27",t:"🔠 「文字の大きさ」がアプリ全体に効くように",L:["「大きく」「もっと大きく」にしても、カードの見出しやボタンの文字が大きくならないところがありました。いまはアプリ中の文字が大きくなります。","ボタンの名前がことばの途中で折り返す(「1本ガ/チャ」など)のも直しました。","一時、「今日の3行」の文字が折り返さずに画面の右へ切れていたのも直しました。"]},
   {id:"2026-10-27c",d:"2026-10-27",t:"👆 「知ってた?」の文字の重なりを直しました",L:["見出しが長いとき、カードの文字が下のボタンに重なっていました。カードの高さを見出しに合わせて伸ばすようにしました。"]},
   {id:"2026-10-27b",d:"2026-10-27",t:"🗺️ ペットの旅を直しました",L:["秋田・山形・青森・岩手・宮城・福島・新潟・東北が「世界」に入っていたのを、「日本」に直しました。","日本の場所は北から南の順に並びます。"]},

@@ -35,6 +35,10 @@ for(const [mode,dark,w] of [["normal",false,390],["normal",true,390],["easy",fal
     ["好きなこと",()=>p.evaluate(()=>{const f=document.querySelector("[data-topics]");f&&f.click();})],["送る",()=>p.evaluate(()=>{document.getElementById("tab-today").click();const f=document.querySelector("[data-share]");f&&f.click();})],
     ["解説",()=>p.evaluate(()=>{document.getElementById("tab-explain").click();const f=document.querySelector("[data-ex]");f&&f.click();})]];
   for(const [n,f] of opens){ await f(); await p.waitForTimeout(700); if(!(await sw(p))) wide=false; await p.evaluate(()=>{ const sh=document.getElementById("sheet"); if(sh&&!sh.hidden){ const x=sh.querySelector(".bar .iconbtn"); x&&x.click(); } const ov=document.getElementById("shareOv"); if(ov){ const x=ov.querySelector("[data-shx],.sh-x,button"); x&&x.click(); } }); await p.waitForTimeout(200); }
+  // さがす:「もっと見る」を最後まで押しても横にずれない(長い札で画面が横に動いた=2026-10-28)
+  await p.evaluate(()=>{const e=document.getElementById("tab-search");e&&e.click();}); await p.waitForTimeout(400);
+  for(let i=0;i<60;i++){ const more=await p.evaluate(()=>{const b=[...document.querySelectorAll("button")].find(x=>/もっと見る/.test(x.textContent)&&x.offsetParent&&x.closest(".view"));if(!b)return false;b.click();return true;}); if(!more) break; await p.waitForTimeout(120); }
+  if(!(await sw(p))) { wide=false; console.log("   (さがすの もっと見る で横にはみ出し)"); }
   const tag=`${mode}/${dark?"暗":"明"}/${w}`;
   ok(tag+": 横にはみ出さない", wide); ok(tag+": 開いたとき開きっぱなしなし", openCnt===0, "open="+openCnt); ok(tag+": エラーなし", !errs.length, errs.slice(0,2).join(" | "));
   await ctx.close(); }
