@@ -932,11 +932,12 @@ svg.eat{animation:petEat .7s ease both!important}
 .if-out{font-size:1rem;background:var(--surface2);border-radius:10px;padding:6px 10px}
 .if-out .up,.if-out .dn{font-size:inherit;font-weight:700}
 /* 知ってた? */
-.kstack{position:relative;height:150px;margin:10px 0;touch-action:pan-y}
-.kcard{position:absolute;inset:0;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:6px;box-shadow:0 4px 14px rgba(0,0,0,.08);transform:translateY(calc(var(--i)*6px)) scale(calc(1 - var(--i)*.03));transition:transform .3s,opacity .3s;cursor:grab;user-select:none}
-.kcard b{font-size:1.02rem}.kcard .chip{align-self:flex-start}
+/* カードは同じマスに重ねる(高さはいちばん長い見出しに合わせる。固定の高さだと長い見出しがボタンに重なった=2026-10-27) */
+.kstack{position:relative;display:grid;margin:10px 0 14px;padding-bottom:26px;touch-action:pan-y}
+.kcard{grid-area:1/1;position:relative;min-height:130px;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px;display:flex;flex-direction:column;gap:6px;box-shadow:0 4px 14px rgba(0,0,0,.08);transform:translateY(calc(var(--i)*6px)) scale(calc(1 - var(--i)*.03));transition:transform .3s,opacity .3s;cursor:grab;user-select:none}
+.kcard b{font-size:1.02rem;line-height:1.6;overflow-wrap:anywhere}.kcard small{margin-top:auto}.kcard .chip{align-self:flex-start}
 .kcard.gone{opacity:0;pointer-events:none}.kcard.gone.r{transform:translateX(120%) rotate(12deg)}.kcard.gone.l{transform:translateX(-120%) rotate(-12deg)}
-.kbtn{display:grid;grid-template-columns:1fr 1fr;gap:8px}.kbtn .fchip{padding:10px;font-size:.95rem;font-weight:700}
+.kbtn{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}.kbtn .fchip{padding:10px;font-size:.95rem;font-weight:700}
 .kdone{display:grid;place-items:center;height:100%;text-align:center;font-weight:700}
 /* 話のタネ */
 .talk{display:flex;flex-direction:column;gap:8px;margin-top:8px}
@@ -4435,6 +4436,7 @@ function openShimen(){ const sh=document.getElementById("sheet"); const w=D.weat
 document.addEventListener("click",e=>{ const b=e.target.closest("[data-shimen]"); if(!b) return; e.preventDefault(); openShimen(); });
 // ===== お知らせ(新しくなったところ)。機能を足したら、いちばん上に1つ足す =====
 const UPDATES=[
+  {id:"2026-10-27c",d:"2026-10-27",t:"👆 「知ってた?」の文字の重なりを直しました",L:["見出しが長いとき、カードの文字が下のボタンに重なっていました。カードの高さを見出しに合わせて伸ばすようにしました。"]},
   {id:"2026-10-27b",d:"2026-10-27",t:"🗺️ ペットの旅を直しました",L:["秋田・山形・青森・岩手・宮城・福島・新潟・東北が「世界」に入っていたのを、「日本」に直しました。","日本の場所は北から南の順に並びます。"]},
   {id:"2026-10-27a",d:"2026-10-27",t:"🕒 更新が1日5回に",L:["ニュースの更新に、午後3時ごろの回を足しました(朝・昼・午後・夕方・夜)。","1回ごとに見くらべる報道機関の数もふやしています。"]},
   {id:"2026-10-26b",d:"2026-10-26",t:"🧹 見やすさの整理",L:["「今日のニュース10」の上の「新聞の形で読む」「自分に関係あるものに印」をボタンにして押しやすくしました。設定の目次に絵をそろえ、「アプリのボタンを置く」の案内を読みやすくしました。","NY原油の値が数日前のままのときは「最新は確認中」と出るようにしました。"]},
