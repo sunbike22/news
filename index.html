@@ -790,7 +790,7 @@ details.faq p{margin:10px 0 12px}
 .plan .pmm{font-size:.9rem;color:var(--muted);margin-top:2px}
 .plan .ics{flex-direction:column;gap:0;padding:4px 8px;min-width:44px;min-height:44px;line-height:1.1;font-size:1.1rem}.plan .ics small{font-size:.7rem;font-weight:700}
 .cd-fold{margin-bottom:10px}
-.pref-l text{fill:var(--muted);font-weight:700;opacity:0;pointer-events:none;paint-order:stroke;stroke:var(--map-sea);stroke-width:2px;transition:opacity .2s}.mapsvg svg.z2 .pref-l text{opacity:.95}
+.pref-l text{fill:var(--muted);font-weight:700;opacity:0;pointer-events:none;paint-order:stroke;stroke:var(--map-sea);stroke-width:2px;transition:opacity .2s}.mapsvg svg.z2 .pref-l text{opacity:.95}.mapsvg svg.z2 .pref-l text.sm{opacity:0}.mapsvg svg.z3 .pref-l text.sm{opacity:.95}.mapsvg .pref-l text.hid{opacity:0!important}
 .mapsvg .pin-leg{stroke:var(--ink);fill:var(--ink);opacity:.55;pointer-events:none}.map-rg{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}.map-rg::-webkit-scrollbar{display:none}.map-rg .fchip{flex:none}
 .s-fold{margin-top:-2px}
 .score{display:grid;grid-template-columns:140px 1fr;gap:16px;align-items:center}
@@ -4489,6 +4489,7 @@ function openShimen(){ const sh=document.getElementById("sheet"); const w=D.weat
 document.addEventListener("click",e=>{ const b=e.target.closest("[data-shimen]"); if(!b) return; e.preventDefault(); openShimen(); });
 // ===== お知らせ(新しくなったところ)。機能を足したら、いちばん上に1つ足す =====
 const UPDATES=[
+  {id:"2026-10-28e",d:"2026-10-28",t:"🌏 世界の地図にも地域ボタンと国の名前",L:["世界の地図の上に「東アジア・中東・ヨーロッパ…」のボタン。押すとその地域に寄れます。","大きくすると国の名前が日本語で出て、近くの丸は重ならないように分かれます(名前どうしが重なるときは、大きい国の名前を先に出します)。"]},
   {id:"2026-10-28d",d:"2026-10-28",t:"🔍 地図を大きくしてもくっきり・捜査ボードを読みやすく",L:["地図を指で大きくすると、iPhoneなどで絵がぼやけていました。指を止めると、その大きさで描きなおしてくっきり見えるようにしました。","捜査ボードの糸は、同じテーマの場所を近いものから1本ずつつなぐだけにしました(前は全部の組み合わせで、線と文字が重なって読めませんでした)。糸の名前は、メモを押したときに出ます。","天気のよびかけ欄で、3行目の文字が半分見えていたのを直しました。","地図の丸が近くて重なるときは、少しずらして元の場所へ細い線を引くようにしました(関東に寄ると、東京・横浜・千葉が別々に押せます)。"]},
   {id:"2026-10-28c",d:"2026-10-28",t:"🗾 地図をくわしく: 都道府県の線と、地方ごとのボタン",L:["日本の地図に都道府県の線が入り、2本指で大きくすると県の名前も出ます。","上の「北海道・東北・関東…」のボタンで、その地方にすぐ寄れます。","大きくすると、近くでまとまっていたピン(東京・横浜・さいたま など)が別々に分かれます。"]},
   {id:"2026-10-28b",d:"2026-10-28",t:"🧹 「きょう」「予定」「さがす」をすっきりさせました",L:["天気カードは3行にたたみ、「▼ くわしく」で1時間ごと・雨雲・持ち物が開きます。","ペットからの手紙・きょうの1問・大事な日・5大ニュース・つづき は「📌 きょうの小さな知らせ」に1行ずつ入れました(押すと開きます。「この画面の並びを変える」で前のように出すこともできます)。","予定タブは「📅 予定 / 🎯 予測」の切りかえに。さがすタブのしぼりこみは「🎛️ しぼりこむ」にたたみました。"]},
@@ -4888,13 +4889,20 @@ function zoomable(wrap,inner,opt){
 let JPP=null, JPPP=null;
 function getJpPref(){ if(JPP) return Promise.resolve(JPP); if(!JPPP) JPPP=fetch("jp-pref.json?v=1").then(r=>r.json()).then(t=>{ JPP=topojson.feature(t,t.objects.japan); return JPP; }).catch(e=>{ JPPP=null; throw e; }); return JPPP; }
 /* 地域ボタン(日本): 地域の名前・中心・倍率 */
+/* 世界の地域ボタン [名前, 中心の経度, 緯度, 倍率](2026-10-28) */
+const WORLD_REGIONS=[["東アジア",125,36,4],["東南アジア",112,8,3.6],["南アジア",79,22,4],["中東",46,29,4.2],["ヨーロッパ",14,50,4.2],["アフリカ",20,3,2.4],["北アメリカ",-98,42,2.6],["中南米",-72,-8,2.2],["オセアニア",145,-26,2.8]];
+/* 国の名前(地図を大きくしたときに出す。world-atlas の英語名 → 日本語。よく知られた国だけ) */
+const CN_JA={"United States of America":"アメリカ","Canada":"カナダ","Mexico":"メキシコ","Brazil":"ブラジル","Argentina":"アルゼンチン","Chile":"チリ","Peru":"ペルー","Colombia":"コロンビア","Venezuela":"ベネズエラ","Bolivia":"ボリビア","Ecuador":"エクアドル","Paraguay":"パラグアイ","Uruguay":"ウルグアイ","Cuba":"キューバ","Guatemala":"グアテマラ","Panama":"パナマ",
+ "United Kingdom":"イギリス","Ireland":"アイルランド","France":"フランス","Spain":"スペイン","Portugal":"ポルトガル","Germany":"ドイツ","Italy":"イタリア","Netherlands":"オランダ","Belgium":"ベルギー","Switzerland":"スイス","Austria":"オーストリア","Poland":"ポーランド","Czechia":"チェコ","Hungary":"ハンガリー","Romania":"ルーマニア","Bulgaria":"ブルガリア","Greece":"ギリシャ","Serbia":"セルビア","Croatia":"クロアチア","Ukraine":"ウクライナ","Belarus":"ベラルーシ","Moldova":"モルドバ","Lithuania":"リトアニア","Latvia":"ラトビア","Estonia":"エストニア","Finland":"フィンランド","Sweden":"スウェーデン","Norway":"ノルウェー","Denmark":"デンマーク","Iceland":"アイスランド","Russia":"ロシア",
+ "Turkey":"トルコ","Syria":"シリア","Lebanon":"レバノン","Israel":"イスラエル","Palestine":"パレスチナ","Jordan":"ヨルダン","Iraq":"イラク","Iran":"イラン","Saudi Arabia":"サウジアラビア","Yemen":"イエメン","Oman":"オマーン","United Arab Emirates":"アラブ首長国連邦","Qatar":"カタール","Kuwait":"クウェート","Egypt":"エジプト","Libya":"リビア","Tunisia":"チュニジア","Algeria":"アルジェリア","Morocco":"モロッコ","Sudan":"スーダン","S. Sudan":"南スーダン","Ethiopia":"エチオピア","Somalia":"ソマリア","Kenya":"ケニア","Tanzania":"タンザニア","Uganda":"ウガンダ","Nigeria":"ナイジェリア","Ghana":"ガーナ","Mali":"マリ","Niger":"ニジェール","Chad":"チャド","Cameroon":"カメルーン","Dem. Rep. Congo":"コンゴ民主共和国","Angola":"アンゴラ","Zambia":"ザンビア","Zimbabwe":"ジンバブエ","Mozambique":"モザンビーク","Madagascar":"マダガスカル","South Africa":"南アフリカ","Namibia":"ナミビア","Botswana":"ボツワナ",
+ "Afghanistan":"アフガニスタン","Pakistan":"パキスタン","India":"インド","Nepal":"ネパール","Bangladesh":"バングラデシュ","Sri Lanka":"スリランカ","Myanmar":"ミャンマー","Thailand":"タイ","Laos":"ラオス","Cambodia":"カンボジア","Vietnam":"ベトナム","Malaysia":"マレーシア","Indonesia":"インドネシア","Philippines":"フィリピン","China":"中国","Mongolia":"モンゴル","Kazakhstan":"カザフスタン","Uzbekistan":"ウズベキスタン","North Korea":"北朝鮮","South Korea":"韓国","Taiwan":"台湾","Japan":"日本","Australia":"オーストラリア","New Zealand":"ニュージーランド","Papua New Guinea":"パプアニューギニア","Greenland":"グリーンランド"};
 const JP_REGIONS=[["北海道",143.2,43.4,2.6],["東北",140.7,39.3,2.6],["関東",139.7,35.8,5],["中部",137.5,36.2,2.8],["近畿",135.6,34.7,4.5],["中国・四国",133.3,34.3,3.4],["九州",130.8,32.6,3.2],["沖縄",127.8,26.4,3.0]];
 function renderMap(){
   const recentDays=[...new Set(NEWS.map(n=>n.d))].slice(0,7);
   main.innerHTML=`<div class="view">
     <div class="sec-h"><h2>🗺️ ニュースの地図</h2><span class="sub">直近7日分</span></div>
     <div class="seg map-seg" role="group" aria-label="地図の種類"><button data-v="japan" aria-pressed="${mapState.view==="japan"}">🗾 日本</button><button data-v="world" aria-pressed="${mapState.view==="world"}">🌏 世界</button><button data-v="board" aria-pressed="${mapState.view==="board"}">🧷 捜査ボード</button></div>
-    ${mapState.view==="japan"?`<div class="map-rg" aria-label="地域をえらぶ"><button class="fchip" data-rg="all" aria-pressed="true">全国</button>${JP_REGIONS.map((r,i)=>`<button class="fchip" data-rg="${i}" aria-pressed="false">${r[0]}</button>`).join("")}</div>`:""}
+    ${mapState.view==="japan"||mapState.view==="world"?`<div class="map-rg" aria-label="地域をえらぶ"><button class="fchip" data-rg="all" aria-pressed="true">${mapState.view==="japan"?"全国":"世界全体"}</button>${(mapState.view==="japan"?JP_REGIONS:WORLD_REGIONS).map((r,i)=>`<button class="fchip" data-rg="${i}" aria-pressed="false">${r[0]}</button>`).join("")}</div>`:""}
     <div class="card mapbox"><div id="map" class="mapsvg"><div class="empty">地図を読み込んでいます…</div></div></div>
     <p class="hint" style="margin:0">丸をタップすると、その場所のニュースが下に出ます。${mapState.view==="japan"?"大きくすると、近い場所がわかれて県の名前も出ます。":""}</p>
     <button class="fchip fl-go" data-world="1">🌍 世界のいま<small>世界の地震・台風・山火事も重ねて見る</small></button>
@@ -4922,7 +4930,9 @@ function renderMap(){
       const pg=svg.append("g").attr("class","prefs"); pg.selectAll("path").data(jp.features).join("path").attr("d",path).attr("fill","var(--map-jp)").attr("stroke","var(--map-line)").attr("stroke-width",.5).append("title").text(d=>d.properties.n);
       /* 県の名前(大きくしたときだけ見える) */
       const lg=svg.append("g").attr("class","pref-l"); lg.selectAll("text").data(jp.features).join("text").attr("transform",d=>{ const c=path.centroid(d); return `translate(${c[0].toFixed(1)},${c[1].toFixed(1)})`; }).attr("text-anchor","middle").text(d=>d.properties.n.replace(/[都府県]$/,"")); }
-    else svg.append("g").selectAll("path").data(world.features).join("path").attr("d",path).attr("fill",d=>d.id==="392"?"var(--map-jp)":"var(--map-land)").attr("stroke","var(--map-line)").attr("stroke-width",.6);
+    else { svg.append("g").selectAll("path").data(world.features).join("path").attr("d",path).attr("fill",d=>d.id==="392"?"var(--map-jp)":"var(--map-land)").attr("stroke","var(--map-line)").attr("stroke-width",.6).append("title").text(d=>CN_JA[d.properties.name]||d.properties.name);
+      /* 国の名前(大きくしたときだけ。小さい国はもっと大きくしたとき) */
+      const lg=svg.append("g").attr("class","pref-l"); lg.selectAll("text").data(world.features.filter(d=>CN_JA[d.properties.name])).join("text").attr("class",d=>path.area(d)<60?"sm":null).attr("transform",d=>{ const c=path.centroid(d); return `translate(${c[0].toFixed(1)},${c[1].toFixed(1)})`; }).attr("text-anchor","middle").text(d=>CN_JA[d.properties.name]); }
     const g=svg.append("g").attr("class","pins");
     let cl=[], zs=1;
     /* 近い場所はまとめる。倍率に合わせてまとめ直す(大きくすると分かれる) */
@@ -4943,12 +4953,16 @@ function renderMap(){
         node.append("text").attr("class","plabel").attr("y",r+13).attr("text-anchor","middle").text(c.name.replace(/\(.*?\)/,""));
         const pick=()=>{ mapState.sel=c.id; svg.selectAll(".pin").classed("on",false); node.classed("on",true); drawList(); document.getElementById("mapList").scrollIntoView({behavior:"smooth",block:"start"}); };
         node.on("click",pick).on("keydown",ev=>{ if(ev.key==="Enter"||ev.key===" "){ ev.preventDefault(); pick(); } }); });
-      svg.classed("z2",scale>=2.2).classed("z3",scale>=4); svg.select(".pref-l").attr("font-size",(11/scale).toFixed(2)); }
+      svg.classed("z2",scale>=2.2).classed("z3",scale>=4); svg.select(".pref-l").attr("font-size",(11/scale).toFixed(2));
+      /* 県・国の名前が、ほかの名前や丸に重なるときは出さない(大きい県・国から先に。2026-10-28) */
+      if(scale>=2.2){ const kept=cl.map(c=>({x:c.sx-c.bw/2,y:c.sy-c.r,w:c.bw,h:c.bh})); const hit=(a)=>kept.some(k=>a.x<k.x+k.w&&k.x<a.x+a.w&&a.y<k.y+k.h&&k.y<a.y+a.h);
+        const L=[]; svg.selectAll(".pref-l text").each(function(d){ const t=this.textContent, m=/translate\(([-\d.]+),([-\d.]+)\)/.exec(this.getAttribute("transform")||""); if(!m) return; L.push({el:this,x:+m[1]*scale,y:+m[2]*scale,w:t.length*11+4,sm:this.classList.contains("sm"),a:path.area(d)}); });
+        L.sort((p,q)=>q.a-p.a).forEach(l=>{ const bx={x:l.x-l.w/2,y:l.y-11,w:l.w,h:14}; const hide=(l.sm&&scale<4)||hit(bx); l.el.classList.toggle("hid",hide); if(!hide) kept.push(bx); }); } }
     el.innerHTML=""; el.appendChild(svg.node());
     const Z=zoomable(el,svg.node(),{max:10,hint:"🔍 2本指でひろげると拡大(ダブルタップでも)。大きくすると近い場所が分かれます",onZoom:(sc)=>{ if(Math.abs(sc-zs)>0.15){ drawPins(sc); drawList(); } if(isJp) main.querySelectorAll("[data-rg]").forEach(b=>{ if(sc<1.05) b.setAttribute("aria-pressed",String(b.dataset.rg==="all")); }); }});
     drawPins(1);
     if(!mapState.sel && cl[0]) mapState.sel=cl[0].id;
-    main.querySelectorAll("[data-rg]").forEach(b=>b.onclick=()=>{ main.querySelectorAll("[data-rg]").forEach(x=>x.setAttribute("aria-pressed",String(x===b))); if(b.dataset.rg==="all"){ Z.reset(); return; } const r=JP_REGIONS[+b.dataset.rg]; const [x,y]=proj([r[1],r[2]]); Z.focus(x,y,r[3]); });
+    main.querySelectorAll("[data-rg]").forEach(b=>b.onclick=()=>{ main.querySelectorAll("[data-rg]").forEach(x=>x.setAttribute("aria-pressed",String(x===b))); if(b.dataset.rg==="all"){ Z.reset(); return; } const r=(isJp?JP_REGIONS:WORLD_REGIONS)[+b.dataset.rg]; const [x,y]=proj([r[1],r[2]]); Z.focus(x,y,r[3]); });
     function drawList(){ const box=document.getElementById("mapList"); if(!box) return; const c=cl.find(x=>x.id===mapState.sel);
       const chips=`<div class="map-chips">${cl.map(x=>`<button class="fchip" data-cl="${esc(x.id)}" aria-pressed="${x.id===mapState.sel}">${esc(x.name.replace(/\(.*?\)/,""))} <b>${x.n}</b></button>`).join("")}</div>`;
       const listOf=gp=>{ const L=gp.list; const more=L.length>5; return `<section class="map-sec"><h3>📍 ${esc(gp.p[3])}<small> ${L.length}件</small></h3><ul class="mlist">${L.slice(0,5).map(n=>newsItem(n)).join("")}</ul>${more?`<details class="faq plain"><summary>あと${L.length-5}件を見る</summary><ul class="mlist">${L.slice(5).map(n=>newsItem(n)).join("")}</ul></details>`:""}</section>`; };
