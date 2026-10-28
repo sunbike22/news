@@ -790,7 +790,7 @@ details.faq p{margin:10px 0 12px}
 .plan .pmm{font-size:.9rem;color:var(--muted);margin-top:2px}
 .plan .ics{flex-direction:column;gap:0;padding:4px 8px;min-width:44px;min-height:44px;line-height:1.1;font-size:1.1rem}.plan .ics small{font-size:.7rem;font-weight:700}
 .cd-fold{margin-bottom:10px}
-.pref-l text{fill:var(--muted);font-weight:700;opacity:0;pointer-events:none;paint-order:stroke;stroke:var(--map-sea);transition:opacity .2s}.mapsvg path{vector-effect:non-scaling-stroke}.mapsvg svg.z2 .pref-l text{opacity:.95}.mapsvg svg.z2 .pref-l text.sm{opacity:0}.mapsvg svg.z3 .pref-l text.sm{opacity:.95}.mapsvg .pref-l text.hid{opacity:0!important}
+.pref-l text{fill:var(--muted);font-weight:700;opacity:0;pointer-events:none;paint-order:stroke;stroke:var(--map-sea);transition:opacity .2s}.mapsvg path{vector-effect:non-scaling-stroke}.mapsvg svg.z2 .pref-l text{opacity:.95}.mapsvg .pref-l text.hid{opacity:0!important}
 .mapsvg .pin-leg{stroke:var(--ink);fill:var(--ink);opacity:.55;pointer-events:none}.map-rg{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}.map-rg::-webkit-scrollbar{display:none}.map-rg .fchip{flex:none}
 .s-fold{margin-top:-2px}
 .score{display:grid;grid-template-columns:140px 1fr;gap:16px;align-items:center}
@@ -3898,7 +3898,7 @@ function gachaResult(n){ const days=Math.round((Date.parse(TODAY)-Date.parse(n.d
 function bindGacha(){ const b=document.getElementById("gaGo"); if(!b) return; b.onclick=()=>{ const r=seeded("ga"+TODAY+Math.random()); const pool=NEWS.filter(x=>x.ok); const n=pool[Math.floor(r()*pool.length)]; ME.gacha={d:TODAY,k:nkey(n)}; saveMe(); learn(n.g,0.5); track("/gacha","ガチャ");
   const box=document.getElementById("gaBox"); box.querySelector(".ga-ball").classList.add("spin"); b.disabled=true; setTimeout(()=>{ box.innerHTML=gachaResult(n); },1100); }; }
 const PREFS=["北海道","青森県","岩手県","宮城県","秋田県","山形県","福島県","茨城県","栃木県","群馬県","埼玉県","千葉県","東京都","神奈川県","新潟県","富山県","石川県","福井県","山梨県","長野県","岐阜県","静岡県","愛知県","三重県","滋賀県","京都府","大阪府","兵庫県","奈良県","和歌山県","鳥取県","島根県","岡山県","広島県","山口県","徳島県","香川県","愛媛県","高知県","福岡県","佐賀県","長崎県","熊本県","大分県","宮崎県","鹿児島県","沖縄県"];
-const PLACE_PREF={"東京":"東京都","横浜":"神奈川県","千葉":"千葉県","伊豆諸島":"東京都","宮崎":"宮崎県","北海道":"北海道","大分":"大分県","福岡":"福岡県","関西":"大阪府","埼玉":"埼玉県","愛媛":"愛媛県","沖縄":"沖縄県","種子島(打ち上げ)":"鹿児島県","秋田":"秋田県","山形":"山形県","青森":"青森県","岩手":"岩手県","宮城":"宮城県","福島":"福島県","新潟":"新潟県"};
+const PLACE_PREF={"東京":"東京都","横浜":"神奈川県","千葉":"千葉県","伊豆諸島":"東京都","宮崎":"宮崎県","北海道":"北海道","大分":"大分県","福岡":"福岡県","関西":"大阪府","大阪":"大阪府","兵庫":"兵庫県","京都":"京都府","奈良":"奈良県","滋賀":"滋賀県","和歌山":"和歌山県","茨城":"茨城県","栃木":"栃木県","群馬":"群馬県","山梨":"山梨県","長野":"長野県","富山":"富山県","石川":"石川県","福井":"福井県","岐阜":"岐阜県","静岡":"静岡県","愛知":"愛知県","三重":"三重県","鳥取":"鳥取県","島根":"島根県","岡山":"岡山県","広島":"広島県","山口":"山口県","徳島":"徳島県","香川":"香川県","高知":"高知県","佐賀":"佐賀県","長崎":"長崎県","熊本":"熊本県","鹿児島":"鹿児島県","埼玉":"埼玉県","愛媛":"愛媛県","沖縄":"沖縄県","種子島(打ち上げ)":"鹿児島県","秋田":"秋田県","山形":"山形県","青森":"青森県","岩手":"岩手県","宮城":"宮城県","福島":"福島県","新潟":"新潟県"};
 function prefWords(pf){ const base=pf.replace(/[都府県]$/,""); const extra={"東京都":["東京","都内","都庁"],"大阪府":["大阪","関西"],"京都府":["京都"],"北海道":["北海道","札幌"],"神奈川県":["神奈川","横浜","川崎"],"鹿児島県":["鹿児島","種子島"],"沖縄県":["沖縄","那覇","石垣","宮古","先島"]}[pf]||[]; return [...new Set([base,...extra])].filter(x=>x.length>=2); }
 function isLocal(text){ const pf=ME.pref; if(!pf) return false; return prefWords(pf).some(w=>String(text).includes(w)); }
 function localCard(){ const pf=ME.pref;
@@ -4489,6 +4489,7 @@ function openShimen(){ const sh=document.getElementById("sheet"); const w=D.weat
 document.addEventListener("click",e=>{ const b=e.target.closest("[data-shimen]"); if(!b) return; e.preventDefault(); openShimen(); });
 // ===== お知らせ(新しくなったところ)。機能を足したら、いちばん上に1つ足す =====
 const UPDATES=[
+  {id:"2026-10-28f",d:"2026-10-28",t:"🗾 地図の「関西」を府県ごとに・国の名前の位置を直しました",L:["地図で大阪・京都・兵庫などが「関西」1つにまとまっていたのを、府県ごとの丸にしました。ほかの県も、ニュースに県の名前が出れば、その県に丸が出ます。","世界の地図で、国の名前がとなりの国の上に出ていたところを直しました(フランスの名前が海外の領土までふくめた真ん中に出ていた、など)。いまは国のいちばん内側に名前を置きます。","小さい県・国の名前は、となりと重なるときに少しずらして出すようにしました。"]},
   {id:"2026-10-28e",d:"2026-10-28",t:"🌏 世界の地図にも地域ボタンと国の名前",L:["世界の地図の上に「東アジア・中東・ヨーロッパ…」のボタン。押すとその地域に寄れます。","大きくすると国の名前が日本語で出て、近くの丸は重ならないように分かれます(名前どうしが重なるときは、大きい国の名前を先に出します)。"]},
   {id:"2026-10-28d",d:"2026-10-28",t:"🔍 地図を大きくしてもくっきり・捜査ボードを読みやすく",L:["地図を指で大きくすると、iPhoneなどで絵がぼやけていました。指を止めると、その大きさで描きなおしてくっきり見えるようにしました。","捜査ボードの糸は、同じテーマの場所を近いものから1本ずつつなぐだけにしました(前は全部の組み合わせで、線と文字が重なって読めませんでした)。糸の名前は、メモを押したときに出ます。","天気のよびかけ欄で、3行目の文字が半分見えていたのを直しました。","地図の丸が近くて重なるときは、少しずらして元の場所へ細い線を引くようにしました(関東に寄ると、東京・横浜・千葉が別々に押せます)。"]},
   {id:"2026-10-28c",d:"2026-10-28",t:"🗾 地図をくわしく: 都道府県の線と、地方ごとのボタン",L:["日本の地図に都道府県の線が入り、2本指で大きくすると県の名前も出ます。","上の「北海道・東北・関東…」のボタンで、その地方にすぐ寄れます。","大きくすると、近くでまとまっていたピン(東京・横浜・さいたま など)が別々に分かれます。"]},
@@ -4747,7 +4748,13 @@ function renderMy(){
 const PLACES=[
   [/沖縄|先島|石垣|宮古|琉球|那覇/,127.68,26.21,"沖縄"],[/横浜|神奈川|DeNA/,139.64,35.44,"横浜"],[/千葉|印旛|内房/,140.12,35.6,"千葉"],[/伊豆|大島/,139.4,34.75,"伊豆諸島"],
   [/宮崎|延岡/,131.42,31.91,"宮崎"],[/十勝|北海道|旭岳|セイコーマート/,142.8,43.3,"北海道"],[/秋田|子吉川|由利本荘/,140.1,39.72,"秋田"],[/山形|最上川/,140.34,38.25,"山形"],[/青森|弘前/,140.74,40.82,"青森"],[/岩手|盛岡/,141.15,39.7,"岩手"],[/宮城|仙台/,140.87,38.27,"宮城"],[/福島|郡山|いわき/,140.47,37.75,"福島"],[/新潟|信濃川|北陸/,139.02,37.9,"新潟"],[/東北/,140.87,38.27,"東北"],[/大分/,131.61,33.24,"大分"],[/福岡|ソフトバンク|九州/,130.4,33.59,"福岡"],
-  [/阪神|大阪|王将/,135.5,34.69,"関西"],[/埼玉/,139.65,35.86,"埼玉"],[/西条/,133.18,33.92,"愛媛"],
+  /* 「関西」でまとめず、府県ごとに(2026-10-28)。京都は「東京都」に当たらないよう (?<!東) をつける。人の名字と同じ県名(山口・石川・福井・香川)は「県」や県庁所在地で当てる */
+  [/大阪|万博|道頓堀/,135.5,34.69,"大阪"],[/阪神|甲子園|兵庫|神戸|姫路|淡路/,135.18,34.69,"兵庫"],[/(?<!東)京都|王将/,135.76,35.01,"京都"],[/奈良/,135.83,34.69,"奈良"],[/滋賀|琵琶湖|大津/,135.87,35.0,"滋賀"],[/和歌山|白浜/,135.17,34.23,"和歌山"],
+  [/埼玉|さいたま/,139.65,35.86,"埼玉"],[/茨城|水戸|つくば/,140.45,36.34,"茨城"],[/栃木|宇都宮|日光/,139.88,36.57,"栃木"],[/群馬|前橋|高崎/,139.06,36.39,"群馬"],[/山梨|甲府|富士五湖/,138.57,35.66,"山梨"],
+  [/長野|松本市|軽井沢/,138.18,36.65,"長野"],[/富山/,137.21,36.7,"富山"],[/石川県|金沢|能登/,136.63,36.59,"石川"],[/福井県|福井市|敦賀/,136.22,36.07,"福井"],[/岐阜/,136.72,35.39,"岐阜"],[/静岡|浜松/,138.38,34.98,"静岡"],[/愛知|名古屋|中日ドラゴンズ/,136.91,35.18,"愛知"],[/三重|伊勢市|伊勢神宮/,136.51,34.73,"三重"],
+  [/鳥取/,134.24,35.5,"鳥取"],[/島根|松江|出雲/,133.05,35.47,"島根"],[/岡山|倉敷/,133.93,34.66,"岡山"],[/広島/,132.46,34.4,"広島"],[/山口県|下関/,131.47,34.19,"山口"],
+  [/徳島/,134.56,34.07,"徳島"],[/香川県|高松市|讃岐/,134.04,34.34,"香川"],[/愛媛|松山市|西条/,132.77,33.84,"愛媛"],[/高知/,133.53,33.56,"高知"],
+  [/佐賀/,130.3,33.25,"佐賀"],[/長崎/,129.87,32.75,"長崎"],[/熊本/,130.74,32.79,"熊本"],[/鹿児島|桜島|奄美/,130.56,31.56,"鹿児島"],
   [/サウジ|リヤド|アラムコ/,46.72,24.69,"サウジアラビア"],[/フーシ|アデン|イエメン/,45.03,12.8,"イエメン"],[/エジプト/,31.24,30.04,"エジプト"],[/ウクライナ/,30.52,50.45,"ウクライナ"],
   [/ロシア|プーチン|記者拘束/,37.62,55.75,"ロシア"],[/北朝鮮/,125.75,39.03,"北朝鮮"],[/中国|GDP/,116.4,39.9,"中国"],[/カナダ/,-75.7,45.42,"カナダ"],
   [/トランプ|米国|ナスダック|FRB|NY原油|大リーグ|ドジャース|カリフォルニア/,-77.04,38.9,"アメリカ"],[/イラン|ホルムズ/,51.39,35.69,"イラン"],[/イスラエル/,35.21,31.77,"イスラエル"],
@@ -4885,6 +4892,19 @@ function zoomable(wrap,inner,opt){
   const focus=(x,y,ns)=>{ const w=wrap.clientWidth,h=wrap.clientHeight; s=Math.max(MIN,Math.min(MAX,ns)); tx=-(x-w/2)*s; ty=-(y-h/2)*s; apply(); };
   return {reset,zoomAt,focus,get scale(){return s;}};
 }
+/* 県・国の名前を置く場所: いちばん大きい島(本土)の中心。中心が国の外に出る形(くの字の国など)は、中にある点のうち中心にいちばん近い所(2026-10-28。フランスの名前がスペインの上に出ていた=海外の領土までふくめて中心を取っていたため) */
+function labelPos(path,proj,f){ const g=f.geometry; let p=f;
+  if(g&&g.type==="MultiPolygon"){ let ba=-1; g.coordinates.forEach(c=>{ const q={type:"Feature",geometry:{type:"Polygon",coordinates:c}}; const a=path.area(q); if(a>ba){ ba=a; p=q; } }); }
+  const c=path.centroid(p); if(!isFinite(c[0])) return c;
+  const inside=xy=>{ const ll=proj.invert&&proj.invert(xy); return ll&&d3.geoContains(p,ll); };
+  /* 境目までのきょり(画面の上で) */
+  const segs=[]; ((p.geometry||p).coordinates||[]).forEach(ring=>{ let q=null; ring.forEach(ll=>{ const xy=proj(ll); if(xy&&q) segs.push([q,xy]); q=xy; }); });
+  const edge=xy=>{ let m=1e9; for(const [a,b] of segs){ const dx=b[0]-a[0],dy=b[1]-a[1],L=dx*dx+dy*dy; let t=L?((xy[0]-a[0])*dx+(xy[1]-a[1])*dy)/L:0; t=t<0?0:t>1?1:t; const d=Math.hypot(xy[0]-a[0]-t*dx,xy[1]-a[1]-t*dy); if(d<m) m=d; } return m; };
+  const b=path.bounds(p); let best=null, bd=-1; const N=12;
+  for(let i=1;i<N;i++) for(let j=1;j<N;j++){ const xy=[b[0][0]+(b[1][0]-b[0][0])*i/N, b[0][1]+(b[1][1]-b[0][1])*j/N]; if(!inside(xy)) continue; const d=edge(xy); if(d>bd){ bd=d; best=xy; } }
+  /* 中心が国の中で、境目からも十分はなれていれば中心のまま(見た目が自然)。そうでなければ、いちばん内側の点 */
+  if(inside(c)&&(!best||edge(c)>=bd*0.6)) return c;
+  return best||c; }
 /* 日本の都道府県の輪郭(jp-pref.json = 地球地図日本(国土地理院)を dataofjapan/land が都道府県ごとにしたものを軽くした。地図タブを開いたときだけ読む。2026-10-28) */
 let JPP=null, JPPP=null;
 function getJpPref(){ if(JPP) return Promise.resolve(JPP); if(!JPPP) JPPP=fetch("jp-pref.json?v=1").then(r=>r.json()).then(t=>{ JPP=topojson.feature(t,t.objects.japan); return JPP; }).catch(e=>{ JPPP=null; throw e; }); return JPPP; }
@@ -4929,10 +4949,10 @@ function renderMap(){
       svg.append("g").selectAll("path").data(world.features.filter(d=>d.id!=="392")).join("path").attr("d",path).attr("fill","var(--map-land)").attr("stroke","var(--map-line)").attr("stroke-width",.6);
       const pg=svg.append("g").attr("class","prefs"); pg.selectAll("path").data(jp.features).join("path").attr("d",path).attr("fill","var(--map-jp)").attr("stroke","var(--map-line)").attr("stroke-width",.5).append("title").text(d=>d.properties.n);
       /* 県の名前(大きくしたときだけ見える) */
-      const lg=svg.append("g").attr("class","pref-l"); lg.selectAll("text").data(jp.features).join("text").attr("transform",d=>{ const c=path.centroid(d); return `translate(${c[0].toFixed(1)},${c[1].toFixed(1)})`; }).attr("text-anchor","middle").text(d=>d.properties.n.replace(/[都府県]$/,"")); }
+      const lg=svg.append("g").attr("class","pref-l"); lg.selectAll("text").data(jp.features).join("text").attr("transform",d=>{ const c=labelPos(path,proj,d); return `translate(${c[0].toFixed(1)},${c[1].toFixed(1)})`; }).attr("text-anchor","middle").text(d=>d.properties.n.replace(/[都府県]$/,"")); }
     else { svg.append("g").selectAll("path").data(world.features).join("path").attr("d",path).attr("fill",d=>d.id==="392"?"var(--map-jp)":"var(--map-land)").attr("stroke","var(--map-line)").attr("stroke-width",.6).append("title").text(d=>CN_JA[d.properties.name]||d.properties.name);
       /* 国の名前(大きくしたときだけ。小さい国はもっと大きくしたとき) */
-      const lg=svg.append("g").attr("class","pref-l"); lg.selectAll("text").data(world.features.filter(d=>CN_JA[d.properties.name])).join("text").attr("class",d=>path.area(d)<60?"sm":null).attr("transform",d=>{ const c=path.centroid(d); return `translate(${c[0].toFixed(1)},${c[1].toFixed(1)})`; }).attr("text-anchor","middle").text(d=>CN_JA[d.properties.name]); }
+      const lg=svg.append("g").attr("class","pref-l"); lg.selectAll("text").data(world.features.filter(d=>CN_JA[d.properties.name])).join("text").attr("class",d=>path.area(d)<60?"sm":null).attr("transform",d=>{ const c=labelPos(path,proj,d); return `translate(${c[0].toFixed(1)},${c[1].toFixed(1)})`; }).attr("text-anchor","middle").text(d=>CN_JA[d.properties.name]); }
     const g=svg.append("g").attr("class","pins");
     let cl=[], zs=1;
     /* 近い場所はまとめる。倍率に合わせてまとめ直す(大きくすると分かれる) */
@@ -4956,8 +4976,12 @@ function renderMap(){
       svg.classed("z2",scale>=2.2).classed("z3",scale>=4); svg.select(".pref-l").attr("font-size",(11/scale).toFixed(2)).style("stroke-width",(2.2/scale).toFixed(3)+"px"); /* ふちどりも倍率で割る(割らないと大きくしたとき太いかたまりになって、となりの名前をかくした) */
       /* 県・国の名前が、ほかの名前や丸に重なるときは出さない(大きい県・国から先に。2026-10-28) */
       if(scale>=2.2){ const kept=cl.map(c=>({x:c.sx-c.bw/2,y:c.sy-c.r,w:c.bw,h:c.bh})); const hit=(a)=>kept.some(k=>a.x<k.x+k.w&&k.x<a.x+a.w&&a.y<k.y+k.h&&k.y<a.y+a.h);
-        const L=[]; svg.selectAll(".pref-l text").each(function(d){ const t=this.textContent, m=/translate\(([-\d.]+),([-\d.]+)\)/.exec(this.getAttribute("transform")||""); if(!m) return; L.push({el:this,x:+m[1]*scale,y:+m[2]*scale,w:t.length*12+10,sm:this.classList.contains("sm"),a:path.area(d)}); });
-        L.sort((p,q)=>q.a-p.a).forEach(l=>{ const bx={x:l.x-l.w/2,y:l.y-13,w:l.w,h:18}; const hide=(l.sm&&scale<4)||hit(bx); l.el.classList.toggle("hid",hide); if(!hide) kept.push(bx); }); } }
+        const L=[]; svg.selectAll(".pref-l text").each(function(d){ const t=this.textContent; if(!this.__b){ const m=/translate\(([-\d.]+),([-\d.]+)\)/.exec(this.getAttribute("transform")||""); if(!m) return; this.__b=[+m[1],+m[2]]; } L.push({el:this,d,x:this.__b[0]*scale,y:this.__b[1]*scale,w:t.length*12+10,sm:this.classList.contains("sm"),a:path.area(d)}); });
+        /* 重なるときは、上下左右に少しずらして(その県・国の中に収まる所だけ)入れる。どこもだめなら出さない */
+        const OFF=[[0,0],[0,-15],[0,15],[-18,-8],[18,-8],[-18,8],[18,8],[0,-28],[0,28]];
+        L.sort((p,q)=>q.a-p.a).forEach(l=>{ let put=null; if(!(l.sm&&scale<3)) for(const [ox,oy] of OFF){ const x=l.x+ox, y=l.y+oy, bx={x:x-l.w/2,y:y-13,w:l.w,h:18}; if(hit(bx)) continue;
+            if(ox||oy){ const ll=proj.invert&&proj.invert([x/scale,y/scale]); if(!ll||!d3.geoContains(l.d,ll)) continue; } put={x,y,bx}; break; }
+          l.el.classList.toggle("hid",!put); if(put){ kept.push(put.bx); l.el.setAttribute("transform",`translate(${(put.x/scale).toFixed(2)},${(put.y/scale).toFixed(2)})`); } }); } }
     el.innerHTML=""; el.appendChild(svg.node());
     const Z=zoomable(el,svg.node(),{max:10,hint:"🔍 2本指でひろげると拡大(ダブルタップでも)。大きくすると近い場所が分かれます",onZoom:(sc)=>{ if(Math.abs(sc-zs)>0.15){ drawPins(sc); drawList(); } if(isJp) main.querySelectorAll("[data-rg]").forEach(b=>{ if(sc<1.05) b.setAttribute("aria-pressed",String(b.dataset.rg==="all")); }); }});
     drawPins(1);
