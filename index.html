@@ -1013,7 +1013,7 @@ svg.eat{animation:petEat .7s ease both!important}
 .map-seg{align-self:flex-start}.map-seg button{padding:8px 14px;font-size:.92rem}
 .mapsvg .plabel{font-size:11px;font-weight:800;fill:var(--ink);paint-order:stroke;stroke:var(--surface);stroke-width:3.5px;stroke-linejoin:round;pointer-events:none}
 .mapsvg .pin.on circle{stroke:var(--ink);stroke-width:3.5}
-.map-chips{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;-webkit-overflow-scrolling:touch}.map-chips .fchip{flex:none}
+.map-rgn{margin-top:14px}.map-rgn h3{font-size:1rem;margin:0 0 6px}.map-rgn h3 small{display:block;font-weight:400;color:var(--muted);font-size:.84rem}.map-chips{display:flex;gap:6px;overflow-x:auto;padding-bottom:4px;-webkit-overflow-scrolling:touch}.map-chips .fchip{flex:none}
 .map-sec{margin-top:10px}.map-sec h3{font-size:1.02rem;margin-bottom:6px}.map-sec h3 small{color:var(--muted);font-weight:500}
 .mlist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:6px}
 /* マイの切り替え */
@@ -4489,6 +4489,7 @@ function openShimen(){ const sh=document.getElementById("sheet"); const w=D.weat
 document.addEventListener("click",e=>{ const b=e.target.closest("[data-shimen]"); if(!b) return; e.preventDefault(); openShimen(); });
 // ===== お知らせ(新しくなったところ)。機能を足したら、いちばん上に1つ足す =====
 const UPDATES=[
+  {id:"2026-10-29a",d:"2026-10-29",t:"🗾 地図に「東北」「九州」の丸を出さないように",L:["「東北」が宮城の上に出ていたのを直しました。東北大学の話は「宮城」、九州大学や九州場所は「福岡」に出ます。","「九州で大雨」のように1つの県に決められない話は、地図の下の「🗾 地方全体のニュース」にまとめました。"]},
   {id:"2026-10-28f",d:"2026-10-28",t:"🗾 地図の「関西」を府県ごとに・国の名前の位置を直しました",L:["地図で大阪・京都・兵庫などが「関西」1つにまとまっていたのを、府県ごとの丸にしました。ほかの県も、ニュースに県の名前が出れば、その県に丸が出ます。","世界の地図で、国の名前がとなりの国の上に出ていたところを直しました(フランスの名前が海外の領土までふくめた真ん中に出ていた、など)。いまは国のいちばん内側に名前を置きます。","小さい県・国の名前は、となりと重なるときに少しずらして出すようにしました。"]},
   {id:"2026-10-28e",d:"2026-10-28",t:"🌏 世界の地図にも地域ボタンと国の名前",L:["世界の地図の上に「東アジア・中東・ヨーロッパ…」のボタン。押すとその地域に寄れます。","大きくすると国の名前が日本語で出て、近くの丸は重ならないように分かれます(名前どうしが重なるときは、大きい国の名前を先に出します)。"]},
   {id:"2026-10-28d",d:"2026-10-28",t:"🔍 地図を大きくしてもくっきり・捜査ボードを読みやすく",L:["地図を指で大きくすると、iPhoneなどで絵がぼやけていました。指を止めると、その大きさで描きなおしてくっきり見えるようにしました。","捜査ボードの糸は、同じテーマの場所を近いものから1本ずつつなぐだけにしました(前は全部の組み合わせで、線と文字が重なって読めませんでした)。糸の名前は、メモを押したときに出ます。","天気のよびかけ欄で、3行目の文字が半分見えていたのを直しました。","地図の丸が近くて重なるときは、少しずらして元の場所へ細い線を引くようにしました(関東に寄ると、東京・横浜・千葉が別々に押せます)。"]},
@@ -4747,7 +4748,7 @@ function renderMy(){
 // ===== 地図 =====
 const PLACES=[
   [/沖縄|先島|石垣|宮古|琉球|那覇/,127.68,26.21,"沖縄"],[/横浜|神奈川|DeNA/,139.64,35.44,"横浜"],[/千葉|印旛|内房/,140.12,35.6,"千葉"],[/伊豆|大島/,139.4,34.75,"伊豆諸島"],
-  [/宮崎|延岡/,131.42,31.91,"宮崎"],[/十勝|北海道|旭岳|セイコーマート/,142.8,43.3,"北海道"],[/秋田|子吉川|由利本荘/,140.1,39.72,"秋田"],[/山形|最上川/,140.34,38.25,"山形"],[/青森|弘前/,140.74,40.82,"青森"],[/岩手|盛岡/,141.15,39.7,"岩手"],[/宮城|仙台/,140.87,38.27,"宮城"],[/福島|郡山|いわき/,140.47,37.75,"福島"],[/新潟|信濃川|北陸/,139.02,37.9,"新潟"],[/東北/,140.87,38.27,"東北"],[/大分/,131.61,33.24,"大分"],[/福岡|ソフトバンク|九州/,130.4,33.59,"福岡"],
+  [/宮崎|延岡/,131.42,31.91,"宮崎"],[/十勝|北海道|旭岳|セイコーマート/,142.8,43.3,"北海道"],[/秋田|子吉川|由利本荘/,140.1,39.72,"秋田"],[/山形|最上川/,140.34,38.25,"山形"],[/青森|弘前/,140.74,40.82,"青森"],[/岩手|盛岡/,141.15,39.7,"岩手"],[/宮城|仙台|東北大/,140.87,38.27,"宮城"],[/福島|郡山|いわき/,140.47,37.75,"福島"],[/新潟|信濃川/,139.02,37.9,"新潟"],[/大分/,131.61,33.24,"大分"],[/福岡|ソフトバンク|九州大|九州場所|博多|天神/,130.4,33.59,"福岡"],
   /* 「関西」でまとめず、府県ごとに(2026-10-28)。京都は「東京都」に当たらないよう (?<!東) をつける。人の名字と同じ県名(山口・石川・福井・香川)は「県」や県庁所在地で当てる */
   [/大阪|万博|道頓堀/,135.5,34.69,"大阪"],[/阪神|甲子園|兵庫|神戸|姫路|淡路/,135.18,34.69,"兵庫"],[/(?<!東)京都|王将/,135.76,35.01,"京都"],[/奈良/,135.83,34.69,"奈良"],[/滋賀|琵琶湖|大津/,135.87,35.0,"滋賀"],[/和歌山|白浜/,135.17,34.23,"和歌山"],
   [/埼玉|さいたま/,139.65,35.86,"埼玉"],[/茨城|水戸|つくば/,140.45,36.34,"茨城"],[/栃木|宇都宮|日光/,139.88,36.57,"栃木"],[/群馬|前橋|高崎/,139.06,36.39,"群馬"],[/山梨|甲府|富士五湖/,138.57,35.66,"山梨"],
@@ -4759,7 +4760,7 @@ const PLACES=[
   [/ロシア|プーチン|記者拘束/,37.62,55.75,"ロシア"],[/北朝鮮/,125.75,39.03,"北朝鮮"],[/中国|GDP/,116.4,39.9,"中国"],[/カナダ/,-75.7,45.42,"カナダ"],
   [/トランプ|米国|ナスダック|FRB|NY原油|大リーグ|ドジャース|カリフォルニア/,-77.04,38.9,"アメリカ"],[/イラン|ホルムズ/,51.39,35.69,"イラン"],[/イスラエル/,35.21,31.77,"イスラエル"],
   [/トルコ/,32.86,39.93,"トルコ"],[/ジブチ/,43.15,11.59,"ジブチ"],[/グリーンランド/,-51.72,64.18,"グリーンランド"],[/ICC|オランダ/,4.3,52.07,"オランダ(ICC)"],[/MMX|火星/,130.97,30.4,"種子島(打ち上げ)"],
-  [/福生|山手線|東京|首相|国会|衆院|参院|日経平均|日銀|関文科相|簗/,139.75,35.68,"東京"]
+  [/福生|山手線|京浜東北|東京|首相|国会|衆院|参院|日経平均|日銀|関文科相|簗/,139.75,35.68,"東京"]
 ];
 // ===== 🌍 世界のいま(このアプリで2社確認したニュースの場所 + 災害の一次情報。SNSは使わない) =====
 const WK={eq:["🔴","地震"],storm:["🌀","台風・嵐"],flood:["🌊","洪水"],volcano:["🌋","火山"],fire:["🔥","山火事"],drought:["🏜️","干ばつ"],other:["⚠️","災害"]};
@@ -4799,6 +4800,9 @@ function openWorld(){ const sh=document.getElementById("sheet"); const back=sh.d
 document.addEventListener("click",ev=>{ if(ev.target.closest("[data-world]")) openWorld(); });
 function isJpPlace(p){ if(!p) return false; const [x,y]=[p[1],p[2]]; if(/韓国|ソウル|釜山|北朝鮮|ロシア|サハリン|ウラジオ|台湾|中国/.test(p[3])) return false;
   return (x>=128.5&&x<=154&&y>=24&&y<=46)||(x>=122.9&&x<128.5&&y>=24&&y<=27.5); }
+/* 地方の名前だけのニュース(「九州で大雨」「東北〜北陸」など)は、1つの県の丸にしない(2026-10-29: 「東北」が宮城の上に出ていた)。地図の下に「地方全体のニュース」としてまとめる */
+const REGIONS=[["北海道・東北",/(?<!京浜)東北(?!大)/],["関東",/関東/],["北陸",/北陸/],["東海",/東海(?!道|村)/],["近畿",/近畿|関西/],["中国地方",/中国地方|山陰|山陽/],["四国",/四国/],["九州",/九州/]];
+function regionOf(n){ const t=n.h+" "+(n.th||""); const r=REGIONS.find(x=>x[1].test(t)); return r?r[0]:null; }
 function placeOf(n){ for(const p of PLACES){ if(p[0].test(n.h+" "+(n.th||""))) return p; } return null; }
 let mapState={view:"japan",sel:null};
 const SCRIPTS={};
@@ -4933,7 +4937,8 @@ function renderMap(){
   main.querySelectorAll("[data-v]").forEach(b=>b.onclick=()=>{ mapState.view=b.dataset.v; mapState.sel=null; renderMap(); });
   if(mapState.view==="board"){ renderBoard(recentDays); return; }
   if(mapState.view==="world") petFlag("world");
-  const items=NEWS.filter(n=>recentDays.includes(n.d)).map(n=>({n,p:placeOf(n)})).filter(x=>x.p);
+  const all7=NEWS.filter(n=>recentDays.includes(n.d)); const items=all7.map(n=>({n,p:placeOf(n)})).filter(x=>x.p);
+  const RG={}; all7.forEach(n=>{ if(placeOf(n)) return; const r=regionOf(n); if(r) (RG[r]=RG[r]||[]).push(n); });
   const JP=[0,139.75,36.2,"日本(国内)"];
   const groups={}; items.forEach(x=>{ let pp=x.p; if(mapState.view==="world" && pp[1]>122 && pp[1]<147 && pp[2]>24 && pp[2]<46) pp=JP; const k=pp[3]; (groups[k]=groups[k]||{p:pp,list:[]}).list.push(x.n); });
   const isJp=mapState.view==="japan";
@@ -4990,7 +4995,9 @@ function renderMap(){
     function drawList(){ const box=document.getElementById("mapList"); if(!box) return; const c=cl.find(x=>x.id===mapState.sel);
       const chips=`<div class="map-chips">${cl.map(x=>`<button class="fchip" data-cl="${esc(x.id)}" aria-pressed="${x.id===mapState.sel}">${esc(x.name.replace(/\(.*?\)/,""))} <b>${x.n}</b></button>`).join("")}</div>`;
       const listOf=gp=>{ const L=gp.list; const more=L.length>5; return `<section class="map-sec"><h3>📍 ${esc(gp.p[3])}<small> ${L.length}件</small></h3><ul class="mlist">${L.slice(0,5).map(n=>newsItem(n)).join("")}</ul>${more?`<details class="faq plain"><summary>あと${L.length-5}件を見る</summary><ul class="mlist">${L.slice(5).map(n=>newsItem(n)).join("")}</ul></details>`:""}</section>`; };
-      box.innerHTML = chips + (c? c.gs.map(listOf).join("") : "") + (others.length?`<p class="hint">この地図の外: ${others.map(o=>`${esc(o.p[3])}(${o.list.length})`).join("・")} → 「${isJp?"🌏 世界":"🗾 日本"}」で見られます</p>`:"")+(isJp?`<p class="hint">地図: 地球地図日本(国土地理院)・Natural Earth</p>`:"");
+      const rgK=REGIONS.map(r=>r[0]).filter(k=>RG[k]); const rsel=String(mapState.sel||"").startsWith("rg:")?mapState.sel.slice(3):null;
+      const rgHTML=isJp&&rgK.length?`<div class="map-rgn"><h3>🗾 地方全体のニュース<small> 1つの県に決められない話(地図には出ません)</small></h3><div class="map-chips">${rgK.map(k=>`<button class="fchip" data-cl="rg:${esc(k)}" aria-pressed="${rsel===k}">${esc(k)} <b>${RG[k].length}</b></button>`).join("")}</div></div>`:"";
+      box.innerHTML = chips + (c? c.gs.map(listOf).join("") : "") + rgHTML + (rsel&&RG[rsel]?listOf({p:[0,0,0,rsel+"(地方全体)"],list:RG[rsel]}):"") + (others.length?`<p class="hint">この地図の外: ${others.map(o=>`${esc(o.p[3])}(${o.list.length})`).join("・")} → 「${isJp?"🌏 世界":"🗾 日本"}」で見られます</p>`:"")+(isJp?`<p class="hint">地図: 地球地図日本(国土地理院)・Natural Earth</p>`:"");
       box.querySelectorAll("[data-cl]").forEach(b=>b.onclick=()=>{ mapState.sel=b.dataset.cl; svg.selectAll(".pin").classed("on",false); drawList(); }); }
     drawList();
   }).catch(()=>{ const el=document.getElementById("map"); if(el) el.innerHTML='<div class="empty">地図を読み込めませんでした。通信状態を確かめて、開き直してください。</div>'; });
