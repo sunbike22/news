@@ -39,9 +39,16 @@ def quakes_jma():
         if "遠地" in (r.get("ttl") or ""):
             continue
         cur = by.get(eid)
-        # 同じ地震の情報のうち、いちばん新しい発表を使う
-        if not cur or (r.get("rdt") or "") > (cur.get("rdt") or ""):
-            by[eid] = r
+        # 同じ地震の情報のうち、いちばん新しい発表を使う。
+        # ただし「震源要素更新のお知らせ」のように最大震度のない発表が後から来たときは、
+        # 前の発表の最大震度を残す(震度5弱の地震が「震度?」になり、帯や通知の判定からも外れていた=2026-10-30)
+        if not cur:
+            by[eid] = dict(r)
+            continue
+        new, old = (r, cur) if (r.get("rdt") or "") > (cur.get("rdt") or "") else (cur, r)
+        if not (new.get("maxi") or "") and (old.get("maxi") or ""):
+            new = dict(new, maxi=old["maxi"])
+        by[eid] = new
     out = []
     for eid, r in by.items():
         depth = None
