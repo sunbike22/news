@@ -59,6 +59,9 @@ for(const [mode,dark,w] of [["normal",false,390],["normal",true,390],["easy",fal
 { const {ctx,p,errs}=await open({me:ME_NORMAL});
   const d=await p.evaluate(()=>{ const D=window.NEWS_DATA, P=window.NEWS_PICKS; return {top10:(D.top10||[]).length,three:(D.three||[]).length,news:(D.news||[]).length,en:D.en?[D.en.top10.length,D.en.three.length]:null,picks:!!(P&&P.g),upd:D.updated}; });
   ok("データ: ニュース10が10件・3行が3つ", d.top10===10&&d.three===3, JSON.stringify([d.top10,d.three])); ok("データ: 英語版の数がそろっている", !d.en||(d.en[0]===d.top10&&d.en[1]===d.three), JSON.stringify(d.en));
+  { const bad=[]; try{ const w={}; new Function("window",require("fs").readFileSync(require("path").join(__dirname,"../../data.js"),"utf8"))(w);
+      Object.entries(w.NEWS_DATA.explainers||{}).forEach(([k,e])=>["more","faq","timeline","us","next"].forEach(f=>{ if(e[f]!==undefined&&!Array.isArray(e[f])) bad.push(k+"."+f); })); }catch(err){ bad.push("読めない: "+err.message); }
+    ok("データ: 解説の形がそろっている(more などが配列)", !bad.length, bad.join(",")); }
   ok("データ: おすすめが読める", d.picks); ok("データ: 更新が3日以内", d.upd&&(Date.now()-Date.parse(d.upd))<3*864e5, d.upd); await ctx.close(); }
 await b.close();
 console.log("\nNG: "+NG.length+(NG.length?"\n  - "+NG.join("\n  - "):""));

@@ -1357,6 +1357,11 @@ ul.ex-rel{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;
 (function(){
 "use strict";
 const D = window.NEWS_DATA;
+/* データの形がちがっても止まらないように(2026-11-01: 解説の more が配列ではなく1つの文字列になっていて、さがすタブの検索がエラーで止まった) */
+(()=>{ const arr=v=>Array.isArray(v)?v:(v==null||v===""?[]:[v]);
+  Object.values(D.explainers||{}).forEach(e=>{ if(!e) return; if(typeof e.more==="string") e.more=e.more.split(",").length===2?e.more.split(","):[e.more];
+    ["more","faq","timeline","us","next","cast","flow"].forEach(f=>{ if(e[f]!==undefined) e[f]=arr(e[f]); });
+    ["name","now","kid"].forEach(f=>{ if(typeof e[f]!=="string") e[f]=e[f]==null?"":String(e[f]); }); }); })();
 const main = document.getElementById("main");
 // ===== 上に重なる画面(#sheet)の「← もどる」を、ひとつ前の画面にもどす =====
 // 画面の上で別の画面を開いたら、前の画面(中身・押せるところ・どこまで読んだか)をそのまま取っておき、
@@ -4489,6 +4494,7 @@ function openShimen(){ const sh=document.getElementById("sheet"); const w=D.weat
 document.addEventListener("click",e=>{ const b=e.target.closest("[data-shimen]"); if(!b) return; e.preventDefault(); openShimen(); });
 // ===== お知らせ(新しくなったところ)。機能を足したら、いちばん上に1つ足す =====
 const UPDATES=[
+  {id:"2026-11-01a",d:"2026-11-01",t:"🔎 さがすで、ことばを打っても結果がしぼりこまれないのを直しました",L:["10/30の夕方から、さがすタブにことばを打っても、全部のニュースが出たままになっていました。いまはふつうに探せます。"]},
   {id:"2026-10-29a",d:"2026-10-29",t:"🗾 地図に「東北」「九州」の丸を出さないように",L:["「東北」が宮城の上に出ていたのを直しました。東北大学の話は「宮城」、九州大学や九州場所は「福岡」に出ます。","「九州で大雨」のように1つの県に決められない話は、地図の下の「🗾 地方全体のニュース」にまとめました。"]},
   {id:"2026-10-28f",d:"2026-10-28",t:"🗾 地図の「関西」を府県ごとに・国の名前の位置を直しました",L:["地図で大阪・京都・兵庫などが「関西」1つにまとまっていたのを、府県ごとの丸にしました。ほかの県も、ニュースに県の名前が出れば、その県に丸が出ます。","世界の地図で、国の名前がとなりの国の上に出ていたところを直しました(フランスの名前が海外の領土までふくめた真ん中に出ていた、など)。いまは国のいちばん内側に名前を置きます。","小さい県・国の名前は、となりと重なるときに少しずらして出すようにしました。"]},
   {id:"2026-10-28e",d:"2026-10-28",t:"🌏 世界の地図にも地域ボタンと国の名前",L:["世界の地図の上に「東アジア・中東・ヨーロッパ…」のボタン。押すとその地域に寄れます。","大きくすると国の名前が日本語で出て、近くの丸は重ならないように分かれます(名前どうしが重なるときは、大きい国の名前を先に出します)。"]},
