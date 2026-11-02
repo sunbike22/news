@@ -294,4 +294,5 @@
 - 右下の💬(`.gd-fab`)は、下へスクロール中は `:root.fab-off` でかくす(上へもどすと出る)。
 - 天気カードの開くボタンは「▼ 1時間ごと・雨雲」(短くして「🛟 防災」と同じ行に)。
 - 🏁 **「きょう」を短く(2026-11-02)**: ふつうモードでは `TODAY_MAIN`(天気・聞く・3行・ニュース10・小さな知らせ)だけをそのまま出し、その下に 読み終わりカード(`doneCard`。4つの約束は閉じた `details.done-more`)→「➕ ほかにも」(`extCard`。ほかの `SECS` を `details.nt[data-ext]` の1行ずつに。名前は `extLbl`、なければカードの h2 から)→ 記録したニュースすべて(`other`)。開いたものは `LOOK.extOpen` に覚える(**自分で押したときだけ**=`bindExt` の click。toggle イベントでは覚えない)。かんたんモードはたたまない。中のカードの h2 は行の名前と同じなのでかくす。
+- 📲 **スマホの画面にボタンを置く**(2026-11-02): `openInstall(tab)`・`[data-instopen]`(右上「設定」の吹き出し・マイ→⚙️設定の `installCard`)。機種は `devKind()`(ios/android/pc)で見分けてタブで切りかえ、手順は `instSteps`(押すマークは自作SVGの `IC`)。LINE・インスタなどの中のブラウザ(`inApp`)では置けないので、先に「ブラウザで開く」と、アドレスのコピーを出す。Android の Chrome で `beforeinstallprompt` が来ていれば「押すだけで置く」。OSの画面の文言が変わったら `instSteps` を直す。
 
