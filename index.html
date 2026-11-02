@@ -75,7 +75,7 @@ h1,h2,h3{line-height:1.35;margin:0;word-break:auto-phrase;text-wrap:pretty;line-
 .top .wrap{display:flex;align-items:center;gap:12px;padding-block:10px}
 .brand{font-family:var(--f-display);font-size:1.15rem;letter-spacing:.02em;display:flex;align-items:center;gap:8px;white-space:nowrap}
 .brand .dot{width:12px;height:12px;border-radius:50%;background:var(--accent);box-shadow:16px 0 0 var(--g-intl),32px 0 0 var(--g-eco);margin-right:34px}
-.top .upd{font-size:.84rem;color:var(--muted);margin-left:auto;text-align:right;line-height:1.3}
+.top .upd{font-size:.84rem;color:var(--muted);margin-left:auto;text-align:right;line-height:1.3}.top .upd .u1,.top .upd .u2{display:block;white-space:nowrap}.brand{min-width:0;flex:0 1 auto}.brand .bt{white-space:normal;word-break:keep-all;line-height:1.15}
 .iconbtn{border:1px solid var(--line);background:var(--surface2);border-radius:10px;min-width:40px;height:40px;cursor:pointer;font-size:.9rem;padding:0 10px;white-space:nowrap;flex:none}
 
 /* tabs */
@@ -1223,6 +1223,8 @@ svg.eat{animation:petEat .7s ease both!important}
 .bd-detail .bd-card{background:var(--surface2);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
 .bd-detail .memo{margin-top:6px}
 /* 案内係 */
+.wx-notes>summary,.foot-corr>summary{padding-top:9px;padding-bottom:9px}.lang-seg button{min-height:40px}
+.gd-fab{transition:transform .25s,opacity .25s}:root.fab-off .gd-fab{transform:translateY(140%);opacity:0;pointer-events:none}
 .gd-fab{position:fixed;right:max(16px,env(safe-area-inset-right,0px));bottom:calc(84px + env(safe-area-inset-bottom,0px));z-index:24;width:54px;height:54px;border-radius:50%;border:0;background:var(--accent);color:var(--on-accent);font-size:1.5rem;box-shadow:0 6px 18px rgba(0,0,0,.22);cursor:pointer}
 @media (min-width:900px){.gd-fab{bottom:24px}}
 .gd-msg{display:flex;flex-direction:column;gap:8px}
@@ -1346,7 +1348,7 @@ ul.ex-rel{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;
 <body>
 <header class="top">
   <div class="wrap">
-    <div class="brand"><span class="dot" aria-hidden="true"></span>まいにちニュース帳</div>
+    <div class="brand"><span class="dot" aria-hidden="true"></span><span class="bt">まいにち<wbr>ニュース帳</span></div>
     <div class="upd" id="upd"></div>
     <button class="iconbtn bell" id="bellBtn" aria-label="お知らせ" title="お知らせ">🔔<i class="dot" id="bellDot" hidden></i></button>
     <button class="iconbtn" id="setBtn" aria-label="設定(文字・モード)" title="設定">設定</button>
@@ -1416,7 +1418,7 @@ function mdLabel(iso){ const x=md(iso); return `${x.m}/${x.d}(${x.w})`; }
 function daysFrom(iso){ return Math.round((Date.parse(iso)-Date.parse(TODAY))/864e5); }
 function relDay(iso){ const n=daysFrom(iso); return n===0?"今日":n===1?"明日":n===-1?"きのう":mdLabel(iso); }
 
-document.getElementById("upd").innerHTML = `最終更新<br><b class="num">${esc(D.updatedLabel)}</b>`;
+{ const L=String(D.updatedLabel||""); const i=L.indexOf(" "); document.getElementById("upd").innerHTML = i>0?`<span class="u1">${esc(L.slice(0,i))} 更新</span><b class="num u2">${esc(L.slice(i+1))}</b>`:`最終更新<br><b class="num">${esc(L)}</b>`; } // 上の帯は2行まで(3〜4行に折り返していた=2026-11-02)
 
 // ===== 閲覧数の集計(公開するときに使う。いまはオフ) =====
 // 使い方: GoatCounter(https://www.goatcounter.com/ 無料・個人を追わない)で登録し、code に登録した名前を入れて on を true にする。
@@ -1539,16 +1541,19 @@ const LOOK = (()=>{ let p={}; try{ p=JSON.parse(store.get("nw-look")||"{}")||{};
   if(!p.v21){ p.v21=1; const HEAD=["weather","listen","three","notes","ten","number","quiz","pet","fun","other"]; const IN=["letter","one","count","first","wk5","cont","follow"];
     const fx=c=>{ if(!c) return; if(Array.isArray(c.order)){ c.order=[...HEAD,...c.order.filter(k=>!HEAD.includes(k))]; } c.off=c.off||{}; IN.forEach(k=>c.off[k]=true); delete c.off.notes; };
     fx(p); if(p.cfg){ fx(p.cfg.easy); fx(p.cfg.normal); } }
+  // v22(2026-11-02): ニュースサイトとして、ニュース10を早く見せる。「📌 きょうの小さな知らせ」を ニュース10 のすぐ下へ(前はニュース10が画面2枚ぶん下だった)。**v21 より後ろに置く**
+  if(!p.v22){ p.v22=1; const mv=c=>{ if(!c||!Array.isArray(c.order)) return; const o=c.order.filter(k=>k!=="notes"); const i=o.indexOf("ten"); if(i<0) return; o.splice(i+1,0,"notes"); c.order=o; };
+    mv(p); if(p.cfg){ mv(p.cfg.easy); mv(p.cfg.normal); } }
   if(!COLORS.some(c=>c[0]===p.color)) p.color="blue"; if(p.season!=="off") p.season="auto"; if(typeof p.preview!=="string") p.preview=""; if(!["compact","normal","roomy"].includes(p.density)) p.density="normal";
   return p; })();
 function saveLook(){ store.set("nw-look", JSON.stringify(LOOK)); }
 // ===== かんたんモード / ふつうモード =====
 // それぞれのモードが「きょうの並び・表示」「下のタブ」「文字の大きさ」を別々に覚える。かんたんモードに、ふつうの機能を足すこともできる
 const MODE_PRESET={
-  easy:()=>{ const on=["weather","listen","three","notes","ten","quiz"]; const order=[...on,...SECS.map(x=>x[0]).filter(k=>!on.includes(k))]; const off={}; order.forEach(k=>{ if(!on.includes(k)) off[k]=true; });
+  easy:()=>{ const on=["weather","listen","three","ten","notes","quiz"]; const order=[...on,...SECS.map(x=>x[0]).filter(k=>!on.includes(k))]; const off={}; order.forEach(k=>{ if(!on.includes(k)) off[k]=true; });
     return {order,off,tabs:["today","explain","search","my","plan","map","numbers","words"],tabOff:{plan:true,map:true,numbers:true,words:true},size:"l"}; },
   normal:()=>{ const off={listen:true,quick:true,picks:true,english:true,mood:true,know:true,talk:true,reporter:true,local:true,gacha:true,play:true,goal:true,kw:true,letter:true,one:true,count:true,first:true,wk5:true,cont:true,follow:true};
-    const HEAD=["weather","notes","three","ten","number","quiz","pet","fun","other"]; return {order:[...HEAD,...SECS.map(x=>x[0]).filter(k=>!HEAD.includes(k))],off,tabs:["today","explain","search","plan","my","map","numbers","words"],tabOff:{map:true,numbers:true,words:true},size:"m"}; }};
+    const HEAD=["weather","three","ten","notes","number","quiz","pet","fun","other"]; return {order:[...HEAD,...SECS.map(x=>x[0]).filter(k=>!HEAD.includes(k))],off,tabs:["today","explain","search","plan","my","map","numbers","words"],tabOff:{map:true,numbers:true,words:true},size:"m"}; }};
 function modeSnap(){ return {order:LOOK.order.slice(),off:Object.assign({},LOOK.off),tabs:LOOK.tabs.slice(),tabOff:Object.assign({},LOOK.tabOff),size:store.get("nw-size")||"m"}; }
 function setMode(m,fresh){ if(m!=="easy") m="normal"; if(m===LOOK.mode&&!fresh) return;
   LOOK.cfg[LOOK.mode]=modeSnap(); LOOK.mode=m; const c=(!fresh&&LOOK.cfg[m])||MODE_PRESET[m]();
@@ -1911,7 +1916,7 @@ function weatherCard(){
       ${open||severe?"":notesHTML}
       <div class="wx-btns"><button class="fchip" data-wxh="1">🕐 1時間ごと</button><button class="fchip" data-wxmap="1">🗾 全国の天気</button><button class="fchip" data-radar="1">☔ 雨雲</button></div>
     </div>
-    <div class="wx-foot">${must?"":`<button class="fchip wx-tg" data-wxtg="1" aria-expanded="${open?"true":"false"}" aria-controls="wxCard">${open?"▲ とじる":"▼ くわしく(1時間ごと・雨雲・持ち物)"}</button>`}<button class="fchip qk-open" data-quake="1">🛟 防災${qkLatestLabel()}</button></div>
+    <div class="wx-foot">${must?"":`<button class="fchip wx-tg" data-wxtg="1" aria-expanded="${open?"true":"false"}" aria-controls="wxCard">${open?"▲ とじる":"▼ 1時間ごと・雨雲"}</button>`}<button class="fchip qk-open" data-quake="1">🛟 防災${qkLatestLabel()}</button></div>
   </section>`;
 }
 function exLink(id){ return id && D.explainers[id] ? ` data-ex="${id}"` : ""; }
@@ -2003,6 +2008,8 @@ function cdPlanHTML(){ const L=cdItems().slice(0,6); if(!L.length) return "";
     <ul class="cd-g">${L.map(s=>{ const d=daysFrom(s[0]); return `<li>${d>1?"<small>あと</small>":""}<b class="num">${d<=0?"きょう":d===1?"あした":d}</b>${d>1?"<small>日</small>":""}<span>${mdLabel(s[0])}<br>${esc(s[3])}</span></li>`; }).join("")}</ul></section>`; }
 
 window.addEventListener("scroll",()=>{ const on=window.scrollY>24; if(on!==root.classList.contains("scrolled")) root.classList.toggle("scrolled",on); },{passive:true});
+// 💬 下にスクロールして読んでいる間は、右下の💬をかくす(本文の右はしを隠していた)。上にもどすとまた出る(2026-11-02)
+{ let lastY=0; window.addEventListener("scroll",()=>{ const y=window.scrollY; const d=y-lastY; if(Math.abs(d)<8) return; root.classList.toggle("fab-off",d>0&&y>200); lastY=y; },{passive:true}); }
 /* 📌 きょうの小さな知らせ(2026-10-28): 「きょう」に大きなカードを並べず、1行ずつたたんで出す。押すと その場で開く(中身は元のカードそのまま。並びで個別にオンにしたものは外す) */
 const NOTE_LBL={letter:"💌 ペットからの手紙",one:"🎯 きょうの1問",count:"🗳️ 大事な日まで",first:"🌱 はじめての7日間",wk5:"📅 今週の5大ニュース",cont:"🔔 つづきがあります",follow:"📬 追っているニュース",season:"",pick:"🎯 気になるジャンルを選ぶ"};
 function noteSub(k,html){ try{ if(k==="count"){ const L=cdItems().filter(s=>daysFrom(s[0])<=7); if(L.length){ const s0=L[0]; return `${cdLeft(s0)} ${s0[3]}`; } }
@@ -2830,7 +2837,7 @@ function renderWords(){
 function footer(){ return `<footer class="foot">
   <div><b>このページについて</b> 毎日のニュースを、複数の報道機関で確かめてやさしくまとめています。✅=別々の2社以上で確認 ／ ⚠️=1社だけ・見出しだけ。SNSだけの情報やうわさは載せていません。</div>
   <div>更新は1日5回(朝6:50・昼12:30・午後3:00・夕方5:50・夜10:30ごろ)。次の更新: ${esc(D.nextLabel)}</div>
-  <details><summary style="cursor:pointer">✏️ 訂正の記録</summary><ul class="us" style="margin-top:6px">${D.corrections.map(c=>`<li>${esc(c[0])} ${esc(c[1])}</li>`).join("")}</ul></details>
+  <details class="foot-corr"><summary style="cursor:pointer">✏️ 訂正の記録</summary><ul class="us" style="margin-top:6px">${D.corrections.map(c=>`<li>${esc(c[0])} ${esc(c[1])}</li>`).join("")}</ul></details>
   <div>まとめ: Claude(AI)。記事の文章はそのまま写さず、要点と出典を載せています。</div>
 </footer>`; }
 function bindFooter(){}
@@ -4573,6 +4580,7 @@ function openShimen(){ const sh=document.getElementById("sheet"); const w=D.weat
 document.addEventListener("click",e=>{ const b=e.target.closest("[data-shimen]"); if(!b) return; e.preventDefault(); openShimen(); });
 // ===== お知らせ(新しくなったところ)。機能を足したら、いちばん上に1つ足す =====
 const UPDATES=[
+  {id:"2026-11-02b",d:"2026-11-02",t:"📰 ニュース10が早く見られるようになりました",L:["「きょう」の画面で、ニュース10を「今日の3行」のすぐ下に上げました(「📌 きょうの小さな知らせ」はニュース10の下へ)。","右下の💬は、下へ読み進めている間はかくれます(上にもどすと出ます)。上の更新時刻も2行にまとめました。"]},
   {id:"2026-11-02a",d:"2026-11-02",t:"🏠 ペットの部屋で遊べるようになりました",L:["ペットが部屋の中を歩き回ります。なでたり、ボールで遊んだり、おやつ(1日1回)をあげたりできます(「💞 なかよし」が増えます。ごはんのルールは今までどおり)。","家具と窓は指で好きな所に動かせます。「🎨 もようがえ」で壁紙と床の色も選べます。","「✨ 見た目」で、もよう(しま・ぶち・てんてん)・目・ほっぺも選べるようになりました。"]},
   {id:"2026-11-01a",d:"2026-11-01",t:"🔎 さがすで、ことばを打っても結果がしぼりこまれないのを直しました",L:["10/30の夕方から、さがすタブにことばを打っても、全部のニュースが出たままになっていました。いまはふつうに探せます。"]},
   {id:"2026-10-29a",d:"2026-10-29",t:"🗾 地図に「東北」「九州」の丸を出さないように",L:["「東北」が宮城の上に出ていたのを直しました。東北大学の話は「宮城」、九州大学や九州場所は「福岡」に出ます。","「九州で大雨」のように1つの県に決められない話は、地図の下の「🗾 地方全体のニュース」にまとめました。"]},
