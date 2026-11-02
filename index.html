@@ -777,6 +777,8 @@ details.faq p{margin:10px 0 12px}
 .pc-i{display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 2px;border-radius:12px;border:2px solid var(--line);background:var(--surface);color:var(--ink);font:inherit;cursor:pointer}
 .pc-i.on{border-color:var(--accent-btn,var(--accent))} .pc-i small{font-size:.82rem}
 .pet-hall .ph{display:flex;flex-direction:column;align-items:center;min-width:84px;text-align:center}
+.pet-hall .ph-av{border:0;background:none;padding:0;cursor:pointer}.pet-hall .ph-b{display:flex;flex-direction:column;gap:6px;margin-top:6px;width:100%}.pet-hall .ph{flex:1 1 140px;max-width:220px;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:10px}
+.vroom{height:240px}.rm-fr.eat svg,.pet-fr.eat svg{animation:rmhop .5s}
 .pet-hall .ph small{color:var(--muted);font-size:.82rem}
 .pop b{font-size:1.05rem}
 /* かんたんモード: 押すところは44px以上(指が太くても押しやすく) */
@@ -3430,8 +3432,61 @@ function petName(){ if(ME.pet&&ME.pet.name) return ME.pet.name; return petStage(
 function petXP(){ const p=petInit(); const b=p.base||{d:0,e:0,w:0}; return Math.max(0, p.fed*5 + Math.max(0,ME.days.length-b.d)*2 + Math.max(0,Object.keys(ME.readEx).length-b.e)*3 + Math.max(0,ME.words.length-b.w)); }
 // 🎓 名人になったら、新しいたまごから育て直せる(前の子は殿堂入り)。そだちの数え直しは base に今の記録を覚えて引く
 function petHall(){ return (ME.pet||{}).hall||[]; }
-function petRestart(){ const p=petInit(); if(petStage().i<5) return false; p.hall=p.hall||[]; p.hall.push({name:petName(),kind:petKind(),color:p.color||null,look:p.look||null,xp:petXP(),wear:p.wear||null,at:TODAY,gen:p.gen||1}); delete p.color; delete p.look;
-  p.fed=0; p.feedDay=""; p.name=""; p.wear=null; p.stay=0; p.kind=petPickKind(p.kind); p.gen=(p.gen||1)+1; p.base={d:ME.days.length,e:Object.keys(ME.readEx).length,w:ME.words.length}; saveMe(); return true; }
+// 🏡 なかまの家(2026-11-02): 名人になった子(hall)と、入れかえでお休み中の子(rest)。会いに行く(openVisit)・いっしょに読む子を入れかえる(petSwap)
+// ひとりひとりの記録は PET_INDIV のキーだけ。ごはんのストック(food)・部屋・ともだちはみんなで共有
+const PET_INDIV=["name","kind","color","look","wear","fed","base","gen","hatched","stay","love","loveDay","loveN","feedDay","mAt"];
+function petCnt(){ return {d:ME.days.length,e:Object.keys(ME.readEx).length,w:ME.words.length}; }
+function petMaxGen(){ const p=ME.pet||{}; return Math.max(p.gen||1,...petHall().map(h=>h.gen||1),...(p.rest||[]).map(h=>h.gen||1)); }
+function petSnap(){ const p=petInit(); const o={}; PET_INDIV.forEach(k=>{ if(p[k]!==undefined&&p[k]!==null) o[k]=JSON.parse(JSON.stringify(p[k])); }); o.name=p.name||""; o.kind=petKind(); o.xp=petXP(); o.st=petStage().i; o.cnt=petCnt(); return o; }
+function petApply(o){ const p=petInit(); PET_INDIV.forEach(k=>delete p[k]); const c=petCnt();
+  if(o.fed===undefined){ // 前のかたちの殿堂(そだちの数だけ)→ 名人のまま入る
+    p.fed=Math.ceil((o.xp||0)/5); p.base=c; p.stay=1; p.hatched=o.gen||1; }
+  else{ PET_INDIV.forEach(k=>{ if(o[k]!==undefined) p[k]=o[k]; }); // お休みの間に開いた日・読んだ解説は、その子のそだちに入れない
+    const b=p.base||{d:0,e:0,w:0}, oc=o.cnt||c; p.base={d:b.d+(c.d-oc.d),e:b.e+(c.e-oc.e),w:b.w+(c.w-oc.w)}; }
+  p.kind=o.kind; p.name=o.name||""; p.gen=o.gen||petMaxGen()+1; if(o.at) p.mAt=o.at; if(o.color) p.color=o.color; if(o.look) p.look=o.look; if(o.wear) p.wear=o.wear; }
+function petFriends(){ const p=petInit(); return [...petHall().map((h,i)=>({h,src:"hall",i})),...(p.rest||[]).map((h,i)=>({h,src:"rest",i}))]; }
+function petSwap(src,i){ const p=petInit(); const L=src==="hall"?(p.hall=p.hall||[]):(p.rest=p.rest||[]); const inn=L[i]; if(!inn) return false;
+  const out=petSnap(); const master=out.st>=5; L.splice(i,1);
+  if(master){ out.at=p.mAt||TODAY; (p.hall=p.hall||[]).push(out); } else (p.rest=p.rest||[]).push(out);
+  petApply(inn); saveMe(); return true; }
+function friendStageOf(h){ return h.st!==undefined?h.st:5; }
+function friendNm(h){ return h.name||(friendStageOf(h)===0?"ふしぎなたまご":(PET_KINDS[h.kind]||PET_KINDS.maru)[0]); }
+function nakamaHTML(){ const F=petFriends(); if(!F.length) return "";
+  return `<details class="faq plain" style="margin-top:8px" id="nakamaBox"><summary>🏡 なかまの家(${F.length}匹)・会いに行く/入れかえる</summary><div class="pet-hall">${F.map(({h,src,i})=>{ const st=friendStageOf(h);
+    return `<div class="ph"><button class="ph-av" data-visit="${src}:${i}" aria-label="${esc(friendNm(h))}に会いに行く">${petSVG(st,"happy",null,64,h.wear||null,h.kind,h.color||null,h.look||{})}</button><b>${esc(friendNm(h))}</b><small>${src==="hall"?`🏆 第${h.gen||1}代 ・ ${esc(mdLabel(h.at))}に名人`:st===0?"🥚 たまごのままお休み中":`💤 お休み中(${esc((PET_STAGES[st]||[])[1]||"")})`}</small>
+      <span class="ph-b"><button class="fchip" data-visit="${src}:${i}">👀 会いに行く</button><button class="fchip" data-swap="${src}:${i}">🔁 いっしょに読む</button></span></div>`; }).join("")}</div>
+    <div class="hint">「いっしょに読む」を押すと、いまの子と入れかわります。いまの子は、育ちのとちゅうのまま「お休み」に入り、いつでももどせます(名人の子は🏆のまま)。ごはんのストックと部屋は、みんなで使います。</div></details>`; }
+function openVisit(src,i){ const p=petInit(); const L=src==="hall"?petHall():(p.rest||[]); const h=L[i]; if(!h) return; const sh=document.getElementById("sheet"); const st=friendStageOf(h);
+  const svg=m=>petSVG(st,m,null,96,h.wear||null,h.kind,h.color||null,h.look||{});
+  const NM=friendNm(h); const LINES=st===0?["…コトコト","(ぐっすり寝ているみたい)"]:[`${NM}だよ。来てくれてありがとう!`,src==="hall"?`${mdLabel(h.at)}に名人になったんだ。おぼえてる?`:"ここでのんびり、お休み中だよ",`いまの子(${petName()})は元気にしてる?`,"またいっしょにニュースを読もうね","えへへ、くすぐったい!"];
+  sh.innerHTML=`<div class="bar"><div class="wrap"><button class="iconbtn" id="vsx" aria-label="もどる">← もどる</button><span class="ttl">🏡 ${esc(NM)}のおうち</span></div></div><div class="wrap body">
+    <div class="room vroom" id="vroom"><div class="rm-wall"></div><div class="rm-floor"></div><span class="rm-it" style="left:14%;top:12%">🏆</span><span class="rm-it" style="left:86%;top:12%">🪟</span><span class="rm-it" style="left:50%;top:14%">🖼️</span>
+      <div class="rm-pet" id="vPet" style="left:50%;width:96px;margin-left:-48px" role="button" tabindex="0" aria-label="${esc(NM)}をなでる"><div class="rm-pi">${svg("happy")}</div></div></div>
+    <div class="rm-tools"><button class="fchip" id="vPat">🤚 なでる</button>${st>0?`<button class="fchip" id="vFeed">🍙 ごはんをあげる(のこり <b id="vFood">${p.food}</b>)</button>`:""}<button class="fchip pet-feed" id="vSwap">🔁 ${esc(NM)}といっしょに読む</button></div>
+    <div class="hint" style="margin-top:8px">${src==="hall"?`🏆 第${h.gen||1}代の名人 ・ そだち <b id="vXp">${h.xp||0}</b>`:st===0?"🥚 たまごのままお休み中":`💤 お休み中 ・ そだち <b id="vXp">${h.xp||0}</b>`} ・ 💞 なかよし <b id="vLove">${h.love||0}</b></div></div>`;
+  const pet=sh.querySelector("#vPet"), room=sh.querySelector("#vroom"); let x=50; const still=matchMedia("(prefers-reduced-motion: reduce)").matches;
+  const say=t=>{ room.querySelectorAll(".rm-say").forEach(e=>e.remove()); const b=document.createElement("span"); b.className="rm-say"; b.textContent=t; pet.appendChild(b); setTimeout(()=>b.remove(),2000); };
+  const walk=()=>{ if(!room.isConnected) return; if(still||st===0||document.hidden){ setTimeout(walk,3000); return; } const nx=14+Math.random()*72, d=Math.abs(nx-x); pet.classList.toggle("left",nx<x); pet.classList.add("walk"); pet.style.transitionDuration=(d/14).toFixed(2)+"s"; pet.style.left=nx+"%"; x=nx; setTimeout(()=>{ pet.classList.remove("walk"); setTimeout(walk,1500+Math.random()*3000); },d/14*1000+30); };
+  setTimeout(walk,900);
+  const pat=()=>{ pet.classList.remove("hop"); void pet.offsetWidth; pet.classList.add("hop"); setTimeout(()=>pet.classList.remove("hop"),550); for(let k=0;k<3;k++){ const e=document.createElement("span"); e.className="rm-heart"; e.textContent="💗"; e.style.left=(25+k*25)+"%"; e.style.animationDelay=(k*.12)+"s"; pet.appendChild(e); setTimeout(()=>e.remove(),1300); }
+    say(LINES[Math.floor(Math.random()*LINES.length)]); if(h.loveDay!==TODAY){ h.loveDay=TODAY; h.loveN=0; } if(h.loveN<LOVE_DAY){ h.loveN++; h.love=(h.love||0)+1; saveMe(); sh.querySelector("#vLove").textContent=h.love; } };
+  pet.onclick=pat; sh.querySelector("#vPat").onclick=pat;
+  { const fb=sh.querySelector("#vFeed"); if(fb) fb.onclick=()=>{ if(p.food<=0){ toast("🍙 ごはんがないよ。クイズに正解するともらえます"); return; }
+    p.food--; if(h.fed!==undefined) h.fed++; h.xp=(h.xp||0)+5; saveMe(); sh.querySelector("#vFood").textContent=p.food; { const xe=sh.querySelector("#vXp"); if(xe) xe.textContent=h.xp; } pat(); say(`もぐもぐ…ありがとう! (${NM}のそだち +5)`); }; } pet.onkeydown=e=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); pat(); } };
+  const close=()=>{ sh.hidden=true; sh.innerHTML=""; document.body.style.overflow=""; };
+  sh.querySelector("#vsx").onclick=close;
+  sh.querySelector("#vSwap").onclick=()=>{ if(swapAsk(src,i)){ close(); } };
+  sh.hidden=false; sh.scrollTop=0; document.body.style.overflow="hidden"; }
+function swapAsk(src,i){ const p=petInit(); const L=src==="hall"?petHall():(p.rest||[]); const h=L[i]; if(!h) return false; const cur=petName(); const master=petStage().i>=5;
+  if(!confirm(`${friendNm(h)}と いっしょに読みます。\n${cur}は${master?"🏆 なかまの家(名人)":"💤 お休み"}に入ります(育ちはそのまま。いつでももどせます)。\nよろしいですか?`)) return false;
+  if(petSwap(src,i)){ toast(`🔁 ${friendNm(h)}がもどってきた! ${cur}はなかまの家でひと休み`); go("my",{keepScroll:true}); return true; } return false; }
+// 🐣 遊びに来たともだち(ぴよた)にも、ごはんのストックからあげられる(ペットのそだちには入れない。なかよしが増える)
+function friendFeed(){ const p=petInit(); if(p.food<=0){ toast("🍙 ごはんがないよ。クイズに正解するともらえます"); return; } p.food--; p.ffed=(p.ffed||0)+1; saveMe();
+  document.querySelectorAll(".rm-fr,.pet-fr").forEach(el=>{ el.classList.remove("eat"); void el.offsetWidth; el.classList.add("eat"); for(let k=0;k<3;k++){ const e=document.createElement("span"); e.className="rm-heart"; e.textContent="💗"; e.style.left=(20+k*25)+"%"; e.style.animationDelay=(k*.12)+"s"; el.appendChild(e); setTimeout(()=>e.remove(),1300); } });
+  toast(`${friendName()}「もぐもぐ…ありがとう!」(なかよし ${p.ffed})`); const pf=document.getElementById("petFood"); if(pf) pf.textContent=p.food; }
+document.addEventListener("click",ev=>{ if(ev.target.closest("[data-ffeed]")){ friendFeed(); return; } const v=ev.target.closest("[data-visit]"); if(v){ const [s,i]=v.dataset.visit.split(":"); openVisit(s,+i); return; } const w=ev.target.closest("[data-swap]"); if(w){ const [s,i]=w.dataset.swap.split(":"); swapAsk(s,+i); } });
+function petRestart(){ const p=petInit(); if(petStage().i<5) return false; p.hall=p.hall||[]; p.hall.push(Object.assign(petSnap(),{at:p.mAt||TODAY})); delete p.color; delete p.look; delete p.mAt; delete p.love;
+  p.fed=0; p.feedDay=""; p.name=""; p.wear=null; p.stay=0; p.kind=petPickKind(p.kind); p.gen=petMaxGen()+1; p.base={d:ME.days.length,e:Object.keys(ME.readEx).length,w:ME.words.length}; saveMe(); return true; }
 function petStage(){ const xp=petXP(); let i=0; PET_STAGES.forEach((s,k)=>{ if(xp>=s[0]) i=k; }); const nx=PET_STAGES[i+1]; return {i,name:PET_STAGES[i][1],xp,next:nx,prog:nx?(xp-PET_STAGES[i][0])/(nx[0]-PET_STAGES[i][0]):1}; }
 function petTopGenre(){ let best=null,v=2.5; Object.entries(ME.auto||{}).forEach(([g,n])=>{ if(PET_ACC[g]&&n>v){v=n;best=g;} }); return best; }
 function petGap(){ const ds=[...ME.days].filter(d=>d<TODAY).sort(); if(!ds.length) return 0; return Math.round((Date.parse(TODAY)-Date.parse(ds[ds.length-1]))/864e5); }
@@ -3563,7 +3618,7 @@ function roomHTML(){ const got=GORDER.filter(g=>(ME.auto||{})[g]>=3); const st=p
   const egg=st.i===0;
   return `<div class="room" id="room" style="--w1:${W[2]};--w2:${W[3]};--f1:${F[2]};--f2:${F[3]}"><div class="rm-wall"></div><div class="rm-floor"></div>${slots}
     ${fr?`<div class="rm-fr">${friendSVG(56)}</div>`:""}<div class="rm-pet" id="rmPet" style="left:50%" role="button" tabindex="0" aria-label="${esc(petName())}をなでる"><div class="rm-pi">${petSVG(st.i,petMood(),null,84,petWear())}</div></div></div>
-    <div class="rm-tools"><button class="fchip" data-rplay="pet">🤚 なでる</button>${egg?"":`<button class="fchip" data-rplay="ball">⚽ ボールで遊ぶ</button><button class="fchip" data-rplay="snack">🍪 おやつ</button>`}<button class="fchip" data-rplay="deco" aria-expanded="false">🎨 もようがえ</button></div>
+    <div class="rm-tools"><button class="fchip" data-rplay="pet">🤚 なでる</button>${fr?`<button class="fchip" data-ffeed="1">🍙 ${esc(friendName())}にごはん</button>`:""}${egg?"":`<button class="fchip" data-rplay="ball">⚽ ボールで遊ぶ</button><button class="fchip" data-rplay="snack">🍪 おやつ</button>`}<button class="fchip" data-rplay="deco" aria-expanded="false">🎨 もようがえ</button></div>
     <div class="rm-deco" id="rmDeco" hidden><div><b>壁紙</b> ${ROOM_WALL.map(w=>`<button class="rm-sw${W===w?" on":""}" data-rwall="${w[0]}" style="background:linear-gradient(${w[2]},${w[3]})" aria-label="${w[1]}" aria-pressed="${W===w}"><small>${w[1]}</small></button>`).join("")}</div>
       <div><b>床</b> ${ROOM_FLOOR.map(f=>`<button class="rm-sw${F===f?" on":""}" data-rfloor="${f[0]}" style="background:repeating-linear-gradient(90deg,${f[2]} 0 10px,${f[3]} 10px 12px)" aria-label="${f[1]}" aria-pressed="${F===f}"><small>${f[1]}</small></button>`).join("")}</div>
       <button class="fchip" data-rreset="1">↺ 家具を元の並びにもどす</button></div>
@@ -3628,10 +3683,10 @@ function petBig(){ petHatchCheck(); const p=petInit(); const st=petStage(); cons
     <div class="hint" style="text-align:center;margin-top:4px">そだち ${st.xp}${st.next?` ・ 「${esc(st.next[1])}」まで あと${st.next[0]-st.xp}`:" ・ 最高の姿!"}</div>
     <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:10px"><button class="fchip pet-feed" data-feed="1" ${p.food>0?"":"disabled"}>🍙 ごはん <b id="petFood">${p.food}</b> こ ・ あげる</button><button class="fchip" id="petRename">✏️ 名前</button></div>
     <div class="hint" style="margin-top:8px">${acc?`🎒 よく読むジャンルが「${esc(PET_ACC[acc][2])}」なので、${esc(PET_ACC[acc][1])}をつけています。`:"🎒 よく読むジャンルが決まると、小物をつけはじめます。"}</div>
-    ${st.i>=5?`<div class="pet-master">${p.stay?`<div class="hint">🎓 ${esc(petName())}は ニュース名人。このまま いっしょに読みつづけています。</div><button class="fchip" id="petRestart" style="margin-top:6px">🥚 新しいたまごから育てる</button>`:`<b>🎓 ${esc(petName())}が ニュース名人になりました!</b><p class="hint" style="margin:4px 0 8px">このまま いっしょに読みつづけるか、新しいたまごから 2代目を育てるか、選べます。新しくしても ${esc(petName())}は「殿堂」に残ります。記録(連続日数・バッジなど)は消えません。</p><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="fchip pet-feed" id="petStay">🏠 このまま育てる</button><button class="fchip" id="petRestart">🥚 新しいたまごから育てる</button></div>`}</div>`:""}
-    ${petHall().length?`<details class="faq plain" style="margin-top:8px"><summary>🏆 殿堂(名人になった子たち)</summary><div class="pet-hall">${petHall().map(h=>`<div class="ph"><span>${petSVG(5,"happy",null,56,h.wear||null,h.kind,h.color||null,h.look||{})}</span><b>${esc(h.name)}</b><small>第${h.gen||1}代 ・ ${esc(mdLabel(h.at))}に名人</small></div>`).join("")}</div></details>`:""}
+    ${st.i>=5?`<div class="pet-master">${p.stay?`<div class="hint">🎓 ${esc(petName())}は ニュース名人。このまま いっしょに読みつづけています。</div><button class="fchip" id="petRestart" style="margin-top:6px">🥚 新しいたまごから育てる</button>`:`<b>🎓 ${esc(petName())}が ニュース名人になりました!</b><p class="hint" style="margin:4px 0 8px">このまま いっしょに読みつづけるか、新しいたまごから 2代目を育てるか、選べます。新しくしても ${esc(petName())}は「🏡 なかまの家」に残り、いつでも会いに行ったり、もどしたりできます。記録(連続日数・バッジなど)は消えません。</p><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="fchip pet-feed" id="petStay">🏠 このまま育てる</button><button class="fchip" id="petRestart">🥚 新しいたまごから育てる</button></div>`}</div>`:""}
+    ${nakamaHTML()}
     <details class="faq plain" style="margin-top:6px"><summary>そだて方</summary><ul class="us"><li>🧠 クイズに正解 → 🍙 ごはん(1日${PET_DAY_MAX}こまで)。あげると そだち +5</li><li>📅 開いた日 +2 ・ 💡 解説を読む +3 ・ 📖 ことばを調べる +1</li><li>3日以上あけると、すねます。ごはんをあげると元気に。</li><li>たまご → あかちゃん → こども → おとな → ものしり → ニュース名人</li><li>🥚 たまごから生まれる子は7種類。どの子が生まれるかは、生まれるまでのお楽しみ!(生まれたあとは変わりません)</li><li>🎓 名人になったら、そのまま育てるか、新しいたまごから育てるか選べます</li></ul></details>
-    ${friendOn()?`<div class="hint" style="text-align:center;margin-top:6px">🐣 ともだちの「${esc(friendName())}」が遊びに来ています <button class="gd-lk" id="frRename">名前</button></div>`:`<div class="hint" style="text-align:center;margin-top:6px">ペットが「おとな」になるか、14日開くと、ともだちがやってくるよ。</div>`}
+    ${friendOn()?`<div class="hint" style="text-align:center;margin-top:6px">🐣 ともだちの「${esc(friendName())}」が遊びに来ています <button class="gd-lk" id="frRename">名前</button> <button class="gd-lk" data-ffeed="1">🍙 ごはんをあげる</button></div>`:`<div class="hint" style="text-align:center;margin-top:6px">ペットが「おとな」になるか、14日開くと、ともだちがやってくるよ。</div>`}
     ${st.i===0?`<p class="hint" style="margin-top:8px">🎨 色は、たまごから生まれたあとに変えられます。</p>`:`<details class="faq plain" style="margin-top:8px" id="petColorBox"><summary>🎨 色を変える</summary><div class="pet-colors">${petColorsFor(petKind()).map(c=>`<button class="pc-i${((p.color||null)===c[0])?" on":""}" data-pcol="${c[0]||""}" aria-pressed="${(p.color||null)===c[0]}"><span>${petSVG(Math.max(1,st.i),"happy",null,48,null,petKind(),c[0])}</span><small>${esc(c[5])}</small></button>`).join("")}</div><div class="hint">いつでも何回でも変えられます。色は、その動物に本当にある色から選べます(けろまるは何色でも)。殿堂の子は、その子の色のまま残ります。</div></details>`}
     <details class="faq plain" style="margin-top:8px"><summary>👕 着せかえ</summary>${wardrobeHTML()}<div class="hint">🔒の服は、書いてあることをすると着られるようになります。</div></details>
     ${st.i===0?"":`<details class="faq plain" id="petLookBox"><summary>✨ 見た目(もよう・目・ほっぺ)</summary>${Object.entries(PET_LOOK).map(([k,L])=>`<div class="pl-row"><b>${{pat:"もよう",eye:"目",cheek:"ほっぺ"}[k]}</b><div class="pet-colors">${L.map(([v,n])=>{ const cur=((p.look||{})[k]||"")===v; const lk={...(p.look||{}),[k]:v}; return `<button class="pc-i${cur?" on":""}" data-plook="${k}:${v}" aria-pressed="${cur}"><span>${petSVG(Math.max(1,st.i),"",null,48,null,petKind(),undefined,lk)}</span><small>${esc(n)}</small></button>`; }).join("")}</div></div>`).join("")}<div class="hint">いつでも何回でも変えられます。殿堂の子は、その子の見た目のまま残ります。</div></details>`}
@@ -3648,7 +3703,7 @@ function bindPet(){
   document.querySelectorAll("[data-petquiz]").forEach(b=>b.onclick=()=>{ const q=document.getElementById("quiz"); if(q){ q.scrollIntoView({behavior:"smooth",block:"center"}); } else go("my"); });
   document.querySelectorAll("[data-pcol]").forEach(b=>b.onclick=()=>{ const v=b.dataset.pcol||null; const pp=petInit(); if(v) pp.color=v; else delete pp.color; saveMe(); toast(`🎨 ${(PET_COLORS.find(c=>c[0]===v)||[])[5]||"もとの色"}にしました`); go("my",{keepScroll:true}); setTimeout(()=>{ const d=document.getElementById("petColorBox"); if(d) d.open=true; },50); });
   const ps=document.getElementById("petStay"); if(ps) ps.onclick=()=>{ petInit().stay=1; saveMe(); toast(`🏠 ${petName()}と、このまま読みつづけます`); go("my",{keepScroll:true}); };
-  const pr=document.getElementById("petRestart"); if(pr) pr.onclick=()=>{ const n=petName(); if(!confirm(`${n}は「殿堂」に入り、新しいたまごから育てはじめます。\n(${n}にはもどせません。記録やバッジは消えません)\nよろしいですか?`)) return; if(petRestart()){ toast(`🥚 新しいたまごがやってきました。なにが生まれるかな? ${n}は殿堂入り!`); go("my",{keepScroll:true}); } };
+  const pr=document.getElementById("petRestart"); if(pr) pr.onclick=()=>{ const n=petName(); if(!confirm(`${n}は「🏡 なかまの家」に入り、新しいたまごから育てはじめます。\n(${n}にはいつでも会いに行けて、もどすこともできます。記録やバッジは消えません)\nよろしいですか?`)) return; if(petRestart()){ toast(`🥚 新しいたまごがやってきました。なにが生まれるかな? ${n}はなかまの家へ!`); go("my",{keepScroll:true}); } };
   const rn=document.getElementById("petRename"); if(rn) rn.onclick=()=>{ const v=prompt("名前をつけてね(10文字まで)",petName()); if(v&&v.trim()){ petInit().name=v.trim().slice(0,10); saveMe(); go(current,{keepScroll:true}); } };
   const wq=document.getElementById("wq"); if(wq) drawWordQuiz(wq,0,[]);
 }
@@ -4661,6 +4716,7 @@ function openShimen(){ const sh=document.getElementById("sheet"); const w=D.weat
 document.addEventListener("click",e=>{ const b=e.target.closest("[data-shimen]"); if(!b) return; e.preventDefault(); openShimen(); });
 // ===== お知らせ(新しくなったところ)。機能を足したら、いちばん上に1つ足す =====
 const UPDATES=[
+  {id:"2026-11-02f",d:"2026-11-02",t:"🏡 なかまの家: 名人になった子に会いに行けます",L:["マイ→ペットの「🏡 なかまの家」から、名人になった子のおうちに遊びに行けます(なでる・🍙 ごはんをあげる)。「🔁 いっしょに読む」で、その子と入れかえられます。いまの子は育ちのとちゅうのまま休み、いつでももどせます。","遊びに来るともだち(ぴよた)にも、🍙 ごはんをあげられるようになりました。"]},
   {id:"2026-11-02e",d:"2026-11-02",t:"💡 解説の一覧を見やすくしました",L:["新しく動いた順に並べ、最近の4本だけ大きく、ほかは1行ずつにしました。7日以上動きのない話題と、決着した話題はたたんであります(押すと開きます)。","まだ読んでいない解説には「● 未読」、読んだあとに動いたものには「🆕 続きあり」の印。📬 続きを追っている話題はいちばん上に出ます。"]},
   {id:"2026-11-02d",d:"2026-11-02",t:"📲 スマホの画面にボタンを置くやり方を、絵つきで",L:["右上の「設定」→「📲 スマホの画面にボタンを置く」で、iPhone・Android・パソコンごとの手順を、押すマークの絵つきで1つずつ見られます。","LINE やインスタの中で開いているときは、先にブラウザで開き直す方法を出します。"]},
   {id:"2026-11-02c",d:"2026-11-02",t:"🏁 「きょう」の画面を短くしました",L:["天気・今日の3行・ニュース10・小さな知らせのあとに「ここまで」を置き、数字・クイズ・ペット・おたのしみ・あなた向けは「➕ ほかにも」の中に1行ずつまとめました(押すと開きます。開いたものは次も開いたままです)。","なくなったものはありません。画面の長さは約3分の2になりました。"]},
