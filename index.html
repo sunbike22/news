@@ -787,6 +787,8 @@ details.faq p{margin:10px 0 12px}
 .pc-stamp{position:absolute;right:10px;top:10px;width:58px;height:66px;border:2px solid #d97706;border-radius:6px;background:#fff7ed;display:flex;flex-direction:column;align-items:center;justify-content:center;font-size:1.5rem}.pc-stamp small{font-size:.82rem;color:#92400e}
 .pc-from{font-size:1.15rem;margin-right:70px}.pc-from small{color:#7c6a52;font-size:.86rem;margin-left:4px}.pc-h{margin:10px 70px 6px 0;line-height:1.7}.pc-sig{text-align:right;color:#7c6a52}
 .pc-list{display:flex;flex-direction:column;gap:6px}
+.pc-map{display:flex;flex-direction:column;gap:8px;margin:6px 0}.pc-reg>b{display:block;font-size:.86rem;color:var(--muted);margin-bottom:3px}.pc-cells{display:flex;flex-wrap:wrap;gap:4px}
+.pc-cell{font-size:.84rem;padding:3px 7px;border-radius:6px;border:1px solid var(--line);color:var(--muted);background:var(--surface)}.pc-cell.got{background:var(--accent-btn,var(--accent));color:var(--on-accent);border-color:transparent;font-weight:700}
 @media (prefers-reduced-motion: reduce){.rm-pp{animation:none}}.rm-fr.eat svg,.pet-fr.eat svg{animation:rmhop .5s}
 .pet-hall .ph small{color:var(--muted);font-size:.82rem}
 .pop b{font-size:1.05rem}
@@ -3561,7 +3563,10 @@ function petDream(){ const p=petInit(); if(p.dreamDay===TODAY) return p.dream||"
   const kw=g?g[0].replace(/\(.*?\)/,""):(String(n.th||"").split(/[,、]/)[0]||n.h.replace(/[、。(].*$/,"").slice(0,12));
   const T=["の海でおよいでたら、目がさめちゃった。","と追いかけっこする夢だった。","の会議に、ぼくも出席してたんだ。","がふわふわの雲になって空にうかんでた。","のニュースを、ぼくが読み上げてたよ。"];
   p.dream=`ゆうべ「${kw}」${T[Math.floor(r()*T.length)]}(きのうのニュースより)`; p.dreamDay=TODAY; saveMe(); return p.dream; }
-function petLine(mood,st){ const n=petName(); if(st.i>0&&isMonthBd()) return `きょうはぼくの${bdMonths()}か月の誕生日なんだ! いつもいっしょに読んでくれてありがとう🎂`; if(st.i>0&&ppToday()&&new Date().getMinutes()%2===0) return "あっ、ハトの郵便屋さん「ぽっぽ」が来てる! マイのページで絵はがきを受けとってね📮"; if(st.i>0 && (ME.pet||{}).dreamDay!==TODAY && new Date(Date.now()+9*3600e3).getUTCHours()<12){ const d=petDream(); if(d) return "ふぁ〜あ。"+d; } if(st.i>0 && (ME.pet||{}).dreamDay===TODAY && (ME.pet||{}).dream && mood!=="happy" && new Date().getMinutes()%3===0) return (ME.pet||{}).dream;
+function petLine(mood,st){ const n=petName(); const mi=new Date().getMinutes();
+  if(st.i>0&&mood!=="sulk"&&mi%5===1){ const w=D.weather; if(w&&relDay(w.iso)==="今日"&&/雨/.test(w.sky)) return "きょうは雨だって。傘、わすれないでね☔"; if(w&&relDay(w.iso)==="今日"&&/雪/.test(w.sky)) return "雪だ! 外は寒いから、あたたかくしてね⛄"; }
+  if(st.i>0&&mood!=="sulk"&&mi%5===3&&D.three&&D.three[0]) return `きょうは「${D.three[0].title.slice(0,22)}${D.three[0].title.length>22?"…":""}」が気になるな。いっしょに読もう?`;
+  if(st.i>0&&isMonthBd()) return `きょうはぼくの${bdMonths()}か月の誕生日なんだ! いつもいっしょに読んでくれてありがとう🎂`; if(st.i>0&&ppToday()&&new Date().getMinutes()%2===0) return current==="my"?"あっ、ぽっぽが絵はがきを持ってきてくれたよ! 下のボタンで受けとってね📮":"あっ、ハトの郵便屋さん「ぽっぽ」が来てる! マイのページで絵はがきを受けとってね📮"; if(st.i>0 && (ME.pet||{}).dreamDay!==TODAY && new Date(Date.now()+9*3600e3).getUTCHours()<12){ const d=petDream(); if(d) return "ふぁ〜あ。"+d; } if(st.i>0 && (ME.pet||{}).dreamDay===TODAY && (ME.pet||{}).dream && mood!=="happy" && new Date().getMinutes()%3===0) return (ME.pet||{}).dream;
   if(st.i===0) return mood==="happy"?`たまごがあたたかい…もうすぐ生まれそう!`:`たまごの中から音がする。ニュースを読むと、${n}が生まれるよ。`;
   if(mood==="happy") return ["ごはんおいしかった!また明日もニュース読もうね","いっしょに読むと、ぼくも賢くなる気がする!","きょうのクイズ、たのしかったね"][new Date().getDate()%3];
   if(mood==="sulk") return `${petGap()}日ぶり…さみしかったんだから。(ぷい) ごはんをくれたら、ゆるしてあげる。`;
@@ -3695,17 +3700,21 @@ function ppToday(){ const p=petInit(); if(p.ppDay===TODAY||petStage().i<1) retur
 function ppPref(nm){ return PLACE_PREF[nm]||null; }
 function ppStats(){ const C=ppCards(); const pref=new Set(), world=new Set(); Object.entries(C).forEach(([nm,c])=>{ if(c.jp){ const pf=ppPref(nm); if(pf) pref.add(pf); } else world.add(nm); }); return {pref:pref.size,world:world.size,all:Object.keys(C).length}; }
 function ppReceive(){ const x=ppToday(); if(!x) return; const p=petInit(); const nm=x.pl[3]; const isNew=!ppCards()[nm]; ppCards()[nm]={d:TODAY,h:x.n.h,jp:isJpPlace(x.pl)}; p.ppDay=TODAY; saveMe(); openPostcard(nm,isNew); setTimeout(checkBadges,900); }
+const PREF_GROUPS=[["北海道・東北",0,7],["関東",7,7],["中部",14,9],["近畿",23,7],["中国",30,5],["四国",35,4],["九州・沖縄",39,8]];
+function prefMapHTML(){ const C=ppCards(); const got=new Set(); Object.entries(C).forEach(([nm,c])=>{ if(c.jp){ const pf=ppPref(nm); if(pf) got.add(pf); } });
+  return `<div class="pc-map">${PREF_GROUPS.map(([nm,i,n])=>`<div class="pc-reg"><b>${nm}</b><div class="pc-cells">${PREFS.slice(i,i+n).map(pf=>`<span class="pc-cell${got.has(pf)?" got":""}" title="${esc(pf)}${got.has(pf)?"":"(まだ)"}">${esc(pf.replace(/[都府県]$/,""))}</span>`).join("")}</div></div>`).join("")}</div>`; }
 function postcardHTML(nm,c){ const pf=c.jp?ppPref(nm):null; return `<div class="pcard"><div class="pc-stamp" aria-hidden="true">📮<small>${esc(mdLabel(c.d))}</small></div><div class="pc-from">${c.jp?"🗾":"🌏"} <b>${esc(nm)}</b>${pf&&pf.indexOf(nm)!==0?`<small>(${esc(pf)})</small>`:""} より</div><p class="pc-h">${esc(c.h)}</p><div class="pc-sig">— ぽっぽ</div></div>`; }
-function openPostcard(nm,isNew){ const sh=document.getElementById("sheet"); const C=ppCards(); const c=C[nm]; if(!c) return; const st=ppStats();
+function openPostcard(nm,isNew,fromBook){ const sh=document.getElementById("sheet"); const C=ppCards(); const c=C[nm]; if(!c) return; const st=ppStats();
   sh.innerHTML=`<div class="bar"><div class="wrap"><button class="iconbtn" id="pcx" aria-label="もどる">← もどる</button><span class="ttl">📮 ぽっぽの絵はがき</span></div></div><div class="wrap body">
-    <div class="pc-top">${poppoSVG(96)}<div class="pc-say">${isNew?`<b>はじめての場所だよ!</b> きょうのニュースに出てきた「${esc(nm)}」から、絵はがきを持ってきたよ。`:`きょうも「${esc(nm)}」から。前にも来たね、おかえり!`}</div></div>
+    <div class="pc-top">${poppoSVG(96)}<div class="pc-say">${fromBook?`絵はがき帳だよ。いちばん新しいのは「${esc(nm)}」から(${esc(mdLabel(c.d))})。${ppToday()?"きょうの分は、マイのページで受けとってね。":"また明日、持ってくるね!"}`:isNew?`<b>はじめての場所だよ!</b> きょうのニュースに出てきた「${esc(nm)}」から、絵はがきを持ってきたよ。`:`きょうも「${esc(nm)}」から。前にも来たね、おかえり!`}</div></div>
     ${postcardHTML(nm,c)}
     <div class="hint" style="margin:10px 0">📒 絵はがき帳: 日本 <b>${st.pref}</b>/47 都道府県 ・ 世界 <b>${st.world}</b> か所</div>
+    <details class="faq plain"><summary>🗾 47都道府県のあつまり具合</summary>${prefMapHTML()}<div class="hint">色がついたところが、絵はがきが来た県です。</div></details>
     <details class="faq plain"><summary>📒 集めた絵はがきを見る(${st.all}まい)</summary><div class="pc-list">${Object.entries(C).sort((a,b)=>b[1].d.localeCompare(a[1].d)).map(([k,v])=>postcardHTML(k,v)).join("")}</div></details>
     <p class="hint">ぽっぽは1日1まい、きょうのニュースの場所から絵はがきを持ってきます。はがきの文は、そのニュースの見出しです。</p></div>`;
   sh.querySelector("#pcx").onclick=()=>{ sh.hidden=true; sh.innerHTML=""; document.body.style.overflow=""; if(current==="my") go("my",{keepScroll:true}); };
   sh.hidden=false; sh.scrollTop=0; document.body.style.overflow="hidden"; }
-document.addEventListener("click",ev=>{ if(ev.target.closest("[data-poppo]")) ppReceive(); else if(ev.target.closest("[data-pcbook]")){ const C=ppCards(); const k=Object.keys(C).sort((a,b)=>C[b].d.localeCompare(C[a].d))[0]; if(k) openPostcard(k,false); } else if(ev.target.closest("[data-petphoto]")) petPhoto(); });
+document.addEventListener("click",ev=>{ if(ev.target.closest("[data-poppo]")) ppReceive(); else if(ev.target.closest("[data-pcbook]")){ const C=ppCards(); const k=Object.keys(C).sort((a,b)=>C[b].d.localeCompare(C[a].d))[0]; if(k) openPostcard(k,false,true); } else if(ev.target.closest("[data-petphoto]")) petPhoto(); });
 // 📸 記念写真(2026-11-03): いまの子・ぴよた・なかまの子(3匹まで)を1まいの画像に。どこにも送らず、スマホで共有/保存するだけ
 async function petPhoto(){ const W=1080,H=1080; const c=document.createElement("canvas"); c.width=W; c.height=H; const x=c.getContext("2d");
   const F='"Hiragino Sans","Hiragino Kaku Gothic ProN","Noto Sans JP","Yu Gothic",sans-serif'; const R=(ME.pet||{}).room||{};
@@ -3755,10 +3764,10 @@ function petBig(){ petHatchCheck(); bdCheck(); const p=petInit(); const st=petSt
     <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:10px"><button class="fchip pet-feed" data-feed="1" ${p.food>0?"":"disabled"}>🍙 ごはん <b id="petFood">${p.food}</b> こ ・ あげる</button><button class="fchip" id="petRename">✏️ 名前</button></div>
     <div class="hint" style="margin-top:8px">${acc?`🎒 よく読むジャンルが「${esc(PET_ACC[acc][2])}」なので、${esc(PET_ACC[acc][1])}をつけています。`:"🎒 よく読むジャンルが決まると、小物をつけはじめます。"}</div>
     ${st.i>=5?`<div class="pet-master">${p.stay?`<div class="hint">🎓 ${esc(petName())}は ニュース名人。このまま いっしょに読みつづけています。</div><button class="fchip" id="petRestart" style="margin-top:6px">🥚 新しいたまごから育てる</button>`:`<b>🎓 ${esc(petName())}が ニュース名人になりました!</b><p class="hint" style="margin:4px 0 8px">このまま いっしょに読みつづけるか、新しいたまごから 2代目を育てるか、選べます。新しくしても ${esc(petName())}は「🏡 なかまの家」に残り、いつでも会いに行ったり、もどしたりできます。記録(連続日数・バッジなど)は消えません。</p><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="fchip pet-feed" id="petStay">🏠 このまま育てる</button><button class="fchip" id="petRestart">🥚 新しいたまごから育てる</button></div>`}</div>`:""}
-    ${nakamaHTML()}
     <div class="pet-extra">${petAgeDays()!==null&&st.i>0?`<span class="hint">🎂 生まれて${petAgeDays()}日${isMonthBd()?` ・ <b>きょうは${bdMonths()}か月の誕生日!</b>`:` ・ 毎月${+ME.pet.born.slice(8)}日がお誕生日`}</span>`:""}
       ${ppToday()?`<button class="fchip pet-feed pp-btn" data-poppo="1">${poppoSVG(28)} ぽっぽが絵はがきを持ってきた!</button>`:Object.keys((ME.pet||{}).cards||{}).length?`<button class="fchip" data-pcbook="1">📒 絵はがき帳(日本 ${ppStats().pref}/47)</button>`:""}
       ${st.i>0?`<button class="fchip" data-petphoto="1">📸 記念写真を撮る</button>`:""}</div>
+    ${nakamaHTML()}
     <details class="faq plain" style="margin-top:6px"><summary>そだて方</summary><ul class="us"><li>🧠 クイズに正解 → 🍙 ごはん(1日${PET_DAY_MAX}こまで)。あげると そだち +5</li><li>📅 開いた日 +2 ・ 💡 解説を読む +3 ・ 📖 ことばを調べる +1</li><li>3日以上あけると、すねます。ごはんをあげると元気に。</li><li>たまご → あかちゃん → こども → おとな → ものしり → ニュース名人</li><li>🥚 たまごから生まれる子は7種類。どの子が生まれるかは、生まれるまでのお楽しみ!(生まれたあとは変わりません)</li><li>🎓 名人になったら、そのまま育てるか、新しいたまごから育てるか選べます</li></ul></details>
     ${friendOn()?`<div class="hint" style="text-align:center;margin-top:6px">🐣 ともだちの「${esc(friendName())}」(${esc(friendStageLine())})が遊びに来ています <button class="gd-lk" id="frRename">名前</button> <button class="gd-lk" data-ffeed="1">🍙 ごはんをあげる</button></div>`:`<div class="hint" style="text-align:center;margin-top:6px">ペットが「おとな」になるか、14日開くと、ともだちがやってくるよ。</div>`}
     ${st.i===0?`<p class="hint" style="margin-top:8px">🎨 色は、たまごから生まれたあとに変えられます。</p>`:`<details class="faq plain" style="margin-top:8px" id="petColorBox"><summary>🎨 色を変える</summary><div class="pet-colors">${petColorsFor(petKind()).map(c=>`<button class="pc-i${((p.color||null)===c[0])?" on":""}" data-pcol="${c[0]||""}" aria-pressed="${(p.color||null)===c[0]}"><span>${petSVG(Math.max(1,st.i),"happy",null,48,null,petKind(),c[0])}</span><small>${esc(c[5])}</small></button>`).join("")}</div><div class="hint">いつでも何回でも変えられます。色は、その動物に本当にある色から選べます(けろまるは何色でも)。殿堂の子は、その子の色のまま残ります。</div></details>`}
@@ -4792,7 +4801,7 @@ function openShimen(){ const sh=document.getElementById("sheet"); const w=D.weat
 document.addEventListener("click",e=>{ const b=e.target.closest("[data-shimen]"); if(!b) return; e.preventDefault(); openShimen(); });
 // ===== お知らせ(新しくなったところ)。機能を足したら、いちばん上に1つ足す =====
 const UPDATES=[
-  {id:"2026-11-03b",d:"2026-11-03",t:"📮 絵はがき集めのバッジと、郵便屋さんの服",L:["絵はがきを集めた数で上がるバッジ「📮 絵はがき集め」を足しました。10まい集めると、ペットが「郵便屋さんの帽子とかばん」を着られます。","部屋の窓の外に、いまの空(朝・昼・夕方・夜、雨や雪の日)が見えます。ペットの日記にも、絵はがきと誕生日のことが書かれます。"]},
+  {id:"2026-11-03b",d:"2026-11-03",t:"📮 絵はがき集めのバッジと、郵便屋さんの服",L:["絵はがき帳に「🗾 47都道府県のあつまり具合」(地方ごとのマス)を足しました。ペットが、きょうの天気やニュースについてもひとこと言います。","絵はがきを集めた数で上がるバッジ「📮 絵はがき集め」を足しました。10まい集めると、ペットが「郵便屋さんの帽子とかばん」を着られます。","部屋の窓の外に、いまの空(朝・昼・夕方・夜、雨や雪の日)が見えます。ペットの日記にも、絵はがきと誕生日のことが書かれます。"]},
   {id:"2026-11-03a",d:"2026-11-03",t:"📮 新しいなかま「ぽっぽ」と、🎂 誕生日・📸 記念写真",L:["ハトの郵便屋さん「ぽっぽ」が、1日1まい、きょうのニュースに出てきた場所から絵はがきを届けてくれます。集めると「📒 絵はがき帳」に(日本は47都道府県ぜんぶ集められるかな?)。","ペットに誕生日ができました(毎月お祝いの🍙)。マイ→ペットの「📸 記念写真を撮る」で、なかまといっしょの1まいが作れます。","ともだちの「ぴよた」も、ごはんをもらうと少しずつ育ちます(ひよこ → わかどり → はばたき鳥 → りっぱな鳥)。"]},
   {id:"2026-11-02f",d:"2026-11-02",t:"🏡 なかまの家: 名人になった子に会いに行けます",L:["マイ→ペットの「🏡 なかまの家」から、名人になった子のおうちに遊びに行けます(なでる・🍙 ごはんをあげる)。「🔁 いっしょに読む」で、その子と入れかえられます。いまの子は育ちのとちゅうのまま休み、いつでももどせます。","遊びに来るともだち(ぴよた)にも、🍙 ごはんをあげられるようになりました。"]},
   {id:"2026-11-02e",d:"2026-11-02",t:"💡 解説の一覧を見やすくしました",L:["新しく動いた順に並べ、最近の4本だけ大きく、ほかは1行ずつにしました。7日以上動きのない話題と、決着した話題はたたんであります(押すと開きます)。","まだ読んでいない解説には「● 未読」、読んだあとに動いたものには「🆕 続きあり」の印。📬 続きを追っている話題はいちばん上に出ます。"]},
