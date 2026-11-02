@@ -634,6 +634,12 @@ mark{background:#ffe066;color:#141b2d;border-radius:3px;padding:0 1px}
 /* explainers */
 .exgrid{display:grid;grid-template-columns:1fr;gap:10px}
 @media (min-width:640px){.exgrid{grid-template-columns:1fr 1fr}}
+.exh{font-size:.95rem;margin:0 0 8px}
+.exlist{display:flex;flex-direction:column;background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);overflow:hidden}
+.exrow{display:flex;align-items:center;gap:10px;min-height:56px;padding:8px 12px;border:0;border-top:1px solid var(--line);background:none;color:inherit;text-align:left;font:inherit;cursor:pointer;width:100%}.exrow:first-child{border-top:0}
+.exr-i{flex:none;width:2.2em;height:2.2em;border-radius:10px;display:grid;place-items:center;font-size:1.1rem}.exr-t{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}.exr-t b{line-height:1.4}.exr-t small{color:var(--muted);font-size:.84rem}.exr-go{color:var(--muted);font-size:1.3rem}
+.exm{font-size:.82rem;font-weight:700;margin-left:4px;white-space:nowrap}.exm.unread{color:var(--accent-on-surface,var(--accent))}.exm.new{color:var(--ink)}
+.ex-fold>summary{cursor:pointer;font-weight:700;font-size:.95rem;padding:10px 0;min-height:44px}.ex-fold .exlist{margin-top:4px}
 .excard{display:grid;grid-template-columns:56px 1fr;gap:12px;text-align:left;width:100%;border:1px solid var(--line);background:var(--surface);border-radius:var(--radius);padding:14px;cursor:pointer;align-items:start}
 .excard .ico{width:56px;height:56px;border-radius:14px;display:grid;place-items:center;font-size:1.7rem;background:var(--surface2)}
 .excard h3{font-size:1.02rem}
@@ -2345,7 +2351,23 @@ function renderSearch(){ sLim=20;
 }
 
 // ===== 解説 =====
-function exCard(k,e){ return `<button class="excard" data-ex="${k}">${ILL[k]?`<span class="ico ill">${ILL[k]}</span>`:`<span class="ico" style="background:var(--g-${e.g}-s)">${e.icon}</span>`}<span><span class="st ${e.status}">${e.status==="live"?"🔥 いま動いている":"✅ 決着"}</span> <span class="hint">・${esc(e.updated)}更新・⏱️${e.min}分</span><h3>${esc(e.name)}</h3><p>${esc(e.now)}</p></span></button>`; }
+// 解説の一覧の印: ● まだ読んでいない / 🆕 読んだあとに動いた(2026-11-02)
+function exMark(k,e){ const r=(ME.readEx||{})[k]; const u=mdIso(e.updated); if(!r) return `<span class="exm unread">● 未読</span>`; if(u&&u>r) return `<span class="exm new">🆕 続きあり</span>`; return ""; }
+function exRow(k,e){ return `<button class="exrow" data-ex="${k}"><span class="exr-i" style="background:var(--g-${e.g}-s)" aria-hidden="true">${e.icon}</span><span class="exr-t"><b>${esc(e.name)}</b><small>${esc(e.updated)}更新・⏱️${e.min}分 ${exMark(k,e)}</small></span><span class="exr-go" aria-hidden="true">›</span></button>`; }
+function exCard(k,e){ return `<button class="excard" data-ex="${k}">${ILL[k]?`<span class="ico ill">${ILL[k]}</span>`:`<span class="ico" style="background:var(--g-${e.g}-s)">${e.icon}</span>`}<span><span class="st ${e.status}">${e.status==="live"?"🔥 いま動いている":"✅ 決着"}</span> <span class="hint">・${esc(e.updated)}更新・⏱️${e.min}分</span> ${exMark(k,e)}<h3>${esc(e.name)}</h3><p>${esc(e.now)}</p></span></button>`; }
+// 💡 解説の一覧(2026-11-02 に見直し): 新しく動いた順。📬 追っている → 🔥 最近動いた4本(大きなカード)→ そのほか(1行ずつ)→ 💤 7日以上動きなし(閉じる)→ ✅ 決着(閉じる)
+const EX_BIG=4, EX_QUIET=7;
+function exListHTML(E){ const age=e=>{ const u=mdIso(e.updated); return u?Math.round((Date.parse(TODAY)-Date.parse(u))/864e5):99; };
+  const L=[...E].sort((a,b)=>(mdIso(b[1].updated)||"").localeCompare(mdIso(a[1].updated)||""));
+  const fol=ME.follow||{}; const F=L.filter(([k,e])=>fol[k]&&e.status==="live");
+  const live=L.filter(([k,e])=>e.status==="live"&&!fol[k]); const act=live.filter(([,e])=>age(e)<EX_QUIET), quiet=live.filter(([,e])=>age(e)>=EX_QUIET);
+  const done=L.filter(([,e])=>e.status!=="live");
+  const big=act.slice(0,EX_BIG), rest=act.slice(EX_BIG);
+  const fold=(id,t,list)=>list.length?`<details class="ex-fold" data-exf="${id}"><summary>${t}(${list.length}本)</summary><div class="exlist">${list.map(([k,e])=>exRow(k,e)).join("")}</div></details>`:"";
+  return `${F.length?`<div><h3 class="exh">📬 追っている話題</h3><div class="exlist">${F.map(([k,e])=>exRow(k,e)).join("")}</div></div>`:""}
+    ${big.length?`<div><h3 class="exh">🔥 最近動いた話題</h3><div class="exgrid">${big.map(([k,e])=>exCard(k,e)).join("")}</div></div>`:""}
+    ${rest.length?`<div><h3 class="exh">🔥 そのほか動いている話題</h3><div class="exlist">${rest.map(([k,e])=>exRow(k,e)).join("")}</div></div>`:""}
+    ${fold("quiet",`💤 しばらく動きなし(${EX_QUIET}日以上)`,quiet)}${fold("done","✅ 決着した話題・まとめ",done)}`; }
 function renderExplain(){
   const E=Object.entries(D.explainers);
   main.innerHTML=`<div class="view">
@@ -2353,8 +2375,7 @@ function renderExplain(){
     ${mascot("explain")}
     <p class="hint" style="margin:0">「ひとことで」→「動く図」→「よくある疑問」の順に読むと、だいたい1分でわかります。</p>
     ${LOOK.mode==="easy"?"":`<button class="lookcard" id="webBtn"><span style="font-size:1.8rem" aria-hidden="true">🕸️</span><span><b>ニュースのつながり地図</b><span class="hint" style="display:block">原油→ガソリン→暮らし…話の流れを糸でたどる</span></span></button>`}
-    <div><h3 style="font-size:.95rem;margin-bottom:8px">🔥 いま動いている話題</h3><div class="exgrid">${E.filter(([,e])=>e.status==="live").map(([k,e])=>exCard(k,e)).join("")}</div></div>
-    <div><h3 style="font-size:.95rem;margin-bottom:8px">✅ 決着した話題・まとめ</h3><div class="exgrid">${E.filter(([,e])=>e.status!=="live").map(([k,e])=>exCard(k,e)).join("")}</div></div>
+    ${exListHTML(E)}
     ${footer()}
   </div>`;
   { const wb=document.getElementById("webBtn"); if(wb) wb.onclick=()=>openWeb(); }
@@ -4640,6 +4661,7 @@ function openShimen(){ const sh=document.getElementById("sheet"); const w=D.weat
 document.addEventListener("click",e=>{ const b=e.target.closest("[data-shimen]"); if(!b) return; e.preventDefault(); openShimen(); });
 // ===== お知らせ(新しくなったところ)。機能を足したら、いちばん上に1つ足す =====
 const UPDATES=[
+  {id:"2026-11-02e",d:"2026-11-02",t:"💡 解説の一覧を見やすくしました",L:["新しく動いた順に並べ、最近の4本だけ大きく、ほかは1行ずつにしました。7日以上動きのない話題と、決着した話題はたたんであります(押すと開きます)。","まだ読んでいない解説には「● 未読」、読んだあとに動いたものには「🆕 続きあり」の印。📬 続きを追っている話題はいちばん上に出ます。"]},
   {id:"2026-11-02d",d:"2026-11-02",t:"📲 スマホの画面にボタンを置くやり方を、絵つきで",L:["右上の「設定」→「📲 スマホの画面にボタンを置く」で、iPhone・Android・パソコンごとの手順を、押すマークの絵つきで1つずつ見られます。","LINE やインスタの中で開いているときは、先にブラウザで開き直す方法を出します。"]},
   {id:"2026-11-02c",d:"2026-11-02",t:"🏁 「きょう」の画面を短くしました",L:["天気・今日の3行・ニュース10・小さな知らせのあとに「ここまで」を置き、数字・クイズ・ペット・おたのしみ・あなた向けは「➕ ほかにも」の中に1行ずつまとめました(押すと開きます。開いたものは次も開いたままです)。","なくなったものはありません。画面の長さは約3分の2になりました。"]},
   {id:"2026-11-02b",d:"2026-11-02",t:"📰 ニュース10が早く見られるようになりました",L:["「きょう」の画面で、ニュース10を「今日の3行」のすぐ下に上げました(「📌 きょうの小さな知らせ」はニュース10の下へ)。","右下の💬は、下へ読み進めている間はかくれます(上にもどすと出ます)。上の更新時刻も2行にまとめました。"]},
