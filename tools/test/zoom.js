@@ -17,7 +17,7 @@ async function pinch(p,sel,from,to){
   await send("touchEnd",[]);
 }
 (async()=>{
-const b=await chromium.launch({executablePath:"/opt/pw-browsers/chromium_headless_shell-1194/chrome-linux/headless_shell"});
+const b=await chromium.launch({executablePath:require("./browser").exe()});
 const ctx=await b.newContext({viewport:{width:390,height:900},serviceWorkers:"block",hasTouch:true,isMobile:true});
 const p=await ctx.newPage(); const errs=[];
 p.on("pageerror",e=>errs.push(e.message));

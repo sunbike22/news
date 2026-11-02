@@ -8,7 +8,7 @@ const NG=[]; const ok=(name,cond,info)=>{ if(!cond) NG.push(name+(info?" → "+i
 const ME_NORMAL={days:["2026-10-19","2026-10-20","2026-10-21"],pet:{fed:3,food:2},gv:{eco:3},interests:{it:true},topics:{baseball:true,anime:true},words:["原油"],pref:"大阪府"};
 const ME_MASTER={days:Array.from({length:30},(_,i)=>"2026-09-"+String(i+1).padStart(2,"0")),pet:{fed:70,food:3},readEx:{a:"2026-10-01",b:"2026-10-02",c:"2026-10-03"},words:["a"]};
 (async()=>{
-const b=await chromium.launch({executablePath:"/opt/pw-browsers/chromium_headless_shell-1194/chrome-linux/headless_shell"});
+const b=await chromium.launch({executablePath:require("./browser").exe()});
 async function open(opt){ const ctx=await b.newContext({viewport:{width:opt.w||390,height:844},serviceWorkers:"block",colorScheme:opt.dark?"dark":"light"}); const p=await ctx.newPage(); const errs=[];
   p.on("pageerror",e=>errs.push("JS: "+e.message)); p.on("console",m=>{ if(m.type()==="error"&&!IGN.test(m.text())) errs.push("console: "+m.text().slice(0,120)); }); p.on("dialog",d=>d.accept());
   await p.route(/fonts\.g|gc\.zgo|p2pquake|unsplash|open-meteo|jma\.go|cyberjapan|disaportal/,r=>r.abort());

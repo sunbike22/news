@@ -128,7 +128,7 @@ main{padding-block:18px 32px}
 .nt{border-top:1px solid var(--line)}.nt:first-child{border-top:0}
 .nt>summary{list-style:none;display:flex;align-items:center;gap:10px;min-height:48px;padding:6px 0;cursor:pointer}.nt>summary::-webkit-details-marker{display:none}
 .nt>summary .nt-i{font-size:1.3rem;width:1.6em;text-align:center;flex:none}.nt>summary b{flex:1 0 auto;min-width:0;max-width:62%}.nt>summary small{color:var(--muted);font-size:.84rem;flex:1 1 0;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
-.nt>summary::after{content:"▸";color:var(--muted);transition:transform .2s}.nt[open]>summary::after{transform:rotate(90deg)}
+.nt>summary::after{content:"▸";color:var(--muted);margin-left:auto;transition:transform .2s}.nt[open]>summary::after{transform:rotate(90deg)}
 .ext .nt>summary b{flex:0 1 auto}.done-more>summary{cursor:pointer;color:var(--muted);font-size:.86rem;padding:6px 0}.ext .nt-b>section>.sec-h>h2{display:none}.ext .nt-b>section>.sec-h{justify-content:flex-end}.ext .nt-b>section>.sec-h:not(:has(>:not(h2))){display:none}
 .nt-b{padding:0 0 10px}.nt-b>section.card,.nt-b>.card{border:0;padding:0;box-shadow:none;background:none;margin:0}.nt-b .season-card{margin:0}
 .wx-foot{display:flex;gap:6px;flex-wrap:wrap;align-items:center;justify-content:space-between}.wx-foot .qk-open{margin-left:auto}
@@ -2053,9 +2053,10 @@ function notesCard(S){ const rows=[];
 const TODAY_MAIN=["weather","listen","three","ten","notes"];
 // 「➕ ほかにも」の行の名前(絵文字・名前・小さな説明)。ないものはカードの見出し(h2)から作る
 function extLbl(k,h){ const L={number:["🔢","今日の数字",()=>`${D.number.value}${D.number.unit}`],quiz:["🧠","今日の3問クイズ",()=>"正解するとペットのごはん"],pet:["🐣",()=>petName(),()=>petStage().name],
-    fun:["✨","おたのしみ",()=>"ジャンル別おすすめ・ゲーム・ことば"],foryou:["🎯","あなた向け",()=>"好きなこと・よく読むジャンルから"]}[k];
+    fun:["✨","おたのしみ",()=>"ジャンル別おすすめ・ゲーム・ことば"],foryou:["🎯","あなた向け",()=>"好きなこと・よく読むジャンルから"],play:["▶️","1分で見る",()=>"寝る前ラジオも"]}[k];
   const f=v=>typeof v==="function"?v():v; if(L) return [L[0],f(L[1]),f(L[2])];
-  const m=/<h2[^>]*>([\s\S]*?)<\/h2>/.exec(h); const t=m?m[1].replace(/<[^>]+>/g,"").trim():k; const sp=t.indexOf(" "); return sp>0&&sp<4?[t.slice(0,sp),t.slice(sp+1),""]:["・",t,""]; }
+  // h2 のないカード(ボタンだけのものなど)は SECS の名前を使う(キーの英語がそのまま出ていた=2026-11-03)
+  const m=/<h2[^>]*>([\s\S]*?)<\/h2>/.exec(h); const sec=SECS.find(x=>x[0]===k); const t=m?m[1].replace(/<[^>]+>/g,"").trim():(sec?sec[1]:k); const sp=t.indexOf(" "); return sp>0&&sp<4?[t.slice(0,sp),t.slice(sp+1),""]:["・",t,""]; }
 function extCard(keys,S){ if(!keys.length) return ""; LOOK.extOpen=LOOK.extOpen||{};
   return `<section class="card notes ext" aria-label="ほかにも"><div class="sec-h"><h2>➕ ほかにも</h2><span class="sub">押すと開きます</span></div><div class="nt-list">${keys.map(k=>{ const [ic,nm,sub]=extLbl(k,S[k]);
     return `<details class="nt" data-ext="${k}"${LOOK.extOpen[k]?" open":""}><summary><span class="nt-i">${ic}</span><b>${esc(nm)}</b>${sub?`<small>${esc(sub)}</small>`:""}</summary><div class="nt-b">${S[k]}</div></details>`; }).join("")}</div></section>`; }

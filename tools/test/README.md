@@ -24,6 +24,7 @@ S=<しらべもの用フォルダ> NODE_PATH=/tmp/node_modules node tools/test/f
 
 - `health.js` — 定期の不具合チェック(週2回の定期タスク「アプリの不具合チェック」もこれを動かす)。はじめての人・ふつう・かんたん・暗い画面・パソコン幅で全タブと主な画面を開き、エラー・横はみ出し・開きっぱなし、ペットの絵(6種類×段階×気分×服)、名人→新しいたまご、データの形を見る。`NG: 0` が合格。
 - `setup.sh <フォルダ>` — Playwright と外のライブラリの控えを npm からそろえる(新しい環境で最初に1回)。
+- `browser.js` — ブラウザ(chromium の headless shell)の場所を `/opt/pw-browsers` から探す(版が変わっても動く。`PW_EXE=<path>` で決め打ちもできる)。各テストはこれを使う。
 - アプリは localhost で開いたときだけ `window.NW_TEST`(petSVG・WEAR・ME など)を出す。テストはこれを使う(本番では出ない)。
 
 ## 気をつけること

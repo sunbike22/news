@@ -23,7 +23,7 @@ const go=(p,t)=>p.evaluate(t=>{const e=document.getElementById("tab-"+t)||docume
 const shut=p=>p.evaluate(()=>{["sheet","story"].forEach(id=>{const e=document.getElementById(id);if(e){e.hidden=true;e.innerHTML="";}});document.querySelectorAll(".toast").forEach(e=>e.remove());});
 
 (async()=>{
-const b=await chromium.launch({executablePath:"/opt/pw-browsers/chromium_headless_shell-1194/chrome-linux/headless_shell"});
+const b=await chromium.launch({executablePath:require("./browser").exe()});
 const ME=JSON.stringify({days:["2026-10-19","2026-10-20","2026-10-21"],words:["消費税","法案","原油","衛星"],
   readEx:{tax:"2026-10-20T00:00:00Z"},pet:{food:12,fed:9},gv:{eco:6,it:4,spo:3},kw:["台風"],pref:"東京都"});
 let {p,ctx,errs}=await mk(b,null,ME);

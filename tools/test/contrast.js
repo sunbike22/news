@@ -42,7 +42,7 @@ const probe=`(()=>{
 })()`;
 
 (async()=>{
-const b=await chromium.launch({executablePath:"/opt/pw-browsers/chromium_headless_shell-1194/chrome-linux/headless_shell"});
+const b=await chromium.launch({executablePath:require("./browser").exe()});
 const all={};
 for(const dark of [false,true]) for(const col of COLORS){
   const ctx=await b.newContext({viewport:{width:390,height:900},serviceWorkers:"block",colorScheme:dark?"dark":"light"});

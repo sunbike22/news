@@ -6,7 +6,7 @@ const LIB=u=>{ if(u.includes("d3@7.9.0")) return "libs/d3-7.9.0/dist/d3.min.js";
   if(u.includes("topojson-client")) return "libs/topojson-client-3.1.0/dist/topojson-client.min.js";
   if(u.includes("countries-50m")) return "libs/world-atlas-2.0.2/countries-50m.json"; return null; };
 (async()=>{
-const b=await chromium.launch({executablePath:"/opt/pw-browsers/chromium_headless_shell-1194/chrome-linux/headless_shell"});
+const b=await chromium.launch({executablePath:require("./browser").exe()});
 const ctx=await b.newContext({viewport:{width:390,height:900},serviceWorkers:"block"});
 const p=await ctx.newPage(); const errs=[]; p.on("pageerror",e=>errs.push(e.message));
 await p.route(/fonts\.g|gc\.zgo|p2pquake|unsplash|open-meteo|raw\.githubusercontent/,r=>r.abort());

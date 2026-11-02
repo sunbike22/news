@@ -5,7 +5,7 @@ const LIB=u=>{ if(u.includes("d3@7.9.0")) return "libs/d3-7.9.0/dist/d3.min.js";
   if(u.includes("countries-50m")) return "libs/world-atlas-2.0.2/countries-50m.json";
   if(u.includes("chart.js")) return "chart.umd.js"; return null; };
 (async()=>{
-const b=await chromium.launch({executablePath:"/opt/pw-browsers/chromium_headless_shell-1194/chrome-linux/headless_shell"});
+const b=await chromium.launch({executablePath:require("./browser").exe()});
 const ctx=await b.newContext({viewport:{width:390,height:900},serviceWorkers:"block"});
 const p=await ctx.newPage(); const errs=[];
 p.on("pageerror",e=>errs.push({m:e.message,s:(e.stack||"").split("\n").slice(1,3).join(" ").replace(/https?:\/\/[^\/]+\//g,"")}));
