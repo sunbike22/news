@@ -3709,7 +3709,7 @@ function openPostcard(nm,isNew,fromBook){ const sh=document.getElementById("shee
   sh.innerHTML=`<div class="bar"><div class="wrap"><button class="iconbtn" id="pcx" aria-label="もどる">← もどる</button><span class="ttl">📮 ぽっぽの絵はがき</span></div></div><div class="wrap body">
     <div class="pc-top">${poppoSVG(96)}<div class="pc-say">${fromBook?`絵はがき帳だよ。いちばん新しいのは「${esc(nm)}」から(${esc(mdLabel(c.d))})。${ppToday()?"きょうの分は、マイのページで受けとってね。":"また明日、持ってくるね!"}`:isNew?`<b>はじめての場所だよ!</b> きょうのニュースに出てきた「${esc(nm)}」から、絵はがきを持ってきたよ。`:`きょうも「${esc(nm)}」から。前にも来たね、おかえり!`}</div></div>
     ${postcardHTML(nm,c)}
-    <div class="hint" style="margin:10px 0">📒 絵はがき帳: 日本 <b>${st.pref}</b>/47 都道府県 ・ 世界 <b>${st.world}</b> か所</div>
+    <div class="hint" style="margin:10px 0">📒 絵はがき帳: 日本 <b>${st.pref}</b>/47 都道府県 ・ 世界 <b>${st.world}</b> か所${st.all<10?`<br>👒 あと <b>${10-st.all}</b> まいで、ペットが郵便屋さんの服を着られます`:(ME.pet&&ME.pet.wear==="postman")?"":`<br>👒 郵便屋さんの服が着られます(マイ→ペット→着せかえ)`}</div>
     <details class="faq plain"><summary>🗾 47都道府県のあつまり具合</summary>${prefMapHTML()}<div class="hint">色がついたところが、絵はがきが来た県です。</div></details>
     <details class="faq plain"><summary>📒 集めた絵はがきを見る(${st.all}まい)</summary><div class="pc-list">${Object.entries(C).sort((a,b)=>b[1].d.localeCompare(a[1].d)).map(([k,v])=>postcardHTML(k,v)).join("")}</div></details>
     <p class="hint">ぽっぽは1日1まい、きょうのニュースの場所から絵はがきを持ってきます。はがきの文は、そのニュースの見出しです。</p></div>`;
