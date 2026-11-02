@@ -3692,11 +3692,11 @@ function isMonthBd(){ const b=(ME.pet||{}).born; if(!b||b>=TODAY||petStage().i<1
 function bdMonths(){ const b=ME.pet.born; return (+TODAY.slice(0,4)-+b.slice(0,4))*12+(+TODAY.slice(5,7)-+b.slice(5,7)); }
 function bdCheck(){ const p=petInit(); if(!isMonthBd()||p.bdGot===TODAY) return; p.bdGot=TODAY; p.food+=1; saveMe(); setTimeout(()=>toast(`🎂 きょうは${petName()}の${bdMonths()}か月の誕生日! お祝いの🍙を1こ`),900); }
 // 📮 新しいキャラ「ぽっぽ」(ハトの郵便屋さん・2026-11-03): 1日1まい、きょうのニュースの場所から絵はがきを届ける。集めると「絵はがき帳」(日本は都道府県ごと /47)
-// 場所は placeOf(見出しのことば)だけで決める。はがきの文は見出しそのまま(新しい事実は書かない)
+// 場所は placeOf(見出しのことば。記録に都道府県があればそれを優先)で決める。はがきの文は見出しそのまま(新しい事実は書かない)
 function poppoSVG(S){ return `<svg viewBox="0 0 120 120" width="${S}" height="${S}" role="img" aria-label="ぽっぽ(ハトの郵便屋さん)"><ellipse cx="60" cy="112" rx="24" ry="4" fill="#000" opacity=".12"/><path d="M84 80q22-2 26 10-14 6-28-2z" fill="#94a3b8"/><ellipse cx="58" cy="78" rx="30" ry="26" fill="#cbd5e1"/><ellipse cx="54" cy="88" rx="16" ry="11" fill="#e2e8f0"/><circle cx="44" cy="52" r="18" fill="#cbd5e1"/><path d="M40 62q8 6 16 0" fill="#a78bfa" opacity=".55"/><circle cx="38" cy="49" r="3.6" fill="#1e293b"/><circle cx="39" cy="48" r="1.1" fill="#fff"/><path d="M24 52l-8 3 8 3z" fill="#f59e0b"/><ellipse cx="34" cy="58" rx="4" ry="2.4" fill="#ff9aa2" opacity=".6"/><rect x="62" y="70" width="26" height="20" rx="3" fill="#b45309"/><path d="M62 74h26" stroke="#78350f" stroke-width="2"/><rect x="70" y="78" width="10" height="7" fill="#fff"/><path d="M60 64l26 8" stroke="#78350f" stroke-width="2.4"/><path d="M50 104v6M62 104v6" stroke="#f59e0b" stroke-width="3" stroke-linecap="round"/><path d="M30 38q8-10 20-6l-4 6z" fill="#1d4ed8"/><rect x="28" y="36" width="24" height="5" rx="2" fill="#1e40af"/></svg>`; }
 function ppCards(){ const p=petInit(); p.cards=p.cards||{}; return p.cards; }
 function ppToday(){ const p=petInit(); if(p.ppDay===TODAY||petStage().i<1) return null; const day=(NEWS[0]||{}).d; if(!day) return null; const C=ppCards();
-  const L=NEWS.filter(n=>n.d===day).map(n=>{ let pl=placeOf(n); if(n.pf&&n.pf.length&&PREF_LL[n.pf[0]]){ const [la,lo,cap]=PREF_LL[n.pf[0]]; const nm=n.pf[0].replace(/[都府県]$/,""); if(!pl||!pl[3]||ppPref(pl[3])!==n.pf[0]) pl=[null,lo,la,nm]; } return {n,pl}; }).filter(x=>x.pl); if(!L.length) return null;
+  const L=NEWS.filter(n=>n.d===day).map(n=>({n,pl:placeOf(n)})).filter(x=>x.pl); if(!L.length) return null;
   const fresh=L.filter(x=>!C[x.pl[3]]); const P=fresh.length?fresh:L; const r=seeded("pp"+TODAY); return P[Math.floor(r()*P.length)]; }
 function ppPref(nm){ return PLACE_PREF[nm]||null; }
 function ppStats(){ const C=ppCards(); const pref=new Set(), world=new Set(); Object.entries(C).forEach(([nm,c])=>{ if(c.jp){ const pf=ppPref(nm); if(pf) pref.add(pf); } else world.add(nm); }); return {pref:pref.size,world:world.size,all:Object.keys(C).length}; }
@@ -4213,17 +4213,30 @@ function bindGacha(){ const b=document.getElementById("gaGo"); if(!b) return; b.
 const PREFS=["北海道","青森県","岩手県","宮城県","秋田県","山形県","福島県","茨城県","栃木県","群馬県","埼玉県","千葉県","東京都","神奈川県","新潟県","富山県","石川県","福井県","山梨県","長野県","岐阜県","静岡県","愛知県","三重県","滋賀県","京都府","大阪府","兵庫県","奈良県","和歌山県","鳥取県","島根県","岡山県","広島県","山口県","徳島県","香川県","愛媛県","高知県","福岡県","佐賀県","長崎県","熊本県","大分県","宮崎県","鹿児島県","沖縄県"];
 const PLACE_PREF={"東京":"東京都","横浜":"神奈川県","千葉":"千葉県","伊豆諸島":"東京都","宮崎":"宮崎県","北海道":"北海道","大分":"大分県","福岡":"福岡県","関西":"大阪府","大阪":"大阪府","兵庫":"兵庫県","京都":"京都府","奈良":"奈良県","滋賀":"滋賀県","和歌山":"和歌山県","茨城":"茨城県","栃木":"栃木県","群馬":"群馬県","山梨":"山梨県","長野":"長野県","富山":"富山県","石川":"石川県","福井":"福井県","岐阜":"岐阜県","静岡":"静岡県","愛知":"愛知県","三重":"三重県","鳥取":"鳥取県","島根":"島根県","岡山":"岡山県","広島":"広島県","山口":"山口県","徳島":"徳島県","香川":"香川県","高知":"高知県","佐賀":"佐賀県","長崎":"長崎県","熊本":"熊本県","鹿児島":"鹿児島県","埼玉":"埼玉県","愛媛":"愛媛県","沖縄":"沖縄県","種子島(打ち上げ)":"鹿児島県","秋田":"秋田県","山形":"山形県","青森":"青森県","岩手":"岩手県","宮城":"宮城県","福島":"福島県","新潟":"新潟県"};
 function prefWords(pf){ const base=pf.replace(/[都府県]$/,""); const extra={"東京都":["東京","都内","都庁"],"大阪府":["大阪","関西"],"京都府":["京都"],"北海道":["北海道","札幌"],"神奈川県":["神奈川","横浜","川崎"],"鹿児島県":["鹿児島","種子島"],"沖縄県":["沖縄","那覇","石垣","宮古","先島"]}[pf]||[]; return [...new Set([base,...extra])].filter(x=>x.length>=2); }
-function isLocal(text,n){ const pf=ME.pref; if(!pf) return false; if(n&&n.pf&&n.pf.includes(pf)) return true; return prefWords(pf).some(w=>String(text).includes(w)); }
+function isLocal(text,n){ const pf=ME.pref; if(!pf) return false; if(n&&n.pf&&n.pf.includes(pf)) return true; if(prefWords(pf).some(w=>String(text).includes(w))) return true;
+  /* 地図と同じ場所の決め方(県庁所在地や市の名前「金沢」「高松」など)でも当てる。NEWS の記録(h がある)だけ */
+  return !!(n&&n.h&&newsPrefs(n).includes(pf)); }
 function localCard(){ const pf=ME.pref;
   if(!pf) return `<section class="card" aria-label="わたしの街"><b>🏠 わたしの街のニュース</b><div class="hint" style="margin:4px 0 8px">住んでいる都道府県を選ぶと、その地域のニュースに🏠の印がつきます(都道府県名だけをこのスマホの中に保存)。</div><select id="prefSel" class="pref-sel"><option value="">都道府県を選ぶ</option>${PREFS.map(x=>`<option>${x}</option>`).join("")}</select></section>`;
-  const L=NEWS.filter(n=>isLocal(n.h+" "+(n.th||""),n)).slice(0,5);
+  const L=NEWS.filter(n=>isLocal(n.h+" "+(n.th||""),n)).slice(0,5); const since3=new Date(Date.parse(TODAY)-2*864e5).toISOString().slice(0,10);
   const seen=new Set(); const far=NEWS.filter(n=>!isLocal(n.h+" "+(n.th||""),n)).map(n=>({n,p:placeOf(n)})).filter(x=>{ if(!x.p||seen.has(x.p[3])) return false; seen.add(x.p[3]); return true; })
     .map(x=>Object.assign(x,{km:kmFrom(x.p[1],x.p[2])})).filter(x=>x.km!=null&&x.km>=30).sort((a,b)=>a.km-b.km).slice(0,4);
   return `<section class="card" aria-label="わたしの街"><div class="sec-h"><h2>🏠 ${esc(pf)}のニュース</h2><button class="gd-lk" id="prefChg">変える</button></div>
-    ${L.length?`<ul class="us" style="margin-top:6px">${L.map(n=>`<li>${esc(mdLabel(n.d))} ${esc(n.h)} ${n.info?"📌":n.ok?"✅":"⚠️"}</li>`).join("")}</ul>`:`<p class="hint" style="margin:6px 0 0">最近の記録には、${esc(pf)}のニュースはまだありません。出てきたら、ここと「ニュース10」に🏠の印がつきます。</p>`}
+    ${L.length?`<ul class="us" style="margin-top:6px">${L.map(n=>`<li>${esc(mdLabel(n.d))} ${esc(n.h)} ${n.info?"📌":n.ok?"✅":"⚠️"}</li>`).join("")}</ul>`:""}
+    ${L.some(n=>n.d>=since3)?"":localEmpty(pf,L.length>0)}
     ${far.length?`<h3 style="font-size:.98rem;margin:14px 0 4px">📏 ${esc(pf)}からの近さ</h3>
       <ul class="dist">${far.map(x=>`<li><b>${esc(x.p[3])}</b><span class="dbar"><i style="width:${Math.max(6,Math.min(100,Math.round(x.km/200)))}%"></i></span><span class="num">約${x.km.toLocaleString("ja-JP")}km</span></li>`).join("")}</ul>
       <div class="hint">ニュースに出てきた場所と、${esc(pf)}の県庁所在地との、だいたいの直線きょりです。</div>`:""}</section>`; }
+/* わたしの街のニュースがこの3日にないとき: 同じ地方の県のニュース(3日分から3つ)と、地方全体のニュースを出す。記録にあるものだけ */
+function prefRegion(pf){ const i=PREFS.indexOf(pf); if(i<0) return null; const g=PREF_GROUPS.find(g=>i>=g[1]&&i<g[1]+g[2]); return g?{nm:g[0],L:PREFS.slice(g[1],g[1]+g[2])}:null; }
+function localEmpty(pf,hasOld){ const rg=prefRegion(pf); let h=hasOld?`<p class="hint" style="margin:6px 0 0">この3日は、${esc(pf)}のニュースはありません。</p>`:`<p class="hint" style="margin:6px 0 0">最近の記録には、${esc(pf)}のニュースはまだありません。出てきたら、ここと「ニュース10」に🏠の印がつきます。</p>`;
+  if(!rg) return h; const near=[]; const seen=new Set();
+  const since=new Date(Date.parse(TODAY)-2*864e5).toISOString().slice(0,10);
+  for(const n of NEWS){ if(near.length>=3||n.d<since) break; const ps=newsPrefs(n).filter(x=>x!==pf&&rg.L.includes(x)); if(!ps.length||seen.has(n.h)) continue; seen.add(n.h); near.push({n,p:ps[0]}); }
+  const rk={"北海道・東北":"北海道・東北","関東":"関東","中部":"北陸|東海","近畿":"近畿","中国":"中国地方","四国":"四国","九州・沖縄":"九州"}[rg.nm]||"";
+  const wide=rk?NEWS.filter(n=>{ if(n.d<since) return false; const r=regionOf(n); return r&&new RegExp(rk).test(r); }).slice(0,2):[];
+  if(!near.length&&!wide.length) return h;
+  return h+`<h3 style="font-size:.98rem;margin:12px 0 4px">🗾 近くの県のニュース(${esc(rg.nm)})</h3><ul class="us">${near.map(x=>`<li><b>${esc(x.p.replace(/[都府県]$/,""))}</b> ${esc(mdLabel(x.n.d))} ${esc(x.n.h)} ${x.n.info?"📌":x.n.ok?"✅":"⚠️"}</li>`).join("")}${wide.map(n=>`<li><b>${esc(regionOf(n))}</b> ${esc(mdLabel(n.d))} ${esc(n.h)} ${n.info?"📌":n.ok?"✅":"⚠️"}</li>`).join("")}</ul>`; }
 function kmFrom(lon,lat){ try{ const me=PREF_LL[ME.pref]; if(!me) return null; const [la1,lo1]=[me[0],me[1]];
   const R=6371,r=x=>x*Math.PI/180, dLa=r(lat-la1), dLo=r(lon-lo1);
   const a=Math.sin(dLa/2)**2+Math.cos(r(la1))*Math.cos(r(lat))*Math.sin(dLo/2)**2;
@@ -4802,6 +4815,7 @@ function openShimen(){ const sh=document.getElementById("sheet"); const w=D.weat
 document.addEventListener("click",e=>{ const b=e.target.closest("[data-shimen]"); if(!b) return; e.preventDefault(); openShimen(); });
 // ===== お知らせ(新しくなったところ)。機能を足したら、いちばん上に1つ足す =====
 const UPDATES=[
+  {id:"2026-11-03c",d:"2026-11-03",t:"🏠 わたしの街と地図の場所が正確に",L:["ニュースの記録に「都道府県」が入るようになり、地図の丸の場所と「🏠 わたしの街」の判定に使います。「金沢市」「高松市」のように市の名前だけのニュースも、その県のニュースとして数えます。","この3日に自分の県のニュースがないときは、同じ地方の近くの県のニュースを出します。"]},
   {id:"2026-11-03b",d:"2026-11-03",t:"📮 絵はがき集めのバッジと、郵便屋さんの服",L:["絵はがき帳に「🗾 47都道府県のあつまり具合」(地方ごとのマス)を足しました。ペットが、きょうの天気やニュースについてもひとこと言います。","絵はがきを集めた数で上がるバッジ「📮 絵はがき集め」を足しました。10まい集めると、ペットが「郵便屋さんの帽子とかばん」を着られます。","部屋の窓の外に、いまの空(朝・昼・夕方・夜、雨や雪の日)が見えます。ペットの日記にも、絵はがきと誕生日のことが書かれます。"]},
   {id:"2026-11-03a",d:"2026-11-03",t:"📮 新しいなかま「ぽっぽ」と、🎂 誕生日・📸 記念写真",L:["ハトの郵便屋さん「ぽっぽ」が、1日1まい、きょうのニュースに出てきた場所から絵はがきを届けてくれます。集めると「📒 絵はがき帳」に(日本は47都道府県ぜんぶ集められるかな?)。","ペットに誕生日ができました(毎月お祝いの🍙)。マイ→ペットの「📸 記念写真を撮る」で、なかまといっしょの1まいが作れます。","ともだちの「ぴよた」も、ごはんをもらうと少しずつ育ちます(ひよこ → わかどり → はばたき鳥 → りっぱな鳥)。"]},
   {id:"2026-11-02f",d:"2026-11-02",t:"🏡 なかまの家: 名人になった子に会いに行けます",L:["マイ→ペットの「🏡 なかまの家」から、名人になった子のおうちに遊びに行けます(なでる・🍙 ごはんをあげる)。「🔁 いっしょに読む」で、その子と入れかえられます。いまの子は育ちのとちゅうのまま休み、いつでももどせます。","遊びに来るともだち(ぴよた)にも、🍙 ごはんをあげられるようになりました。"]},
@@ -5127,7 +5141,15 @@ function isJpPlace(p){ if(!p) return false; const [x,y]=[p[1],p[2]]; if(/韓国|
 /* 地方の名前だけのニュース(「九州で大雨」「東北〜北陸」など)は、1つの県の丸にしない(2026-10-29: 「東北」が宮城の上に出ていた)。地図の下に「地方全体のニュース」としてまとめる */
 const REGIONS=[["北海道・東北",/(?<!京浜)東北(?!大)/],["関東",/関東/],["北陸",/北陸/],["東海",/東海(?!道|村)/],["近畿",/近畿|関西/],["中国地方",/中国地方|山陰|山陽/],["四国",/四国/],["九州",/九州/]];
 function regionOf(n){ const t=n.h+" "+(n.th||""); const r=REGIONS.find(x=>x[1].test(t)); return r?r[0]:null; }
-function placeOf(n){ for(const p of PLACES){ if(p[0].test(n.h+" "+(n.th||""))) return p; } return null; }
+/* 場所は見出しのことば(PLACES)で決める。ただし記録に都道府県(n.pf、2026-11-03〜)があり、見出しの場所がその県でないときは、その県(PLACES にある県の丸、なければ PREF_LL の県庁所在地)にする */
+const PREF_PIN={};
+function prefPin(pf){ if(pf in PREF_PIN) return PREF_PIN[pf]; let p=PLACES.find(x=>PLACE_PREF[x[3]]===pf&&x[3]===pf.replace(/[都府県]$/,""))||PLACES.find(x=>PLACE_PREF[x[3]]===pf);
+  if(!p&&PREF_LL[pf]){ const [la,lo]=PREF_LL[pf]; p=[/$^/,lo,la,pf.replace(/[都府県]$/,"")]; } return PREF_PIN[pf]=p||null; }
+function placeOf(n){ let hp=null; for(const p of PLACES){ if(p[0].test(n.h+" "+(n.th||""))){ hp=p; break; } }
+  if(n.pf&&n.pf.length){ if(hp&&n.pf.includes(PLACE_PREF[hp[3]])) return hp; const pp=prefPin(n.pf[0]); if(pp) return pp; }
+  return hp; }
+/* そのニュースの都道府県(記録の欄 → なければ見出しの場所から) */
+function newsPrefs(n){ if(n.pf&&n.pf.length) return n.pf; const p=placeOf(n); const pf=p&&PLACE_PREF[p[3]]; return pf?[pf]:[]; }
 let mapState={view:"japan",sel:null};
 const SCRIPTS={};
 // グラフの部品(Chart.js)は、グラフを出すページを開いたときだけ読み込む(最初の表示を軽くするため)
@@ -5906,7 +5928,7 @@ document.addEventListener("click",ev=>{ const x=ev.target.closest("[data-alx]");
 document.addEventListener("keydown",ev=>{ if((ev.key==="Enter"||ev.key===" ")&&ev.target.matches&&ev.target.matches(".al-band[data-quake]")){ ev.preventDefault(); openQuake(); } });
 try{ loadAlerts(); setInterval(()=>{ if(document.visibilityState==="visible") loadAlerts(); },3*60*1000); document.addEventListener("visibilitychange",()=>{ if(document.visibilityState==="visible") loadAlerts(); }); }catch(_){}
 // テスト用の手がかり(localhost で動かしたときだけ。本番では出さない)
-if(/^(localhost|127\.0\.0\.1)$/.test(location.hostname)) window.NW_TEST={petSVG,PET_KINDS,PET_COLORS,petColorsFor,WEAR,petStage,petXP,petKind,petHall,petName,petRestart,get ME(){return ME;},get LOOK(){return LOOK;},TOPIC_GROUPS,FUN,SECS,openFun,openEx,fillQs,hhNews,ktQs,serialChapters,go,openLife,trendWords,openShimen};
+if(/^(localhost|127\.0\.0\.1)$/.test(location.hostname)) window.NW_TEST={placeOf,localCard,get NEWS(){return NEWS;},petSVG,PET_KINDS,PET_COLORS,petColorsFor,WEAR,petStage,petXP,petKind,petHall,petName,petRestart,get ME(){return ME;},get LOOK(){return LOOK;},TOPIC_GROUPS,FUN,SECS,openFun,openEx,fillQs,hhNews,ktQs,serialChapters,go,openLife,trendWords,openShimen};
 const h=(location.hash||"").slice(1);
 if(h==="quake"){ go("today"); setTimeout(openQuake,50); } else if(h==="shimen"){ go("today"); setTimeout(openShimen,50); } else if(D.explainers[h]){ go("explain"); openEx(h); }
 else if(h.startsWith("t=")) openTHash(h);
