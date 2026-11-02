@@ -1756,7 +1756,7 @@ function srcOf(n){ const k=n.title; if(k in SRC_CACHE) return SRC_CACHE[k]; let 
   try{ const q=gdQuery(n.title); NEWS.forEach(x=>{ if(x.d<since) return; const sc=gdScore(q,x.h); if(sc>bs){ bs=sc; best=x; } }); }catch(_){}
   if(!best||bs<0.3) return SRC_CACHE[k]=null;
   const outs=[]; String(best.s||"").split(/[、,，]/).forEach(p=>{ let nm=p.replace(/[(（].*$/,"").replace(/\s*\d{1,2}\/\d{1,2}.*$/,"").replace(/\s*\d{1,2}:\d{2}.*$/,"").replace(/\s*\d{1,2}日.*$/,"").trim(); if(nm&&nm.length<=14&&!outs.includes(nm)) outs.push(nm); });
-  return SRC_CACHE[k]={d:best.d,outs}; }
+  return SRC_CACHE[k]={d:best.d,outs,pf:best.pf||[]}; }
 function srcLine(n){ const r=srcOf(n); if(!r) return ""; const o=r.outs.slice(0,3).join("・")+(r.outs.length>3?" ほか":""); const rd=relDay(r.d); return `<span class="srcl">🕒 ${/[0-9]/.test(rd)?"":esc(rd)+" "}${esc(mdLabel(r.d))}${o?` ・ ${esc(o)}`:""}</span>`; }
 
 // ===== 🔖 わたしのキーワード。登録したことばを含むニュースを、7日分の記録から自動で集める(このスマホの中だけ) =====
@@ -2080,7 +2080,7 @@ function renderToday(){
       <div class="hint rd-min">📖 ここから約${readMin()}分で、きょうの大事なニュースを読み終われます</div>
       <div class="rd-acts"><button class="fchip" data-shimen="1">🗞️ 新聞の形で読む</button>${ME.lifeSet?"":`<button class="fchip" data-lifeopen="1">🙋 自分に関係あるものに印</button>`}</div>
       <ol class="ten${(LOOK.len||"short")==="short"?" short":""}" style="margin-top:10px">${t.map((n,i)=>{
-        const big=i<3; const link=n.ex||n.tab; const wt=newsWeight(n); const mine=isLocal(n.title+" "+(n.text||""));
+        const big=i<3; const link=n.ex||n.tab; const wt=newsWeight(n); const mine=isLocal(n.title+" "+(n.text||""),srcOf(n));
         return `<li class="${big?'big':''} w${wt.lv}${mine?' mytown':''}">${pinBtn({k:"t|"+n.title,h:n.title,g:n.g,d:(NEWS[0]||{}).d,ex:n.ex},"abs")}<button class="row${link?' link':''}"${n.ex?` data-ex="${n.ex}"`:''}${n.tab?` data-tab="${n.tab}"`:''} ${link?'':'tabindex="-1"'}>
           <span class="rank">${i+1}</span>
           <span>${big&&ILL[n.ill||n.ex]?`<div class="ill">${ILL[n.ill||n.ex]}</div>`:""}<span class="meta"><span class="chip ${n.g}">${GN[n.g]}</span>${topicChip(n)}${whoChip(n)}${n.ok?`<span class="badge-ok tap" role="button" tabindex="0" data-trust="${esc(n.title)}" data-ok="1" title="タップで出典">✅<small style="font-size:.82rem;font-weight:700;margin-left:2px">確認ずみ</small></span>`:`<span class="badge-one tap" role="button" tabindex="0" data-trust="${esc(n.title)}" data-ok="0" title="タップでわけ">⚠️ 1社</span>`}${mine?'<span class="heat town">🏠 あなたの街</span>':""}${wt.lv>=2?`<span class="heat" title="この3日で関連ニュース${wt.n}件">🔥</span>`:""}</span>
@@ -2308,7 +2308,8 @@ function closeStory(){ if(st) cancelAnimationFrame(st.raf); st=null; stopSpeak()
 // ===== さがす =====
 /* 予測の欄は「N12・N24」のような番号だけにする(説明の文が入っていると札が横に長くなり、画面が横にずれた=2026-10-28) */
 const predIds=v=>{ v=String(v||""); if(/対象外|^なし/.test(v)) return ""; return [...new Set(v.match(/\b[A-Z]{1,2}\d{1,3}\b/g)||[])].join("・"); };
-const NEWS = D.news.map(r=>({d:r[0],g:r[1],ok:r[2]===1?1:0,info:r[2]===2,h:r[3],s:r[4],th:r[5],p:predIds(r[6])})).sort((a,b)=>b.d.localeCompare(a.d));
+// 8番目(r[7])は都道府県(2026-11-03〜。Notion の「都道府県」。複数なら「・」区切り。ないときは空)
+const NEWS = D.news.map(r=>({d:r[0],g:r[1],ok:r[2]===1?1:0,info:r[2]===2,h:r[3],s:r[4],th:r[5],p:predIds(r[6]),pf:String(r[7]||"").split("・").map(x=>x.trim()).filter(Boolean)})).sort((a,b)=>b.d.localeCompare(a.d));
 const THEMES = [...new Set(NEWS.flatMap(n=>n.th?n.th.split(/[、,]/):[]).filter(Boolean))];
 const sState={q:"",g:new Set(),th:"",ok:false,onlyNew:false};
 let sLim=20;
@@ -3695,7 +3696,7 @@ function bdCheck(){ const p=petInit(); if(!isMonthBd()||p.bdGot===TODAY) return;
 function poppoSVG(S){ return `<svg viewBox="0 0 120 120" width="${S}" height="${S}" role="img" aria-label="ぽっぽ(ハトの郵便屋さん)"><ellipse cx="60" cy="112" rx="24" ry="4" fill="#000" opacity=".12"/><path d="M84 80q22-2 26 10-14 6-28-2z" fill="#94a3b8"/><ellipse cx="58" cy="78" rx="30" ry="26" fill="#cbd5e1"/><ellipse cx="54" cy="88" rx="16" ry="11" fill="#e2e8f0"/><circle cx="44" cy="52" r="18" fill="#cbd5e1"/><path d="M40 62q8 6 16 0" fill="#a78bfa" opacity=".55"/><circle cx="38" cy="49" r="3.6" fill="#1e293b"/><circle cx="39" cy="48" r="1.1" fill="#fff"/><path d="M24 52l-8 3 8 3z" fill="#f59e0b"/><ellipse cx="34" cy="58" rx="4" ry="2.4" fill="#ff9aa2" opacity=".6"/><rect x="62" y="70" width="26" height="20" rx="3" fill="#b45309"/><path d="M62 74h26" stroke="#78350f" stroke-width="2"/><rect x="70" y="78" width="10" height="7" fill="#fff"/><path d="M60 64l26 8" stroke="#78350f" stroke-width="2.4"/><path d="M50 104v6M62 104v6" stroke="#f59e0b" stroke-width="3" stroke-linecap="round"/><path d="M30 38q8-10 20-6l-4 6z" fill="#1d4ed8"/><rect x="28" y="36" width="24" height="5" rx="2" fill="#1e40af"/></svg>`; }
 function ppCards(){ const p=petInit(); p.cards=p.cards||{}; return p.cards; }
 function ppToday(){ const p=petInit(); if(p.ppDay===TODAY||petStage().i<1) return null; const day=(NEWS[0]||{}).d; if(!day) return null; const C=ppCards();
-  const L=NEWS.filter(n=>n.d===day).map(n=>({n,pl:placeOf(n)})).filter(x=>x.pl); if(!L.length) return null;
+  const L=NEWS.filter(n=>n.d===day).map(n=>{ let pl=placeOf(n); if(n.pf&&n.pf.length&&PREF_LL[n.pf[0]]){ const [la,lo,cap]=PREF_LL[n.pf[0]]; const nm=n.pf[0].replace(/[都府県]$/,""); if(!pl||!pl[3]||ppPref(pl[3])!==n.pf[0]) pl=[null,lo,la,nm]; } return {n,pl}; }).filter(x=>x.pl); if(!L.length) return null;
   const fresh=L.filter(x=>!C[x.pl[3]]); const P=fresh.length?fresh:L; const r=seeded("pp"+TODAY); return P[Math.floor(r()*P.length)]; }
 function ppPref(nm){ return PLACE_PREF[nm]||null; }
 function ppStats(){ const C=ppCards(); const pref=new Set(), world=new Set(); Object.entries(C).forEach(([nm,c])=>{ if(c.jp){ const pf=ppPref(nm); if(pf) pref.add(pf); } else world.add(nm); }); return {pref:pref.size,world:world.size,all:Object.keys(C).length}; }
@@ -4212,11 +4213,11 @@ function bindGacha(){ const b=document.getElementById("gaGo"); if(!b) return; b.
 const PREFS=["北海道","青森県","岩手県","宮城県","秋田県","山形県","福島県","茨城県","栃木県","群馬県","埼玉県","千葉県","東京都","神奈川県","新潟県","富山県","石川県","福井県","山梨県","長野県","岐阜県","静岡県","愛知県","三重県","滋賀県","京都府","大阪府","兵庫県","奈良県","和歌山県","鳥取県","島根県","岡山県","広島県","山口県","徳島県","香川県","愛媛県","高知県","福岡県","佐賀県","長崎県","熊本県","大分県","宮崎県","鹿児島県","沖縄県"];
 const PLACE_PREF={"東京":"東京都","横浜":"神奈川県","千葉":"千葉県","伊豆諸島":"東京都","宮崎":"宮崎県","北海道":"北海道","大分":"大分県","福岡":"福岡県","関西":"大阪府","大阪":"大阪府","兵庫":"兵庫県","京都":"京都府","奈良":"奈良県","滋賀":"滋賀県","和歌山":"和歌山県","茨城":"茨城県","栃木":"栃木県","群馬":"群馬県","山梨":"山梨県","長野":"長野県","富山":"富山県","石川":"石川県","福井":"福井県","岐阜":"岐阜県","静岡":"静岡県","愛知":"愛知県","三重":"三重県","鳥取":"鳥取県","島根":"島根県","岡山":"岡山県","広島":"広島県","山口":"山口県","徳島":"徳島県","香川":"香川県","高知":"高知県","佐賀":"佐賀県","長崎":"長崎県","熊本":"熊本県","鹿児島":"鹿児島県","埼玉":"埼玉県","愛媛":"愛媛県","沖縄":"沖縄県","種子島(打ち上げ)":"鹿児島県","秋田":"秋田県","山形":"山形県","青森":"青森県","岩手":"岩手県","宮城":"宮城県","福島":"福島県","新潟":"新潟県"};
 function prefWords(pf){ const base=pf.replace(/[都府県]$/,""); const extra={"東京都":["東京","都内","都庁"],"大阪府":["大阪","関西"],"京都府":["京都"],"北海道":["北海道","札幌"],"神奈川県":["神奈川","横浜","川崎"],"鹿児島県":["鹿児島","種子島"],"沖縄県":["沖縄","那覇","石垣","宮古","先島"]}[pf]||[]; return [...new Set([base,...extra])].filter(x=>x.length>=2); }
-function isLocal(text){ const pf=ME.pref; if(!pf) return false; return prefWords(pf).some(w=>String(text).includes(w)); }
+function isLocal(text,n){ const pf=ME.pref; if(!pf) return false; if(n&&n.pf&&n.pf.includes(pf)) return true; return prefWords(pf).some(w=>String(text).includes(w)); }
 function localCard(){ const pf=ME.pref;
   if(!pf) return `<section class="card" aria-label="わたしの街"><b>🏠 わたしの街のニュース</b><div class="hint" style="margin:4px 0 8px">住んでいる都道府県を選ぶと、その地域のニュースに🏠の印がつきます(都道府県名だけをこのスマホの中に保存)。</div><select id="prefSel" class="pref-sel"><option value="">都道府県を選ぶ</option>${PREFS.map(x=>`<option>${x}</option>`).join("")}</select></section>`;
-  const L=NEWS.filter(n=>isLocal(n.h+" "+(n.th||""))).slice(0,5);
-  const seen=new Set(); const far=NEWS.filter(n=>!isLocal(n.h+" "+(n.th||""))).map(n=>({n,p:placeOf(n)})).filter(x=>{ if(!x.p||seen.has(x.p[3])) return false; seen.add(x.p[3]); return true; })
+  const L=NEWS.filter(n=>isLocal(n.h+" "+(n.th||""),n)).slice(0,5);
+  const seen=new Set(); const far=NEWS.filter(n=>!isLocal(n.h+" "+(n.th||""),n)).map(n=>({n,p:placeOf(n)})).filter(x=>{ if(!x.p||seen.has(x.p[3])) return false; seen.add(x.p[3]); return true; })
     .map(x=>Object.assign(x,{km:kmFrom(x.p[1],x.p[2])})).filter(x=>x.km!=null&&x.km>=30).sort((a,b)=>a.km-b.km).slice(0,4);
   return `<section class="card" aria-label="わたしの街"><div class="sec-h"><h2>🏠 ${esc(pf)}のニュース</h2><button class="gd-lk" id="prefChg">変える</button></div>
     ${L.length?`<ul class="us" style="margin-top:6px">${L.map(n=>`<li>${esc(mdLabel(n.d))} ${esc(n.h)} ${n.info?"📌":n.ok?"✅":"⚠️"}</li>`).join("")}</ul>`:`<p class="hint" style="margin:6px 0 0">最近の記録には、${esc(pf)}のニュースはまだありません。出てきたら、ここと「ニュース10」に🏠の印がつきます。</p>`}
