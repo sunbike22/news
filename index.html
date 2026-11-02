@@ -1152,12 +1152,27 @@ svg.eat{animation:petEat .7s ease both!important}
 .wd-i:disabled{opacity:.6;cursor:default}
 .wd-svg{height:46px;display:grid;place-items:center}.wd-lock{font-size:1.3rem}
 .pet-big{position:relative}.pet-fr{position:absolute;right:calc(50% - 130px);bottom:0}
-.room{position:relative;height:190px;border-radius:12px;overflow:hidden;border:1px solid var(--line);margin-top:6px}
-.rm-wall{position:absolute;inset:0 0 35% 0;background:linear-gradient(#fde9c8,#f7dcae)}
-.rm-floor{position:absolute;inset:65% 0 0 0;background:repeating-linear-gradient(90deg,#c9915a 0 34px,#bf8650 34px 36px)}
+.room{position:relative;height:220px;border-radius:12px;overflow:hidden;border:1px solid var(--line);margin-top:6px;user-select:none;-webkit-user-select:none}
+.rm-wall{position:absolute;inset:0 0 35% 0;background:linear-gradient(var(--w1,#fde9c8),var(--w2,#f7dcae))}
+.rm-floor{position:absolute;inset:65% 0 0 0;background:repeating-linear-gradient(90deg,var(--f1,#c9915a) 0 34px,var(--f2,#bf8650) 34px 36px)}
+.rm-it.mv{cursor:grab;touch-action:none;z-index:2}.rm-it.drag{transform:scale(1.3);z-index:6;cursor:grabbing;filter:drop-shadow(0 4px 4px rgba(0,0,0,.25))}
+.rm-pet{transition-property:left;transition-timing-function:linear;z-index:4;cursor:pointer;width:84px}
+.rm-pet .rm-pi{transform-origin:50% 100%}.rm-pet.left .rm-pi svg{transform:scaleX(-1)}
+.rm-pet.walk .rm-pi{animation:rmwalk .45s ease-in-out infinite}.rm-pet.hop .rm-pi{animation:rmhop .55s ease-out}
+.rm-pet.zz::after{content:"💤";position:absolute;right:-4px;top:-6px;font-size:20px;animation:rmzz 2s ease-in-out infinite}
+@keyframes rmwalk{50%{transform:translateY(-4px) rotate(3deg)}}@keyframes rmhop{40%{transform:translateY(-24px)}}@keyframes rmzz{50%{transform:translateY(-6px);opacity:.6}}
+.rm-say{position:absolute;bottom:88px;left:50%;transform:translateX(-50%);background:#fff;color:#3a2a14;border-radius:10px;padding:3px 9px;font-size:13px;white-space:nowrap;box-shadow:0 1px 4px rgba(0,0,0,.2);z-index:7}
+.rm-heart{position:absolute;bottom:60px;font-size:16px;animation:rmh 1.2s ease-out forwards;pointer-events:none}@keyframes rmh{to{transform:translateY(-40px);opacity:0}}
+.rm-prop{position:absolute;bottom:8px;font-size:22px;margin-left:-11px;z-index:3;pointer-events:none}.rm-ball{transition:left 1.1s cubic-bezier(.2,.7,.3,1),transform 1.1s}
+.rm-tools{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}
+.rm-deco{margin-top:8px;display:flex;flex-direction:column;gap:8px}.rm-deco>div{display:flex;gap:6px;align-items:center;flex-wrap:wrap}
+.rm-sw{min-width:52px;height:44px;border-radius:8px;border:2px solid var(--line);display:flex;align-items:flex-end;justify-content:center;padding:0 6px 3px;cursor:pointer}.rm-sw.on{border-color:var(--accent);box-shadow:0 0 0 2px var(--accent-soft)}
+.rm-sw small{white-space:nowrap;background:rgba(255,255,255,.85);color:#3a2a14;border-radius:4px;padding:0 3px;font-size:.82rem;line-height:1.3}
+.pl-row{margin:6px 0}.pl-row>b{display:block;margin-bottom:4px}
+@media (prefers-reduced-motion: reduce){.rm-pet{transition:none!important}.rm-pet .rm-pi,.rm-heart,.rm-pet.zz::after{animation:none!important}.rm-ball{transition:none}}
 .rm-it{position:absolute;font-size:24px;line-height:1;width:30px;margin-left:-15px;text-align:center}.rm-it.off{opacity:.35;font-size:16px;color:#8a6a43}
 .rm-pet{position:absolute;left:50%;bottom:4px;margin-left:-42px}
-.rm-fr{position:absolute;left:calc(50% + 40px);bottom:6px}
+.rm-fr{position:absolute;right:4px;bottom:6px;z-index:3}
 .diary{background:#fffdf3;color:#2a2116;border:1px solid #e9dcb6;border-radius:10px;padding:10px 12px;font-family:"Hiragino Maru Gothic ProN","Hiragino Sans",sans-serif;background-image:repeating-linear-gradient(transparent 0 27px,#efe4c4 27px 28px)}
 .diary p{margin:4px 0}.dy-h{font-weight:800}.dy-h small{font-weight:400;color:#7a6a55}
 /* ページのペット */
@@ -3327,7 +3342,7 @@ function petName(){ if(ME.pet&&ME.pet.name) return ME.pet.name; return petStage(
 function petXP(){ const p=petInit(); const b=p.base||{d:0,e:0,w:0}; return Math.max(0, p.fed*5 + Math.max(0,ME.days.length-b.d)*2 + Math.max(0,Object.keys(ME.readEx).length-b.e)*3 + Math.max(0,ME.words.length-b.w)); }
 // 🎓 名人になったら、新しいたまごから育て直せる(前の子は殿堂入り)。そだちの数え直しは base に今の記録を覚えて引く
 function petHall(){ return (ME.pet||{}).hall||[]; }
-function petRestart(){ const p=petInit(); if(petStage().i<5) return false; p.hall=p.hall||[]; p.hall.push({name:petName(),kind:petKind(),color:p.color||null,xp:petXP(),wear:p.wear||null,at:TODAY,gen:p.gen||1}); delete p.color;
+function petRestart(){ const p=petInit(); if(petStage().i<5) return false; p.hall=p.hall||[]; p.hall.push({name:petName(),kind:petKind(),color:p.color||null,look:p.look||null,xp:petXP(),wear:p.wear||null,at:TODAY,gen:p.gen||1}); delete p.color; delete p.look;
   p.fed=0; p.feedDay=""; p.name=""; p.wear=null; p.stay=0; p.kind=petPickKind(p.kind); p.gen=(p.gen||1)+1; p.base={d:ME.days.length,e:Object.keys(ME.readEx).length,w:ME.words.length}; saveMe(); return true; }
 function petStage(){ const xp=petXP(); let i=0; PET_STAGES.forEach((s,k)=>{ if(xp>=s[0]) i=k; }); const nx=PET_STAGES[i+1]; return {i,name:PET_STAGES[i][1],xp,next:nx,prog:nx?(xp-PET_STAGES[i][0])/(nx[0]-PET_STAGES[i][0]):1}; }
 function petTopGenre(){ let best=null,v=2.5; Object.entries(ME.auto||{}).forEach(([g,n])=>{ if(PET_ACC[g]&&n>v){v=n;best=g;} }); return best; }
@@ -3341,16 +3356,22 @@ const HEAD_ACC=["band","helmet","straw","chef","phones","ribbon"];
 // SVGの中のid(グラデーション・チェック柄)は1ページに何匹出ても重ならないよう番号をつける
 // (同じidが2つあると、うしろのペットの色が前のペットのものを見にいってしまう)
 let petUID=0;
-function petSVG(stage,mood,acc,size,costume,kind,color){
+// ✨ 見た目(色以外): もよう・目・ほっぺ。ME.pet.look={pat,eye,cheek}。殿堂の子はその子の look を残す(2026-11-02)
+const PET_LOOK={pat:[["","なし"],["shima","しま"],["buchi","ぶち"],["tenten","てんてん"]],eye:[["","ふつう"],["kira","きらきら"],["tsubu","つぶら"]],cheek:[["","ふつう"],["ooki","大きめ"],["nashi","なし"]]};
+function petSVG(stage,mood,acc,size,costume,kind,color,look){
   const mine0=!PET_KINDS[kind];
   /* 🥚 何が生まれるかヒミツ: いまの子がまだたまごなら、どこで描いても(4コマ・着せかえ・画像・案内など)たまごの絵にする */
   let hideKind=false; if(mine0&&stage>0){ try{ if(petStage().i===0){ stage=0; hideKind=true; } }catch(_){} }
   const S=size||120; const egg=stage===0; const U="u"+(++petUID); const mine=mine0; kind=PET_KINDS[kind]?kind:petKind();
+  const LK=look!==undefined?(look||{}):(mine?((ME.pet||{}).look||{}):{});
+  const PAT=egg?"":({shima:`<path d="M48 45q4 4 0 9M60 43v10M72 45q-4 4 0 9" stroke="var(--pd)" stroke-width="3.2" fill="none" stroke-linecap="round" opacity=".7"/>`,
+    buchi:`<ellipse cx="87" cy="60" rx="9" ry="7" fill="var(--pd)" opacity=".55"/><ellipse cx="34" cy="92" rx="7" ry="5.5" fill="var(--pd)" opacity=".5"/>`,
+    tenten:`<g fill="var(--pd)" opacity=".55"><circle cx="40" cy="56" r="2.4"/><circle cx="47" cy="50" r="2"/><circle cx="80" cy="56" r="2.4"/><circle cx="73" cy="50" r="2"/><circle cx="60" cy="47" r="2.2"/></g>`})[LK.pat]||"";
   // 🎨 色: 引数 color(殿堂・見本)> いまの子の ME.pet.color > 種類のもとの色
   let PC=PET_COLORS.find(c=>c[0]===(color!==undefined?color:(mine?(ME.pet||{}).color:null))); if(PC&&PC[0]&&!petColorsFor(kind).includes(PC)) PC=null; // その種類にない色は もとの色で
   const K=PC&&PC[1]?[PET_KINDS[kind][0],PC[1],PC[2],[PC[3],PC[4]],PET_KINDS[kind][4]]:PET_KINDS[kind]; const KP=petKindParts(kind,stage,egg);
   const body=egg?`<path d="M60 22c22 0 34 30 34 52s-15 34-34 34-34-12-34-34 12-52 34-52z" fill="#fff7e6" stroke="#e8c98f" stroke-width="3"/><path d="M38 70l8-6 8 7 8-7 8 7 8-6 8 6" fill="none" stroke="#e8c98f" stroke-width="3" stroke-linejoin="round"/>`
-    : `${KP.back}<ellipse cx="60" cy="${74+(KP.dy||0)}" rx="${34+stage*1.2+(KP.dx||0)}" ry="${31+stage-(KP.sy||0)}" fill="${stage>=5?`url(#pg${U})`:K[1]}"/><ellipse cx="60" cy="${86+(KP.dy||0)}" rx="${20+stage+(KP.dx||0)/2}" ry="${12+stage*.6}" fill="${K[2]}" opacity="${PC&&PC[6]?1:.85}"/>${KP.front}`;
+    : `${KP.back}<ellipse cx="60" cy="${74+(KP.dy||0)}" rx="${34+stage*1.2+(KP.dx||0)}" ry="${31+stage-(KP.sy||0)}" fill="${stage>=5?`url(#pg${U})`:K[1]}"/><ellipse cx="60" cy="${86+(KP.dy||0)}" rx="${20+stage+(KP.dx||0)/2}" ry="${12+stage*.6}" fill="${K[2]}" opacity="${PC&&PC[6]?1:.85}"/>${PAT}${KP.front}`;
   const kfl=(!egg&&kind!=="maru"&&stage===4)?`<g transform="translate(80 46) scale(.75)">${[0,72,144,216,288].map(a=>`<ellipse rx="5" ry="8" transform="rotate(${a}) translate(0 -7)" fill="#ff8fb3"/>`).join("")}<circle r="4.5" fill="#ffd34d"/></g>`:""; // ものしり: 花のかみかざり(体の上に描く)
   const leaf=egg||kind!=="maru"?"":stage>=4?`<path d="M60 44V30" stroke="#3f8f3a" stroke-width="3"/><g transform="translate(60 26)">${[0,72,144,216,288].map(a=>`<ellipse rx="5" ry="8" transform="rotate(${a}) translate(0 -7)" fill="#ff8fb3"/>`).join("")}<circle r="4.5" fill="#ffd34d"/></g>`
     : `<path d="M60 44q0-10 2-14" stroke="#3f8f3a" stroke-width="3" fill="none"/><path d="M62 31q10-10 18-4-6 9-18 4z" fill="#58b84f"/>${stage>=2?`<path d="M61 34q-10-8-17-2 6 8 17 2z" fill="#6cc763"/>`:""}`;
@@ -3358,9 +3379,11 @@ function petSVG(stage,mood,acc,size,costume,kind,color){
   const dk=!!(PC&&PC[6]); const ec=dk?"#ffe9a8":"#3a2a14";
   const eyes=egg?(hideKind?`<circle cx="51" cy="50" r="2.8" fill="#6b4a22"/><circle cx="69" cy="50" r="2.8" fill="#6b4a22"/><path d="M56 56q4 3 8 0" stroke="#b08850" stroke-width="2.2" fill="none" stroke-linecap="round"/><ellipse cx="45" cy="56" rx="3.5" ry="2" fill="#ffb3b8" opacity=".6"/><ellipse cx="75" cy="56" rx="3.5" ry="2" fill="#ffb3b8" opacity=".6"/>`:""): mood==="happy"?`<path d="M42 70q5-6 10 0M68 70q5-6 10 0" stroke="${ec}" stroke-width="3.2" fill="none" stroke-linecap="round"/>`
     : mood==="sulk"?`<path d="M41 67l11 3M79 67l-11 3" stroke="${ec}" stroke-width="3" stroke-linecap="round"/>${dk?`<circle cx="47" cy="72" r="4.4" fill="#fffaf0"/><circle cx="73" cy="72" r="4.4" fill="#fffaf0"/>`:""}<circle cx="47" cy="72" r="2.6" fill="#3a2a14"/><circle cx="73" cy="72" r="2.6" fill="#3a2a14"/>`
+    : LK.eye==="kira"?`${dk?`<circle cx="47" cy="70" r="7.5" fill="#fffaf0"/><circle cx="73" cy="70" r="7.5" fill="#fffaf0"/>`:""}<circle cx="47" cy="70" r="5.6" fill="#3a2a14"/><circle cx="73" cy="70" r="5.6" fill="#3a2a14"/><circle cx="49" cy="67.8" r="2" fill="#fff"/><circle cx="75" cy="67.8" r="2" fill="#fff"/><circle cx="45.6" cy="72.4" r="1" fill="#fff"/><circle cx="71.6" cy="72.4" r="1" fill="#fff"/>`
+    : LK.eye==="tsubu"?`${dk?`<circle cx="47" cy="70" r="4.4" fill="#fffaf0"/><circle cx="73" cy="70" r="4.4" fill="#fffaf0"/>`:""}<circle cx="47" cy="70" r="2.7" fill="#3a2a14"/><circle cx="73" cy="70" r="2.7" fill="#3a2a14"/>`
     : `${dk?`<circle cx="47" cy="70" r="6" fill="#fffaf0"/><circle cx="73" cy="70" r="6" fill="#fffaf0"/>`:""}<circle cx="47" cy="70" r="4" fill="#3a2a14"/><circle cx="73" cy="70" r="4" fill="#3a2a14"/><circle cx="48.3" cy="68.6" r="1.3" fill="#fff"/><circle cx="74.3" cy="68.6" r="1.3" fill="#fff"/>`;
   const mouth=egg?"": mood==="happy"?`<path d="M54 79q6 7 12 0" fill="#c2453a"/>` : mood==="sulk"?`<path d="M54 82q6-5 12 0" stroke="${ec}" stroke-width="2.6" fill="none" stroke-linecap="round"/><path d="M90 50l6-4M92 56l7 0M90 62l6 4" stroke="#e5484d" stroke-width="2.4" stroke-linecap="round"/>` : `<ellipse cx="60" cy="80" rx="4" ry="3.2" fill="#c2453a"/>`;
-  const bl=KP.blush||[38,78,5,3,.7]; const blush=egg?"":`<ellipse cx="${bl[0]}" cy="${bl[1]}" rx="${bl[2]}" ry="${bl[3]}" fill="#ff9aa2" opacity="${dk?Math.min(.9,bl[4]+.15):bl[4]}"/><ellipse cx="${120-bl[0]}" cy="${bl[1]}" rx="${bl[2]}" ry="${bl[3]}" fill="#ff9aa2" opacity="${dk?Math.min(.9,bl[4]+.15):bl[4]}"/>`;
+  let bl=KP.blush||[38,78,5,3,.7]; if(LK.cheek==="ooki") bl=[bl[0]-1,bl[1],bl[2]*1.5,bl[3]*1.5,bl[4]]; const blush=egg||LK.cheek==="nashi"?"":`<ellipse cx="${bl[0]}" cy="${bl[1]}" rx="${bl[2]}" ry="${bl[3]}" fill="#ff9aa2" opacity="${dk?Math.min(.9,bl[4]+.15):bl[4]}"/><ellipse cx="${120-bl[0]}" cy="${bl[1]}" rx="${bl[2]}" ry="${bl[3]}" fill="#ff9aa2" opacity="${dk?Math.min(.9,bl[4]+.15):bl[4]}"/>`;
   const A=egg?"":({
     glasses:`<g fill="none" stroke="#2b2b2b" stroke-width="2.6"><circle cx="47" cy="70" r="9"/><circle cx="73" cy="70" r="9"/><path d="M56 70h8"/></g>`,
     tie:`<path d="M56 94h8l-2 4 4 14-6 5-6-5 4-14z" fill="#d23a3a"/>`,
@@ -3437,12 +3460,64 @@ const WEAR=[
 function petWear(){ const w=(ME.pet||{}).wear; const it=WEAR.find(x=>x[0]===w); return it&&it[3]()?w:null; }
 function wardrobeHTML(){ const w=petWear(); return `<div class="wardrobe">${WEAR.map(([k,n,c,ok])=>{ const open=ok(); return `<button class="wd-i${w===k?" on":""}" data-wear="${k}" ${open?"":"disabled"} title="${esc(open?n:"🔒 "+c)}"><span class="wd-svg">${open?petSVG(Math.max(1,petStage().i),"happy",null,46,k):'<span class="wd-lock">🔒</span>'}</span><small>${esc(open?n:c)}</small></button>`; }).join("")}<button class="wd-i${!w?" on":""}" data-wear=""><span class="wd-svg" style="font-size:1.4rem">🚫</span><small>なにも着ない</small></button></div>`; }
 const ROOM={pol:"🏛️",eco:"💰",soc:"🚒",it:"💻",intl:"🌏",spo:"⚽",sci:"🔬",ent:"🎬",fas:"👗",home:"🪴",food:"🍳",life:"☕",trip:"🧳"};
-function roomHTML(){ const got=GORDER.filter(g=>(ME.auto||{})[g]>=3); const st=petStage(); const fr=friendOn();
-  // 棚は2段×7こ(上7こ・下6こ+窓)。窓も枠の1つにして、家具と重ならないようにする(2026-11-02)
-  const cell=(i,html,cls,t)=>{ const r=i<7?0:1, c=i<7?i:i-7; return `<span class="rm-it${cls}" style="left:${7+c*14.3}%;top:${r?40:12}%"${t?` title="${esc(t)}"`:""}>${html}</span>`; };
-  const slots=GORDER.map((g,i)=>{ const has=got.includes(g); return cell(i,has?ROOM[g]:"・",has?"":" off",GN[g]+(has?"":"(まだ)")); }).join("")+cell(13,"🪟"," win","窓");
-  return `<div class="room"><div class="rm-wall"></div><div class="rm-floor"></div>${slots}<div class="rm-pet">${petSVG(st.i,petMood(),null,84,petWear())}</div>${fr?`<div class="rm-fr">${friendSVG(64)}</div>`:""}</div>
-    <div class="hint" style="margin-top:6px">🏠 ${esc(petName())}の部屋 ・ 家具 ${got.length}/${GORDER.length}こ(そのジャンルをよく読むと増えます)</div>`; }
+// 🏠 部屋(2026-11-02): ペットが歩き回る・なでる/ボール/おやつ・家具を指で動かす・壁紙と床を選ぶ。記録は ME.pet.room / love(スマホの中だけ)
+// なでる・遊ぶ は「なかよし」だけ増える(ごはん・そだちのルールは変えない)
+const ROOM_WALL=[["cream","クリーム","#fde9c8","#f7dcae"],["sky","そら","#e3f1ff","#cfe4fb"],["mint","ミント","#e3f7ee","#cdeedd"],["sakura","さくら","#ffe8ef","#fbd3df"],["night","よる","#3b4470","#2a3157"]];
+const ROOM_FLOOR=[["wood","木","#c9915a","#bf8650"],["dark","こげ茶","#8a5a3a","#7a4d30"],["tatami","たたみ","#cfd79a","#bcc684"],["tile","タイル","#e5e7eb","#d1d5db"]];
+const LOVE_DAY=5;
+function petRoom(){ const p=petInit(); p.room=p.room||{}; p.room.pos=p.room.pos||{}; return p.room; }
+function roomCell(i){ const r=i<7?0:1, c=i<7?i:i-7; return [7+c*14.3, r?36:10]; } // 棚は2段×7こ(上7・下6+窓)
+function petLove(){ return +(ME.pet||{}).love||0; }
+function roomHTML(){ const got=GORDER.filter(g=>(ME.auto||{})[g]>=3); const st=petStage(); const fr=friendOn(); const R=petRoom();
+  const W=ROOM_WALL.find(x=>x[0]===R.wall)||ROOM_WALL[0], F=ROOM_FLOOR.find(x=>x[0]===R.floor)||ROOM_FLOOR[0];
+  const it=(key,i,html,cls,t)=>{ const [x,y]=R.pos[key]||roomCell(i); return `<span class="rm-it${cls}" data-rk="${key}" style="left:${x}%;top:${y}%"${t?` title="${esc(t)}"`:""}>${html}</span>`; };
+  const slots=GORDER.map((g,i)=>{ const has=got.includes(g); return has?it(g,i,ROOM[g]," mv",GN[g]):`<span class="rm-it off" style="left:${roomCell(i)[0]}%;top:${roomCell(i)[1]}%" title="${esc(GN[g])}(まだ)">・</span>`; }).join("")+it("win",13,"🪟"," mv","窓");
+  const egg=st.i===0;
+  return `<div class="room" id="room" style="--w1:${W[2]};--w2:${W[3]};--f1:${F[2]};--f2:${F[3]}"><div class="rm-wall"></div><div class="rm-floor"></div>${slots}
+    ${fr?`<div class="rm-fr">${friendSVG(56)}</div>`:""}<div class="rm-pet" id="rmPet" style="left:50%" role="button" tabindex="0" aria-label="${esc(petName())}をなでる"><div class="rm-pi">${petSVG(st.i,petMood(),null,84,petWear())}</div></div></div>
+    <div class="rm-tools"><button class="fchip" data-rplay="pet">🤚 なでる</button>${egg?"":`<button class="fchip" data-rplay="ball">⚽ ボールで遊ぶ</button><button class="fchip" data-rplay="snack">🍪 おやつ</button>`}<button class="fchip" data-rplay="deco" aria-expanded="false">🎨 もようがえ</button></div>
+    <div class="rm-deco" id="rmDeco" hidden><div><b>壁紙</b> ${ROOM_WALL.map(w=>`<button class="rm-sw${W===w?" on":""}" data-rwall="${w[0]}" style="background:linear-gradient(${w[2]},${w[3]})" aria-label="${w[1]}" aria-pressed="${W===w}"><small>${w[1]}</small></button>`).join("")}</div>
+      <div><b>床</b> ${ROOM_FLOOR.map(f=>`<button class="rm-sw${F===f?" on":""}" data-rfloor="${f[0]}" style="background:repeating-linear-gradient(90deg,${f[2]} 0 10px,${f[3]} 10px 12px)" aria-label="${f[1]}" aria-pressed="${F===f}"><small>${f[1]}</small></button>`).join("")}</div>
+      <button class="fchip" data-rreset="1">↺ 家具を元の並びにもどす</button></div>
+    <div class="hint" style="margin-top:6px">🏠 家具 ${got.length}/${GORDER.length}こ(そのジャンルをよく読むと増えます) ・ 家具と窓は指で動かせます ・ 💞 なかよし <b id="rmLove">${petLove()}</b></div>`; }
+function bindRoom(){ const room=document.getElementById("room"); if(!room) return; const pet=document.getElementById("rmPet"); const pi=pet.querySelector(".rm-pi");
+  const R=petRoom(); const still=matchMedia("(prefers-reduced-motion: reduce)").matches; const egg=petStage().i===0;
+  let x=50, busy=false, tm=0;
+  const alive=()=>room.isConnected;
+  const say=(t,ms)=>{ room.querySelectorAll(".rm-say").forEach(e=>e.remove()); const b=document.createElement("span"); b.className="rm-say"; b.textContent=t; pet.appendChild(b); setTimeout(()=>b.remove(),ms||1800); };
+  const face=(m,ms)=>{ const st=petStage(); pi.innerHTML=petSVG(st.i,m,null,84,petWear()); if(ms) setTimeout(()=>{ if(alive()) pi.innerHTML=petSVG(st.i,petMood(),null,84,petWear()); },ms); };
+  const moveTo=(nx,cb)=>{ nx=Math.max(10,Math.min(86,nx)); const d=Math.abs(nx-x); if(d<1||still){ x=nx; pet.style.left=x+"%"; cb&&cb(); return; }
+    pet.classList.toggle("left",nx<x); pet.classList.add("walk"); pet.style.transitionDuration=(d/14).toFixed(2)+"s"; pet.style.left=nx+"%"; x=nx;
+    clearTimeout(tm); tm=setTimeout(()=>{ pet.classList.remove("walk"); cb&&cb(); },d/14*1000+30); };
+  const wander=()=>{ if(!alive()) return; if(busy||egg||still||document.hidden){ setTimeout(wander,3000); return; }
+    if(Math.random()<.15){ pet.classList.add("zz"); setTimeout(()=>{ pet.classList.remove("zz"); setTimeout(wander,1500); },6000); return; }
+    moveTo(12+Math.random()*72,()=>setTimeout(wander,1800+Math.random()*3500)); };
+  setTimeout(wander,1200);
+  const love=()=>{ const p=petInit(); if(p.loveDay!==TODAY){ p.loveDay=TODAY; p.loveN=0; } if(p.loveN<LOVE_DAY){ p.loveN++; p.love=petLove()+1; saveMe(); const e=document.getElementById("rmLove"); if(e) e.textContent=p.love; } };
+  const hearts=()=>{ for(let i=0;i<3;i++){ const h=document.createElement("span"); h.className="rm-heart"; h.textContent="💗"; h.style.left=(25+i*25)+"%"; h.style.animationDelay=(i*.12)+"s"; pet.appendChild(h); setTimeout(()=>h.remove(),1300); } };
+  const LINES=egg?["…コトコト","(あったかい…)","もうすぐ会えるよ"]:["えへへ","くすぐったい!","もっとなでて〜","きょうも読もうね","ふわぁ〜","すき!"];
+  const pat=()=>{ if(busy) return; pet.classList.remove("zz","hop"); void pet.offsetWidth; pet.classList.add("hop"); setTimeout(()=>pet.classList.remove("hop"),550);
+    if(!egg) face("happy",2200); hearts(); say(LINES[Math.floor(Math.random()*LINES.length)]); love(); };
+  pet.onclick=pat; pet.onkeydown=e=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); pat(); } };
+  const prop=(ch,cls)=>{ const b=document.createElement("span"); b.className="rm-prop "+cls; b.textContent=ch; room.appendChild(b); return b; };
+  room.parentElement.querySelectorAll("[data-rplay]").forEach(b=>b.onclick=()=>{ const k=b.dataset.rplay;
+    if(k==="deco"){ const d=document.getElementById("rmDeco"); d.hidden=!d.hidden; b.setAttribute("aria-expanded",String(!d.hidden)); return; }
+    if(k==="pet"){ pat(); return; }
+    if(busy) return; busy=true; pet.classList.remove("zz");
+    if(k==="ball"){ const bx=x<50?78:18; const ball=prop("⚽","rm-ball"); ball.style.left=x+"%"; requestAnimationFrame(()=>{ ball.style.left=bx+"%"; ball.style.transform=`rotate(${bx>x?720:-720}deg)`; });
+      setTimeout(()=>moveTo(bx+(bx>50?-6:6),()=>{ pet.classList.add("hop"); say("つかまえた!"); if(!egg) face("happy",2000); love(); setTimeout(()=>{ pet.classList.remove("hop"); ball.style.transition="opacity .4s"; ball.style.opacity="0"; setTimeout(()=>{ ball.remove(); busy=false; },400); },700); }),still?0:500); }
+    if(k==="snack"){ const p=petInit(); if(p.snackDay===TODAY){ say("きょうはもう食べたよ。また明日!"); busy=false; return; } const sx=12+Math.random()*72; const c=prop("🍪","rm-snack"); c.style.left=sx+"%";
+      setTimeout(()=>moveTo(sx,()=>{ c.remove(); say("もぐもぐ…おいしい!"); face("happy",2400); hearts(); p.snackDay=TODAY; saveMe(); love(); busy=false; }),still?0:700); }
+  });
+  // 🪑 家具を指で動かす(少し動いたらドラッグ。保存は ME.pet.room.pos)
+  room.querySelectorAll(".rm-it.mv").forEach(el=>{ el.onpointerdown=e=>{ e.preventDefault(); el.setPointerCapture(e.pointerId); el.classList.add("drag"); const rr=room.getBoundingClientRect();
+    el.onpointermove=ev=>{ const nx=Math.max(4,Math.min(96,(ev.clientX-rr.left)/rr.width*100)), ny=Math.max(2,Math.min(86,(ev.clientY-rr.top-12)/rr.height*100)); el.style.left=nx+"%"; el.style.top=ny+"%"; };
+    el.onpointerup=el.onpointercancel=()=>{ el.onpointermove=null; el.classList.remove("drag"); R.pos[el.dataset.rk]=[+parseFloat(el.style.left).toFixed(1),+parseFloat(el.style.top).toFixed(1)]; saveMe(); }; }; });
+  const redraw=()=>{ go("my",{keepScroll:true}); setTimeout(()=>{ const d=document.getElementById("petRoomBox"); if(d) d.open=true; const dc=document.getElementById("rmDeco"); if(dc) dc.hidden=false; },50); };
+  room.parentElement.querySelectorAll("[data-rwall]").forEach(b=>b.onclick=()=>{ R.wall=b.dataset.rwall; saveMe(); redraw(); });
+  room.parentElement.querySelectorAll("[data-rfloor]").forEach(b=>b.onclick=()=>{ R.floor=b.dataset.rfloor; saveMe(); redraw(); });
+  room.parentElement.querySelectorAll("[data-rreset]").forEach(b=>b.onclick=()=>{ R.pos={}; saveMe(); toast("🪑 家具を元の並びにもどしました"); redraw(); });
+}
 function friendOn(){ return petStage().i>=3 || ME.days.length>=14; }
 function friendName(){ return ((ME.pet||{}).fname)||"ぴよた"; }
 function friendSVG(S){ return `<svg viewBox="0 0 120 120" width="${S}" height="${S}" aria-label="${esc(friendName())}"><ellipse cx="60" cy="112" rx="26" ry="4" fill="#000" opacity=".12"/><ellipse cx="60" cy="76" rx="32" ry="30" fill="#8fe3c8"/><ellipse cx="60" cy="88" rx="18" ry="11" fill="#e3fff4"/><path d="M48 46q-4-14 6-16 2 8-6 16zM72 46q4-14-6-16-2 8 6 16z" fill="#5cc9a7"/><circle cx="49" cy="72" r="4" fill="#173d33"/><circle cx="71" cy="72" r="4" fill="#173d33"/><path d="M55 81q5 5 10 0" stroke="#173d33" stroke-width="2.4" fill="none" stroke-linecap="round"/><ellipse cx="40" cy="80" rx="5" ry="3" fill="#ff9aa2" opacity=".7"/><ellipse cx="80" cy="80" rx="5" ry="3" fill="#ff9aa2" opacity=".7"/></svg>`; }
@@ -3466,12 +3541,13 @@ function petBig(){ petHatchCheck(); const p=petInit(); const st=petStage(); cons
     <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:10px"><button class="fchip pet-feed" data-feed="1" ${p.food>0?"":"disabled"}>🍙 ごはん <b id="petFood">${p.food}</b> こ ・ あげる</button><button class="fchip" id="petRename">✏️ 名前</button></div>
     <div class="hint" style="margin-top:8px">${acc?`🎒 よく読むジャンルが「${esc(PET_ACC[acc][2])}」なので、${esc(PET_ACC[acc][1])}をつけています。`:"🎒 よく読むジャンルが決まると、小物をつけはじめます。"}</div>
     ${st.i>=5?`<div class="pet-master">${p.stay?`<div class="hint">🎓 ${esc(petName())}は ニュース名人。このまま いっしょに読みつづけています。</div><button class="fchip" id="petRestart" style="margin-top:6px">🥚 新しいたまごから育てる</button>`:`<b>🎓 ${esc(petName())}が ニュース名人になりました!</b><p class="hint" style="margin:4px 0 8px">このまま いっしょに読みつづけるか、新しいたまごから 2代目を育てるか、選べます。新しくしても ${esc(petName())}は「殿堂」に残ります。記録(連続日数・バッジなど)は消えません。</p><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="fchip pet-feed" id="petStay">🏠 このまま育てる</button><button class="fchip" id="petRestart">🥚 新しいたまごから育てる</button></div>`}</div>`:""}
-    ${petHall().length?`<details class="faq plain" style="margin-top:8px"><summary>🏆 殿堂(名人になった子たち)</summary><div class="pet-hall">${petHall().map(h=>`<div class="ph"><span>${petSVG(5,"happy",null,56,h.wear||null,h.kind,h.color||null)}</span><b>${esc(h.name)}</b><small>第${h.gen||1}代 ・ ${esc(mdLabel(h.at))}に名人</small></div>`).join("")}</div></details>`:""}
+    ${petHall().length?`<details class="faq plain" style="margin-top:8px"><summary>🏆 殿堂(名人になった子たち)</summary><div class="pet-hall">${petHall().map(h=>`<div class="ph"><span>${petSVG(5,"happy",null,56,h.wear||null,h.kind,h.color||null,h.look||{})}</span><b>${esc(h.name)}</b><small>第${h.gen||1}代 ・ ${esc(mdLabel(h.at))}に名人</small></div>`).join("")}</div></details>`:""}
     <details class="faq plain" style="margin-top:6px"><summary>そだて方</summary><ul class="us"><li>🧠 クイズに正解 → 🍙 ごはん(1日${PET_DAY_MAX}こまで)。あげると そだち +5</li><li>📅 開いた日 +2 ・ 💡 解説を読む +3 ・ 📖 ことばを調べる +1</li><li>3日以上あけると、すねます。ごはんをあげると元気に。</li><li>たまご → あかちゃん → こども → おとな → ものしり → ニュース名人</li><li>🥚 たまごから生まれる子は7種類。どの子が生まれるかは、生まれるまでのお楽しみ!(生まれたあとは変わりません)</li><li>🎓 名人になったら、そのまま育てるか、新しいたまごから育てるか選べます</li></ul></details>
     ${friendOn()?`<div class="hint" style="text-align:center;margin-top:6px">🐣 ともだちの「${esc(friendName())}」が遊びに来ています <button class="gd-lk" id="frRename">名前</button></div>`:`<div class="hint" style="text-align:center;margin-top:6px">ペットが「おとな」になるか、14日開くと、ともだちがやってくるよ。</div>`}
     ${st.i===0?`<p class="hint" style="margin-top:8px">🎨 色は、たまごから生まれたあとに変えられます。</p>`:`<details class="faq plain" style="margin-top:8px" id="petColorBox"><summary>🎨 色を変える</summary><div class="pet-colors">${petColorsFor(petKind()).map(c=>`<button class="pc-i${((p.color||null)===c[0])?" on":""}" data-pcol="${c[0]||""}" aria-pressed="${(p.color||null)===c[0]}"><span>${petSVG(Math.max(1,st.i),"happy",null,48,null,petKind(),c[0])}</span><small>${esc(c[5])}</small></button>`).join("")}</div><div class="hint">いつでも何回でも変えられます。色は、その動物に本当にある色から選べます(けろまるは何色でも)。殿堂の子は、その子の色のまま残ります。</div></details>`}
     <details class="faq plain" style="margin-top:8px"><summary>👕 着せかえ</summary>${wardrobeHTML()}<div class="hint">🔒の服は、書いてあることをすると着られるようになります。</div></details>
-    <details class="faq plain"><summary>🏠 ${esc(petName())}の部屋</summary>${roomHTML()}</details>
+    ${st.i===0?"":`<details class="faq plain" id="petLookBox"><summary>✨ 見た目(もよう・目・ほっぺ)</summary>${Object.entries(PET_LOOK).map(([k,L])=>`<div class="pl-row"><b>${{pat:"もよう",eye:"目",cheek:"ほっぺ"}[k]}</b><div class="pet-colors">${L.map(([v,n])=>{ const cur=((p.look||{})[k]||"")===v; const lk={...(p.look||{}),[k]:v}; return `<button class="pc-i${cur?" on":""}" data-plook="${k}:${v}" aria-pressed="${cur}"><span>${petSVG(Math.max(1,st.i),"",null,48,null,petKind(),undefined,lk)}</span><small>${esc(n)}</small></button>`; }).join("")}</div></div>`).join("")}<div class="hint">いつでも何回でも変えられます。殿堂の子は、その子の見た目のまま残ります。</div></details>`}
+    <details class="faq plain" id="petRoomBox"><summary>🏠 ${esc(petName())}の部屋</summary>${roomHTML()}</details>
     <details class="faq plain"><summary>📔 今週の日記</summary>${diaryHTML()}</details>
     <div class="quiz" id="wq" style="margin-top:12px;border-top:1px solid var(--line);padding-top:12px"></div>
   </section>`; }
@@ -3479,6 +3555,8 @@ function bindPet(){
   document.querySelectorAll("[data-wear]").forEach(b=>b.onclick=()=>{ petInit().wear=b.dataset.wear; saveMe(); toast(b.dataset.wear?"👕 着がえました":"いつもの姿にもどりました"); go(current,{keepScroll:true}); });
   const fr=document.getElementById("frRename"); if(fr) fr.onclick=()=>{ const v=prompt("ともだちの名前(10文字まで)",friendName()); if(v&&v.trim()){ petInit().fname=v.trim().slice(0,10); saveMe(); go(current,{keepScroll:true}); } };
   document.querySelectorAll("[data-feed]").forEach(b=>b.onclick=()=>petFeed(b));
+  document.querySelectorAll("[data-plook]").forEach(b=>b.onclick=()=>{ const [k,v]=b.dataset.plook.split(":"); const pp=petInit(); pp.look={...(pp.look||{})}; if(v) pp.look[k]=v; else delete pp.look[k]; saveMe(); toast("✨ 見た目を変えました"); go("my",{keepScroll:true}); setTimeout(()=>{ const d=document.getElementById("petLookBox"); if(d) d.open=true; },50); });
+  bindRoom();
   document.querySelectorAll("[data-petquiz]").forEach(b=>b.onclick=()=>{ const q=document.getElementById("quiz"); if(q){ q.scrollIntoView({behavior:"smooth",block:"center"}); } else go("my"); });
   document.querySelectorAll("[data-pcol]").forEach(b=>b.onclick=()=>{ const v=b.dataset.pcol||null; const pp=petInit(); if(v) pp.color=v; else delete pp.color; saveMe(); toast(`🎨 ${(PET_COLORS.find(c=>c[0]===v)||[])[5]||"もとの色"}にしました`); go("my",{keepScroll:true}); setTimeout(()=>{ const d=document.getElementById("petColorBox"); if(d) d.open=true; },50); });
   const ps=document.getElementById("petStay"); if(ps) ps.onclick=()=>{ petInit().stay=1; saveMe(); toast(`🏠 ${petName()}と、このまま読みつづけます`); go("my",{keepScroll:true}); };
@@ -4495,6 +4573,7 @@ function openShimen(){ const sh=document.getElementById("sheet"); const w=D.weat
 document.addEventListener("click",e=>{ const b=e.target.closest("[data-shimen]"); if(!b) return; e.preventDefault(); openShimen(); });
 // ===== お知らせ(新しくなったところ)。機能を足したら、いちばん上に1つ足す =====
 const UPDATES=[
+  {id:"2026-11-02a",d:"2026-11-02",t:"🏠 ペットの部屋で遊べるようになりました",L:["ペットが部屋の中を歩き回ります。なでたり、ボールで遊んだり、おやつ(1日1回)をあげたりできます(「💞 なかよし」が増えます。ごはんのルールは今までどおり)。","家具と窓は指で好きな所に動かせます。「🎨 もようがえ」で壁紙と床の色も選べます。","「✨ 見た目」で、もよう(しま・ぶち・てんてん)・目・ほっぺも選べるようになりました。"]},
   {id:"2026-11-01a",d:"2026-11-01",t:"🔎 さがすで、ことばを打っても結果がしぼりこまれないのを直しました",L:["10/30の夕方から、さがすタブにことばを打っても、全部のニュースが出たままになっていました。いまはふつうに探せます。"]},
   {id:"2026-10-29a",d:"2026-10-29",t:"🗾 地図に「東北」「九州」の丸を出さないように",L:["「東北」が宮城の上に出ていたのを直しました。東北大学の話は「宮城」、九州大学や九州場所は「福岡」に出ます。","「九州で大雨」のように1つの県に決められない話は、地図の下の「🗾 地方全体のニュース」にまとめました。"]},
   {id:"2026-10-28f",d:"2026-10-28",t:"🗾 地図の「関西」を府県ごとに・国の名前の位置を直しました",L:["地図で大阪・京都・兵庫などが「関西」1つにまとまっていたのを、府県ごとの丸にしました。ほかの県も、ニュースに県の名前が出れば、その県に丸が出ます。","世界の地図で、国の名前がとなりの国の上に出ていたところを直しました(フランスの名前が海外の領土までふくめた真ん中に出ていた、など)。いまは国のいちばん内側に名前を置きます。","小さい県・国の名前は、となりと重なるときに少しずらして出すようにしました。"]},
