@@ -1155,10 +1155,9 @@ svg.eat{animation:petEat .7s ease both!important}
 .room{position:relative;height:190px;border-radius:12px;overflow:hidden;border:1px solid var(--line);margin-top:6px}
 .rm-wall{position:absolute;inset:0 0 35% 0;background:linear-gradient(#fde9c8,#f7dcae)}
 .rm-floor{position:absolute;inset:65% 0 0 0;background:repeating-linear-gradient(90deg,#c9915a 0 34px,#bf8650 34px 36px)}
-.rm-it{position:absolute;font-size:1.5rem;line-height:1}.rm-it.off{opacity:.35;font-size:1rem;color:#8a6a43}
+.rm-it{position:absolute;font-size:24px;line-height:1;width:30px;margin-left:-15px;text-align:center}.rm-it.off{opacity:.35;font-size:16px;color:#8a6a43}
 .rm-pet{position:absolute;left:50%;bottom:4px;margin-left:-42px}
 .rm-fr{position:absolute;left:calc(50% + 40px);bottom:6px}
-.rm-win{position:absolute;right:10px;top:8px;font-size:1.6rem}
 .diary{background:#fffdf3;color:#2a2116;border:1px solid #e9dcb6;border-radius:10px;padding:10px 12px;font-family:"Hiragino Maru Gothic ProN","Hiragino Sans",sans-serif;background-image:repeating-linear-gradient(transparent 0 27px,#efe4c4 27px 28px)}
 .diary p{margin:4px 0}.dy-h{font-weight:800}.dy-h small{font-weight:400;color:#7a6a55}
 /* ページのペット */
@@ -3439,8 +3438,10 @@ function petWear(){ const w=(ME.pet||{}).wear; const it=WEAR.find(x=>x[0]===w); 
 function wardrobeHTML(){ const w=petWear(); return `<div class="wardrobe">${WEAR.map(([k,n,c,ok])=>{ const open=ok(); return `<button class="wd-i${w===k?" on":""}" data-wear="${k}" ${open?"":"disabled"} title="${esc(open?n:"🔒 "+c)}"><span class="wd-svg">${open?petSVG(Math.max(1,petStage().i),"happy",null,46,k):'<span class="wd-lock">🔒</span>'}</span><small>${esc(open?n:c)}</small></button>`; }).join("")}<button class="wd-i${!w?" on":""}" data-wear=""><span class="wd-svg" style="font-size:1.4rem">🚫</span><small>なにも着ない</small></button></div>`; }
 const ROOM={pol:"🏛️",eco:"💰",soc:"🚒",it:"💻",intl:"🌏",spo:"⚽",sci:"🔬",ent:"🎬",fas:"👗",home:"🪴",food:"🍳",life:"☕",trip:"🧳"};
 function roomHTML(){ const got=GORDER.filter(g=>(ME.auto||{})[g]>=3); const st=petStage(); const fr=friendOn();
-  const slots=GORDER.map((g,i)=>{ const has=got.includes(g); const x=8+(i%6)*15.5, y=i<6?14:40; return `<span class="rm-it${has?"":" off"}" style="left:${x}%;top:${y}%" title="${esc(GN[g])}${has?"":"(まだ)"}">${has?ROOM[g]:"・"}</span>`; }).join("");
-  return `<div class="room"><div class="rm-wall"></div><div class="rm-floor"></div>${slots}<div class="rm-pet">${petSVG(st.i,petMood(),null,84,petWear())}</div>${fr?`<div class="rm-fr">${friendSVG(64)}</div>`:""}<div class="rm-win">🪟</div></div>
+  // 棚は2段×7こ(上7こ・下6こ+窓)。窓も枠の1つにして、家具と重ならないようにする(2026-11-02)
+  const cell=(i,html,cls,t)=>{ const r=i<7?0:1, c=i<7?i:i-7; return `<span class="rm-it${cls}" style="left:${7+c*14.3}%;top:${r?40:12}%"${t?` title="${esc(t)}"`:""}>${html}</span>`; };
+  const slots=GORDER.map((g,i)=>{ const has=got.includes(g); return cell(i,has?ROOM[g]:"・",has?"":" off",GN[g]+(has?"":"(まだ)")); }).join("")+cell(13,"🪟"," win","窓");
+  return `<div class="room"><div class="rm-wall"></div><div class="rm-floor"></div>${slots}<div class="rm-pet">${petSVG(st.i,petMood(),null,84,petWear())}</div>${fr?`<div class="rm-fr">${friendSVG(64)}</div>`:""}</div>
     <div class="hint" style="margin-top:6px">🏠 ${esc(petName())}の部屋 ・ 家具 ${got.length}/${GORDER.length}こ(そのジャンルをよく読むと増えます)</div>`; }
 function friendOn(){ return petStage().i>=3 || ME.days.length>=14; }
 function friendName(){ return ((ME.pet||{}).fname)||"ぴよた"; }
