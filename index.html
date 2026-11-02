@@ -129,6 +129,7 @@ main{padding-block:18px 32px}
 .nt>summary{list-style:none;display:flex;align-items:center;gap:10px;min-height:48px;padding:6px 0;cursor:pointer}.nt>summary::-webkit-details-marker{display:none}
 .nt>summary .nt-i{font-size:1.3rem;width:1.6em;text-align:center;flex:none}.nt>summary b{flex:1 0 auto;min-width:0;max-width:62%}.nt>summary small{color:var(--muted);font-size:.84rem;flex:1 1 0;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .nt>summary::after{content:"▸";color:var(--muted);transition:transform .2s}.nt[open]>summary::after{transform:rotate(90deg)}
+.ext .nt>summary b{flex:0 1 auto}.done-more>summary{cursor:pointer;color:var(--muted);font-size:.86rem;padding:6px 0}.ext .nt-b>section>.sec-h>h2{display:none}.ext .nt-b>section>.sec-h{justify-content:flex-end}.ext .nt-b>section>.sec-h:not(:has(>:not(h2))){display:none}
 .nt-b{padding:0 0 10px}.nt-b>section.card,.nt-b>.card{border:0;padding:0;box-shadow:none;background:none;margin:0}.nt-b .season-card{margin:0}
 .wx-foot{display:flex;gap:6px;flex-wrap:wrap;align-items:center;justify-content:space-between}.wx-foot .qk-open{margin-left:auto}
 .wm-svg{display:block;width:100%;height:auto}
@@ -1933,7 +1934,7 @@ function doneCard(){ const st=todayStats(); ME.done=ME.done||{}; const done=!!ME
   return `<section class="card done-c" id="doneCard" aria-label="きょうはここまで">
     <div class="done-h"><span class="done-i" aria-hidden="true">${done?"✅":"🏁"}</span><div><b>きょうの大事なニュースは、ここまでです</b><small>${done?`読み終わり ${Object.keys(ME.done).length}日目`:"ここまで来たら、読み終わり"}。次に新しくなるのは ${esc(D.nextLabel||"次の更新")}</small></div></div>
     <p class="done-t">このページは、<b>${st.outlets}社</b>の報道<b>${st.arts}本</b>を見くらべて、${st.d===st.d2?mdLabel(st.d):mdLabel(st.d)+"〜"+mdLabel(st.d2)}に記録したニュース${st.n}本(2社以上で確かめられたもの ${st.ok}本)から、上のニュース10を選んでいます。</p>
-    <ul class="done-why"><li>🔍 <b>2社以上で確かめた</b>ものに✅。うわさやSNSだけの話は載せません</li><li>⏹️ <b>終わりがある</b>。下にずっと続かないので、見すぎません</li><li>🚫 <b>広告なし</b>。おすすめに広告をまぜません</li><li>🔒 <b>あなたの記録はスマホの中だけ</b>。読んだものを外に送りません</li></ul>
+    <details class="done-more"><summary>このアプリの4つの約束(✅確かめた・終わりがある・広告なし・記録はスマホの中だけ)</summary><ul class="done-why"><li>🔍 <b>2社以上で確かめた</b>ものに✅。うわさやSNSだけの話は載せません</li><li>⏹️ <b>終わりがある</b>。下にずっと続かないので、見すぎません</li><li>🚫 <b>広告なし</b>。おすすめに広告をまぜません</li><li>🔒 <b>あなたの記録はスマホの中だけ</b>。読んだものを外に送りません</li></ul></details>
   </section>`; }
 function bindDone(){ const c=document.getElementById("doneCard"); if(!c||!("IntersectionObserver" in window)) return; ME.done=ME.done||{}; if(ME.done[TODAY]) return;
   const io=new IntersectionObserver(es=>{ if(!es.some(x=>x.isIntersecting)) return; io.disconnect(); if(ME.done[TODAY]) return; ME.done[TODAY]=1; const ks=Object.keys(ME.done).sort(); if(ks.length>120) delete ME.done[ks[0]]; saveMe();
@@ -2023,6 +2024,16 @@ function notesCard(S){ const rows=[];
   const pk=intPickHTML(); if(pk&&!LOOK.off.foryou&&!(GORDER.some(g=>interestScore(g)>0)||myTopics().length)) rows.push(`<details class="nt"><summary><span class="nt-i">🎯</span><b>気になるジャンルを選ぶ</b><small>選ぶと「あなた向け」が出ます</small></summary><div class="nt-b">${pk}</div></details>`);
   if(!rows.length) return "";
   return `<section class="card notes" aria-label="きょうの小さな知らせ"><div class="sec-h"><h2>📌 きょうの小さな知らせ</h2><span class="sub">押すと開きます</span></div><div class="nt-list">${rows.join("")}</div></section>`; }
+const TODAY_MAIN=["weather","listen","three","ten","notes"];
+// 「➕ ほかにも」の行の名前(絵文字・名前・小さな説明)。ないものはカードの見出し(h2)から作る
+function extLbl(k,h){ const L={number:["🔢","今日の数字",()=>`${D.number.value}${D.number.unit}`],quiz:["🧠","今日の3問クイズ",()=>"正解するとペットのごはん"],pet:["🐣",()=>petName(),()=>petStage().name],
+    fun:["✨","おたのしみ",()=>"ジャンル別おすすめ・ゲーム・ことば"],foryou:["🎯","あなた向け",()=>"好きなこと・よく読むジャンルから"]}[k];
+  const f=v=>typeof v==="function"?v():v; if(L) return [L[0],f(L[1]),f(L[2])];
+  const m=/<h2[^>]*>([\s\S]*?)<\/h2>/.exec(h); const t=m?m[1].replace(/<[^>]+>/g,"").trim():k; const sp=t.indexOf(" "); return sp>0&&sp<4?[t.slice(0,sp),t.slice(sp+1),""]:["・",t,""]; }
+function extCard(keys,S){ if(!keys.length) return ""; LOOK.extOpen=LOOK.extOpen||{};
+  return `<section class="card notes ext" aria-label="ほかにも"><div class="sec-h"><h2>➕ ほかにも</h2><span class="sub">押すと開きます</span></div><div class="nt-list">${keys.map(k=>{ const [ic,nm,sub]=extLbl(k,S[k]);
+    return `<details class="nt" data-ext="${k}"${LOOK.extOpen[k]?" open":""}><summary><span class="nt-i">${ic}</span><b>${esc(nm)}</b>${sub?`<small>${esc(sub)}</small>`:""}</summary><div class="nt-b">${S[k]}</div></details>`; }).join("")}</div></section>`; }
+function bindExt(){ document.querySelectorAll("details[data-ext]>summary").forEach(sm=>sm.addEventListener("click",()=>{ const d=sm.parentElement; setTimeout(()=>{ LOOK.extOpen=LOOK.extOpen||{}; if(d.open) LOOK.extOpen[d.dataset.ext]=1; else delete LOOK.extOpen[d.dataset.ext]; saveLook(); },0); })); } // 開け閉めは自分で押したときだけ覚える
 function renderToday(){
   const t=D.top10;
   const S={};
@@ -2071,7 +2082,12 @@ function renderToday(){
       <div class="bignum" style="margin-top:6px"><div class="v num">${esc(D.number.value)}<small>${esc(D.number.unit)}</small></div><p style="margin:0">${esc(D.number.caption)}</p>${perPerson()}<span class="hint">(${esc(D.number.src)})</span></div>
       ${marketsMini()}
     </section>`;
-  const body=LOOK.order.filter(k=>!LOOK.off[k]).map(k=>S[k]||"").join("");
+  // 🏁「きょう」を短く(2026-11-02): ふつうモードでは、天気・3行・ニュース10・小さな知らせ のあとに「ここまで」を置き、
+  // そのほかのカード(数字・クイズ・ペット・おたのしみ・あなた向け など)は「➕ ほかにも」の中に1行ずつ(押すと開く)。何も消さない
+  const keys=LOOK.order.filter(k=>!LOOK.off[k]&&S[k]); const fold=LOOK.mode!=="easy";
+  const mainK=fold?keys.filter(k=>TODAY_MAIN.includes(k)):keys, extK=fold?keys.filter(k=>!TODAY_MAIN.includes(k)):[];
+  const body=mainK.map(k=>S[k]).join("");
+  const extHTML=extK.length?extCard(extK.filter(k=>k!=="other"),S)+(extK.includes("other")?S.other:""):"";
   main.innerHTML = `<div class="view">
     ${vsCard()}
     ${LOOK.off.notes?seasonCard():""}
@@ -2080,11 +2096,12 @@ function renderToday(){
     ${navigator.onLine===false?'<div class="offline">📴 いまはオフラインです。前に読み込んだ内容を表示しています。</div>':''}
     ${body||'<div class="card"><b>表示する項目がありません</b><div class="hint">着せかえで、見たい項目をオンにしてください。</div></div>'}
     ${body?doneCard():""}
+    ${extHTML}
     ${LOOK.mode==="easy"?`<button class="card ms-card" data-modesw="normal"><span class="ms-i" aria-hidden="true">📱</span><span><b>もっと使ってみる?</b><small>ふつうモードで何が増えるか見る(すぐには変わりません)→</small></span></button>`:""}
     <button class="fchip" id="lookBtnToday" style="align-self:flex-start">🎨 この画面の並びを変える</button>
     ${footer()}
   </div>`;
-  bindDone();
+  bindDone(); bindExt();
   const lb=document.getElementById("listenBtn"); if(lb) lb.onclick=()=>{ if(window.speechSynthesis&&window.speechSynthesis.speaking){ stopSpeak(); lb.classList.remove("on"); lb.querySelector("b").textContent="今日のニュースを聞く"; return; }
     const w=D.weather; const t=`${relDay(w.iso)}の${w.place}は${w.sky}。最高${w.hi}度、最低${w.lo}度。${w.umbrella}。では、今日のニュースです。`+D.three.map((x,i)=>`${i+1}つ目。${x.title}。${x.text}`).join("。")+"。ニュース10の見出しです。"+D.top10.map((n,i)=>`${i+1}位、${n.title}`).join("。")+"。以上です。";
     speak(t); lb.classList.add("on"); lb.querySelector("b").textContent="■ 止める"; track("/listen","聞く"); };
@@ -4580,6 +4597,7 @@ function openShimen(){ const sh=document.getElementById("sheet"); const w=D.weat
 document.addEventListener("click",e=>{ const b=e.target.closest("[data-shimen]"); if(!b) return; e.preventDefault(); openShimen(); });
 // ===== お知らせ(新しくなったところ)。機能を足したら、いちばん上に1つ足す =====
 const UPDATES=[
+  {id:"2026-11-02c",d:"2026-11-02",t:"🏁 「きょう」の画面を短くしました",L:["天気・今日の3行・ニュース10・小さな知らせのあとに「ここまで」を置き、数字・クイズ・ペット・おたのしみ・あなた向けは「➕ ほかにも」の中に1行ずつまとめました(押すと開きます。開いたものは次も開いたままです)。","なくなったものはありません。画面の長さは約3分の2になりました。"]},
   {id:"2026-11-02b",d:"2026-11-02",t:"📰 ニュース10が早く見られるようになりました",L:["「きょう」の画面で、ニュース10を「今日の3行」のすぐ下に上げました(「📌 きょうの小さな知らせ」はニュース10の下へ)。","右下の💬は、下へ読み進めている間はかくれます(上にもどすと出ます)。上の更新時刻も2行にまとめました。"]},
   {id:"2026-11-02a",d:"2026-11-02",t:"🏠 ペットの部屋で遊べるようになりました",L:["ペットが部屋の中を歩き回ります。なでたり、ボールで遊んだり、おやつ(1日1回)をあげたりできます(「💞 なかよし」が増えます。ごはんのルールは今までどおり)。","家具と窓は指で好きな所に動かせます。「🎨 もようがえ」で壁紙と床の色も選べます。","「✨ 見た目」で、もよう(しま・ぶち・てんてん)・目・ほっぺも選べるようになりました。"]},
   {id:"2026-11-01a",d:"2026-11-01",t:"🔎 さがすで、ことばを打っても結果がしぼりこまれないのを直しました",L:["10/30の夕方から、さがすタブにことばを打っても、全部のニュースが出たままになっていました。いまはふつうに探せます。"]},
