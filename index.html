@@ -1773,7 +1773,7 @@ function kwCard(){ const L=kwList(); const sel=ME.kwSel&&L.includes(ME.kwSel)?ME
   const hits=sel?kwHits(sel):[];
   return `<section class="card kw" aria-label="わたしのキーワード"><div class="sec-h"><h2>🔖 わたしのキーワード</h2><span class="sub">7日分から自動で</span></div>
     ${L.length?`<div class="chips kw-chips">${L.map(w=>{ const c=kwHits(w).length; const nw=kwHits(w).some(isNew); return `<button class="fchip" data-kw="${esc(w)}" aria-pressed="${w===sel}">${esc(w)} <b class="num">${c}</b>${nw?' <span class="kw-new">🆕</span>':""}</button>`; }).join("")}</div>
-      ${hits.length?`<ul class="kw-list">${hits.slice(0,6).map(n=>`<li><span class="chip ${n.g}">${GN[n.g]}</span> <small class="hint">${esc(mdLabel(n.d))}</small>${isNew(n)?' <span class="kw-new">🆕</span>':""}<div>${esc(n.h).replace(new RegExp(esc(sel).replace(/[.*+?^${}()|[\]\\]/g,"\\$&"),"gi"),m=>`<mark>${m}</mark>`)}</div></li>`).join("")}</ul>${hits.length>6?`<button class="fchip" id="kwMore" style="margin-top:6px">「${esc(sel)}」をぜんぶ見る(${hits.length}件)</button>`:""}`:`<p class="hint" style="margin:8px 0 0">この7日間、「${esc(sel)}」のニュースはまだありません。出てきたらここに並びます。</p>`}`
+      ${hits.length?`<ul class="kw-list">${hits.slice(0,6).map(n=>`<li><span class="chip ${n.g}">${GN[n.g]}</span> <small class="hint">${esc(mdLabel(n.d))}</small>${isNew(n)?' <span class="kw-new">🆕</span>':""}<div class="nv-h" data-nv="${esc(nkey(n))}" role="button" tabindex="0">${esc(n.h).replace(new RegExp(esc(sel).replace(/[.*+?^${}()|[\]\\]/g,"\\$&"),"gi"),m=>`<mark>${m}</mark>`)}</div></li>`).join("")}</ul>${hits.length>6?`<button class="fchip" id="kwMore" style="margin-top:6px">「${esc(sel)}」をぜんぶ見る(${hits.length}件)</button>`:""}`:`<p class="hint" style="margin:8px 0 0">この7日間、「${esc(sel)}」のニュースはまだありません。出てきたらここに並びます。</p>`}`
     :`<p class="hint" style="margin:6px 0 8px">気になることば(チーム名・会社名・地名など)を登録すると、そのことばのニュースが自動でここに集まります。</p>`}
     <div class="kw-add"><input id="kwIn" type="text" maxlength="12" placeholder="例: 阪神、AI、台風" aria-label="キーワードを入れる"><button class="fchip" id="kwAdd">＋ 登録</button></div>
     ${L.length?`<button class="fchip kw-edit" id="kwEdit">${ME.kwEdit?"できた":"✏️ 消す"}</button>${ME.kwEdit?`<div class="chips" style="margin-top:6px">${L.map(w=>`<button class="fchip" data-kwdel="${esc(w)}">✕ ${esc(w)}</button>`).join("")}</div>`:""}`:""}
@@ -2664,7 +2664,7 @@ function openNews(n,side){ if(!n) return; if(side) SH_SIDE=true; track("/news/"+
       box.innerHTML=`<div class="kid"><div class="l">📝 なにがあった?</div><h2>${esc(S[0]||b)}</h2></div>${S.length>1?`<div class="blk" id="nv-more"><h3>💡 もう少しくわしく</h3>${exParas(S.slice(1).join(""))}</div>`:""}`; try{ applyRuby(); }catch(_){} }
     else box.innerHTML=`<div class="kid"><div class="l">📝 なにがあった?</div><p class="hint" style="margin:4px 0 0">このニュースの概要は、まだ書かれていません${n.d<"2026-10-28"?"(概要は 2026年10月28日 以降の記録から順に足しています)":"(次の更新で入ります)"}。見出し・出典・同じ話題の記録・解説を見てください。</p></div>`; }); }
 // 見出しを押すと、そのニュースのページを開く(さがす・あなた向け・わたしの街・解説の関係するニュース・記録したニュースすべて)
-document.addEventListener("click",ev=>{ const b=ev.target.closest("[data-nv]"); if(!b||b.classList.contains("nv-rel")) return; if(ev.target.closest("button:not([data-nv]),a,.pin-btn,.gl,[data-trust],[data-share],[data-say],.ensay,details,.th-cr")) return; const x=newsFind(b.dataset.nv); if(x){ ev.preventDefault(); openNews(x); } });
+document.addEventListener("click",ev=>{ const b=ev.target.closest("[data-nv]"); if(!b||b.classList.contains("nv-rel")) return; if(ev.target.closest("button:not([data-nv]),a,.pin-btn,.gl,[data-trust],[data-share],[data-say],.ensay,summary,details.pt,.th-cr")) return; const x=newsFind(b.dataset.nv); if(x){ ev.preventDefault(); openNews(x); } });
 function trustPop(title,ok){ const n=D.top10.find(x=>x.title===title); const r=n?srcOf(n):null; const outs=(r&&r.outs)||[]; const off=outs.some(o=>/気象庁|庁|省|警察|裁判所|日銀|日本銀行/.test(o));
   const p=document.getElementById("pop");
   p.innerHTML=`<b>${ok?"✅ 2社以上で確かめました":"⚠️ まだ1社だけです"}</b>
@@ -2885,7 +2885,7 @@ function guideAnswerHTML(q,focus){
     parts.push(`<div class="gd-a"><b>${d.t==="word"?"📖 "+esc(d.q):d.t==="faq"?"Q. "+esc(d.q):"💡 "+esc(d.q)}</b><br>${esc(d.t==="ex"&&d.hit?d.hit:d.a)}<div class="hint">${from}${d.k&&d.k!==focus?` <button class="gd-lk" data-gex="${d.k}">解説を読む →</button>`:""}</div></div>`); }
   r.words.forEach(w=>parts.push(`<div class="gd-a"><b>📖 ${esc(w.q)}</b><br>${esc(w.a)}</div>`));
   if(r.plans.length && (I.when||!r.best)) parts.push(`<div class="gd-a"><b>📅 これからの予定</b><ul class="us" style="margin:4px 0 0">${r.plans.map(s=>`<li>${esc(mdLabel(s[0]))} ${esc(s[3])}</li>`).join("")}</ul></div>`);
-  if(r.news.length) parts.push(`<div class="gd-a"><b>📰 関係するニュース</b><ul class="us" style="margin:4px 0 0">${r.news.map(n=>`<li>${esc(mdLabel(n.d))} ${esc(n.h)} ${n.info?"📌":n.ok?"✅":"⚠️"}</li>`).join("")}</ul></div>`);
+  if(r.news.length) parts.push(`<div class="gd-a"><b>📰 関係するニュース</b><ul class="us" style="margin:4px 0 0">${r.news.map(n=>`<li>${esc(mdLabel(n.d))} <span class="nv-h" data-nv="${esc(nkey(n))}" role="button" tabindex="0">${esc(n.h)}</span> ${n.info?"📌":n.ok?"✅":"⚠️"}</li>`).join("")}</ul></div>`);
   if(!parts.length) parts.push(`<div class="gd-a">このアプリの中には、ぴったりの答えが見つかりませんでした。ことばを短くして聞きなおすか、下のボタンでClaudeに聞いてみてください。</div>`);
   if(r.best&&r.best.g) learn(r.best.g,1);
   track("/ask/"+(r.best?(r.best.k||"word"):(I.today?"today":I.weather?"weather":I.market?"market":"none")),"案内係");
@@ -3815,7 +3815,7 @@ function diaryHTML(){ const end=TODAY; const start=new Date(Date.parse(TODAY)-6*
   return `<div class="diary"><div class="dy-h">📔 ${esc(petName())}の日記 <small>${esc(mdLabel(start))}〜${esc(mdLabel(end))}</small></div>
     <p>今週は <b>${days}日</b> いっしょにニュースを読んだよ。${esc(mood)}</p>
     ${topG.length?`<p>世の中でいちばん多かったのは「${esc(topG.join("」と「"))}」のニュース。</p>`:""}
-    ${picks.length?`<p>おぼえておきたいニュース:</p><ul class="us">${picks.map(n=>`<li>${esc(mdLabel(n.d))} ${esc(n.h)}</li>`).join("")}</ul>`:""}
+    ${picks.length?`<p>おぼえておきたいニュース:</p><ul class="us">${picks.map(n=>`<li>${esc(mdLabel(n.d))} <span class="nv-h" data-nv="${esc(nkey(n))}" role="button" tabindex="0">${esc(n.h)}</span></li>`).join("")}</ul>`:""}
     ${(()=>{ const C=(ME.pet||{}).cards||{}; const wk=Object.entries(C).filter(([,c])=>c.d>=start&&c.d<=end); return wk.length?`<p>📮 ぽっぽが <b>${wk.length}まい</b> 絵はがきを届けてくれた(${esc(wk.map(([k])=>k).slice(0,4).join("・"))}${wk.length>4?" など":""})。</p>`:""; })()}
     ${(()=>{ const b=(ME.pet||{}).born; if(!b) return ""; const d=+b.slice(8); const inWk=[...Array(7)].some((_,i)=>{ const x=new Date(Date.parse(start)+i*864e5).toISOString().slice(0,10); return x>b&&+x.slice(8)===d; }); return inWk?`<p>🎂 今週は、ぼくの誕生日があったよ。</p>`:""; })()}
     ${friendOn()?`<p>${esc(friendName())}も「また来週ね」って言ってたよ。</p>`:""}</div>`; }
@@ -3901,7 +3901,7 @@ function openPaper(){
 }
 // ===== タイムカプセル・あの日のニュース =====
 function capsBlock(){ ME.caps=ME.caps||[]; const L=ME.caps.slice().sort((a,b)=>a.open.localeCompare(b.open));
-  const ago=[[7,"1週間前"],[30,"1か月前"],[365,"1年前"]].map(([n,l])=>{ const d=new Date(Date.parse(TODAY)-n*864e5).toISOString().slice(0,10); const N=NEWS.filter(x=>x.d===d&&x.ok).slice(0,3); return N.length?`<div><b>📆 ${l}の今日(${esc(mdLabel(d))})</b><ul class="us" style="margin-top:4px">${N.map(x=>`<li>${esc(x.h)}</li>`).join("")}</ul></div>`:""; }).join("");
+  const ago=[[7,"1週間前"],[30,"1か月前"],[365,"1年前"]].map(([n,l])=>{ const d=new Date(Date.parse(TODAY)-n*864e5).toISOString().slice(0,10); const N=NEWS.filter(x=>x.d===d&&x.ok).slice(0,3); return N.length?`<div><b>📆 ${l}の今日(${esc(mdLabel(d))})</b><ul class="us" style="margin-top:4px">${N.map(x=>`<li><span class="nv-h" data-nv="${esc(nkey(x))}" role="button" tabindex="0">${esc(x.h)}</span></li>`).join("")}</ul></div>`:""; }).join("");
   return `<section class="card"><b>⏳ タイムカプセル</b><div class="hint" style="margin:4px 0 8px">今の気持ちや予想を書いて封をすると、決めた日まで開けられません。今日のニュース10の上位3つもいっしょに入ります。</div>
     <textarea id="capMsg" class="memo" rows="2" maxlength="200" placeholder="例: 消費税、ほんとうに1%になってるかな?"></textarea>
     <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:6px">${[[30,"1か月後"],[90,"3か月後"],[365,"1年後"]].map(([n,l])=>`<button class="fchip" data-cap="${n}">🔒 ${l}に開く</button>`).join("")}</div>
@@ -4014,7 +4014,7 @@ function openWeb(k){
     ${flow.map((f,i)=>{ const rel=relatedEx(k,f.t+" "+(f.s||"")).slice(0,2); return `<div class="wn ${i%2?"r":"l"}" data-n="${i+1}"><span>${f.i}</span><b>${esc(f.t)}</b>${f.s?`<small>${esc(f.s)}</small>`:""}${rel.map(r=>`<button class="wlink" data-web="${r.k}">🔗 ${r.e.icon} ${esc(r.e.name)}へ</button>`).join("")}</div>`; }).join("")}
    </div>
    ${(()=>{ const R=relatedEx(k,exText(e),4).slice(0,3); return R.length?`<div class="card"><b>🔗 つながっている話題</b><div class="chips" style="margin-top:6px">${R.map(r=>`<button class="fchip" data-web="${r.k}">${r.e.icon} ${esc(r.e.name)}</button>`).join("")}</div></div>`:""; })()}
-   ${rn.length?`<div class="card"><b>📰 この話題の最近のニュース</b><ul class="us" style="margin-top:6px">${rn.map(n=>`<li>${esc(mdLabel(n.d))} ${esc(n.h)}</li>`).join("")}</ul></div>`:""}
+   ${rn.length?`<div class="card"><b>📰 この話題の最近のニュース</b><ul class="us" style="margin-top:6px">${rn.map(n=>`<li>${esc(mdLabel(n.d))} <span class="nv-h" data-nv="${esc(nkey(n))}" role="button" tabindex="0">${esc(n.h)}</span></li>`).join("")}</ul></div>`:""}
    <button class="fchip" id="wbOpen" style="align-self:flex-start">💡 「${esc(e.name)}」の解説を読む →</button>
    <div class="hint">「図でわかる」の流れを糸でつなぎました。🔗は、同じことばが出てくるほかの話題です。タップするとそちらに移ります。</div></div>`;
   const close=()=>{ sh.hidden=true; sh.innerHTML=""; document.body.style.overflow=""; window.removeEventListener("resize",draw); };
@@ -4534,7 +4534,7 @@ function backCard(){ const B=backDays(); const days=(ME.days||[]).length;
   if(!B.length) return `<section class="card" aria-label="あのとき"><div class="sec-h"><h2>📅 あのとき何してた?</h2></div><p style="margin:0">記録がたまると、1週間前・1か月前の「その日のニュース」をここに出します。<br>いまは ${days}日分 たまっています。</p></section>`;
   return `<section class="card" aria-label="あのとき"><div class="sec-h"><h2>📅 あのとき何してた?</h2><span class="sub">${days}日分の記録</span></div>
     ${B.map(b=>`<div class="back-b"><b>${esc(b.lab)}(${esc(mdLabel(b.d))})${b.open?" ・ 📖 この日も開いていました":""}</b>
-      <ul class="us" style="margin-top:4px">${b.L.map(n=>`<li><span class="chip ${n.g}">${GN[n.g]}</span> ${esc(n.h)}</li>`).join("")}</ul></div>`).join("")}</section>`; }
+      <ul class="us" style="margin-top:4px">${b.L.map(n=>`<li><span class="chip ${n.g}">${GN[n.g]}</span> <span class="nv-h" data-nv="${esc(nkey(n))}" role="button" tabindex="0">${esc(n.h)}</span></li>`).join("")}</ul></div>`).join("")}</section>`; }
 
 // ===== 🎲 ニュースビンゴ(週がわり。その週のニュースで9マスがうまる) =====
 const BINGO=[["🌀","台風・大雨","台風|大雨|暴風|警報"],["🗳️","選挙","選挙|当選|投票"],["💴","値上げ・値下げ","値上げ|値下げ|価格|物価"],["⚾","スポーツの結果","優勝|勝|敗|記録|大会"],
@@ -4879,6 +4879,7 @@ function openShimen(){ const sh=document.getElementById("sheet"); const w=D.weat
 document.addEventListener("click",e=>{ const b=e.target.closest("[data-shimen]"); if(!b) return; e.preventDefault(); openShimen(); });
 // ===== お知らせ(新しくなったところ)。機能を足したら、いちばん上に1つ足す =====
 const UPDATES=[
+  {id:"2026-11-04b",d:"2026-11-04",t:"🗺️ 地図からもニュースのページへ",L:["地図の下の一覧、わたしのキーワード、💬しつもんの答え、捜査ボード、あのとき何してた?などに出てくる見出しも、押すとそのニュースのページ(概要・出典・同じ話題の記録)が開きます。"]},
   {id:"2026-11-04a",d:"2026-11-04",t:"📰 ニュース1件ずつの「くわしく」ページ",L:["ニュース10・さがす・あなた向け・わたしの街などで見出しを押すと、そのニュースのページが開きます。なにがあったかの概要(2〜3文)、だれが伝えたか、同じ話題の記録、関係する解説をまとめて見られます。","概要は11/4からの記録に入っていきます(10/28〜11/3の分も、順に足しています)。"]},
   {id:"2026-11-03c",d:"2026-11-03",t:"🏠 わたしの街と地図の場所が正確に",L:["ニュースの記録に「都道府県」が入るようになり、地図の丸の場所と「🏠 わたしの街」の判定に使います。「金沢市」「高松市」のように市の名前だけのニュースも、その県のニュースとして数えます。","この3日に自分の県のニュースがないときは、同じ地方の近くの県のニュースを出します。"]},
   {id:"2026-11-03b",d:"2026-11-03",t:"📮 絵はがき集めのバッジと、郵便屋さんの服",L:["絵はがき帳に「🗾 47都道府県のあつまり具合」(地方ごとのマス)を足しました。ペットが、きょうの天気やニュースについてもひとこと言います。","絵はがきを集めた数で上がるバッジ「📮 絵はがき集め」を足しました。10まい集めると、ペットが「郵便屋さんの帽子とかばん」を着られます。","部屋の窓の外に、いまの空(朝・昼・夕方・夜、雨や雪の日)が見えます。ペットの日記にも、絵はがきと誕生日のことが書かれます。"]},
@@ -5197,7 +5198,7 @@ function openWorld(){ const sh=document.getElementById("sheet"); const back=sh.d
     mb.innerHTML=`<svg viewBox="0 ${y0.toFixed(1)} ${W} ${H}" class="wm-svg" role="img" aria-label="世界のいまの地図"><path d="${path({type:"Sphere"})}" class="wd-sea"/>${world.features.filter(f=>+f.id!==10).map(f=>`<path d="${path(f)}" class="wm-land"/>`).join("")}${ev}${nw}</svg>`;
     zoomable(mb,mb.querySelector("svg"),{max:8});
     mb.addEventListener("click",ev2=>{ const t=ev2.target; const sel=document.getElementById("wdSel"); if(!sel) return;
-      if(t.dataset.wdn!=null){ const x=N[+t.dataset.wdn]; sel.innerHTML=`<div class="card" style="margin-top:8px"><b>🔵 ${esc(x.p[3])}</b><ul class="us">${x.L.slice(0,5).map(n=>`<li>${esc(n.h)} <small class="hint">${mdLabel(n.d)}</small></li>`).join("")}</ul></div>`; }
+      if(t.dataset.wdn!=null){ const x=N[+t.dataset.wdn]; sel.innerHTML=`<div class="card" style="margin-top:8px"><b>🔵 ${esc(x.p[3])}</b><ul class="us">${x.L.slice(0,5).map(n=>`<li><span class="nv-h" data-nv="${esc(nkey(n))}" role="button" tabindex="0">${esc(n.h)}</span> <small class="hint">${mdLabel(n.d)}</small></li>`).join("")}</ul></div>`; }
       else if(t.dataset.wde!=null){ const e=E[+t.dataset.wde]; sel.innerHTML=`<div class="card" style="margin-top:8px"><b>${WK[e[0]][0]} ${WK[e[0]][1]}${e[0]==="eq"?" M"+e[5]:""}</b>${wdPlace(e[1])?`<p style="margin:4px 0 0"><b>${esc(wdPlace(e[1]))}</b></p>`:""}<p class="hint" style="margin:4px 0 0">${esc(e[1])}(英語の表記) ・ 出典: ${esc(e[6])}</p></div>`; } });
   }).catch(()=>{ const mb=document.getElementById("wdMap"); if(mb) mb.innerHTML='<div class="empty">地図を読み込めませんでした。下の一覧を見てください。</div>'; }); }
 document.addEventListener("click",ev=>{ if(ev.target.closest("[data-world]")) openWorld(); });
@@ -5224,7 +5225,7 @@ let WORLD=null;
 let WORLDP=null;
 function getWorld(){ if(WORLD) return Promise.resolve(WORLD); if(!WORLDP) WORLDP=(async()=>{ await loadScript("https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"); await loadScript("https://cdn.jsdelivr.net/npm/topojson-client@3.1.0/dist/topojson-client.min.js");
   const topo=await (await fetch("https://cdn.jsdelivr.net/npm/world-atlas@2.0.2/countries-50m.json")).json(); WORLD=topojson.feature(topo,topo.objects.countries); return WORLD; })().catch(e=>{ WORLDP=null; throw e; }); return WORLDP; }
-function newsItem(n){ return `<li class="item"><div class="meta"><span class="chip ${n.g}">${GN[n.g]}</span>${n.info?'<span class="badge-info">📌 話題</span>':n.ok?'<span class="badge-ok">✅</span>':'<span class="badge-one">⚠️ 1社</span>'}<span class="hint">${mdLabel(n.d)}</span></div><div class="h">${esc(n.h)}</div></li>`; }
+function newsItem(n){ return `<li class="item"><div class="meta"><span class="chip ${n.g}">${GN[n.g]}</span>${n.info?'<span class="badge-info">📌 話題</span>':n.ok?'<span class="badge-ok">✅</span>':'<span class="badge-one">⚠️ 1社</span>'}<span class="hint">${mdLabel(n.d)}</span></div><div class="h nv-h" data-nv="${esc(nkey(n))}" role="button" tabindex="0">${esc(n.h)}</div></li>`; }
 // ===== 指で拡大・縮小・移動(地図と捜査ボードで共通に使う) =====
 // wrap=外のわく(はみ出しをかくす)、inner=中身(動かす)。
 // ・2本指でひろげる/つまむ=拡大縮小、2本指でなぞる=移動
@@ -5498,7 +5499,7 @@ function renderBoard(recentDays){
       const links=[...auto,...B.links].filter(e=>e.a===n.id||e.b===n.id).map(e=>{ const o=find(e.a===n.id?e.b:e.a); return {o,t:e.t,mine:B.links.includes(e)}; }).filter(x=>x.o);
       const nm=o=>o.g?o.g.p[3]:"📝 "+(o.u.text||"メモ").slice(0,12);
       const linkHTML=links.length?`<div class="chips" style="margin-top:8px">${links.map(l=>`<button class="fchip" data-go="${esc(l.o.id)}">🧵 ${esc(nm(l.o))}${l.t?` ・ ${esc(l.t)}`:""}</button>`).join("")}</div>`:"";
-      if(n.g){ det.innerHTML=`<div class="bd-card"><b>📌 ${esc(n.g.p[3])}(${n.g.list.length}件)</b><ul class="us" style="margin-top:4px">${n.g.list.slice(0,6).map(x=>`<li>${esc(mdLabel(x.d))} ${esc(x.h)} ${x.info?"📌":x.ok?"✅":"⚠️"}</li>`).join("")}</ul>${n.g.list.length>6?`<div class="hint">ほか${n.g.list.length-6}件</div>`:""}${linkHTML}<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px"><button class="fchip" data-linkfrom="${esc(n.id)}">🧵 ここから糸を引く</button><button class="fchip" data-clear="1">✕ 選ぶのをやめる</button></div></div>`; }
+      if(n.g){ det.innerHTML=`<div class="bd-card"><b>📌 ${esc(n.g.p[3])}(${n.g.list.length}件)</b><ul class="us" style="margin-top:4px">${n.g.list.slice(0,6).map(x=>`<li>${esc(mdLabel(x.d))} <span class="nv-h" data-nv="${esc(nkey(x))}" role="button" tabindex="0">${esc(x.h)}</span> ${x.info?"📌":x.ok?"✅":"⚠️"}</li>`).join("")}</ul>${n.g.list.length>6?`<div class="hint">ほか${n.g.list.length-6}件</div>`:""}${linkHTML}<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px"><button class="fchip" data-linkfrom="${esc(n.id)}">🧵 ここから糸を引く</button><button class="fchip" data-clear="1">✕ 選ぶのをやめる</button></div></div>`; }
       else { det.innerHTML=`<div class="bd-card"><b>📝 あなたのメモ</b><textarea class="memo" id="bdTxt" rows="3" maxlength="120" placeholder="気づいたこと・つながりそうなこと">${esc(n.u.text||"")}</textarea>${linkHTML}<div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px"><button class="fchip" data-linkfrom="${esc(n.id)}">🧵 ここから糸を引く</button><button class="fchip" id="bdDel">🗑 はがす</button><button class="fchip" data-clear="1">✕ とじる</button></div></div>`;
         const t=document.getElementById("bdTxt"); t.oninput=()=>{ n.u.text=t.value.slice(0,120); saveMe(); const el=bd.querySelector(`[data-id="${CSS.escape(n.id)}"] .mtx`); if(el) el.textContent=n.u.text||"(タップして書く)"; };
         document.getElementById("bdDel").onclick=()=>{ B.notes=B.notes.filter(x=>x.id!==n.id); B.links=B.links.filter(e=>e.a!==n.id&&e.b!==n.id); saveMe(); BD.sel=null; show(); }; }
