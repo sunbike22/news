@@ -11,7 +11,7 @@ self.addEventListener("fetch", e => {
   if (url.hostname === "raw.githubusercontent.com" || url.hostname === "api.p2pquake.net" || url.hostname === "api.open-meteo.com" || url.hostname === "www.jma.go.jp" || url.hostname === "cyberjapandata.gsi.go.jp") return;  // 雨雲と地図は、いつも新しいものを読む
   // Googleのログイン・ドライブ(自分の記録)は、保存せずそのままネットへ
   if (req.headers.has("authorization") || /(^|\.)google(apis)?\.com$/.test(url.hostname) || url.hostname.endsWith("gstatic.com")) return;
-  const fresh = same && (url.pathname.endsWith("/") || url.pathname.endsWith(".html") || url.pathname.endsWith("data.js") || url.pathname.endsWith("picks.js"));
+  const fresh = same && (url.pathname.endsWith("/") || url.pathname.endsWith(".html") || url.pathname.endsWith("data.js") || url.pathname.endsWith("picks.js") || /\/brief(-\d{4}-\d{2})?\.js$/.test(url.pathname));  // 概要(brief.js)も新しさが大事
   if (fresh) {
     // ニュースは新しさが大事: まずネット、だめなら保存分
     e.respondWith(fetch(req).then(r => { const c = r.clone(); caches.open(CACHE).then(x => x.put(req, c)); return r; }).catch(() => caches.match(req).then(r => r || caches.match("./index.html"))));
