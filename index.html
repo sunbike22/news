@@ -3576,6 +3576,10 @@ function petEarn(key,n){ const p=petInit(); if(p.got[key]) return 0; if(p.earnDa
 // 頭にかぶる小物。コスプレの帽子とぶつかるので、コスプレ中はまるごと外す
 // (前は文字列で一部だけ消していたので、ヘアバンドの赤い玉などが頭に残っていた)
 const HEAD_ACC=["band","helmet","straw","chef","phones","ribbon"];
+// 服と小物がぶつかるときは小物を出さない(2026-11-04): 手に持つ物(右下)・首まわり・めがね
+const HAND_ACC=["popcorn","hammer","mug"], NECK_ACC=["tie","scarf"];
+const COS_HAND=["newsboy","detective","explorer","professor","banker","fortune","book"], COS_NECK=["lifevest","medal","traveler","postman"], COS_EYE=["book"];
+function accHidden(acc,costume){ if(!costume||!acc) return false; return HEAD_ACC.includes(acc)||(HAND_ACC.includes(acc)&&COS_HAND.includes(costume))||(NECK_ACC.includes(acc)&&COS_NECK.includes(costume))||(acc==="glasses"&&COS_EYE.includes(costume)); }
 // SVGの中のid(グラデーション・チェック柄)は1ページに何匹出ても重ならないよう番号をつける
 // (同じidが2つあると、うしろのペットの色が前のペットのものを見にいってしまう)
 let petUID=0;
@@ -3609,7 +3613,7 @@ function petSVG(stage,mood,acc,size,costume,kind,color,look){
   let bl=KP.blush||[38,78,5,3,.7]; if(LK.cheek==="ooki") bl=[bl[0]-1,bl[1],bl[2]*1.5,bl[3]*1.5,bl[4]]; const blush=egg||LK.cheek==="nashi"?"":`<ellipse cx="${bl[0]}" cy="${bl[1]}" rx="${bl[2]}" ry="${bl[3]}" fill="#ff9aa2" opacity="${dk?Math.min(.9,bl[4]+.15):bl[4]}"/><ellipse cx="${120-bl[0]}" cy="${bl[1]}" rx="${bl[2]}" ry="${bl[3]}" fill="#ff9aa2" opacity="${dk?Math.min(.9,bl[4]+.15):bl[4]}"/>`;
   const A=egg?"":({
     glasses:`<g fill="none" stroke="#2b2b2b" stroke-width="2.6"><circle cx="47" cy="70" r="9"/><circle cx="73" cy="70" r="9"/><path d="M56 70h8"/></g>`,
-    tie:`<path d="M56 94h8l-2 4 4 14-6 5-6-5 4-14z" fill="#d23a3a"/>`,
+    tie:`<path d="M56 88h8l-2 4 4 12-6 5-6-5 4-12z" fill="#d23a3a"/>`,
     helmet:`<path d="M30 56q30-32 60 0z" fill="#f5c400"/><rect x="28" y="54" width="64" height="5" rx="2" fill="#d9a800"/>`,
     phones:`<path d="M26 72q0-40 34-40t34 40" fill="none" stroke="#4b5563" stroke-width="5"/><rect x="20" y="64" width="11" height="18" rx="4" fill="#374151"/><rect x="89" y="64" width="11" height="18" rx="4" fill="#374151"/>`,
     scarf:`<path d="M30 92q30 12 60 0v8q-30 12-60 0z" fill="#2563c9"/><path d="M76 98l6 16h-9l-3-14z" fill="#c42b2b"/>`,
@@ -3621,8 +3625,8 @@ function petSVG(stage,mood,acc,size,costume,kind,color,look){
     mug:`<g transform="translate(88 82)"><rect width="16" height="18" rx="3" fill="#0e7490"/><path d="M16 4q7 0 7 6t-7 6" fill="none" stroke="#0e7490" stroke-width="3"/><path d="M4 -3q2-4 0-8M10 -3q2-4 0-8" stroke="#94a3b8" stroke-width="1.6" fill="none"/></g>`,
     straw:`<ellipse cx="60" cy="48" rx="38" ry="7" fill="#e9c46a"/><path d="M40 48q2-18 20-18t20 18z" fill="#f2d07a"/><rect x="40" y="42" width="40" height="5" fill="#d23a3a"/>`
   })[acc]||"";
-  const C=costume?costumeSVG(costume,egg?-12:0,U):"";
-  return `<svg viewBox="0 0 120 120" width="${S}" height="${S}" role="img" aria-label="${esc(petName())}" style="--pb:${K[1]};--pd:${K[3][1]}"><defs><linearGradient id="pg${U}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${K[3][0]}"/><stop offset="1" stop-color="${K[3][1]}"/></linearGradient><pattern id="plaid${U}" width="8" height="8" patternUnits="userSpaceOnUse"><path d="M0 4h8M4 0v8" stroke="#5a4127" stroke-width="1.2" opacity=".6"/></pattern></defs><ellipse cx="60" cy="112" rx="30" ry="4" fill="#000" opacity=".12"/>${costume?"":leaf}${body}${costume?"":kfl}${blush}${KP.eyeUp?`<g transform="translate(0 -${KP.eyeUp})">${eyes}</g>`:eyes}${mouth}${costume&&HEAD_ACC.includes(acc)?"":(KP.eyeUp&&acc==="glasses"?`<g transform="translate(0 -${KP.eyeUp})">${A}</g>`:A)}${C}${stage>=5&&!costume?`<text x="60" y="20" text-anchor="middle" font-size="16">👑</text>`:""}</svg>`;
+  const C=costume?costumeSVG(costume,egg?-12:0,U,egg?0:(KP.eyeUp||0),KP.dx||0,egg):""; const CB=costume&&!egg?costumeBack(costume,KP.dx||0):"";
+  return `<svg viewBox="0 0 120 120" width="${S}" height="${S}" role="img" aria-label="${esc(petName())}" style="--pb:${K[1]};--pd:${K[3][1]}"><defs><linearGradient id="pg${U}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${K[3][0]}"/><stop offset="1" stop-color="${K[3][1]}"/></linearGradient><pattern id="plaid${U}" width="8" height="8" patternUnits="userSpaceOnUse"><path d="M0 4h8M4 0v8" stroke="#5a4127" stroke-width="1.2" opacity=".6"/></pattern></defs><ellipse cx="60" cy="112" rx="30" ry="4" fill="#000" opacity=".12"/>${costume?"":leaf}${CB}${body}${costume?"":kfl}${blush}${KP.eyeUp?`<g transform="translate(0 -${KP.eyeUp})">${eyes}</g>`:eyes}${mouth}${accHidden(acc,costume)?"":(KP.eyeUp&&acc==="glasses"?`<g transform="translate(0 -${KP.eyeUp})">${A}</g>`:KP.eyeUp&&/^(band|helmet|straw|chef)$/.test(acc)?`<g transform="translate(0 -14)">${A}</g>`:A)}${C}${stage>=5&&!costume?`<text x="60" y="20" text-anchor="middle" font-size="16">👑</text>`:""}</svg>`;
 }
 function petDream(){ const p=petInit(); if(p.dreamDay===TODAY) return p.dream||""; const y=new Date(Date.parse(TODAY)-864e5).toISOString().slice(0,10); const L=NEWS.filter(n=>n.d===y&&n.ok); if(!L.length) return "";
   const r=seeded("dream"+TODAY+petName()); const n=L[Math.floor(r()*L.length)]; const g=D.glossary.find(w=>n.h.includes(w[0].replace(/\(.*?\)/,"")));
@@ -4028,32 +4032,33 @@ function openWeb(k){
   sh.hidden=false; sh.scrollTop=0; document.body.style.overflow="hidden"; requestAnimationFrame(()=>requestAnimationFrame(draw)); window.addEventListener("resize",draw); track("/web/"+k,"つながり: "+e.name);
 }
 // ===== ページごとのコスプレ(自作SVG。帽子は頭の上 y≒44 を基準に描く) =====
-function costumeSVG(c,dy,U){ const T=`transform="translate(0 ${dy})"`; U=U||"";
+// eu=目を上げる量(けろまる)・dx=体の横の広がり。けろまるは目が頭の上にあるので、帽子を上にずらす(2026-11-04)
+function costumeSVG(c,dy,U,eu,dx,egg){ eu=eu||0; dx=dx||0; const T=`transform="translate(0 ${c==="book"?dy-eu:dy-(eu?(/^(fortune|santa|pumpkin|kagami)$/.test(c)?10:14):0)})"`; U=U||"";
   const hat={
     detective:`<path d="M30 50q30-30 60 0z" fill="#8a6a43"/><path d="M30 50q30-30 60 0" fill="url(#plaid${U})"/><path d="M28 50h64l-6 6H34z" fill="#6b4f2e"/><path d="M60 28v-6" stroke="#6b4f2e" stroke-width="3"/><circle cx="60" cy="21" r="3" fill="#6b4f2e"/>`,
-    newsboy:`<path d="M32 50q2-20 28-20t28 20z" fill="#5b6472"/><path d="M32 50q28 8 56 0" fill="none" stroke="#3f4652" stroke-width="2"/><path d="M60 50q22 2 36 8-18 4-36-2z" fill="#3f4652"/><circle cx="60" cy="31" r="3" fill="#3f4652"/>`,
+    newsboy:`<path d="M27 52q1-24 33-25 32 1 33 25q-33 7-66 0z" fill="#6b7280"/><path d="M60 28q-12 9-20 23M60 28q12 9 20 23M60 28v25" stroke="#4b5563" stroke-width="1.6" fill="none"/><path d="M27 52q33 7 66 0" fill="none" stroke="#374151" stroke-width="2.4"/><circle cx="60" cy="28.5" r="3" fill="#374151"/><path d="M40 54q20 10 40 0q-2 6-20 7-18-1-20-7z" fill="#374151"/>`,
     explorer:`<ellipse cx="60" cy="50" rx="40" ry="8" fill="#c9b27c"/><path d="M38 50q0-24 22-24t22 24z" fill="#e2cf98"/><rect x="38" y="44" width="44" height="5" fill="#7a5c2e"/>`,
     professor:`<path d="M60 28l34 10-34 10-34-10z" fill="#222"/><rect x="44" y="40" width="32" height="10" fill="#333"/><path d="M90 39v14" stroke="#f5c400" stroke-width="2"/><circle cx="90" cy="55" r="3" fill="#f5c400"/>`,
     banker:`<path d="M30 52q30-16 60 0l-6 6q-24-10-48 0z" fill="#1f8a4c" opacity=".9"/><rect x="30" y="50" width="60" height="4" rx="2" fill="#14593a"/>`,
-    fortune:`<path d="M60 4l22 46H38z" fill="#5b2bb5"/><ellipse cx="60" cy="50" rx="30" ry="6" fill="#3f1d85"/><text x="54" y="34" font-size="9" fill="#ffd34d">★</text><text x="62" y="22" font-size="7" fill="#ffd34d">✦</text>`,
+    fortune:`<path d="M60 12l20 38H40z" fill="#5b2bb5"/><ellipse cx="60" cy="50" rx="30" ry="6" fill="#3f1d85"/><text x="54" y="38" font-size="9" fill="#ffd34d">★</text><text x="62" y="28" font-size="7" fill="#ffd34d">✦</text>`,
     book:`<g fill="none" stroke="#2b2b2b" stroke-width="2.4"><circle cx="47" cy="70" r="8"/><circle cx="73" cy="70" r="8"/><path d="M55 70h10"/></g>`,
     pumpkin:`<path d="M60 22c-3-6 2-9 5-8" stroke="#3f6b2a" stroke-width="3" fill="none"/><ellipse cx="48" cy="38" rx="11" ry="14" fill="#e8620c"/><ellipse cx="72" cy="38" rx="11" ry="14" fill="#e8620c"/><ellipse cx="60" cy="38" rx="11" ry="15" fill="#f97316"/><path d="M52 36l4 3-5 1zM68 36l-4 3 5 1z" fill="#3a1702"/>`,
     santa:`<path d="M32 50q6-30 34-28 18 2 24 22l-6 2q-4-12-14-14z" fill="#d42a2a"/><rect x="30" y="46" width="52" height="9" rx="4.5" fill="#fff"/><circle cx="88" cy="44" r="6" fill="#fff"/>`,
     kagami:`<ellipse cx="60" cy="46" rx="22" ry="8" fill="#fffaf0" stroke="#e6d9c2"/><ellipse cx="60" cy="36" rx="16" ry="7" fill="#fffaf0" stroke="#e6d9c2"/><circle cx="60" cy="27" r="6" fill="#f59e0b"/><path d="M60 21l2-3" stroke="#3f8f3a" stroke-width="2"/>`,
     crown:`<path d="M40 48l4-18 9 10 7-14 7 14 9-10 4 18z" fill="#f5c400" stroke="#c99a00" stroke-width="2"/><circle cx="60" cy="40" r="3" fill="#e5484d"/><circle cx="47" cy="43" r="2" fill="#2563c9"/><circle cx="73" cy="43" r="2" fill="#2563c9"/>`,
-    star:`<g transform="translate(74 36)"><path d="M0 -10l3 7 8 1-6 5 2 8-7-4-7 4 2-8-6-5 8-1z" fill="#ffd34d" stroke="#e0a800" stroke-width="1.5"/></g><circle cx="52" cy="40" r="2" fill="#fff6a8"/><circle cx="86" cy="30" r="1.6" fill="#fff6a8"/>`,
-    ribbonbig:`<g transform="translate(60 34)"><path d="M0 0l-18-10v20zM0 0l18-10v20z" fill="#ec4899"/><circle r="5" fill="#be185d"/></g>`,
-    raincoat:`<path d="M26 60q0-34 34-36 34 2 34 36l-6 2q-4-26-28-28-24 2-28 28z" fill="#f5c400"/><path d="M34 60q26-6 52 0" fill="none" stroke="#d9a800" stroke-width="2.5"/><circle cx="60" cy="24" r="3" fill="#d9a800"/>`,
-    heartpin:`<g transform="translate(78 38)"><path d="M0 6c-8-6-10-12-5-14 3-1 5 1 5 3 0-2 2-4 5-3 5 2 3 8-5 14z" fill="#e5484d"/><circle cx="-14" cy="-2" r="2" fill="#ffb3c6"/></g>`,
+    star:`<g transform="translate(74 45)"><path d="M0 -10l3 7 8 1-6 5 2 8-7-4-7 4 2-8-6-5 8-1z" fill="#ffd34d" stroke="#e0a800" stroke-width="1.5"/></g><circle cx="62" cy="44" r="2" fill="#fff6a8"/><circle cx="86" cy="40" r="1.6" fill="#fff6a8"/>`,
+    ribbonbig:`<g transform="translate(60 39)"><path d="M0 0l-18-10v20zM0 0l18-10v20z" fill="#ec4899"/><circle r="5" fill="#be185d"/></g>`,
+    raincoat:`<g transform="translate(60 64) scale(.93) translate(-60 -64)"><path d="M21 86q-4-58 39-60 43 2 39 60-6 6-12 0 2-38-27-40-29 2-27 40-6 6-12 0z" fill="#facc15" stroke="#d9a800" stroke-width="1.5"/><path d="M33 84q-1-34 27-36 28 2 27 36" fill="none" stroke="#eab308" stroke-width="2.5"/><circle cx="32" cy="88" r="2.6" fill="#d9a800"/><circle cx="88" cy="88" r="2.6" fill="#d9a800"/></g>`,
+    heartpin:`<g transform="translate(75 47)"><path d="M0 6c-8-6-10-12-5-14 3-1 5 1 5 3 0-2 2-4 5-3 5 2 3 8-5 14z" fill="#e5484d"/><circle cx="-14" cy="-2" r="2" fill="#ffb3c6"/></g>`,
     postman:`<path d="M34 50q2-18 26-18t26 18z" fill="#1d4ed8"/><path d="M30 50h60l-4 5H34z" fill="#1e3a8a"/><rect x="51" y="37" width="18" height="9" rx="2" fill="#fff"/><text x="60" y="44.5" text-anchor="middle" font-size="7" font-weight="800" fill="#dc2626">〒</text>`,
     traveler:`<path d="M30 50q30-14 60 0l-4 5q-26-10-52 0z" fill="#f0e6d2" stroke="#c9b58f" stroke-width="1.5"/><path d="M40 50q0-20 20-20t20 20z" fill="#f7efdd" stroke="#c9b58f" stroke-width="1.5"/><rect x="40" y="43" width="40" height="6" fill="#2f9e6b"/><g transform="translate(76 26) rotate(12)"><path d="M0 -9l2 6 6 1-5 4 2 6-5-3-5 3 2-6-5-4 6-1z" fill="#ffd34d"/></g>`
   }[c]||"";
   const item={
-    lifevest:`<path d="M34 88q26-8 52 0v14q-26 9-52 0z" fill="#f97316"/><path d="M40 94h40M60 87v18" stroke="#fff" stroke-width="2.5" opacity=".9"/><rect x="55" y="89" width="10" height="12" rx="2" fill="#f97316" stroke="#fff" stroke-width="2"/>`,
-    randoseru:`<path d="M44 62q-10 2-12 14M76 62q10 2 12 14" fill="none" stroke="#b91c1c" stroke-width="5" stroke-linecap="round"/><g transform="translate(92 78)"><rect x="-4" y="-10" width="18" height="26" rx="3" fill="#dc2626"/><rect x="-4" y="-10" width="18" height="9" rx="3" fill="#b91c1c"/><rect x="1" y="2" width="8" height="4" rx="1" fill="#fbbf24"/></g>`,
+    lifevest:`<path d="M${25-dx} 72q-2 26 26 35l3-17q-14-4-20-22z" fill="#f97316"/><path d="M${95+dx} 72q2 26-26 35l-3-17q14-4 20-22z" fill="#f97316"/><path d="M${27-dx} 88q8 8 22 12M${93+dx} 88q-8 8-22 12" stroke="#fff" stroke-width="2.6" fill="none" stroke-linecap="round"/><rect x="44" y="96" width="32" height="4.5" rx="2" fill="#c2410c"/><rect x="56" y="94.5" width="8" height="7.5" rx="1.5" fill="#1f2937"/>`,
+    randoseru:`<path d="M${31-dx} 60q-7 20 1 40M${89+dx} 60q7 20-1 40" fill="none" stroke="#b91c1c" stroke-width="5" stroke-linecap="round"/><rect x="${26.5-dx}" y="86" width="7" height="5" rx="1.2" fill="#fbbf24"/><rect x="${86.5+dx}" y="86" width="7" height="5" rx="1.2" fill="#fbbf24"/>`,
     medal:`<path d="M48 88q12 8 24 0" fill="none" stroke="#2563c9" stroke-width="4"/><circle cx="60" cy="96" r="9" fill="#f5c400" stroke="#c99a00" stroke-width="2"/><text x="60" y="100" text-anchor="middle" font-size="10" fill="#8a6500">1</text>`,
-    postman:`<path d="M40 60q-8 4-10 18" fill="none" stroke="#78350f" stroke-width="3"/><g transform="translate(22 84)"><rect x="-2" y="-8" width="24" height="18" rx="3" fill="#b45309"/><path d="M-2 -3h24" stroke="#78350f" stroke-width="2"/><rect x="6" y="0" width="8" height="6" fill="#fff"/></g>`,
-    traveler:`<g transform="translate(88 82)"><rect x="-13" y="-8" width="26" height="18" rx="3" fill="#2b2b2b"/><rect x="-6" y="-12" width="12" height="5" rx="1" fill="#444"/><circle r="6" fill="#111" stroke="#9ca3af" stroke-width="2"/><circle r="2.5" fill="#60a5fa"/><circle cx="9" cy="-4" r="1.5" fill="#f59e0b"/></g>`,
+    postman:`<path d="M${95+dx} 80q-30 20-62 16" fill="none" stroke="#78350f" stroke-width="3.5" stroke-linecap="round"/><g transform="translate(${15-dx} 90)"><rect width="26" height="19" rx="3" fill="#b45309"/><path d="M0 7h26" stroke="#78350f" stroke-width="2"/><rect x="9" y="10" width="8" height="5" rx="1" fill="#fde68a"/></g>`,
+    traveler:`<path d="M34 84q26 18 52 0" fill="none" stroke="#444" stroke-width="2.4"/><g transform="translate(60 99)"><rect x="-12" y="-8" width="24" height="16" rx="3" fill="#2b2b2b"/><rect x="-5" y="-11" width="10" height="4" rx="1" fill="#444"/><circle r="5.5" fill="#111" stroke="#9ca3af" stroke-width="2"/><circle r="2.2" fill="#60a5fa"/><circle cx="8.5" cy="-4" r="1.4" fill="#f59e0b"/></g>`,
     detective:`<g transform="translate(86 78) rotate(-20)"><circle r="11" fill="rgba(200,230,255,.55)" stroke="#5b4630" stroke-width="3.5"/><rect x="-2.5" y="10" width="5" height="16" rx="2" fill="#5b4630"/><path d="M-5 -5q3-3 7-2" stroke="#fff" stroke-width="2" fill="none"/></g>`,
     newsboy:`<g transform="translate(84 80) rotate(-15)"><rect width="22" height="16" rx="1" fill="#f4f1e8" stroke="#999"/><path d="M3 4h16M3 8h10M3 12h14" stroke="#777" stroke-width="1.4"/></g>`,
     explorer:`<g transform="translate(86 82)"><circle r="10" fill="#fff" stroke="#7a5c2e" stroke-width="3"/><path d="M0 -7l3 7-3 7-3-7z" fill="#d23a3a"/></g>`,
@@ -4062,7 +4067,12 @@ function costumeSVG(c,dy,U){ const T=`transform="translate(0 ${dy})"`; U=U||"";
     fortune:`<g transform="translate(92 86)"><circle r="12" fill="rgba(170,140,255,.6)" stroke="#5b2bb5" stroke-width="2"/><path d="M-5 -5q3-3 7-2" stroke="#fff" stroke-width="2" fill="none"/><rect x="-9" y="10" width="18" height="5" rx="2" fill="#3f1d85"/></g>`,
     book:`<g transform="translate(80 84)"><path d="M0 0q12-6 24 0v18q-12-6-24 0z" fill="#2563c9"/><path d="M12 -3v18" stroke="#fff" stroke-width="1.5"/></g>`
   }[c]||"";
-  return `<g ${T}>${hat}</g>${item}`; }
+  if(egg&&/^(randoseru|lifevest)$/.test(c)) return ""; // たまごには体に着る服は着せない(形が合わないため)
+  return egg&&c==="raincoat"?`<g transform="translate(60 0) scale(.8 1) translate(-60 ${dy})">${hat}</g>`:`<g ${T}>${hat}</g>${item}`; }
+// 体のうしろに描く部品(ランドセルの本体など)
+function costumeBack(c,dx){ dx=dx||0; return ({
+  randoseru:`<rect x="${26-dx}" y="44" width="${68+dx*2}" height="56" rx="11" fill="#dc2626"/><path d="M${26-dx} 56q0-12 11-12h${46+dx*2}q11 0 11 12v5H${26-dx}z" fill="#b91c1c"/>`
+})[c]||""; }
 const MASCOT={
   search:["detective",["さがしたいことばを入れてね。きっと手がかりが見つかるよ!","ジャンルをしぼると、さがしやすいよ。","よく探されることばのボタンからでもOK!"]],
   map:["explorer",["世界のどこで何が起きたか、地図でたどろう!","「🧷 捜査ボード」にすると、ぼくが探偵になるよ。","点が大きいほど、ニュースが多い場所だよ。"]],
@@ -4880,6 +4890,7 @@ function openShimen(){ const sh=document.getElementById("sheet"); const w=D.weat
 document.addEventListener("click",e=>{ const b=e.target.closest("[data-shimen]"); if(!b) return; e.preventDefault(); openShimen(); });
 // ===== お知らせ(新しくなったところ)。機能を足したら、いちばん上に1つ足す =====
 const UPDATES=[
+  {id:"2026-11-04c",d:"2026-11-04",t:"👕 ペットの服を直しました",L:["ランドセルを背中にしょう形に、ハンチング帽を前にひさしのある形に直しました。レインコートのフード・郵便屋さんのかばん・旅のカメラ・救命どうい・かみかざりの位置も自然に。けろまるは帽子やヘルメットで目がかくれないようにしました。服と小物(マフラー・ポップコーンなど)が重なるときは、小物をしまうようにしました。"]},
   {id:"2026-11-04b",d:"2026-11-04",t:"🗺️ 地図からもニュースのページへ",L:["地図の下の一覧、わたしのキーワード、💬しつもんの答え、捜査ボード、あのとき何してた?などに出てくる見出しも、押すとそのニュースのページ(概要・出典・同じ話題の記録)が開きます。"]},
   {id:"2026-11-04a",d:"2026-11-04",t:"📰 ニュース1件ずつの「くわしく」ページ",L:["ニュース10・さがす・あなた向け・わたしの街などで見出しを押すと、そのニュースのページが開きます。なにがあったかの概要(2〜3文)、だれが伝えたか、同じ話題の記録、関係する解説をまとめて見られます。","概要は11/4からの記録に入っていきます(10/28〜11/3の分も、順に足しています)。"]},
   {id:"2026-11-03c",d:"2026-11-03",t:"🏠 わたしの街と地図の場所が正確に",L:["ニュースの記録に「都道府県」が入るようになり、地図の丸の場所と「🏠 わたしの街」の判定に使います。「金沢市」「高松市」のように市の名前だけのニュースも、その県のニュースとして数えます。","この3日に自分の県のニュースがないときは、同じ地方の近くの県のニュースを出します。"]},
