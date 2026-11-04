@@ -2617,8 +2617,9 @@ const BRIEF_SRC={};
 function briefLoad(src){ if(BRIEF_SRC[src]) return BRIEF_SRC[src]; return BRIEF_SRC[src]=loadScript(src).catch(()=>{ delete BRIEF_SRC[src]; return null; }); }
 async function briefOf(n){ const k=n.d+"|"+n.h; const v=encodeURIComponent(String(D.updated||"").slice(0,16));
   const recent=n.d>=new Date(Date.parse(TODAY)-13*864e5).toISOString().slice(0,10);
-  if(recent){ await briefLoad("brief.js?v="+v); const B=window.NEWS_BRIEF||{}; if(B[k]) return B[k]; }
-  await briefLoad(`brief-${n.d.slice(0,7)}.js?v=${v}`); const M=window.NEWS_BRIEF_M||{}; return M[k]||null; }
+  const ok=s=>typeof s==="string"&&s.trim().length>=20&&!/^[（(]確かめられず/.test(s.trim())?s.trim():null;
+  if(recent){ await briefLoad("brief.js?v="+v); const B=window.NEWS_BRIEF||{}; if(ok(B[k])) return ok(B[k]); }
+  await briefLoad(`brief-${n.d.slice(0,7)}.js?v=${v}`); const M=window.NEWS_BRIEF_M||{}; return ok(M[k]); }
 function newsBadge(n,long){ return n.info?'<span class="badge-info">📌 話題</span>':n.ok?`<span class="badge-ok">✅${long?" 2社以上で確認":""}</span>`:`<span class="badge-one">⚠️ 1社${long?"だけ":""}</span>`; }
 function newsOuts(s){ const outs=[]; String(s||"").split(/[、,，・]/).forEach(p=>{ let nm=p.replace(/[(（].*$/,"").replace(/\s*\d{1,2}\/\d{1,2}.*$/,"").replace(/\s*\d{1,2}:\d{2}.*$/,"").replace(/\s*\d{1,2}日.*$/,"").trim(); if(nm&&nm.length<=16&&!outs.includes(nm)) outs.push(nm); }); return outs; }
 function newsFind(key){ return NEWS.find(x=>nkey(x)===key)||null; }

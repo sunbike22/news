@@ -62,6 +62,18 @@ for(const [mode,dark,w] of [["normal",false,390],["normal",true,390],["easy",fal
   { const bad=[]; try{ const w={}; new Function("window",require("fs").readFileSync(require("path").join(__dirname,"../../data.js"),"utf8"))(w);
       Object.entries(w.NEWS_DATA.explainers||{}).forEach(([k,e])=>["more","faq","timeline","us","next"].forEach(f=>{ if(e[f]!==undefined&&!Array.isArray(e[f])) bad.push(k+"."+f); })); }catch(err){ bad.push("読めない: "+err.message); }
     ok("データ: 解説の形がそろっている(more などが配列)", !bad.length, bad.join(",")); }
+  // ニュースの概要(brief.js・2026-11-04〜): キーが news と合っているか・きのうの分がほぼ埋まっているか
+  { const fs=require("fs"), path=require("path"), bp=path.join(__dirname,"../../brief.js");
+    if(fs.existsSync(bp)){ const w={}; let msg="", good=true;
+      try{ new Function("window",fs.readFileSync(path.join(__dirname,"../../data.js"),"utf8"))(w); new Function("window",fs.readFileSync(bp,"utf8"))(w);
+        const B=w.NEWS_BRIEF||{}, N=w.NEWS_DATA.news, H=new Set(N.map(n=>n[0]+"|"+n[3])), ks=Object.keys(B);
+        const miss=ks.filter(k=>!H.has(k)).length, badTxt=ks.filter(k=>typeof B[k]!=="string"||B[k].length<20||/確かめられず/.test(B[k])).length;
+        const up=String(w.NEWS_DATA.updated).slice(0,10), yd=new Date(Date.parse(up)-864e5).toISOString().slice(0,10);
+        const yRows=N.filter(n=>n[0]===yd), yHas=yRows.filter(n=>B[n[0]+"|"+n[3]]).length;
+        msg=`${ks.length}件・見出しが合わない ${miss}・文がおかしい ${badTxt}・きのう(${yd}) ${yHas}/${yRows.length}`;
+        good=miss<=ks.length*0.2&&!badTxt&&(up<"2026-11-06"||!yRows.length||yHas>=yRows.length*0.6);
+      }catch(err){ good=false; msg="読めない: "+err.message; }
+      ok("データ: ニュースの概要(brief.js)がそろっている", good, msg); } }
   ok("データ: おすすめが読める", d.picks); ok("データ: 更新が3日以内", d.upd&&(Date.now()-Date.parse(d.upd))<3*864e5, d.upd); await ctx.close(); }
 await b.close();
 console.log("\nNG: "+NG.length+(NG.length?"\n  - "+NG.join("\n  - "):""));
