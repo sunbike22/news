@@ -1026,6 +1026,9 @@ svg.eat{animation:petEat .7s ease both!important}
 .hp-line{display:flex;margin:6px 0}
 .hp-sec.hp-hl>summary{background:var(--accent-soft)}
 .yo-row input{flex:1 1 120px;min-width:0;font:inherit;font-size:1rem;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:8px;min-height:44px}
+.yo-lb{display:flex;flex-direction:column;gap:4px;margin-top:10px;font-weight:700}.yo-lb input,.yo-lb select,.yo-lb textarea{font:inherit;font-size:1rem;font-weight:400;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:8px;min-height:44px;width:100%;box-sizing:border-box}
+.yo-fixlink{display:block;margin:-4px auto 0 4px;font-size:.88rem;min-height:40px;text-align:left}
+.hp-fb{display:flex;flex-wrap:wrap;gap:6px;align-items:center;margin:8px 0 4px;font-size:.9rem}.hp-fb>span{flex:1 1 100%}
 .yo-l{list-style:none;margin:8px 0 0;padding:0;display:flex;flex-direction:column;gap:6px}.yo-l li{display:flex;gap:6px;align-items:center}.yo-l li>span{flex:1;min-width:0;overflow-wrap:anywhere}
 .vc-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.vc-row select{flex:1 1 160px;min-width:0;font:inherit;font-size:1rem;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:8px;min-height:44px}
 /* つながり地図 */
@@ -2107,7 +2110,7 @@ function renderToday(){
       <button class="play sm alt" id="radioBtn"><span class="pi" aria-hidden="true">🌙</span><b>寝る前ラジオ</b></button>
     </div>`;
   S.pet=petCard();
-  S.listen=`<button class="listen-big" id="listenBtn"><span class="li" aria-hidden="true">🔊</span><span><b>今日のニュースを聞く</b><small>押すと読み上げます。もう一度押すと止まります</small></span></button>`;
+  S.listen=`<button class="listen-big" id="listenBtn"><span class="li" aria-hidden="true">🔊</span><span><b>今日のニュースを聞く</b><small>押すと読み上げます。もう一度押すと止まります</small></span></button><button class="linkish yo-fixlink" data-yofix="1">🗣️ 読み方がおかしいときは →</button>`;
   S.weather=weatherCard();
   S.three=`<section aria-label="今日の3行">
       <div class="sec-h"><h2>☀️ 今日の3行</h2>${EN?langSeg():`<span class="sub">時間がない日はここだけでOK</span>`}</div>
@@ -2333,13 +2336,40 @@ function voiceScore(v){ const n=v.name||""; let s=0; if(/Natural|ニューラル
 function langVoices(code){ try{ const c=(code||"ja").split("-")[0].toLowerCase(); return (window.speechSynthesis.getVoices()||[]).filter(v=>(v.lang||"").replace("_","-").toLowerCase().startsWith(c)).sort((a,b)=>voiceScore(b)-voiceScore(a)); }catch(_){ return []; } }
 function bestJaVoice(){ const vs=langVoices("ja"); if(!vs.length) return null; const want=store.get("nw-vname"); return (want&&vs.find(v=>v.name===want))||vs[0]; }
 try{ window.speechSynthesis&&window.speechSynthesis.getVoices(); }catch(_){}
-function yoListHTML(){ const L=userYomi(); return L.length?`<ul class="yo-l">${L.map(([a,b],i)=>`<li><span><b>${esc(a)}</b> → ${esc(b)}</span><button class="fchip" data-yosay="${i}" aria-label="${esc(a)}を読んでみる">🔊</button><button class="fchip" data-yodel="${i}" aria-label="${esc(a)}を消す">✕ 消す</button></li>`).join("")}</ul>`:""; }
+// 読み方の辞書(yomi.js)は小さいので、開いて少したってから読んでおく(読み上げを押したときに間に合うように)
+setTimeout(()=>{ try{ loadScript("yomi.js?v="+encodeURIComponent(String(D.updated||""))).catch(()=>{}); }catch(_){} },2500);
+// ===== 作った人に知らせる(2026-11-07): ntfy の受け取り用のあいことばに送る。送るのは見る人が入れたことばだけ =====
+const RPT_TOPIC="mainichi-yomi-0ddaf8b5";
+async function rptSend(kind,fields){ let r={}; try{ r=JSON.parse(store.get("nw-rpt")||"{}"); }catch(_){} if(r.d!==TODAY) r={d:TODAY,n:0};
+  if(r.n>=5){ toast("きょうはもう5回知らせました。あしたまた送れます"); return false; }
+  const body=[`種類: ${kind}`,...Object.entries(fields).filter(([,v])=>v).map(([k,v])=>`${k}: ${String(v).replace(/[\r\n]+/g," ").trim().slice(0,200)}`),`日付: ${TODAY}`].join("\n");
+  try{ const res=await fetch("https://ntfy.sh/"+RPT_TOPIC+"?title="+encodeURIComponent(kind==="yomi"?"🗣️ 読みまちがいの報告":"🤔 説明がわかりにくい")+"&tags="+(kind==="yomi"?"speaking_head":"thinking"),{method:"POST",body});
+    if(!res.ok) throw 0; r.n++; store.set("nw-rpt",JSON.stringify(r)); track("/report/"+kind,"知らせる"); return true; }catch(_){ toast("送れませんでした。電波のよい所で、もう一度押してください"); return false; } }
+function openYomiFix(word,yomi){ const sh=document.getElementById("sheet");
+  sh.innerHTML=`<div class="bar"><div class="wrap"><button class="iconbtn" id="yfx" aria-label="もどる">← もどる</button><span class="ttl">🗣️ 読み方を直す・知らせる</span></div></div>
+  <div class="wrap body"><p class="hint" style="margin:0 0 10px">読み上げで、まちがえて読まれたことばを教えてください。<b>「このスマホで直す」</b>はすぐにあなたのスマホで直り、<b>「作った人に知らせる」</b>と、みんなの読み上げも直します(たしかめてから直すので、少し時間がかかります)。</p>
+   <label class="yo-lb">まちがえて読まれたことば<input id="yfW" maxlength="20" placeholder="例: 百音" value="${esc(word||"")}"></label>
+   <label class="yo-lb">正しい読み方(ひらがな。わからなければ空のままでOK)<input id="yfY" maxlength="40" placeholder="例: もね" value="${esc(yomi||"")}"></label>
+   <label class="yo-lb">どこで聞きましたか?<select id="yfP">${["今日のニュースを聞く","解説の🔊 聞く","ニュースのページ","ことば辞典","寝る前ラジオ","そのほか"].map(x=>`<option>${x}</option>`).join("")}</select></label>
+   <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px"><button class="fchip" id="yfTry">🔊 いまの読み方を聞く</button><button class="fchip" id="yfMine">✏️ このスマホで直す</button><button class="fchip pet-feed" id="yfSend">📮 作った人に知らせる</button></div>
+   <p class="hint" style="margin-top:12px">作った人に届くのは、ここに入れたことば・読み方・聞いた場所だけです(あなたの名前や記録は送りません)。名前や住所などは書かないでください。1日5回まで。</p></div>`;
+  const v=id=>sh.querySelector(id).value.trim();
+  sh.querySelector("#yfx").onclick=()=>{ sh.hidden=true; sh.innerHTML=""; document.body.style.overflow=""; };
+  sh.querySelector("#yfTry").onclick=()=>{ const w=v("#yfW"); if(w) sayJa(w); };
+  sh.querySelector("#yfMine").onclick=()=>{ const w=v("#yfW"), y=v("#yfY"); if(!w||!y){ toast("ことばと読み方の両方を入れてください"); return; } const L=userYomi().filter(x=>x[0]!==w); L.unshift([w,y]); store.set("nw-yomi",JSON.stringify(L.slice(0,100))); sayJa(w); toast(`このスマホでは「${w}」を「${y}」と読みます`); };
+  sh.querySelector("#yfSend").onclick=async e=>{ const bt=e.currentTarget; const w=v("#yfW"); if(!w){ toast("まちがえて読まれたことばを入れてください"); return; } bt.disabled=true;
+    const ok=await rptSend("yomi",{"ことば":w,"読み":v("#yfY"),"場所":v("#yfP")}); bt.disabled=false; if(ok) toast("📮 作った人に知らせました。ありがとうございます!"); };
+  sh.hidden=false; sh.scrollTop=0; document.body.style.overflow="hidden"; }
+document.addEventListener("click",ev=>{ const b=ev.target.closest("[data-yofix]"); if(!b) return; ev.preventDefault(); const p=document.getElementById("pop"); if(p) p.hidden=true; openYomiFix(b.dataset.yow||"",b.dataset.yoy||""); });
+function yoListHTML(){ const L=userYomi(); return L.length?`<ul class="yo-l">${L.map(([a,b],i)=>`<li><span><b>${esc(a)}</b> → ${esc(b)}</span><button class="fchip" data-yosay="${i}" aria-label="${esc(a)}を読んでみる">🔊</button><button class="fchip" data-yofix="1" data-yow="${esc(a)}" data-yoy="${esc(b)}" aria-label="${esc(a)}の読みを作った人に知らせる">📮</button><button class="fchip" data-yodel="${i}" aria-label="${esc(a)}を消す">✕ 消す</button></li>`).join("")}</ul>`:""; }
 function voiceOpts(){ const vs=langVoices("ja"); const cur=store.get("nw-vname")||""; const nm=v=>v.name.replace(/\s*[-–]\s*Japanese.*$/i,"").replace(/^Microsoft\s+/,"");
   return `<option value="">おまかせ${vs[0]?`(いまは ${esc(nm(vs[0]))})`:""}</option>`+vs.map((v,i)=>`<option value="${esc(v.name)}"${v.name===cur?" selected":""}>${esc(nm(v))}${i===0&&voiceScore(v)>=40?" ⭐おすすめ":""}</option>`).join(""); }
 function sayPitch(){ const p=+(store.get("nw-pitch")||1); return p>=.8&&p<=1.2?p:1; }
 // ===== 読み上げの読みまちがいを直す(2026-11-07) =====
 // スマホの声は、ニュースのことば・記号・英字の略語をよくまちがえるので、読む前に「読み方」に置きかえる(画面の文字は変えない)。
 // 見る人が自分で足した読み(nw-yomi=[[書き方,読み方],…])をいちばん先に使う。
+// 大文字の略語は1文字ずつ読む(「AI」を「あい」と読まれないように)
+const TTS_ABC={A:"エー",B:"ビー",C:"シー",D:"ディー",E:"イー",F:"エフ",G:"ジー",H:"エイチ",I:"アイ",J:"ジェー",K:"ケー",L:"エル",M:"エム",N:"エヌ",O:"オー",P:"ピー",Q:"キュー",R:"アール",S:"エス",T:"ティー",U:"ユー",V:"ブイ",W:"ダブリュー",X:"エックス",Y:"ワイ",Z:"ゼット"};
 const TTS_WD={月:"月曜日",火:"火曜日",水:"水曜日",木:"木曜日",金:"金曜日",土:"土曜日",日:"日曜日",祝:"祝日"};
 const TTS_MEDIA=/^(?:[、・,\s]*(?:NHK|ANN|TBS|FNN|JNN|NNN|共同|時事|日経|朝日|読売|毎日|産経|東京新聞|中日|北海道新聞|西日本新聞|河北新報|神戸新聞|京都新聞|中国新聞|沖縄タイムス|琉球新報|山陰中央新報|信濃毎日|静岡新聞|ロイター|AP|AFP|CNN|BBC|CNBC|CBS|ABC|NBC|FOX|WSJ|ブルームバーグ|ITmedia|マイナビ|Impress|INTERNET Watch|ウェザーニュース|tenki\.jp|気象庁|みんかぶ|フィスコ|Yahoo|ABEMA|テレ東|日テレ|フジ|テレ朝|[^)）]{0,12}新聞|[^)）]{0,10}テレビ|[^)）]{0,10}放送)(?:のみ)?)+[、・,\s]*$/;
 // かっこの中が出典(社名の並び)なら読まない。2つ以上並んでいる・社名の一覧(MEDIA)にある・英字だけ・「〜のみ」なら出典とみなす
@@ -2367,18 +2397,21 @@ const TTS_FIX=[
  // 英字の略語・会社
  [/NY(?![A-Za-z])/g,"ニューヨーク"],[/NATO/g,"ナトー"],[/ASEAN/g,"アセアン"],[/OPEC/g,"オペック"],[/NASA/g,"ナサ"],[/JAXA/g,"ジャクサ"],[/UNESCO/g,"ユネスコ"],[/WHO(?![A-Za-z])/g,"ダブリューエイチオー"],[/BRICS/g,"ブリックス"],[/COP(?=\d)/g,"コップ"],[/JAL/g,"日本航空"],[/ANA(?![A-Za-z])/g,"全日空"],[/DeNA/g,"ディーエヌエー"],[/OpenAI/g,"オープンエーアイ"],[/ChatGPT/g,"チャットジーピーティー"],[/iPhone/g,"アイフォーン"],[/YouTube/gi,"ユーチューブ"],[/Google/g,"グーグル"],[/Apple/g,"アップル"],[/Amazon/g,"アマゾン"],[/Microsoft/g,"マイクロソフト"],[/Meta(?![a-z])/g,"メタ"],[/Nintendo/g,"任天堂"],[/LINE(?![A-Za-z])/g,"ライン"],[/Yahoo!?/g,"ヤフー"],[/Wi-?Fi/gi,"ワイファイ"],[/SDGs/g,"エスディージーズ"],[/mRNA/g,"エムアールエヌエー"],[/iPS/g,"アイピーエス"],[/PFAS/g,"ピーファス"],[/eスポーツ/g,"イースポーツ"],[/GP(?![A-Za-z])/g,"グランプリ"],[/KOSPI/g,"コスピ"],[/CAPCOM/gi,"カプコン"],[/MUJI/g,"無印良品"],[/So-net/g,"ソネット"],[/hPa/g,"ヘクトパスカル"],[/G20/g,"ジートゥエンティ"],[/G7/g,"ジーセブン"],[/5G\s*SA/g,"ファイブジー エスエー"],[/5G(?![A-Za-z])/g,"ファイブジー"],[/4G(?![A-Za-z])/g,"フォージー"],[/6G(?![A-Za-z])/g,"シックスジー"],[/ナ[・･]リーグ/g,"ナショナルリーグ"],[/ア[・･]リーグ/g,"アメリカンリーグ"],[/([ァ-ヴー])[・･](?=[ァ-ヴ])/g,"$1"],[/H3(?![0-9])/g,"エイチスリー"],[/EV(?![A-Za-z])/g,"イーブイ"],[/X(?=\s*[(（]?旧ツイッター|の投稿|で発信|に投稿)/g,"エックス"],[/tenki\.jp/g,"てんきジェーピー"],
  // 単位・記号
+ [/UNIQLO/g,"ユニクロ"],[/SONY/g,"ソニー"],[/TOYOTA/g,"トヨタ"],[/HONDA/g,"ホンダ"],[/SUBARU/g,"スバル"],[/YAMAHA/g,"ヤマハ"],[/NISSAN/g,"日産"],[/MAZDA/g,"マツダ"],[/NIKE/g,"ナイキ"],[/IKEA/g,"イケア"],[/ZOZO/g,"ゾゾ"],[/COVID-?19/g,"コロナ"],
  [/(\d)\s*℃/g,"$1度"],[/(\d)\s*hPa/g,"$1ヘクトパスカル"],[/(\d)\s*km\/h/g,"$1キロ毎時"],[/(\d)\s*km/g,"$1キロ"],[/(\d)\s*mm/g,"$1ミリ"],[/(\d)\s*cm/g,"$1センチ"],[/(\d)\s*kg/g,"$1キロ"],[/(\d)\s*m(?![A-Za-z])/g,"$1メートル"],[/(\d)\s*kWh/g,"$1キロワットアワー"],[/(\d)\s*GB/g,"$1ギガ"],
  [/(\d),(?=\d{3})/g,"$1"],[/(^|[^\d])[+＋](?=\d)/g,"$1プラス"],[/[▲△−](?=\d)/g,"マイナス"],[/(^|[\s(（、])-(?=\d)/g,"$1マイナス"],[/(\d)\s*[%％]/g,"$1パーセント"],[/[=＝]/g,"、"],[/＆|&/g,"アンド"],
  [/(\d{1,2})[:：](\d{2})(?!\d)/g,(m,h,mi)=>`${+h}時${+mi?(+mi)+"分":""}`],
  // そのほかよくまちがうことば
- [/他の/g,"ほかの"],[/その他/g,"そのほか"],[/一段落/g,"いちだんらく"],[/重複/g,"ちょうふく"],[/早急/g,"さっきゅう"],[/施策/g,"しさく"],[/漏洩/g,"ろうえい"],[/出生率/g,"しゅっしょうりつ"],[/文言/g,"もんごん"],[/役所/g,"やくしょ"],[/大家/g,"おおや"],[/一家/g,"いっか"],[/市場(?=(価格|関係者|予想|の予想|は|が|で|全体|心理|規模))/g,"しじょう"],[/行方/g,"ゆくえ"],[/今日/g,"きょう"],[/明日/g,"あす"],[/昨日/g,"きのう"]
+ [/他の/g,"ほかの"],[/その他/g,"そのほか"],[/一段落/g,"いちだんらく"],[/重複/g,"ちょうふく"],[/早急/g,"さっきゅう"],[/施策/g,"しさく"],[/漏洩/g,"ろうえい"],[/出生率/g,"しゅっしょうりつ"],[/文言/g,"もんごん"],[/役所/g,"やくしょ"],[/大家/g,"おおや"],[/一家/g,"いっか"],[/市場(?=(価格|関係者|予想|の予想|は|が|で|全体|心理|規模))/g,"しじょう"],[/行方/g,"ゆくえ"],[/今日/g,"きょう"],[/明日/g,"あす"],[/昨日/g,"きのう"],
+ // 最後に、残った大文字の略語を1文字ずつ(NHK→エヌエイチケー、AI→エーアイ)
+ [/(?<![A-Za-z])[A-Z]{2,6}(?![a-z])/g,m=>[...m].map(c=>TTS_ABC[c]||c).join("")]
 ];
 const GL_YOMI=(D.glossary||[]).map(w=>[String(w[0]).replace(/[(（].*?[)）]/g,"").trim(),String(w[1]||"").replace(/[(（].*?[)）]/g,"").trim()]).filter(([k,y])=>k&&y&&k!==y&&/[一-龠々A-Za-z]/.test(k)&&!/[・]/.test(k)).sort((a,b)=>b[0].length-a[0].length);
 function userYomi(){ try{ const a=JSON.parse(store.get("nw-yomi")||"[]"); return Array.isArray(a)?a.filter(x=>Array.isArray(x)&&x[0]&&x[1]).slice(0,100):[]; }catch(_){ return []; } }
 const reEsc=s=>s.replace(/[.*+?^${}()|[\]\\]/g,"\\$&");
 function ttsYomi(t){ let s=String(t||"");
   userYomi().forEach(([a,b])=>{ s=s.split(a).join(b); });
-  Object.entries(D.yomi||{}).sort((a,b)=>b[0].length-a[0].length).forEach(([a,b])=>{ if(a&&b) s=s.split(a).join(b); });
+  Object.entries(Object.assign({},window.NEWS_YOMI||{},D.yomi||{})).sort((a,b)=>b[0].length-a[0].length).forEach(([a,b])=>{ if(a&&b&&a.length>=2) s=s.split(a).join(b); });
   s=s.replace(/[（(]([月火水木金土日祝])[）)]/g,(m,w)=>TTS_WD[w]);
   s=s.replace(/[（(]([^（(）)]{1,80})[）)]/g,(m,x)=>ttsIsSrc(x)?"":m);
   TTS_FIX.forEach(([re,r])=>{ s=s.replace(re,r); });
@@ -3253,6 +3286,7 @@ function voiceCard(){ const r=sayRate();
     <div class="hint" style="margin-bottom:6px">まちがえて読まれることばと、正しい読み方(ひらがな)を入れると、次からその読み方で読みます。このスマホの中だけに保存します。</div>
     <div class="vc-row yo-row"><input id="yoW" maxlength="20" placeholder="書き方(例: 百音)" aria-label="書き方"><input id="yoY" maxlength="40" placeholder="読み方(例: もね)" aria-label="読み方"><button class="fchip" id="yoAdd">＋ 足す</button></div>
     <div id="yoList">${yoListHTML()}</div>
+    <button class="fchip" data-yofix="1" style="margin-top:8px">📮 読みまちがいを作った人に知らせる</button>
     <div class="sec-h" style="margin-top:12px"><h2 style="font-size:1rem">🈁 ふりがな</h2></div>
     <div class="chips" id="vRuby">${[["1","つける"],["0","つけない"]].map(([v,l])=>`<button class="fchip" data-ruby="${v}" aria-pressed="${rubyOn()===(v==="1")}">${l}</button>`).join("")}</div>
     <div class="hint" style="margin-top:6px">ことば辞典にあることば(点線のことば)に、よみがなをつけます。かんたんモードでは最初からついています。</div>
@@ -5046,6 +5080,7 @@ function openShimen(){ const sh=document.getElementById("sheet"); const w=D.weat
 document.addEventListener("click",e=>{ const b=e.target.closest("[data-shimen]"); if(!b) return; e.preventDefault(); openShimen(); });
 // ===== お知らせ(新しくなったところ)。機能を足したら、いちばん上に1つ足す =====
 const UPDATES=[
+  {id:"2026-11-07b",d:"2026-11-07",t:"🗣️ 読みまちがいを作った人に知らせられるように",L:["「AI」を「あい」と読んでいたのを「エーアイ」に直しました。NHK・TBS などの英字の略語も1文字ずつ読みます。","「🔊 今日のニュースを聞く」の下の「🗣️ 読み方がおかしいときは →」から、まちがえたことばを作った人に知らせられます。たしかめてから、みんなの読み上げを直します。","📖 使い方ガイドの説明ごとに「👍 わかった / 🤔 わかりにくい」を押せるようにしました。わかりにくいところから直していきます。"]},
   {id:"2026-11-07a",d:"2026-11-07",t:"🔊 読み上げの読みまちがいを直しました",L:["「最高値(さいたかね)」「米(べい)大統領」「震度5弱(じゃく)」「晴れ後(のち)くもり」、人の名前・地名、時刻や記号(℃・%・+)などを、正しい読み方で読むようにしました。かっこの中の出典(NHK・共同など)は読まずに飛ばします。","それでもまちがえることばは、マイ→⚙️設定の「📝 読みまちがいを直す」で、自分で正しい読み方を登録できます。"]},
   {id:"2026-11-06d",d:"2026-11-06",t:"📖 説明を増やし、読み上げの声と寝る前ラジオの音を見直しました",L:["4コマの生徒の名札が、あなたのペットの名前になりました(名前を変えていれば、その名前)。","画面のあちこちに「？ これは何?」を足し、「設定」→「📖 使い方ガイド」で、マークの意味や解説・4コマ・ペットの見かたを読めるようにしました。","読み上げは、スマホに入っている中でいちばん自然な声を選び、1文ずつ間をあけて読みます。マイ→⚙️設定で声・高さを選べます。寝る前ラジオのうしろの音は、オルゴール・波の音・音なしから選べます。"]},
   {id:"2026-11-06c",d:"2026-11-06",t:"🎨 4コマを短く、楽しく",L:["1コマのせりふを2〜3つにしぼり、キャラのいる舞台を上に、吹き出しを下にして、短く読めるようにしました。","「えっ!?」「ガーン」などの効果音や、びっくりしたときの集中線も入りました。"]},
@@ -5231,7 +5266,7 @@ const HELP=[
   ["ten","📰","ニュース10の読み方",["上から順に、その日に大きく伝えられたニュースです。","右上の<b>「短く／くわしく」</b>で、見出しだけにするか、説明も出すかを切りかえられます。","<b>「くわしい解説 →」</b>があるものは、図や流れつきの解説ページが読めます。","<b>🏷️ 保存</b>で「マイ」にとっておけます。<b>📤 送る</b>で家族や友だちに見出しを送れます(あなたの記録は送りません)。"]],
   ["ex","💡","解説ページの読み方",["大きな話題を1つずつ、やさしく説明するページです。上から読めば全体がわかります。","<b>ひとことで言うと</b>…まずここだけ読めば大まかにわかります。","<b>目次</b>を押すと、その場所に飛びます。","<b>🙋 わたしたちへの影響</b>…くらしにどう関係するか。","<b>📅 流れ</b>…これまでに起きたことの年表。<b>🔭 これから</b>…次に注目する日。","<b>🔔 続きを追う</b>を押すと、新しい動きがあったとき「きょう」でお知らせします。","<b>💬 話しながら読む</b>・<b>📖 連載で読む</b>…同じ中身を、会話や1日1話の形で読めます。","画面を<b>左右にすべらせる</b>と、前後の解説に移ります。"]],
   ["manga","🎨","4コマの見かた",["解説の中身を、4つのコマで説明するマンガです。","左にいるのは<b>あなたのペット</b>(名札はペットの名前)。ニュースにくわしくない生徒で、わたしたちと同じ立場で質問します。","右の<b>🦉 ホー先生</b>がやさしく答えます。","上から<b>①はてな? → ②なにがあった? → ③どうなるの? → ④これから</b>の順に読みます。","いちばん下の<b>📝 ホー先生の黒板</b>が、まとめです。"]],
-  ["listen","🔊","聞く・読み上げ",["<b>🔊 聞く</b>のボタンで、文を読み上げます。もう一度押すと止まります。","速さ・声の高さ・声の種類は、<b>マイ → ⚙️設定 →「🔊 読み上げの速さと声」</b>で変えられます。","声は<b>スマホに入っている声</b>を使います。もっと自然な声にしたいときは、同じ場所の「もっと自然な声にするには」を見てください。","<b>🌙 寝る前ラジオ</b>(おたのしみ)は、3分でニュースを耳で聞けます。うしろの音は「オルゴール・波の音・音なし」から選べます。"]],
+  ["listen","🔊","聞く・読み上げ",["<b>🔊 聞く</b>のボタンで、文を読み上げます。もう一度押すと止まります。","速さ・声の高さ・声の種類は、<b>マイ → ⚙️設定 →「🔊 読み上げの速さと声」</b>で変えられます。","声は<b>スマホに入っている声</b>を使います。もっと自然な声にしたいときは、同じ場所の「もっと自然な声にするには」を見てください。","読み方がおかしいことばは、<b>「🗣️ 読み方がおかしいときは →」</b>から、このスマホで直したり、作った人に知らせたりできます。","<b>🌙 寝る前ラジオ</b>(おたのしみ)は、3分でニュースを耳で聞けます。うしろの音は「オルゴール・波の音・音なし」から選べます。"]],
   ["pet","🐣","ペットの育て方",["ペットはニュースといっしょに育ちます。はじめはたまごで、何が生まれるかはお楽しみです。","<b>🧠 クイズ</b>に正解すると🍙ごはんがもらえます。ごはんをあげたり、毎日開いたり、解説を読んだりすると育ちます。","名前は<b>マイ → 🐣 ペット の「✏️ 名前」</b>で変えられます。変えた名前は4コマなどにも出ます。","服・部屋・色は、育つと選べるものが増えます。ごはんやお世話をしなくても、困ることはありません。"]],
   ["plan","📅","予定と予測",["<b>📅 予定</b>…これから決まっている日(選挙・発表・値上げなど)。","<b>🎯 予測</b>…Claude(AI)が「こうなりそう」と考えたもの。あたるとは限りません。","あなたも<b>予想</b>して、答え合わせができます。"]],
   ["search","🔎","さがす・地図・数字",["<b>🔎 さがす</b>…ことばやジャンルで、これまでのニュースを探せます。","<b>🗺️ 地図</b>…ニュースがどこで起きたか。2本の指で大きくできます。","<b>📈 数字</b>…日経平均・円・原油のグラフと、くらしの便利。","地図と数字は、「さがす」の上のボタンから開けます。"]],
@@ -5239,19 +5274,25 @@ const HELP=[
   ["ask","💬","聞いてみる",["右下の<b>💬</b>で質問できます。アプリの中の解説やことば辞典から答えを探します(質問はどこにも送りません)。","もっと深く知りたいときは「Claudeでもっと深く聞く」で、アプリの外のClaude(AI)に聞けます。"]],
   ["custom","🎨","自分好みにする",["右上の<b>「設定」</b>で、文字の大きさ・画面の色・モード(かんたん/ふつう)を変えられます。","<b>かんたん</b>…文字が大きく、天気・ニュース・聞くボタンだけ。<b>ふつう</b>…ペットやクイズなど、ぜんぶの機能。","「きょう」の並びや下のボタンも、好きなように変えられます。"]],
   ["install","📲","スマホの画面にボタンを置く",["iPhone: 画面の「□に↑」のマーク →「ホーム画面に追加」→「追加」。","Android: 右上の「︙」→「ホーム画面に追加」→「追加」。","絵つきのやり方は、右上の「設定」→「📲 スマホの画面にボタンを置く」。"]],
-  ["privacy","🔒","記録について",["あなたの記録・保存・着せかえは、<b>このスマホ(ブラウザ)の中だけ</b>に保存されます。ほかの人や作った人には見えません。",...(STATS.on&&STATS.code?["サイトをよくするため、<b>どの画面・解説・ジャンルが何回開かれたか</b>だけを数えています(だれが見たかはわかりません)。質問の文章やメモは送りません。"]:[]),"ニュースの更新は1日5回(朝・昼・午後・夕方・夜)です。"]]
+  ["privacy","🔒","記録について",["あなたの記録・保存・着せかえは、<b>このスマホ(ブラウザ)の中だけ</b>に保存されます。ほかの人や作った人には見えません。",...(STATS.on&&STATS.code?["サイトをよくするため、<b>どの画面・解説・ジャンルが何回開かれたか</b>だけを数えています(だれが見たかはわかりません)。質問の文章やメモは送りません。"]:[]),"<b>「📮 作った人に知らせる」</b>を押したときだけ、そこに入れたことば(読みまちがい・わかりにくい説明)が作った人に届きます。あなたの名前や記録は送りません。","ニュースの更新は1日5回(朝・昼・午後・夕方・夜)です。"]]
 ];
 function helpBtn(k,label){ return `<button class="hp-q" data-help="${k}" aria-label="説明を見る: ${esc((HELP.find(h=>h[0]===k)||[])[2]||"")}">？ ${label||"これは何?"}</button>`; }
 function openHelp(k){ const sh=document.getElementById("sheet");
   sh.innerHTML=`<div class="bar"><div class="wrap"><button class="iconbtn" id="hpx" aria-label="もどる">← もどる</button><span class="ttl">📖 使い方ガイド</span></div></div>
   <div class="wrap body"><p class="hint" style="margin:0 0 10px">知りたいところを押すと開きます。</p>
-   ${HELP.map(([key,ic,t,L])=>`<details class="faq plain hp-sec" id="hp-${key}"${key===k?" open":""}><summary>${ic} ${esc(t)}</summary><ul class="us" style="margin:6px 0 4px">${L.map(x=>`<li>${x}</li>`).join("")}</ul></details>`).join("")}
+   ${HELP.map(([key,ic,t,L])=>`<details class="faq plain hp-sec" id="hp-${key}"${key===k?" open":""}><summary>${ic} ${esc(t)}</summary><ul class="us" style="margin:6px 0 4px">${L.map(x=>`<li>${x}</li>`).join("")}</ul><div class="hp-fb" data-hpk="${key}"><span>この説明でわかりましたか?</span><button class="fchip" data-hpok="1">👍 わかった</button><button class="fchip" data-hpng="1">🤔 わかりにくい</button></div></details>`).join("")}
    <button class="fchip" id="hpOb" style="margin-top:12px">🔰 はじめての案内をもう一度見る</button></div>`;
   sh.querySelector("#hpx").onclick=()=>{ sh.hidden=true; sh.innerHTML=""; document.body.style.overflow=""; };
   sh.querySelector("#hpOb").onclick=()=>{ sh.hidden=true; sh.innerHTML=""; document.body.style.overflow=""; onboard(true); };
-  sh.hidden=false; sh.scrollTop=0; document.body.style.overflow="hidden"; track("/help","使い方ガイド");
+  sh.querySelectorAll(".hp-fb").forEach(f=>{ const k=f.dataset.hpk;
+    f.querySelector("[data-hpok]").onclick=()=>{ track("/help-ok/"+k,"わかった: "+k); f.innerHTML="<span>👍 ありがとうございます!</span>"; };
+    f.querySelector("[data-hpng]").onclick=()=>{ track("/help-ng/"+k,"わかりにくい: "+k);
+      f.innerHTML=`<label class="yo-lb" style="width:100%">どこがわかりにくかったですか?(書かなくてもOK)<textarea rows="2" maxlength="200" placeholder="例: ✅と⚠️のちがいがわからない"></textarea></label><button class="fchip pet-feed" data-hpsend="1">📮 作った人に知らせる</button><button class="fchip" data-hpno="1">知らせない</button><small class="hint">届くのは、ここに書いた文と、どの説明かだけです。名前や住所は書かないでください。</small>`;
+      f.querySelector("[data-hpno]").onclick=()=>{ f.innerHTML="<span>わかりました。説明を直すときの参考にします。</span>"; };
+      f.querySelector("[data-hpsend]").onclick=async e=>{ const bt=e.currentTarget; bt.disabled=true; const t=f.querySelector("textarea").value.trim(); const ok=await rptSend("help",{"説明":(HELP.find(h=>h[0]===k)||[])[2]||k,"コメント":t}); if(ok) f.innerHTML="<span>📮 作った人に知らせました。ありがとうございます!</span>"; else bt.disabled=false; }; }; });
+  sh.hidden=false; sh.scrollTop=0; document.body.style.overflow="hidden"; track("/help/"+(k||"top"),"使い方ガイド");
   if(k){ const el=sh.querySelector("#hp-"+k); if(el) setTimeout(()=>{ el.scrollIntoView({block:"start"}); sh.scrollTop=Math.max(0,sh.scrollTop-64); el.classList.add("hp-hl"); },60); } }
-document.addEventListener("click",ev=>{ const b=ev.target.closest("[data-help]"); if(!b) return; ev.preventDefault(); ev.stopPropagation(); const pp=document.getElementById("pop"); if(pp) pp.hidden=true; document.querySelectorAll(".ob").forEach(o=>o.remove()); openHelp(b.dataset.help); },true);
+document.addEventListener("click",ev=>{ const b=ev.target.closest("[data-help]"); if(!b) return; ev.preventDefault(); ev.stopPropagation(); const pp=document.getElementById("pop"); if(pp) pp.hidden=true; document.querySelectorAll(".ob").forEach(o=>o.remove()); track("/help-q/"+b.dataset.help,"？ これは何: "+b.dataset.help); openHelp(b.dataset.help); },true);
 function guideBlock(){ return `<button class="tp-open" data-help="start"><span aria-hidden="true">📖</span><span><b>使い方ガイド</b><small>マークの意味・解説や4コマの読み方・ペット・読み上げなど</small></span></button>`; }
 
 // ===== マイ =====

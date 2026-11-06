@@ -1,0 +1,40 @@
+name: 見る人からの知らせを集める
+# アプリの「作った人に知らせる」(読みまちがい・わかりにくい説明)は ntfy に届く。ntfy は12時間で消えるので、
+# 1時間ごとに reports ブランチの reports.json に残す(main には書かない=ニュースの更新とぶつからない)。
+# 定期タスク「読み方の自動収集」がこれを読んで、確かめてから data.js の yomi やアプリの説明を直す。
+on:
+  schedule:
+    - cron: "41 * * * *"
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: reports
+  cancel-in-progress: false
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    timeout-minutes: 4
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - name: 前回の reports.json を読む
+        run: |
+          git fetch --depth=1 origin reports:reports 2>/dev/null && git show reports:reports.json > /tmp/prev.json || echo '{}' > /tmp/prev.json
+      - name: ntfy から集める
+        id: run
+        run: |
+          mkdir -p /tmp/out
+          python3 tools/fetch_reports.py /tmp/prev.json /tmp/out/reports.json | tee /tmp/log.txt
+          if grep -q '^CHANGED' /tmp/log.txt; then echo "changed=1" >> "$GITHUB_OUTPUT"; fi
+      - name: reports ブランチに書く(いつも1コミットだけ)
+        if: steps.run.outputs.changed == '1'
+        run: |
+          cd /tmp/out
+          git init -q -b reports
+          git config user.name "report-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add reports.json
+          git commit -qm "見る人からの知らせ"
+          git push -qf "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" reports
