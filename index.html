@@ -1025,6 +1025,8 @@ svg.eat{animation:petEat .7s ease both!important}
 :root[data-mode="easy"] .hp-q{min-height:44px}
 .hp-line{display:flex;margin:6px 0}
 .hp-sec.hp-hl>summary{background:var(--accent-soft)}
+.yo-row input{flex:1 1 120px;min-width:0;font:inherit;font-size:1rem;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:8px;min-height:44px}
+.yo-l{list-style:none;margin:8px 0 0;padding:0;display:flex;flex-direction:column;gap:6px}.yo-l li{display:flex;gap:6px;align-items:center}.yo-l li>span{flex:1;min-width:0;overflow-wrap:anywhere}
 .vc-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.vc-row select{flex:1 1 160px;min-width:0;font:inherit;font-size:1rem;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:8px;min-height:44px}
 /* つながり地図 */
 .web{position:relative;display:flex;flex-direction:column;gap:34px;padding:6px 0 10px}
@@ -2331,14 +2333,63 @@ function voiceScore(v){ const n=v.name||""; let s=0; if(/Natural|ニューラル
 function langVoices(code){ try{ const c=(code||"ja").split("-")[0].toLowerCase(); return (window.speechSynthesis.getVoices()||[]).filter(v=>(v.lang||"").replace("_","-").toLowerCase().startsWith(c)).sort((a,b)=>voiceScore(b)-voiceScore(a)); }catch(_){ return []; } }
 function bestJaVoice(){ const vs=langVoices("ja"); if(!vs.length) return null; const want=store.get("nw-vname"); return (want&&vs.find(v=>v.name===want))||vs[0]; }
 try{ window.speechSynthesis&&window.speechSynthesis.getVoices(); }catch(_){}
+function yoListHTML(){ const L=userYomi(); return L.length?`<ul class="yo-l">${L.map(([a,b],i)=>`<li><span><b>${esc(a)}</b> → ${esc(b)}</span><button class="fchip" data-yosay="${i}" aria-label="${esc(a)}を読んでみる">🔊</button><button class="fchip" data-yodel="${i}" aria-label="${esc(a)}を消す">✕ 消す</button></li>`).join("")}</ul>`:""; }
 function voiceOpts(){ const vs=langVoices("ja"); const cur=store.get("nw-vname")||""; const nm=v=>v.name.replace(/\s*[-–]\s*Japanese.*$/i,"").replace(/^Microsoft\s+/,"");
   return `<option value="">おまかせ${vs[0]?`(いまは ${esc(nm(vs[0]))})`:""}</option>`+vs.map((v,i)=>`<option value="${esc(v.name)}"${v.name===cur?" selected":""}>${esc(nm(v))}${i===0&&voiceScore(v)>=40?" ⭐おすすめ":""}</option>`).join(""); }
 function sayPitch(){ const p=+(store.get("nw-pitch")||1); return p>=.8&&p<=1.2?p:1; }
+// ===== 読み上げの読みまちがいを直す(2026-11-07) =====
+// スマホの声は、ニュースのことば・記号・英字の略語をよくまちがえるので、読む前に「読み方」に置きかえる(画面の文字は変えない)。
+// 見る人が自分で足した読み(nw-yomi=[[書き方,読み方],…])をいちばん先に使う。
+const TTS_WD={月:"月曜日",火:"火曜日",水:"水曜日",木:"木曜日",金:"金曜日",土:"土曜日",日:"日曜日",祝:"祝日"};
+const TTS_MEDIA=/^(?:[、・,\s]*(?:NHK|ANN|TBS|FNN|JNN|NNN|共同|時事|日経|朝日|読売|毎日|産経|東京新聞|中日|北海道新聞|西日本新聞|河北新報|神戸新聞|京都新聞|中国新聞|沖縄タイムス|琉球新報|山陰中央新報|信濃毎日|静岡新聞|ロイター|AP|AFP|CNN|BBC|CNBC|CBS|ABC|NBC|FOX|WSJ|ブルームバーグ|ITmedia|マイナビ|Impress|INTERNET Watch|ウェザーニュース|tenki\.jp|気象庁|みんかぶ|フィスコ|Yahoo|ABEMA|テレ東|日テレ|フジ|テレ朝|[^)）]{0,12}新聞|[^)）]{0,10}テレビ|[^)）]{0,10}放送)(?:のみ)?)+[、・,\s]*$/;
+// かっこの中が出典(社名の並び)なら読まない。2つ以上並んでいる・社名の一覧(MEDIA)にある・英字だけ・「〜のみ」なら出典とみなす
+function ttsIsSrc(x){ if(TTS_MEDIA.test(x)) return true; const it=x.split(/[・、,，]\s*/).map(v=>v.replace(/のみ$/,"").trim()).filter(Boolean); if(!it.length) return false;
+  if(/\d/.test(x)&&!/[A-Za-z]/.test(x)) return false;
+  const isM=v=>(typeof MEDIA!=="undefined"&&MEDIA.some(([n])=>v.includes(n)))||/^[A-Za-z][A-Za-z0-9 .&'\-]*$/.test(v)||/(新聞|日報|通信|タイムズ|ニュース|スポーツ|テレビ|放送|新報|ジャーナル|BIZ|プレス|マガジン|オンライン)$/.test(v);
+  if(it.length>=2&&!/\d/.test(x)&&!it.some(v=>/[ぁ-ん]/.test(v))) return true;
+  return it.length>=2?it.filter(isM).length>=Math.ceil(it.length/2):isM(it[0])||/のみ$/.test(x.trim()); }
+// [書き方(正規表現), 読み]。上から順に置きかえる。長いことばを先に。
+const TTS_FIX=[
+ // 株・お金
+ [/上場来高値/g,"じょうじょうらいたかね"],[/最高値/g,"さいたかね"],[/最安値/g,"さいやすね"],[/年初来高値/g,"ねんしょらいたかね"],[/年初来安値/g,"ねんしょらいやすね"],[/初値/g,"はつね"],[/終値/g,"おわりね"],[/高値/g,"たかね"],[/安値/g,"やすね"],[/大引け/g,"おおびけ"],[/前場/g,"ぜんば"],[/後場/g,"ごば"],[/円相場/g,"えんそうば"],[/NISA/g,"ニーサ"],[/iDeCo/gi,"イデコ"],[/M&A/g,"エムアンドエー"],[/TOPIX/g,"トピックス"],[/日経平均/g,"にっけいへいきん"],
+ // 「米」「仏」「露」など国の1文字
+ [/(日|訪|対|在|全|親|反|駐|北|南|中|欧|英|露|韓)米/g,"$1べい"],[/米(?=(大統領|政府|政権|軍|紙|側|中|ロ|露|韓|欧|英|国|株|債|長期|連邦|企業|メディア|議会|下院|上院|財務|国務|当局|経済|景気|雇用|金利|司法|最高裁|東部|西部|南部|北部|主要|共和党|民主党|大手|航空|IT|テック|有力|報道|商務|国防|通商|製|産|系|大リーグ|ニューヨーク|NY|カリフォルニア|ホワイトハウス|中間選挙|大統領選|関税))/g,"べい"],
+ [/(日|対|訪|米|中|英|独)露/g,"$1ろ"],[/露(?=(大統領|政府|軍|側|外務|国防|領|紙|経済|産))/g,"ろ"],[/仏(?=(大統領|政府|首相|紙|議会|軍|国|大手|製))/g,"ふつ"],[/(日|米|英|独)仏/g,"$1ふつ"],[/独(?=(政府|首相|紙|議会|軍|大手|製|経済))/g,"どく"],[/豪(?=(政府|首相|州|軍|紙))/g,"ごう"],[/印(?=(政府|首相|紙|軍))/g,"いん"],
+ // 「同〜」
+ [/同日/g,"どうじつ"],[/同社/g,"どうしゃ"],[/同氏/g,"どうし"],[/同国/g,"どうこく"],[/同省/g,"どうしょう"],[/同党/g,"どうとう"],[/同庁/g,"どうちょう"],[/同署/g,"どうしょ"],[/同紙/g,"どうし"],[/同月/g,"どうげつ"],[/同年/g,"どうねん"],[/同期比/g,"どうきひ"],[/同市/g,"どうし"],[/同県/g,"どうけん"],[/同町/g,"どうちょう"],[/同村/g,"どうそん"],
+ // 「初」
+ [/(世界|国内|日本|史上|県内|全国|過去|球団|大会|国産|民間|女性|アジア)初/g,"$1はつ"],[/初の/g,"はつの"],
+ // 天気・地震
+ [/震度(\d|[一二三四五六七])弱/g,"震度$1じゃく"],[/震度(\d|[一二三四五六七])強/g,"震度$1きょう"],[/(?<![A-Za-z])[MＭ](?=\d(\.\d)?(の|、|。|\s|程度|規模|を|が|と|で|$))/g,"マグニチュード"],[/(晴れ|晴|くもり|曇り|曇|雨|雪)\s*後\s*(?=(晴|く|曇|雨|雪|時々|一時))/g,"$1のち"],[/最高潮/g,"さいこうちょう"],
+ [/寒気/g,"かんき"],[/山沿い/g,"やまぞい"],[/所により/g,"ところにより"],[/雨雲/g,"あまぐも"],[/真冬日/g,"まふゆび"],[/真夏日/g,"まなつび"],[/猛暑日/g,"もうしょび"],[/夏日/g,"なつび"],[/冬日/g,"ふゆび"],[/小春日和/g,"こはるびより"],[/木枯らし/g,"こがらし"],[/初冠雪/g,"はつかんせつ"],[/大雪/g,"おおゆき"],[/大雨/g,"おおあめ"],[/線状降水帯/g,"せんじょうこうすいたい"],
+ // スポーツ
+ [/W杯/g,"ワールドカップ"],[/本塁打/g,"ほんるいだ"],[/金星/g,"きんぼし"],[/今季/g,"こんき"],[/来季/g,"らいき"],[/MLB/g,"大リーグ"],[/FIFA/g,"フィファ"],[/UEFA/g,"ウエファ"],[/MVP/g,"エムブイピー"],[/F1(?![0-9])/g,"エフワン"],[/(?<![\d\-])(\d{1,2})\s*[-－]\s*(\d{1,2})(?![\d\-])(?=\s*(で|の|と|、|。|$|勝|敗))/g,"$1対$2"],
+ // 英字の略語・会社
+ [/NY(?![A-Za-z])/g,"ニューヨーク"],[/NATO/g,"ナトー"],[/ASEAN/g,"アセアン"],[/OPEC/g,"オペック"],[/NASA/g,"ナサ"],[/JAXA/g,"ジャクサ"],[/UNESCO/g,"ユネスコ"],[/WHO(?![A-Za-z])/g,"ダブリューエイチオー"],[/BRICS/g,"ブリックス"],[/COP(?=\d)/g,"コップ"],[/JAL/g,"日本航空"],[/ANA(?![A-Za-z])/g,"全日空"],[/DeNA/g,"ディーエヌエー"],[/OpenAI/g,"オープンエーアイ"],[/ChatGPT/g,"チャットジーピーティー"],[/iPhone/g,"アイフォーン"],[/YouTube/gi,"ユーチューブ"],[/Google/g,"グーグル"],[/Apple/g,"アップル"],[/Amazon/g,"アマゾン"],[/Microsoft/g,"マイクロソフト"],[/Meta(?![a-z])/g,"メタ"],[/Nintendo/g,"任天堂"],[/LINE(?![A-Za-z])/g,"ライン"],[/Yahoo!?/g,"ヤフー"],[/Wi-?Fi/gi,"ワイファイ"],[/SDGs/g,"エスディージーズ"],[/mRNA/g,"エムアールエヌエー"],[/iPS/g,"アイピーエス"],[/PFAS/g,"ピーファス"],[/eスポーツ/g,"イースポーツ"],[/GP(?![A-Za-z])/g,"グランプリ"],[/KOSPI/g,"コスピ"],[/CAPCOM/gi,"カプコン"],[/MUJI/g,"無印良品"],[/So-net/g,"ソネット"],[/hPa/g,"ヘクトパスカル"],[/G20/g,"ジートゥエンティ"],[/G7/g,"ジーセブン"],[/5G\s*SA/g,"ファイブジー エスエー"],[/5G(?![A-Za-z])/g,"ファイブジー"],[/4G(?![A-Za-z])/g,"フォージー"],[/6G(?![A-Za-z])/g,"シックスジー"],[/ナ[・･]リーグ/g,"ナショナルリーグ"],[/ア[・･]リーグ/g,"アメリカンリーグ"],[/([ァ-ヴー])[・･](?=[ァ-ヴ])/g,"$1"],[/H3(?![0-9])/g,"エイチスリー"],[/EV(?![A-Za-z])/g,"イーブイ"],[/X(?=\s*[(（]?旧ツイッター|の投稿|で発信|に投稿)/g,"エックス"],[/tenki\.jp/g,"てんきジェーピー"],
+ // 単位・記号
+ [/(\d)\s*℃/g,"$1度"],[/(\d)\s*hPa/g,"$1ヘクトパスカル"],[/(\d)\s*km\/h/g,"$1キロ毎時"],[/(\d)\s*km/g,"$1キロ"],[/(\d)\s*mm/g,"$1ミリ"],[/(\d)\s*cm/g,"$1センチ"],[/(\d)\s*kg/g,"$1キロ"],[/(\d)\s*m(?![A-Za-z])/g,"$1メートル"],[/(\d)\s*kWh/g,"$1キロワットアワー"],[/(\d)\s*GB/g,"$1ギガ"],
+ [/(\d),(?=\d{3})/g,"$1"],[/(^|[^\d])[+＋](?=\d)/g,"$1プラス"],[/[▲△−](?=\d)/g,"マイナス"],[/(^|[\s(（、])-(?=\d)/g,"$1マイナス"],[/(\d)\s*[%％]/g,"$1パーセント"],[/[=＝]/g,"、"],[/＆|&/g,"アンド"],
+ [/(\d{1,2})[:：](\d{2})(?!\d)/g,(m,h,mi)=>`${+h}時${+mi?(+mi)+"分":""}`],
+ // そのほかよくまちがうことば
+ [/他の/g,"ほかの"],[/その他/g,"そのほか"],[/一段落/g,"いちだんらく"],[/重複/g,"ちょうふく"],[/早急/g,"さっきゅう"],[/施策/g,"しさく"],[/漏洩/g,"ろうえい"],[/出生率/g,"しゅっしょうりつ"],[/文言/g,"もんごん"],[/役所/g,"やくしょ"],[/大家/g,"おおや"],[/一家/g,"いっか"],[/市場(?=(価格|関係者|予想|の予想|は|が|で|全体|心理|規模))/g,"しじょう"],[/行方/g,"ゆくえ"],[/今日/g,"きょう"],[/明日/g,"あす"],[/昨日/g,"きのう"]
+];
+const GL_YOMI=(D.glossary||[]).map(w=>[String(w[0]).replace(/[(（].*?[)）]/g,"").trim(),String(w[1]||"").replace(/[(（].*?[)）]/g,"").trim()]).filter(([k,y])=>k&&y&&k!==y&&/[一-龠々A-Za-z]/.test(k)&&!/[・]/.test(k)).sort((a,b)=>b[0].length-a[0].length);
+function userYomi(){ try{ const a=JSON.parse(store.get("nw-yomi")||"[]"); return Array.isArray(a)?a.filter(x=>Array.isArray(x)&&x[0]&&x[1]).slice(0,100):[]; }catch(_){ return []; } }
+const reEsc=s=>s.replace(/[.*+?^${}()|[\]\\]/g,"\\$&");
+function ttsYomi(t){ let s=String(t||"");
+  userYomi().forEach(([a,b])=>{ s=s.split(a).join(b); });
+  Object.entries(D.yomi||{}).sort((a,b)=>b[0].length-a[0].length).forEach(([a,b])=>{ if(a&&b) s=s.split(a).join(b); });
+  s=s.replace(/[（(]([月火水木金土日祝])[）)]/g,(m,w)=>TTS_WD[w]);
+  s=s.replace(/[（(]([^（(）)]{1,80})[）)]/g,(m,x)=>ttsIsSrc(x)?"":m);
+  TTS_FIX.forEach(([re,r])=>{ s=s.replace(re,r); });
+  GL_YOMI.forEach(([k,y])=>{ if(/^[A-Za-z0-9 ]+$/.test(k)) s=s.replace(new RegExp("(?<![A-Za-z])"+reEsc(k)+"(?![A-Za-z])","g"),y); else s=s.split(k).join(y); });
+  return s; }
 // 絵文字・記号は「右矢印」などと読まれて機械っぽくなるので、読む前に整える(意味は変えない)
-function ttsClean(t){ return String(t||"").replace(/\*\*/g,"").replace(/(\d{1,2})\/(\d{1,2})(?!\d)/g,"$1月$2日")
+function ttsClean(t){ return ttsYomi(String(t||"").replace(/\*\*/g,"").replace(/(\d{1,2})\/(\d{1,2})\s*[〜～\-]\s*(\d{1,2})(?![\d\/])/g,"$1月$2日から$3日").replace(/(\d{1,2})\/(\d{1,2})(?!\d)/g,"$1月$2日"))
+  .replace(/[:：]/g,"、")
   .replace(/[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{2B00}-\u{2BFF}\u{2190}-\u{21FF}️‍⃣]/gu,"、")
   .replace(/[・／/|｜]/g,"、").replace(/[（(]([^）)]{0,40})[）)]/g,"、$1、").replace(/[「」『』【】〈〉《》"“”]/g,"")
-  .replace(/([0-9０-９]\s*[^\s〜～、。]{0,3})[〜～](?=\s*[0-9０-９])/g,"$1から").replace(/[〜～]/g,"").replace(/…+|‥+/g,"、").replace(/\s*、[\s、]*/g,"、").replace(/^、+|、+(?=[。！？!?]|$)/g,"").replace(/\s+/g," ").trim(); }
+  .replace(/([0-9０-９]\s*[^\s〜～、。]{0,3})[〜～](?=\s*[0-9０-９])/g,"$1から").replace(/[〜～]/g,"").replace(/…+|‥+/g,"、").replace(/\s*、[\s、]*/g,"、").replace(/^、+|、+(?=[。！？!?]|$)/g,"").replace(/([。！？!?])[\s、]+/g,"$1").replace(/\s+/g," ").trim(); }
 // 1文ずつに分けて読む(文と文の間に自然な「間」ができる。長い文で止まる端末の不具合もさける)
 function ttsChunks(t){ const a=ttsClean(t).split(/(?<=[。！？!?])\s*|\n+/).map(x=>x.replace(/^[、。\s]+/,"").trim()).filter(Boolean); const out=[];
   a.forEach(x=>{ while(x.length>140){ const i=x.lastIndexOf("、",140); const c=i>40?i+1:140; out.push(x.slice(0,c)); x=x.slice(c); } if(!x) return; if(out.length&&out[out.length-1].length+x.length<40) out[out.length-1]+=x; else out.push(x); }); return out; }
@@ -3198,6 +3249,10 @@ function voiceCard(){ const r=sayRate();
       <p style="margin:6px 0"><b>iPhone・iPad</b>: 「設定」→「アクセシビリティ」→「読み上げコンテンツ」→「声」→「日本語」で、「Kyoko(拡張)」や「O-ren(拡張)」などを入れてください(数百MB・Wi-Fiがおすすめ)。入れたあと、このアプリを開き直して、上で選びます。</p>
       <p style="margin:6px 0"><b>Android</b>: 「設定」→「システム」→「言語と入力」→「テキスト読み上げの出力」で「Google 音声サービス」を選び、⚙️から日本語の声をダウンロードしてください。</p>
       <p style="margin:6px 0"><b>パソコン</b>: Microsoft Edge で開くと「Nanami(Natural)」などの自然な声が使えます。</p></details>
+    <div class="sec-h" style="margin-top:12px"><h2 style="font-size:1rem">📝 読みまちがいを直す</h2></div>
+    <div class="hint" style="margin-bottom:6px">まちがえて読まれることばと、正しい読み方(ひらがな)を入れると、次からその読み方で読みます。このスマホの中だけに保存します。</div>
+    <div class="vc-row yo-row"><input id="yoW" maxlength="20" placeholder="書き方(例: 百音)" aria-label="書き方"><input id="yoY" maxlength="40" placeholder="読み方(例: もね)" aria-label="読み方"><button class="fchip" id="yoAdd">＋ 足す</button></div>
+    <div id="yoList">${yoListHTML()}</div>
     <div class="sec-h" style="margin-top:12px"><h2 style="font-size:1rem">🈁 ふりがな</h2></div>
     <div class="chips" id="vRuby">${[["1","つける"],["0","つけない"]].map(([v,l])=>`<button class="fchip" data-ruby="${v}" aria-pressed="${rubyOn()===(v==="1")}">${l}</button>`).join("")}</div>
     <div class="hint" style="margin-top:6px">ことば辞典にあることば(点線のことば)に、よみがなをつけます。かんたんモードでは最初からついています。</div>
@@ -4991,6 +5046,7 @@ function openShimen(){ const sh=document.getElementById("sheet"); const w=D.weat
 document.addEventListener("click",e=>{ const b=e.target.closest("[data-shimen]"); if(!b) return; e.preventDefault(); openShimen(); });
 // ===== お知らせ(新しくなったところ)。機能を足したら、いちばん上に1つ足す =====
 const UPDATES=[
+  {id:"2026-11-07a",d:"2026-11-07",t:"🔊 読み上げの読みまちがいを直しました",L:["「最高値(さいたかね)」「米(べい)大統領」「震度5弱(じゃく)」「晴れ後(のち)くもり」、人の名前・地名、時刻や記号(℃・%・+)などを、正しい読み方で読むようにしました。かっこの中の出典(NHK・共同など)は読まずに飛ばします。","それでもまちがえることばは、マイ→⚙️設定の「📝 読みまちがいを直す」で、自分で正しい読み方を登録できます。"]},
   {id:"2026-11-06d",d:"2026-11-06",t:"📖 説明を増やし、読み上げの声と寝る前ラジオの音を見直しました",L:["4コマの生徒の名札が、あなたのペットの名前になりました(名前を変えていれば、その名前)。","画面のあちこちに「？ これは何?」を足し、「設定」→「📖 使い方ガイド」で、マークの意味や解説・4コマ・ペットの見かたを読めるようにしました。","読み上げは、スマホに入っている中でいちばん自然な声を選び、1文ずつ間をあけて読みます。マイ→⚙️設定で声・高さを選べます。寝る前ラジオのうしろの音は、オルゴール・波の音・音なしから選べます。"]},
   {id:"2026-11-06c",d:"2026-11-06",t:"🎨 4コマを短く、楽しく",L:["1コマのせりふを2〜3つにしぼり、キャラのいる舞台を上に、吹き出しを下にして、短く読めるようにしました。","「えっ!?」「ガーン」などの効果音や、びっくりしたときの集中線も入りました。"]},
   {id:"2026-11-06b",d:"2026-11-06",t:"🎨 4コマの見た目を新しくしました",L:["吹き出しを白い紙の上に出して、背景はキャラのいる「舞台」だけにしたので、せりふが読みやすくなりました。","コマごとに「起・承・転・結」と見出しがつき、天気・地球・グラフの背景も増えました。ホー先生は先生の帽子をかぶっています。"]},
@@ -5267,6 +5323,12 @@ function renderMy(){
   main.querySelectorAll("[data-tab]").forEach(b=>b.onclick=()=>go(b.dataset.tab));
   { const vn=main.querySelector("#vName"); if(vn){ const fill=()=>{ const cur=vn.value; vn.innerHTML=voiceOpts(); vn.value=store.get("nw-vname")||cur||""; }; try{ window.speechSynthesis&&window.speechSynthesis.addEventListener("voiceschanged",fill,{once:true}); }catch(_){}
     vn.onchange=()=>{ store.set("nw-vname",vn.value); sayJa("こんにちは。この声で、今日のニュースを読み上げます。"); };
+    const yoBind=()=>{ const box=main.querySelector("#yoList"); if(!box) return; box.innerHTML=yoListHTML();
+      box.querySelectorAll("[data-yosay]").forEach(b=>b.onclick=()=>{ const it=userYomi()[+b.dataset.yosay]; if(it) sayJa(it[0]); });
+      box.querySelectorAll("[data-yodel]").forEach(b=>b.onclick=()=>{ const L=userYomi(); L.splice(+b.dataset.yodel,1); store.set("nw-yomi",JSON.stringify(L)); yoBind(); }); };
+    yoBind();
+    main.querySelector("#yoAdd").onclick=()=>{ const w=main.querySelector("#yoW").value.trim(), y=main.querySelector("#yoY").value.trim(); if(!w||!y){ toast("書き方と読み方の両方を入れてください"); return; }
+      const L=userYomi().filter(x=>x[0]!==w); L.unshift([w,y]); store.set("nw-yomi",JSON.stringify(L.slice(0,100))); main.querySelector("#yoW").value=""; main.querySelector("#yoY").value=""; yoBind(); sayJa(w); toast(`「${w}」を「${y}」と読みます`); };
     main.querySelector("#vTry").onclick=()=>sayJa(`こんにちは。${petName()}です。今日のニュースを、この声で読み上げます。`);
     main.querySelectorAll("#vPitch [data-pitch]").forEach(b=>b.onclick=()=>{ store.set("nw-pitch",b.dataset.pitch); main.querySelectorAll("#vPitch [data-pitch]").forEach(x=>x.setAttribute("aria-pressed",String(x===b))); sayJa("この高さで読み上げます"); }); } }
   main.querySelectorAll("#vRate [data-rate]").forEach(b=>b.onclick=()=>{ store.set("nw-rate",b.dataset.rate); main.querySelectorAll("#vRate [data-rate]").forEach(x=>x.setAttribute("aria-pressed",String(x===b))); sayJa("この速さで読み上げます"); });
