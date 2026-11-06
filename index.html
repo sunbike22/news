@@ -510,20 +510,25 @@ mark{background:#ffe066;color:#141b2d;border-radius:3px;padding:0 1px}
 .mg-k{font-weight:900;color:#c2410c;font-size:.95rem}
 .mg-h{font-weight:800;font-size:.95rem;min-width:0}
 .mg-cap{margin-left:auto;background:#fff;border:2px solid #1d1d1f;font-size:.82rem;font-weight:700;padding:0 7px;line-height:1.6}
-.mg-talk{display:flex;flex-direction:column;gap:14px;padding:10px 10px 18px}
-.mg-b{--bb:#fff;position:relative;max-width:84%;margin:0;background:var(--bb);border:2.5px solid #1d1d1f;border-radius:18px;padding:6px 13px;font-size:1.05rem;line-height:1.5;font-weight:800;color:#1d1d1f}
+.mg-talk{display:flex;flex-direction:column;gap:10px;padding:16px 10px 10px}
+.mg-b{--bb:#fff;position:relative;max-width:88%;margin:0;background:var(--bb);border:2.5px solid #1d1d1f;border-radius:18px;padding:5px 12px;font-size:1.02rem;line-height:1.45;font-weight:800;color:#1d1d1f}
 .mg-b.l{align-self:flex-start}
 .mg-b.r{align-self:flex-end;--bb:#fff6dc}
 .mg-b::before,.mg-b::after{content:"";position:absolute;width:0;height:0;border-style:solid}
-.mg-b::before{bottom:-14px;border-width:14px 7px 0 7px;border-color:#1d1d1f transparent transparent transparent}
-.mg-b::after{bottom:-9.5px;border-width:10px 4.6px 0 4.6px;border-color:var(--bb) transparent transparent transparent}
-.mg-b.l::before{left:22px;transform:skewX(-25deg)}.mg-b.l::after{left:24.4px;transform:skewX(-25deg)}
-.mg-b.r::before{right:22px;transform:skewX(25deg)}.mg-b.r::after{right:24.4px;transform:skewX(25deg)}
-.mg-stage{position:relative;display:grid;grid-template-columns:64px minmax(0,1fr) 64px;align-items:end;gap:4px;min-height:112px;padding:6px 6px 4px;border-top:2px dashed #d6d0c2;isolation:isolate}
+.mg-b::before,.mg-b::after{display:none}
+.mg-b:first-child::before,.mg-b:first-child::after,.mg-b.l+.mg-b.r::before,.mg-b.l+.mg-b.r::after,.mg-b.r+.mg-b.l::before,.mg-b.r+.mg-b.l::after{display:block}
+.mg-b::before{top:-14px;border-width:0 7px 14px 7px;border-color:transparent transparent #1d1d1f transparent}
+.mg-b::after{top:-9.5px;border-width:0 4.6px 10px 4.6px;border-color:transparent transparent var(--bb) transparent}
+.mg-b.l::before{left:22px;transform:skewX(25deg)}.mg-b.l::after{left:24.4px;transform:skewX(25deg)}
+.mg-b.r::before{right:22px;transform:skewX(-25deg)}.mg-b.r::after{right:24.4px;transform:skewX(-25deg)}
+.mg-stage{position:relative;display:grid;grid-template-columns:64px minmax(0,1fr) 64px;align-items:end;gap:4px;min-height:96px;margin-top:6px;padding:6px 6px 4px;border-top:2px dashed #d6d0c2;border-bottom:2px dashed #d6d0c2;isolation:isolate}
+.mg-burst{position:absolute;inset:0;width:100%;height:100%;z-index:-1}
+.mg-fx{position:absolute;left:50%;top:3px;z-index:2;transform:translateX(-50%) rotate(-6deg);font-family:"Dela Gothic One",var(--font,inherit);font-weight:900;font-size:1.2rem;line-height:1.1;color:#e11d48;text-shadow:2px 0 0 #fff,-2px 0 0 #fff,0 2px 0 #fff,0 -2px 0 #fff,2px 2px 0 #fff,-2px -2px 0 #fff,3px 3px 0 #1d1d1f;white-space:nowrap;letter-spacing:.04em}
+.mg-stage:has(.mg-fx) .mg-ctr{padding-top:34px}
 .mg-stage .mg-bg{position:absolute;inset:0;width:100%;height:100%;z-index:-1}
 .mg-c{position:relative;line-height:0;text-align:center}
-.mg-c svg{width:56px;height:auto}
-.mg-c.r svg{width:50px}
+.mg-c svg{width:52px;height:auto}
+.mg-c.r svg{width:46px}
 .mg-nm{display:block;line-height:1.3;margin-top:2px;text-align:center;font-size:13px;letter-spacing:-.04em;font-weight:800;color:#1d1d1f;background:#ffffffd9;border-radius:4px;white-space:nowrap}
 .mg-c.r .mg-nm{color:#5b3a12}
 .mg-mark{position:absolute;top:-6px;font-size:1.15rem;line-height:1;font-style:normal;z-index:1}
@@ -2441,7 +2446,7 @@ document.addEventListener("click",e=>{ const g=e.target.closest(".gl"); if(g){ e
 
 
 // ===== 4コマでわかる。台本(data.js の解説の manga)をアプリが絵にする。絵は自作SVGだけ。実在の人は描かない =====
-// manga: {t:"題", sum:"黒板のまとめ(60字まで)", p:[{bg:"shop|diet|home|city|sea|space|stadium|tv|school|weather|world|money", h:"コマの見出し", cap:"ナレーション", e:"大きな絵文字(1〜3こ)", big:"看板(2行まで)", l:[["y"=生徒(わたし)|"m"=ホー先生, 顔, "せりふ(30字まで)"], …最大4つ]}] ×4}  ※古い形 y/m/o2 も読める
+// manga: {t:"題", sum:"黒板のまとめ(60字まで)", p:[{bg:"shop|diet|home|city|sea|space|stadium|tv|school|weather|world|money", h:"コマの見出し", fx:"効果音(6字まで)", cap:"ナレーション", e:"大きな絵文字(1〜3こ)", big:"看板(2行まで)", l:[["y"=生徒(わたし)|"m"=ホー先生, 顔, "せりふ(30字まで)"], …最大4つ]}] ×4}  ※古い形 y/m/o2 も読める
 // y=あなたのペット(よむまる)、m=ホー先生。顔: q(はてな) o(びっくり) s(にっこり) t(考える) n(ふつう)
 function owlSVG(f,size,hat){ const S=size||78; const eye=f==="o"?`<circle cx="31" cy="38" r="7" fill="#fff" stroke="#3a2a14" stroke-width="2"/><circle cx="49" cy="38" r="7" fill="#fff" stroke="#3a2a14" stroke-width="2"/><circle cx="31" cy="38" r="3" fill="#3a2a14"/><circle cx="49" cy="38" r="3" fill="#3a2a14"/>`
   : f==="s"?`<path d="M25 39q6-6 12 0M43 39q6-6 12 0" stroke="#3a2a14" stroke-width="3" fill="none" stroke-linecap="round"/>`
@@ -2463,6 +2468,8 @@ const MG_BG={
  world:`<rect width="320" height="120" fill="#eef6fb"/><circle cx="160" cy="48" r="34" fill="#9fd3f2" stroke="#7ab4d6" stroke-width="2"/><path d="M140 28q10 4 8 14t10 12q4 10-4 18M170 22q-6 10 4 16t14 6M176 66q6-6 14-4" fill="none" stroke="#7cc47a" stroke-width="7" stroke-linecap="round"/><rect y="98" width="320" height="22" fill="#d7e2ea"/>`,
  money:`<rect width="320" height="120" fill="#f3f8f0"/><rect x="100" y="16" width="120" height="70" rx="4" fill="#fff" stroke="#cfd8d2" stroke-width="2"/><path d="M112 72l22-18 18 10 22-24 20 14 14-20" fill="none" stroke="#ef4444" stroke-width="3" stroke-linejoin="round"/><path d="M112 76h96" stroke="#cfd8d2" stroke-width="2"/><rect y="96" width="320" height="24" fill="#d9e2d7"/>`};
 // コマの見出し(p.h がないときの目安)
+// びっくりの顔があるコマは、舞台に集中線を出す
+const MG_BURST=`<svg class="mg-burst" viewBox="0 0 320 120" preserveAspectRatio="none">${Array.from({length:28},(_,i)=>{ const a=i/28*Math.PI*2; return `<path d="M${160+Math.cos(a)*70} ${60+Math.sin(a)*34}L${160+Math.cos(a)*230} ${60+Math.sin(a)*130}" stroke="#1d1d1f" stroke-width="${i%2?1:2}" opacity=".18"/>`; }).join("")}</svg>`;
 const MG_KI=["起","承","転","結"], MG_HDEF=["はてな?","なにがあった?","どうなるの?","これから"];
 const MG_MARK={q:"❓",o:"❗",t:"💭",s:"♪"};
 // 1コマの会話(2026-11-06〜): l:[["y"|"m", 顔, せりふ], ...] 最大4つ。古い形(y・m・o2)も読む
@@ -2473,14 +2480,14 @@ function mangaHTML(m){ if(!m||!(m.p||[]).length) return ""; const st=petStage();
     const yl=L.filter(x=>x[0]==="y"), ml=L.filter(x=>x[0]==="m");
     const yf=yl.length?yl[yl.length-1][1]:"n", of=ml.length?ml[ml.length-1][1]:"n";
     const bg=MG_BG[p.bg]?p.bg:"home";
-    return `<figure class="mg-p" aria-label="${i+1}コマ目: ${esc([p.h,p.cap,...L.map(x=>(x[0]==="m"?"ホー先生":"わたし")+"「"+x[2]+"」"),p.big].filter(Boolean).join(" "))}">
+    return `<figure class="mg-p" aria-label="${i+1}コマ目: ${esc([p.h,p.cap,p.fx,...L.map(x=>(x[0]==="m"?"ホー先生":"わたし")+"「"+x[2]+"」"),p.big].filter(Boolean).join(" "))}">
       <figcaption class="mg-hd"><span class="mg-n">${i+1}</span><span class="mg-k">${MG_KI[i]}</span><span class="mg-h">${esc(p.h||MG_HDEF[i])}</span>${p.cap?`<span class="mg-cap">${esc(p.cap)}</span>`:""}</figcaption>
-      <div class="mg-talk" aria-hidden="true">${L.map(x=>`<p class="mg-b ${x[0]==="m"?"r":"l"}">${esc(x[2])}</p>`).join("")}</div>
-      <div class="mg-stage" aria-hidden="true"><svg class="mg-bg" viewBox="0 0 320 120" preserveAspectRatio="xMidYMax slice">${MG_BG[bg]}</svg>
+      <div class="mg-stage" aria-hidden="true"><svg class="mg-bg" viewBox="0 0 320 120" preserveAspectRatio="xMidYMax slice">${MG_BG[bg]}</svg>${L.some(x=>x[1]==="o")?MG_BURST:""}${p.fx?`<b class="mg-fx">${esc(p.fx)}</b>`:""}
         <span class="mg-c l">${yl.length&&MG_MARK[yf]?`<i class="mg-mark">${MG_MARK[yf]}</i>`:""}${petSVG(st.i,yf==="s"||yf==="o"?"happy":"hungry",null,62,wear)}<b class="mg-nm">わたし</b></span>
         <span class="mg-ctr">${p.e?`<span class="mg-e">${esc(p.e)}</span>`:""}${p.big?`<span class="mg-big">${esc(p.big)}</span>`:""}</span>
         <span class="mg-c r">${ml.length&&MG_MARK[of]?`<i class="mg-mark">${MG_MARK[of]}</i>`:""}${owlSVG(of,54,1)}<b class="mg-nm">ホー先生</b></span>
       </div>
+      <div class="mg-talk" aria-hidden="true">${L.map(x=>`<p class="mg-b ${x[0]==="m"?"r":"l"}">${esc(x[2])}</p>`).join("")}</div>
 </figure>`; }).join("");
   return `<div class="blk"><h3>🎨 4コマでわかる</h3><div class="manga"><div class="mg-ttl"><span>4コマでわかる</span><b>${esc(m.t||"きょうのニュース")}</b></div>${P}${m.sum?`<div class="mg-sum"><b>📝 ホー先生の黒板</b>${esc(m.sum)}</div>`:""}</div><div class="mg-cast">「わたし」=生徒(わたしたち。絵はあなたのペット ${esc(petName())})・🦉ホー先生=やさしい先生</div></div>`; }
 // ===== 解説の前後へ(左右スワイプ・ボタン) =====
@@ -4921,6 +4928,7 @@ function openShimen(){ const sh=document.getElementById("sheet"); const w=D.weat
 document.addEventListener("click",e=>{ const b=e.target.closest("[data-shimen]"); if(!b) return; e.preventDefault(); openShimen(); });
 // ===== お知らせ(新しくなったところ)。機能を足したら、いちばん上に1つ足す =====
 const UPDATES=[
+  {id:"2026-11-06c",d:"2026-11-06",t:"🎨 4コマを短く、楽しく",L:["1コマのせりふを2〜3つにしぼり、キャラのいる舞台を上に、吹き出しを下にして、短く読めるようにしました。","「えっ!?」「ガーン」などの効果音や、びっくりしたときの集中線も入りました。"]},
   {id:"2026-11-06b",d:"2026-11-06",t:"🎨 4コマの見た目を新しくしました",L:["吹き出しを白い紙の上に出して、背景はキャラのいる「舞台」だけにしたので、せりふが読みやすくなりました。","コマごとに「起・承・転・結」と見出しがつき、天気・地球・グラフの背景も増えました。ホー先生は先生の帽子をかぶっています。"]},
   {id:"2026-11-06a",d:"2026-11-06",t:"🎨 4コマが先生と生徒の会話に",L:["解説の4コマを、🦉ホー先生と「わたし」(生徒)のやりとりに作り直しました。1コマのせりふが増えて、自然な会話で中身がよくわかるようになりました。","4コマの下には「📝 ホー先生の黒板」のまとめも出ます。"]},
   {id:"2026-11-04c",d:"2026-11-04",t:"👕 ペットの服を直しました",L:["ランドセルを背中にしょう形に、ハンチング帽を前にひさしのある形に直しました。レインコートのフード・郵便屋さんのかばん・旅のカメラ・救命どうい・かみかざりの位置も自然に。けろまるは帽子やヘルメットで目がかくれないようにしました。服と小物(マフラー・ポップコーンなど)が重なるときは、小物をしまうようにしました。"]},
