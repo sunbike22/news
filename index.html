@@ -529,7 +529,8 @@ mark{background:#ffe066;color:#141b2d;border-radius:3px;padding:0 1px}
 .mg-c{position:relative;line-height:0;text-align:center}
 .mg-c svg{width:52px;height:auto}
 .mg-c.r svg{width:46px}
-.mg-nm{display:block;line-height:1.3;margin-top:2px;text-align:center;font-size:13px;letter-spacing:-.04em;font-weight:800;color:#1d1d1f;background:#ffffffd9;border-radius:4px;white-space:nowrap}
+.mg-nm{display:block;line-height:1.3;margin-top:2px;text-align:center;font-size:13px;letter-spacing:-.04em;font-weight:800;color:#1d1d1f;background:#ffffffd9;border-radius:4px;white-space:nowrap;max-width:76px;overflow:hidden;text-overflow:ellipsis;padding:0 3px}
+.mg-nm.lg{white-space:normal;word-break:break-all;font-size:11px;line-height:1.2;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
 .mg-c.r .mg-nm{color:#5b3a12}
 .mg-mark{position:absolute;top:-6px;font-size:1.15rem;line-height:1;font-style:normal;z-index:1}
 .mg-c.l .mg-mark{right:0}.mg-c.r .mg-mark{left:0}
@@ -1020,6 +1021,11 @@ svg.eat{animation:petEat .7s ease both!important}
 .rd-now{min-height:6.5em;font-size:1.05rem;line-height:1.8;background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:14px;text-align:left}
 .rd-bar{height:6px;background:var(--line);border-radius:3px;overflow:hidden}.rd-bar i{display:block;height:100%;width:0;background:var(--accent);transition:width .6s}
 .rd-btn{width:auto}
+.hp-q{font:inherit;font-size:.86rem;font-weight:700;color:var(--ink);background:var(--surface);border:1.5px solid var(--line);border-radius:999px;padding:4px 12px;min-height:36px;cursor:pointer;word-break:keep-all}
+:root[data-mode="easy"] .hp-q{min-height:44px}
+.hp-line{display:flex;margin:6px 0}
+.hp-sec.hp-hl>summary{background:var(--accent-soft)}
+.vc-row{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.vc-row select{flex:1 1 160px;min-width:0;font:inherit;font-size:1rem;color:var(--ink);background:var(--surface);border:1px solid var(--line);border-radius:8px;padding:8px;min-height:44px}
 /* つながり地図 */
 .web{position:relative;display:flex;flex-direction:column;gap:34px;padding:6px 0 10px}
 .web-svg{position:absolute;inset:0;pointer-events:none;overflow:visible}
@@ -2109,7 +2115,7 @@ function renderToday(){
   S.ten=`<section aria-label="今日のニュース10">
       <div class="sec-h"><h2>📰 今日のニュース10</h2><span class="seg len-seg" role="group" aria-label="長さ">${[["short","短く"],["full","くわしく"]].map(([k,l])=>`<button data-len="${k}" aria-pressed="${(LOOK.len||"short")===k}">${l}</button>`).join("")}</span></div>
       <div class="hint rd-min">📖 ここから約${readMin()}分で、きょうの大事なニュースを読み終われます</div>
-      <div class="rd-acts"><button class="fchip" data-shimen="1">🗞️ 新聞の形で読む</button>${ME.lifeSet?"":`<button class="fchip" data-lifeopen="1">🙋 自分に関係あるものに印</button>`}</div>
+      <div class="rd-acts"><button class="fchip" data-shimen="1">🗞️ 新聞の形で読む</button>${helpBtn("marks","✅⚠️の意味")}${ME.lifeSet?"":`<button class="fchip" data-lifeopen="1">🙋 自分に関係あるものに印</button>`}</div>
       <ol class="ten${(LOOK.len||"short")==="short"?" short":""}" style="margin-top:10px">${t.map((n,i)=>{
         const big=i<3; const sr=srcOf(n); const nv=(!n.ex&&!n.tab&&sr&&sr.nk)?sr.nk:""; const link=n.ex||n.tab||nv; const wt=newsWeight(n); const mine=isLocal(n.title+" "+(n.text||""),sr);
         return `<li class="${big?'big':''} w${wt.lv}${mine?' mytown':''}">${pinBtn({k:"t|"+n.title,h:n.title,g:n.g,d:(NEWS[0]||{}).d,ex:n.ex},"abs")}<button class="row${link?' link':''}"${n.ex?` data-ex="${n.ex}"`:''}${n.tab?` data-tab="${n.tab}"`:''}${nv?` data-nv="${esc(nv)}"`:''} ${link?'':'tabindex="-1"'}>
@@ -2318,7 +2324,29 @@ function openStory(fn){
   show(0);
 }
 function storyKeys(e){ if(!st) return; if(e.key==="Escape") closeStory(); if(e.key==="ArrowRight") show(st.i+1); if(e.key==="ArrowLeft") show(st.i-1); if(e.key===" "){e.preventDefault(); setPause(!st.paused);} }
-function speak(txt){ try{ const s=window.speechSynthesis; if(!s) return; s.cancel(); const u=new SpeechSynthesisUtterance(txt); u.lang="ja-JP"; u.rate=1.05*sayRate(); s.speak(u);}catch(e){} }
+// ===== 読み上げの声(2026-11-06: 機械っぽさを減らす) =====
+// 端末に入っている日本語の声から、いちばん自然なもの(Natural/Premium/拡張/Google など)を選ぶ。自分で選んだ声は nw-vname(nw-voice は物語の読み上げのオン/オフなので別)。
+const VOICE_BAD=/Eddy|Flo|Grandma|Grandpa|Reed|Rocko|Sandy|Shelley|Bad News|Bahh|Bells|Boing|Bubbles|Cellos|Wobble|Zarvox|Trinoids|Whisper|Jester|Organ|Superstar|Albert|Fred|Junior|Ralph|Kathy/i;
+function voiceScore(v){ const n=v.name||""; let s=0; if(/Natural|ニューラル/i.test(n)) s+=60; if(/Online/i.test(n)) s+=20; if(/Premium|プレミアム/i.test(n)) s+=55; if(/Enhanced|拡張|高品質/i.test(n)) s+=45; if(/Google/i.test(n)) s+=30; if(/Nanami|Keita|Kyoko|O-ren|Otoya|Hattori/i.test(n)) s+=10; if(VOICE_BAD.test(n)) s-=80; if(v.default) s+=2; return s; }
+function langVoices(code){ try{ const c=(code||"ja").split("-")[0].toLowerCase(); return (window.speechSynthesis.getVoices()||[]).filter(v=>(v.lang||"").replace("_","-").toLowerCase().startsWith(c)).sort((a,b)=>voiceScore(b)-voiceScore(a)); }catch(_){ return []; } }
+function bestJaVoice(){ const vs=langVoices("ja"); if(!vs.length) return null; const want=store.get("nw-vname"); return (want&&vs.find(v=>v.name===want))||vs[0]; }
+try{ window.speechSynthesis&&window.speechSynthesis.getVoices(); }catch(_){}
+function voiceOpts(){ const vs=langVoices("ja"); const cur=store.get("nw-vname")||""; const nm=v=>v.name.replace(/\s*[-–]\s*Japanese.*$/i,"").replace(/^Microsoft\s+/,"");
+  return `<option value="">おまかせ${vs[0]?`(いまは ${esc(nm(vs[0]))})`:""}</option>`+vs.map((v,i)=>`<option value="${esc(v.name)}"${v.name===cur?" selected":""}>${esc(nm(v))}${i===0&&voiceScore(v)>=40?" ⭐おすすめ":""}</option>`).join(""); }
+function sayPitch(){ const p=+(store.get("nw-pitch")||1); return p>=.8&&p<=1.2?p:1; }
+// 絵文字・記号は「右矢印」などと読まれて機械っぽくなるので、読む前に整える(意味は変えない)
+function ttsClean(t){ return String(t||"").replace(/\*\*/g,"").replace(/(\d{1,2})\/(\d{1,2})(?!\d)/g,"$1月$2日")
+  .replace(/[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{2B00}-\u{2BFF}\u{2190}-\u{21FF}️‍⃣]/gu,"、")
+  .replace(/[・／/|｜]/g,"、").replace(/[（(]([^）)]{0,40})[）)]/g,"、$1、").replace(/[「」『』【】〈〉《》"“”]/g,"")
+  .replace(/([0-9０-９]\s*[^\s〜～、。]{0,3})[〜～](?=\s*[0-9０-９])/g,"$1から").replace(/[〜～]/g,"").replace(/…+|‥+/g,"、").replace(/\s*、[\s、]*/g,"、").replace(/^、+|、+(?=[。！？!?]|$)/g,"").replace(/\s+/g," ").trim(); }
+// 1文ずつに分けて読む(文と文の間に自然な「間」ができる。長い文で止まる端末の不具合もさける)
+function ttsChunks(t){ const a=ttsClean(t).split(/(?<=[。！？!?])\s*|\n+/).map(x=>x.replace(/^[、。\s]+/,"").trim()).filter(Boolean); const out=[];
+  a.forEach(x=>{ while(x.length>140){ const i=x.lastIndexOf("、",140); const c=i>40?i+1:140; out.push(x.slice(0,c)); x=x.slice(c); } if(!x) return; if(out.length&&out[out.length-1].length+x.length<40) out[out.length-1]+=x; else out.push(x); }); return out; }
+function jaUtter(txt,rate){ const u=new SpeechSynthesisUtterance(txt); u.lang="ja-JP"; const v=bestJaVoice(); if(v){ u.voice=v; u.lang=v.lang; } u.rate=(rate||1)*sayRate(); u.pitch=sayPitch(); return u; }
+let SAY_ID=0;
+function sayQueue(txt,rate,onend){ try{ const s=window.speechSynthesis; if(!s) return; s.cancel(); const id=++SAY_ID; const ch=ttsChunks(txt); if(!ch.length){ onend&&onend(); return; }
+  ch.forEach((c,i)=>{ const u=jaUtter(c,rate); if(i===ch.length-1) u.onend=u.onerror=()=>{ if(id===SAY_ID&&onend) onend(); }; s.speak(u); }); }catch(_){} }
+function speak(txt){ sayQueue(txt,1); }
 function stopSpeak(){ try{ window.speechSynthesis && window.speechSynthesis.cancel(); }catch(e){} }
 function setPause(p){ st.paused=p; const b=document.getElementById("stPause"); b.textContent=p?"▶":"❚❚"; b.setAttribute("aria-label",p?"再生":"一時停止"); if(!p){ st.t0=performance.now()-st.el; tick(); } else { cancelAnimationFrame(st.raf);} }
 function show(i){
@@ -2446,7 +2474,7 @@ document.addEventListener("click",e=>{ const g=e.target.closest(".gl"); if(g){ e
 
 
 // ===== 4コマでわかる。台本(data.js の解説の manga)をアプリが絵にする。絵は自作SVGだけ。実在の人は描かない =====
-// manga: {t:"題", sum:"黒板のまとめ(60字まで)", p:[{bg:"shop|diet|home|city|sea|space|stadium|tv|school|weather|world|money", h:"コマの見出し", fx:"効果音(6字まで)", cap:"ナレーション", e:"大きな絵文字(1〜3こ)", big:"看板(2行まで)", l:[["y"=生徒(わたし)|"m"=ホー先生, 顔, "せりふ(30字まで)"], …最大4つ]}] ×4}  ※古い形 y/m/o2 も読める
+// manga: {t:"題", sum:"黒板のまとめ(60字まで)", p:[{bg:"shop|diet|home|city|sea|space|stadium|tv|school|weather|world|money", h:"コマの見出し", fx:"効果音(6字まで)", cap:"ナレーション", e:"大きな絵文字(1〜3こ)", big:"看板(2行まで)", l:[["y"=生徒(名札はペットの名前 petName())|"m"=ホー先生, 顔, "せりふ(30字まで)"], …最大4つ]}] ×4}  ※古い形 y/m/o2 も読める
 // y=あなたのペット(よむまる)、m=ホー先生。顔: q(はてな) o(びっくり) s(にっこり) t(考える) n(ふつう)
 function owlSVG(f,size,hat){ const S=size||78; const eye=f==="o"?`<circle cx="31" cy="38" r="7" fill="#fff" stroke="#3a2a14" stroke-width="2"/><circle cx="49" cy="38" r="7" fill="#fff" stroke="#3a2a14" stroke-width="2"/><circle cx="31" cy="38" r="3" fill="#3a2a14"/><circle cx="49" cy="38" r="3" fill="#3a2a14"/>`
   : f==="s"?`<path d="M25 39q6-6 12 0M43 39q6-6 12 0" stroke="#3a2a14" stroke-width="3" fill="none" stroke-linecap="round"/>`
@@ -2480,16 +2508,16 @@ function mangaHTML(m){ if(!m||!(m.p||[]).length) return ""; const st=petStage();
     const yl=L.filter(x=>x[0]==="y"), ml=L.filter(x=>x[0]==="m");
     const yf=yl.length?yl[yl.length-1][1]:"n", of=ml.length?ml[ml.length-1][1]:"n";
     const bg=MG_BG[p.bg]?p.bg:"home";
-    return `<figure class="mg-p" aria-label="${i+1}コマ目: ${esc([p.h,p.cap,p.fx,...L.map(x=>(x[0]==="m"?"ホー先生":"わたし")+"「"+x[2]+"」"),p.big].filter(Boolean).join(" "))}">
+    return `<figure class="mg-p" aria-label="${i+1}コマ目: ${esc([p.h,p.cap,p.fx,...L.map(x=>(x[0]==="m"?"ホー先生":petName())+"「"+x[2]+"」"),p.big].filter(Boolean).join(" "))}">
       <figcaption class="mg-hd"><span class="mg-n">${i+1}</span><span class="mg-k">${MG_KI[i]}</span><span class="mg-h">${esc(p.h||MG_HDEF[i])}</span>${p.cap?`<span class="mg-cap">${esc(p.cap)}</span>`:""}</figcaption>
       <div class="mg-stage" aria-hidden="true"><svg class="mg-bg" viewBox="0 0 320 120" preserveAspectRatio="xMidYMax slice">${MG_BG[bg]}</svg>${L.some(x=>x[1]==="o")?MG_BURST:""}${p.fx?`<b class="mg-fx">${esc(p.fx)}</b>`:""}
-        <span class="mg-c l">${yl.length&&MG_MARK[yf]?`<i class="mg-mark">${MG_MARK[yf]}</i>`:""}${petSVG(st.i,yf==="s"||yf==="o"?"happy":"hungry",null,62,wear)}<b class="mg-nm">わたし</b></span>
+        <span class="mg-c l">${yl.length&&MG_MARK[yf]?`<i class="mg-mark">${MG_MARK[yf]}</i>`:""}${petSVG(st.i,yf==="s"||yf==="o"?"happy":"hungry",null,62,wear)}<b class="mg-nm${petName().length>5?" lg":""}">${esc(petName())}</b></span>
         <span class="mg-ctr">${p.e?`<span class="mg-e">${esc(p.e)}</span>`:""}${p.big?`<span class="mg-big">${esc(p.big)}</span>`:""}</span>
         <span class="mg-c r">${ml.length&&MG_MARK[of]?`<i class="mg-mark">${MG_MARK[of]}</i>`:""}${owlSVG(of,54,1)}<b class="mg-nm">ホー先生</b></span>
       </div>
       <div class="mg-talk" aria-hidden="true">${L.map(x=>`<p class="mg-b ${x[0]==="m"?"r":"l"}">${esc(x[2])}</p>`).join("")}</div>
 </figure>`; }).join("");
-  return `<div class="blk"><h3>🎨 4コマでわかる</h3><div class="manga"><div class="mg-ttl"><span>4コマでわかる</span><b>${esc(m.t||"きょうのニュース")}</b></div>${P}${m.sum?`<div class="mg-sum"><b>📝 ホー先生の黒板</b>${esc(m.sum)}</div>`:""}</div><div class="mg-cast">「わたし」=生徒(わたしたち。絵はあなたのペット ${esc(petName())})・🦉ホー先生=やさしい先生</div></div>`; }
+  return `<div class="blk"><h3>🎨 4コマでわかる</h3><div class="hp-line">${helpBtn("manga","4コマの見かた")}</div><div class="manga"><div class="mg-ttl"><span>4コマでわかる</span><b>${esc(m.t||"きょうのニュース")}</b></div>${P}${m.sum?`<div class="mg-sum"><b>📝 ホー先生の黒板</b>${esc(m.sum)}</div>`:""}</div><div class="mg-cast">${esc(petName())}=あなたのペット(ニュースを学ぶ生徒。わたしたちと同じ立場)・🦉ホー先生=やさしい先生</div></div>`; }
 // ===== 解説の前後へ(左右スワイプ・ボタン) =====
 function exKeys(){ return Object.entries(D.explainers).filter(([,e])=>e&&e.name).map(([k])=>k); }
 function exNavHTML(k){ const K=exKeys(); const i=K.indexOf(k); if(i<0||K.length<2) return "";
@@ -2551,6 +2579,7 @@ function openEx(k){
     <div class="kid"><div class="l">🧒 ひとことで言うと</div><h2>${esc(e.kid)}</h2>${EN&&EN.ex&&EN.ex[k]&&langMode()!=="ja"?`<p class="enx" lang="en" style="margin:6px 0 0">${esc(EN.ex[k])} <span class="ensay" role="button" tabindex="0" data-say="${esc(EN.ex[k])}">🔊</span></p>`:""}</div>
     <div class="ex-acts"><button class="chat-go" id="exChat">💬 話しながら読む</button><button class="fchip" id="exSpeak">🔊 聞く</button><button class="fchip" data-serial="${k}">📖 連載で読む</button>${e.status!=="done"||fwOn(k)?fwBtn(k):""}</div>
     ${exTocHTML(e)}
+    <div class="hp-line">${helpBtn("ex","この画面の読み方")}</div>
     ${e.manga?`<div id="ex-mg">${mangaHTML(e.manga)}</div>`:""}
     ${LOOK.mode==="easy"?`<details class="faq plain exmore"><summary>📖 もっとくわしく見る(くわしい説明・出てくる人・動く図)</summary>`:""}
     <div class="blk" id="ex-more"><h3>💡 もう少しくわしく</h3><p class="ex-lead"><mark class="hl">${glossify(esc(e.more[0]))}</mark></p>${exParas(e.more[1])}</div>
@@ -2978,6 +3007,7 @@ function renderPlan(){ pLim=5;
   const pv=planView;
   main.innerHTML=`<div class="view">
     <div class="sec-h"><h2>${pv==="plan"?"📅 これからの予定":"🎯 予測と、あなたの予想"}</h2><span class="seg plan-seg" role="group" aria-label="予定か予測か">${[["plan","📅 予定"],["pred","🎯 予測"]].map(([k,l])=>`<button data-pv="${k}" aria-pressed="${pv===k}">${l}</button>`).join("")}</span></div>
+    <div class="hp-line">${helpBtn("plan","予定と予測とは?")}</div>
     <div id="pvPlan"${pv==="plan"?"":" hidden"}>
     ${mascot("plan")}
     <details class="faq plain cd-fold"><summary>🗳️ 大事な日まで(選挙・制度・値段が変わる日)</summary>${cdPlanHTML()}</details>
@@ -3045,7 +3075,7 @@ document.getElementById("setBtn").onclick=()=>{
     <div class="setrow" style="margin-bottom:10px"><span style="min-width:5em">モード<small style="display:block;font-size:.82rem;opacity:.8">押すと、どう変わるか見られます</small></span><span class="seg">${[["easy","かんたん"],["normal","ふつう"]].map(([k,l])=>`<button data-pmode="${k}" aria-pressed="${LOOK.mode===k}">${l}</button>`).join("")}</span></div>
     <div class="setrow" style="margin-bottom:10px"><span style="min-width:5em">文字の大きさ</span><span class="seg">${[["m","ふつう"],["l","大きめ"],["xl","特大"],["xxl","もっと大きく"]].map(([k,l])=>`<button data-size="${k}" aria-pressed="${s===k}">${l}</button>`).join("")}</span></div>
     <div class="setrow"><span style="min-width:5em">画面の色</span><span class="seg">${[["system","スマホに合わせる"],["light","明るい"],["dark","暗い"]].map(([k,l])=>`<button data-theme="${k}" aria-pressed="${t===k}">${l}</button>`).join("")}</span></div>
-    <div style="display:flex;flex-direction:column;gap:8px;margin-top:12px"><button class="fchip" id="popTabs">🧭 下のボタン(ページ)を選ぶ</button><button class="fchip" id="popLook">🎨 色・画面の並びを変える</button><button class="fchip" id="popHelp">🔰 使い方を見る</button>${isStandalone()?"":`<button class="fchip" data-instopen="1">📲 スマホの画面にボタンを置く</button>`}<button class="fchip" id="popMore">⚙️ ほかの設定(お知らせ・読み上げの速さ・ふりがな など) →</button></div>`;
+    <div style="display:flex;flex-direction:column;gap:8px;margin-top:12px"><button class="fchip" id="popTabs">🧭 下のボタン(ページ)を選ぶ</button><button class="fchip" id="popLook">🎨 色・画面の並びを変える</button><button class="fchip" id="popHelp">🔰 はじめての案内</button><button class="fchip" data-help="start">📖 使い方ガイド(マークの意味など)</button>${isStandalone()?"":`<button class="fchip" data-instopen="1">📲 スマホの画面にボタンを置く</button>`}<button class="fchip" id="popMore">⚙️ ほかの設定(お知らせ・読み上げの速さ・ふりがな など) →</button></div>`;
   p.hidden=false;
   document.getElementById("popx").onclick=()=>p.hidden=true;
   document.getElementById("popLook").onclick=()=>{ p.hidden=true; openLook(); };
@@ -3157,9 +3187,17 @@ function cvdCard(){ return `<section class="card" aria-label="色の見分けや
   <div class="hint" style="margin-top:6px">赤と緑など、色の見分けがつきにくい人向けです。「よい・悪い」の色を青とオレンジにかえ、色だけで分けていたところ(地図の丸・きょうの1問の結果など)に、形や文字もつけます。</div></section>`; }
 document.addEventListener("click",ev=>{ const b=ev.target.closest("#vCvd [data-cvd]"); if(!b) return; store.set("nw-cvd",b.dataset.cvd); applySettings(); document.querySelectorAll("#vCvd [data-cvd]").forEach(x=>x.setAttribute("aria-pressed",String(x===b))); toast(b.dataset.cvd==="1"?"🎨 色を見分けやすくしました":"🎨 ふつうの色にもどしました"); try{ track("/cvd/"+b.dataset.cvd,"色の見分けやすさ"); }catch(_){} });
 function voiceCard(){ const r=sayRate();
-  return `<section class="card" aria-label="読み上げ"><div class="sec-h"><h2>🔊 読み上げの速さ</h2></div>
+  return `<section class="card" aria-label="読み上げ"><div class="sec-h"><h2>🔊 読み上げの速さと声</h2></div>
     <div class="chips" id="vRate">${[[0.75,"🐢 ゆっくり"],[1,"ふつう"],[1.25,"🐇 はやい"]].map(([v,l])=>`<button class="fchip" data-rate="${v}" aria-pressed="${Math.abs(r-v)<.01}">${l}</button>`).join("")}</div>
     <div class="hint" style="margin-top:6px">「🔊 聞く」やことば辞典の読み上げの速さが変わります。お子さんや、ゆっくり聞きたいときは🐢がおすすめです。</div>
+    <div class="sec-h" style="margin-top:12px"><h2 style="font-size:1rem">🗣️ 読み上げの声</h2></div>
+    <div class="vc-row"><select id="vName" aria-label="読み上げの声">${voiceOpts()}</select><button class="fchip" id="vTry">▶ ためしに聞く</button></div>
+    <div class="chips" id="vPitch" style="margin-top:8px">${[[0.92,"声を低め"],[1,"ふつう"],[1.08,"声を高め"]].map(([v,l])=>`<button class="fchip" data-pitch="${v}" aria-pressed="${Math.abs(sayPitch()-v)<.01}">${l}</button>`).join("")}</div>
+    <div class="hint" style="margin-top:6px">声はスマホに入っているものから選びます。「おまかせ」は、入っている中でいちばん自然な声を使います。</div>
+    <details class="faq plain"><summary>もっと自然な声にするには</summary>
+      <p style="margin:6px 0"><b>iPhone・iPad</b>: 「設定」→「アクセシビリティ」→「読み上げコンテンツ」→「声」→「日本語」で、「Kyoko(拡張)」や「O-ren(拡張)」などを入れてください(数百MB・Wi-Fiがおすすめ)。入れたあと、このアプリを開き直して、上で選びます。</p>
+      <p style="margin:6px 0"><b>Android</b>: 「設定」→「システム」→「言語と入力」→「テキスト読み上げの出力」で「Google 音声サービス」を選び、⚙️から日本語の声をダウンロードしてください。</p>
+      <p style="margin:6px 0"><b>パソコン</b>: Microsoft Edge で開くと「Nanami(Natural)」などの自然な声が使えます。</p></details>
     <div class="sec-h" style="margin-top:12px"><h2 style="font-size:1rem">🈁 ふりがな</h2></div>
     <div class="chips" id="vRuby">${[["1","つける"],["0","つけない"]].map(([v,l])=>`<button class="fchip" data-ruby="${v}" aria-pressed="${rubyOn()===(v==="1")}">${l}</button>`).join("")}</div>
     <div class="hint" style="margin-top:6px">ことば辞典にあることば(点線のことば)に、よみがなをつけます。かんたんモードでは最初からついています。</div>
@@ -3866,7 +3904,7 @@ function petBig(){ petHatchCheck(); bdCheck(); const p=petInit(); const st=petSt
   return `<section class="card pet-big-card" aria-label="ペット">
     <div class="pet-big">${petSVG(st.i,mood,acc&&PET_ACC[acc][0],150,petWear())}${friendOn()?`<span class="pet-fr">${friendSVG(90)}</span>`:""}</div>
     <div style="text-align:center"><b style="font-size:1.2rem">${esc(petName())}</b> <span class="chip" style="margin-left:4px">${esc(st.name)}</span>
-      <div class="hint" style="margin-top:4px">${esc(petLine(mood,st))}</div></div>
+      <div class="hint" style="margin-top:4px">${esc(petLine(mood,st))}</div><div class="hp-line" style="justify-content:center">${helpBtn("pet","育て方")}</div></div>
     <div class="bar" style="margin-top:10px"><i style="width:${Math.round(st.prog*100)}%"></i></div>
     <div class="hint" style="text-align:center;margin-top:4px">そだち ${st.xp}${st.next?` ・ 「${esc(st.next[1])}」まで あと${st.next[0]-st.xp}`:" ・ 最高の姿!"}</div>
     <div style="display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-top:10px"><button class="fchip pet-feed" data-feed="1" ${p.food>0?"":"disabled"}>🍙 ごはん <b id="petFood">${p.food}</b> こ ・ あげる</button><button class="fchip" id="petRename">✏️ 名前</button></div>
@@ -4021,25 +4059,42 @@ function radioScript(){ const h=new Date(Date.now()+9*3600e3).getUTCHours(); con
   if(w) L.push(`${relDay(w.iso)}の${w.place}は、${w.sky}。最高気温${w.hi}度、最低気温${w.lo}度。${w.umbrella}。`);
   L.push(`${petName()}も、もうおやすみの時間です。きょうも読んでくれて、ありがとう。おやすみなさい。`); return L; }
 let RADIO=null;
-function bgmStart(){ try{ const AC=window.AudioContext||window.webkitAudioContext; if(!AC) return null; const ac=new AC(); const g=ac.createGain(); g.gain.value=0; g.connect(ac.destination);
-  const chords=[[220,277.18,329.63],[196,246.94,293.66],[174.61,220,261.63],[196,246.94,329.63]]; const osc=[0,1,2].map(()=>{ const o=ac.createOscillator(); o.type="sine"; const og=ac.createGain(); og.gain.value=.33; o.connect(og).connect(g); o.start(); return o; });
-  let k=0; const step=()=>{ const c=chords[k++%chords.length]; osc.forEach((o,i)=>o.frequency.setTargetAtTime(c[i],ac.currentTime,1.2)); }; step(); const iv=setInterval(step,6000);
-  g.gain.setTargetAtTime(.035,ac.currentTime,1.5); return {ac,g,iv,stop(){ clearInterval(iv); try{ g.gain.setTargetAtTime(0,ac.currentTime,.8); setTimeout(()=>ac.close(),2500); }catch(_){} }}; }catch(_){ return null; } }
+// 寝る前ラジオの音(2026-11-06 に作り直し): 「低い音がずっと鳴って高さがすべる」のが怖いという声があったので、
+// 明るい長調の音だけを1音ずつ小さく鳴らすオルゴールと、波の音にした。選べる(nw-rdbgm: box/wave/off)。
+function rdBgmKind(){ const k=store.get("nw-rdbgm"); return k==="wave"||k==="off"?k:"box"; }
+function bgmStart(kind){ try{ kind=kind||rdBgmKind(); if(kind==="off") return null; const AC=window.AudioContext||window.webkitAudioContext; if(!AC) return null; const ac=new AC();
+  const g=ac.createGain(); g.gain.value=0; const lp=ac.createBiquadFilter(); lp.type="lowpass"; lp.frequency.value=kind==="wave"?700:2600; lp.connect(g); g.connect(ac.destination);
+  let iv=0, src=null;
+  if(kind==="wave"){ // 波: やわらかいノイズ(ブラウン)を、8秒くらいでゆっくり大きく小さく
+    const n=ac.sampleRate*4, buf=ac.createBuffer(1,n,ac.sampleRate), d=buf.getChannelData(0); let last=0; for(let i=0;i<n;i++){ last=(last+0.02*(Math.random()*2-1))/1.02; d[i]=last*3.2; }
+    src=ac.createBufferSource(); src.buffer=buf; src.loop=true; const wg=ac.createGain(); wg.gain.value=.5; src.connect(wg).connect(lp); src.start();
+    const lfo=ac.createOscillator(); lfo.frequency.value=.12; const lg=ac.createGain(); lg.gain.value=.35; lfo.connect(lg).connect(wg.gain); lfo.start();
+    g.gain.setTargetAtTime(.05,ac.currentTime,2);
+  } else { // オルゴール: ハ長調のペンタトニック(ド・レ・ミ・ソ・ラ)を高めの音で、ゆっくり1音ずつ
+    const N=[523.25,587.33,659.25,783.99,880,1046.5]; let k=2;
+    const ping=f=>{ const t=ac.currentTime; [[1,"sine",1],[2,"sine",.18]].forEach(([m,ty,v])=>{ const o=ac.createOscillator(); o.type=ty; o.frequency.value=f*m; const e=ac.createGain(); e.gain.setValueAtTime(0,t); e.gain.linearRampToValueAtTime(v,t+.01); e.gain.exponentialRampToValueAtTime(.0001,t+2.4); o.connect(e).connect(lp); o.start(t); o.stop(t+2.5); }); };
+    const step=()=>{ if(Math.random()<.22) return; k=Math.max(0,Math.min(N.length-1,k+[-1,-1,0,1,1,2,-2][Math.floor(Math.random()*7)])); ping(N[k]); if(Math.random()<.18) setTimeout(()=>{ try{ ping(N[Math.max(0,k-2)]); }catch(_){} },420); };
+    step(); iv=setInterval(step,950); g.gain.setTargetAtTime(.06,ac.currentTime,1);
+  }
+  return {ac,g,iv,kind,stop(){ clearInterval(iv); try{ g.gain.setTargetAtTime(0,ac.currentTime,.6); setTimeout(()=>{ try{ src&&src.stop(); }catch(_){} ac.close(); },2200); }catch(_){} }}; }catch(_){ return null; } }
 function openRadio(){
   const sh=document.getElementById("sheet"); const L=radioScript(); const can=!!window.speechSynthesis;
   sh.innerHTML=`<div class="bar"><div class="wrap"><button class="iconbtn" id="rdx" aria-label="もどる">← もどる</button><span class="ttl">🌙 寝る前ラジオ</span></div></div>
   <div class="wrap body radio"><div class="rd-moon" aria-hidden="true">🌙<span>✦</span><span>✧</span><span>✦</span></div>
     <div class="rd-now" id="rdNow">${can?"▶ を押すと始まります(約3分・終わると自動で止まります)":"この端末では読み上げが使えないので、文字で読めます。"}</div>
     <div class="rd-bar"><i id="rdProg"></i></div>
-    <div style="display:flex;gap:10px;justify-content:center">${can?`<button class="play rd-btn" id="rdPlay"><span class="pi">▶</span><span><b>再生</b></span></button>`:""}<label class="fchip" style="display:flex;align-items:center;gap:6px"><input type="checkbox" id="rdBgm" checked> やさしい音</label></div>
+    <div style="display:flex;gap:10px;justify-content:center">${can?`<button class="play rd-btn" id="rdPlay"><span class="pi">▶</span><span><b>再生</b></span></button>`:""}</div>
+    <div class="chips" id="rdBgm" role="group" aria-label="うしろの音" style="justify-content:center">${[["box","🎵 オルゴール"],["wave","🌊 波の音"],["off","🔇 音なし"]].map(([k,l])=>`<button class="fchip" data-bgm="${k}" aria-pressed="${rdBgmKind()===k}">${l}</button>`).join("")}</div>
+    <div class="hint" style="text-align:center">うしろの音は小さめです。声だけで聞きたいときは「音なし」に。声の種類や速さは マイ→⚙️設定 で変えられます。</div>
     <details class="faq plain"><summary>読み上げる文</summary>${L.map(t=>`<p style="margin:6px 0">${esc(t)}</p>`).join("")}</details></div>`;
   const stop=()=>{ try{ window.speechSynthesis&&window.speechSynthesis.cancel(); }catch(_){} if(RADIO&&RADIO.bgm) RADIO.bgm.stop(); RADIO=null; const b=document.getElementById("rdPlay"); if(b) b.innerHTML='<span class="pi">▶</span><span><b>再生</b></span>'; };
   const close=()=>{ stop(); sh.hidden=true; sh.innerHTML=""; document.body.style.overflow=""; };
   sh.querySelector("#rdx").onclick=close;
-  const pb=sh.querySelector("#rdPlay"); if(pb) pb.onclick=()=>{ if(RADIO){ stop(); return; } RADIO={i:0,bgm:document.getElementById("rdBgm").checked?bgmStart():null}; pb.innerHTML='<span class="pi">■</span><span><b>止める</b></span>'; track("/radio","寝る前ラジオ");
+  sh.querySelectorAll("#rdBgm [data-bgm]").forEach(b=>b.onclick=()=>{ store.set("nw-rdbgm",b.dataset.bgm); sh.querySelectorAll("#rdBgm [data-bgm]").forEach(x=>x.setAttribute("aria-pressed",String(x===b))); if(RADIO){ if(RADIO.bgm) RADIO.bgm.stop(); RADIO.bgm=bgmStart(); } });
+  const pb=sh.querySelector("#rdPlay"); if(pb) pb.onclick=()=>{ if(RADIO){ stop(); return; } RADIO={i:0,bgm:bgmStart()}; pb.innerHTML='<span class="pi">■</span><span><b>止める</b></span>'; track("/radio","寝る前ラジオ");
     const next=()=>{ if(!RADIO) return; const i=RADIO.i++; if(i>=L.length){ document.getElementById("rdNow").textContent="おやすみなさい 🌙"; document.getElementById("rdProg").style.width="100%"; setTimeout(stop,1500); return; }
       document.getElementById("rdNow").textContent=L[i]; document.getElementById("rdProg").style.width=Math.round(i/L.length*100)+"%";
-      const u=new SpeechSynthesisUtterance(L[i]); u.lang="ja-JP"; u.rate=.95; u.pitch=.95; u.onend=()=>setTimeout(next,700); u.onerror=()=>setTimeout(next,300); window.speechSynthesis.speak(u); };
+      const u=jaUtter(ttsClean(L[i]),.9); u.pitch=sayPitch()*.96; u.onend=()=>setTimeout(next,900); u.onerror=()=>setTimeout(next,300); window.speechSynthesis.speak(u); };
     setTimeout(next,1200); };
   sh.hidden=false; sh.scrollTop=0; document.body.style.overflow="hidden";
 }
@@ -4290,13 +4345,21 @@ function onboard(force){ if(!force && (store.get("nw-onboard")==="1" || ME.days.
       <div class="tp-grid ob-tp">${OB_TOPICS.map(k=>TOPIC[k]).filter(Boolean).map(t=>`<button class="tpk" data-obtp="${t[0]}" aria-pressed="${!!ME.topics[t[0]]}"><span class="tp-i" aria-hidden="true">${t[1]}</span><span class="tp-n">${esc(t[2])}</span></button>`).join("")}</div>
       <p class="obp hint" id="obTpN" style="margin-top:10px">${n?`💗 ${n}こ 選んでいます。`:""}ぜんぶで ${TOPICS.length}こ あります。あとで マイ→⚙️設定 の「💗 好きなこと」で足せます。</p>`; }},
     {t:"画面の見かた",pet:"professor",h:()=>mock()+legend()},
+    {t:"マークと押せるところ",pet:"detective",h:()=>`<ul class="obh">
+      <li><span class="obk">✅</span><span><b>確認ずみ</b>。別々の報道機関2社以上が伝えたニュース</span></li>
+      <li><span class="obk">⚠️</span><span>まだ1社だけのニュース。確かめられたら✅に変わります</span></li>
+      <li><span class="obk">📌</span><span><b>話題</b>。レシピ・新商品・イベントなど、暮らしの話</span></li>
+      <li><span class="obk" style="text-decoration:underline dotted">ことば</span><span>点線のことばは、押すと意味が出ます</span></li>
+      <li><span class="obk">💡</span><span>「くわしい解説」は、図・4コマ・流れつきで、ゆっくりわかるページ</span></li>
+      <li><span class="obk">🔊</span><span>押すと読み上げます。もう一度押すと止まります</span></li></ul>`},
     {t:"こまったときは",pet:"detective",h:()=>`<ul class="obh">
       <li><span class="obk">← もどる</span><span>左上のボタンで、前の画面にもどります</span></li>
       <li><span class="obk">設定</span><span>右上。文字を大きくしたり、モードを変えたりできます</span></li>
       <li><span class="obk">💬</span><span>右下。わからないことを聞けます</span></li>
-      <li><span class="obk">🔔</span><span>右上。アプリの新しくなったところ</span></li></ul>
-      <p class="obp hint">この案内は「設定」→「🔰 使い方を見る」で、いつでももう一度見られます。</p>`}];
-  steps.push({normalOnly:1,t:"いっしょに育とう!",pet:"newsboy",h:()=>`<p class="obp">ぼくは<b>${esc(petName())}</b>。<b>🧠 クイズ</b>に正解すると、ぼくのごはん🍙になるよ。ニュースを読むほど大きくなるんだ。点線のことばは、押すと意味が出るよ。</p>`});
+      <li><span class="obk">🔔</span><span>右上。アプリの新しくなったところ</span></li>
+      <li><span class="obk">？</span><span>画面の「？ これは何?」を押すと、その場所の説明が出ます</span></li></ul>
+      <p class="obp hint">この案内は「設定」→「🔰 はじめての案内」で、くわしい説明は「設定」→「📖 使い方ガイド」で、いつでも見られます。</p>`}];
+  steps.push({normalOnly:1,t:"いっしょに育とう!",pet:"newsboy",h:()=>`<p class="obp">ぼくは<b>${esc(petName())}</b>。<b>🧠 クイズ</b>に正解すると、ぼくのごはん🍙になるよ。ニュースを読むほど大きくなるんだ。</p><p class="obp">名前は マイ→🐣ペット の「✏️ 名前」で、すきな名前に変えられるよ。解説の4コマでは、ぼくがあなたの代わりに🦉ホー先生に質問するね。</p>`});
   let i=0; const draw=()=>{ const V=steps.filter(x=>!x.normalOnly||LOOK.mode!=="easy"); const st=V[i]; const last=i===V.length-1;
     ov.innerHTML=`<div class="ob-card"><div class="ob-step">${i+1} / ${V.length}</div><div class="ob-pet">${petSVG(Math.max(1,petStage().i),"happy",null,i===1?64:88,st.pet)}</div><h2>${esc(st.t)}</h2>${st.h()}
       <div class="ob-bt">${i>0?`<button class="fchip" id="obBack">← もどる</button>`:`<button class="fchip" id="obSkip">とばす</button>`}<button class="fchip pet-feed ob-next" id="obNext">${last?"はじめる!":"つぎへ →"}</button></div></div>`;
@@ -4704,7 +4767,7 @@ function lgRender(){ const box=document.getElementById("lgBody"); if(!box||!LG) 
   box.querySelectorAll("[data-lgpick]").forEach(b=>b.onclick=()=>{ const k=b.dataset.lgpick; const i=L.indexOf(k); if(i>=0){ if(L.length>1) L.splice(i,1); else { toast("1つは選んでおいてね"); return; } } else L.push(k); ME.langs=L; saveMe(); lgRender(); });
   lgBindQuiz(box); }
 function sayLang(t,code,btn){ try{ const s=window.speechSynthesis; if(!s) return; s.cancel(); const u=new SpeechSynthesisUtterance(t); u.lang=code; u.rate=.85*sayRate();
-    const v=(s.getVoices()||[]).find(v=>v.lang&&v.lang.replace("_","-").toLowerCase().startsWith(code.split("-")[0])); if(v) u.voice=v;
+    const v=/^ja/i.test(code)?bestJaVoice():langVoices(code)[0]; if(v){ u.voice=v; u.lang=v.lang; }
     const av=document.getElementById("lgAv"); if(av){ av.classList.remove("talk"); void av.offsetWidth; av.classList.add("talk"); }
     if(btn){ btn.classList.add("on"); u.onend=()=>btn.classList.remove("on"); u.onerror=()=>btn.classList.remove("on"); }
     s.speak(u); }catch(_){} }
@@ -4928,6 +4991,7 @@ function openShimen(){ const sh=document.getElementById("sheet"); const w=D.weat
 document.addEventListener("click",e=>{ const b=e.target.closest("[data-shimen]"); if(!b) return; e.preventDefault(); openShimen(); });
 // ===== お知らせ(新しくなったところ)。機能を足したら、いちばん上に1つ足す =====
 const UPDATES=[
+  {id:"2026-11-06d",d:"2026-11-06",t:"📖 説明を増やし、読み上げの声と寝る前ラジオの音を見直しました",L:["4コマの生徒の名札が、あなたのペットの名前になりました(名前を変えていれば、その名前)。","画面のあちこちに「？ これは何?」を足し、「設定」→「📖 使い方ガイド」で、マークの意味や解説・4コマ・ペットの見かたを読めるようにしました。","読み上げは、スマホに入っている中でいちばん自然な声を選び、1文ずつ間をあけて読みます。マイ→⚙️設定で声・高さを選べます。寝る前ラジオのうしろの音は、オルゴール・波の音・音なしから選べます。"]},
   {id:"2026-11-06c",d:"2026-11-06",t:"🎨 4コマを短く、楽しく",L:["1コマのせりふを2〜3つにしぼり、キャラのいる舞台を上に、吹き出しを下にして、短く読めるようにしました。","「えっ!?」「ガーン」などの効果音や、びっくりしたときの集中線も入りました。"]},
   {id:"2026-11-06b",d:"2026-11-06",t:"🎨 4コマの見た目を新しくしました",L:["吹き出しを白い紙の上に出して、背景はキャラのいる「舞台」だけにしたので、せりふが読みやすくなりました。","コマごとに「起・承・転・結」と見出しがつき、天気・地球・グラフの背景も増えました。ホー先生は先生の帽子をかぶっています。"]},
   {id:"2026-11-06a",d:"2026-11-06",t:"🎨 4コマが先生と生徒の会話に",L:["解説の4コマを、🦉ホー先生と「わたし」(生徒)のやりとりに作り直しました。1コマのせりふが増えて、自然な会話で中身がよくわかるようになりました。","4コマの下には「📝 ホー先生の黒板」のまとめも出ます。"]},
@@ -5083,8 +5147,8 @@ function langMode(){ return EN?(LOOK.lang||"ja"):"ja"; }
 function enOf(kind,i){ if(!EN) return null; const L=EN[kind]; return L&&L[i]?L[i]:null; }
 function enBlock(e){ if(!e||langMode()==="ja") return ""; return `<span class="enb" lang="en"><span class="ent">${esc(e.t||"")}</span>${e.x?`<span class="enx">${esc(e.x)}</span>`:""}${(e.w||[]).length?`<span class="enw">${e.w.map(([a,b])=>`<i>📘 ${esc(a)} = ${esc(b)}</i>`).join("")}</span>`:""}<span class="ensay" role="button" tabindex="0" data-say="${esc((e.t||"")+". "+(e.x||""))}">🔊 English</span></span>`; }
 function langSeg(){ if(!EN) return ""; const m=langMode(); return `<span class="seg lang-seg" role="group" aria-label="ことば">${[["ja","日本語"],["both","日+英"],["en","English"]].map(([k,l])=>`<button data-lang="${k}" aria-pressed="${m===k}">${l}</button>`).join("")}</span>`; }
-function sayJa(t){ try{ const s=window.speechSynthesis; if(!s) return; s.cancel(); const u=new SpeechSynthesisUtterance(t); u.lang="ja-JP"; u.rate=.95*sayRate(); s.speak(u); }catch(_){} }
-function sayEn(t){ try{ const s=window.speechSynthesis; if(!s) return; s.cancel(); const u=new SpeechSynthesisUtterance(t); u.lang="en-US"; u.rate=.9; s.speak(u); }catch(_){} }
+function sayJa(t){ sayQueue(t,.95); }
+function sayEn(t){ try{ const s=window.speechSynthesis; if(!s) return; s.cancel(); const u=new SpeechSynthesisUtterance(t); u.lang="en-US"; const v=langVoices("en")[0]; if(v){ u.voice=v; u.lang=v.lang; } u.rate=.9; s.speak(u); }catch(_){} }
 document.addEventListener("click",e=>{ const sj=e.target.closest("[data-sayj]"); if(sj){ e.preventDefault(); e.stopPropagation(); sayJa(sj.dataset.sayj); return; }
   { const r=e.target.closest(".ten.short li>.row"); if(r&&!r.classList.contains("link")&&!e.target.closest("[data-trust],[data-share],[data-pin],a,details")){ r.parentElement.classList.toggle("exp"); } }
   const ln=e.target.closest("[data-len]"); if(ln){ e.preventDefault(); e.stopPropagation(); LOOK.len=ln.dataset.len; saveLook(); const ol=document.querySelector("ol.ten"); if(ol){ ol.classList.toggle("short",LOOK.len==="short"); document.querySelectorAll("[data-len]").forEach(x=>x.setAttribute("aria-pressed",String(x.dataset.len===LOOK.len))); } return; }
@@ -5103,22 +5167,36 @@ function openUpdates(){ const sh=document.getElementById("sheet"); const n=updUn
 function updCard(){ const u=UPDATES[0]; const n=updUnread();
   return `<button class="lookcard" id="updBtn"><span style="font-size:1.6rem" aria-hidden="true">🔔</span><span style="min-width:0"><b>お知らせ${n>0?` <span class="newtag">NEW ${n}</span>`:""}</b><span class="hint" style="display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${esc(mdLabel(u.d))} ${esc(u.t)}</span></span></button>`; }
 // ===== 使い方 =====
-const GUIDE = [
-  ["🚀","まずはここから",["「✨ おたのしみ」の<b>▶ 1分で見る</b>を押すと、今日のニュースが動くスライドで流れます(かんたんモードは「🔊 今日のニュースを聞く」)。","時間がない日は<b>☀️ 今日の3行</b>だけ読めばOK。","<b>📰 今日のニュース10</b>は、その日に関心が高かった順のランキングです。下の「記録したニュース すべて」で、ほかのニュースも見られます。"]],
-  ["🔖","マークの見かた",["<b>✅</b> 別々の報道機関2社以上で確かめたニュース。","<b>⚠️</b> まだ1社だけ・見出しだけのニュース。続報で確かめられたら✅に変わります。","<b>📌 話題</b> 旬のレシピ・新しい商品・イベント・お役所の発表・研究など、暮らしや趣味の話題。会社や役所の発表、専門のサイトから集めています(ニュース10・今日の3行には入りません)。","<b>NEW</b> 前に開いたあとに増えたニュース。"]],
-  ["👆","さわってみよう",["<b>点線のことば</b>をタップすると、意味がその場で出ます。調べたことばは「マイ」にたまります。","<b>📍</b>を押すと、そのニュースを保存できます。保存したものは「マイ」で見られて、メモも書けます。","「くわしい解説 →」から、<b>図・Q&A・これまでの流れ</b>つきの解説が読めます。<b>🔊 聞く</b>で読み上げもできます。"]],
-  ["🧭","下のタブ",["<b>📰 きょう</b> 今日のまとめ ／ <b>🔎 さがす</b> ことばやジャンルで過去のニュースを検索 ／ <b>🗺️ 地図</b> どこで起きたかを地図で","<b>💡 解説</b> 大きな話題をやさしく ／ <b>📈 数字</b> 日経平均・円・原油のグラフ(数時間ごと〜全期間) ／ <b>📅 予定</b> これからの予定と、Claudeの予測","<b>⭐ マイ</b> あなたの記録・保存・着せかえ"]],
-  ["🎯","続けるとたのしいこと",["<b>🐣 ペット</b>がニュースといっしょに育ちます。クイズに正解すると🍙ごはんがもらえて、あげると大きくなります。よく読むジャンルで小物が変わり、3日あけるとすねます。","開いた日・解説・クイズ・ことば・予想で<b>ポイント</b>がたまり、レベルとバッジが上がります。","「予定」の予測に<b>あなたも予想</b>して、答え合わせができます。Claudeと的中率くらべも。","毎日の連続記録は「マイ」のカレンダーで見られます。"]],
-  ["✨","ちょっと変わった楽しみ方",["<b>🗺️ 世の中の天気図</b>(おたのしみ)…ジャンルごとのニュースの空気を、晴れ〜あらしで。","<b>👆 知ってた?</b>(おたのしみ)…「🤔 知らなかった / 😎 知ってた」を押すと、知らなかったジャンルを多めに出します。","<b>🍽️ 今日の話のタネ</b>(おたのしみ)…家族や友だちと話せる問いかけ。","<b>🌙 寝る前ラジオ</b>(おたのしみ)…3分でニュースを耳で。やさしい音つき。","<b>⚔️ クイズ対戦</b>…クイズのあとに挑戦状のリンクを送って勝負。","<b>📰 未来の新聞</b>(予定)…予測を新聞の紙面に。<b>🕸️ つながり地図</b>(解説)…話の流れを糸でたどる。","<b>🧮 もしも計算機</b>(数字)…円やガソリンが動いたら、財布はどうなる?","<b>⏳ タイムカプセル</b>(マイ)…決めた日まで開けられないメモ。"]],
-  ["💬","聞いてみる",["右下の<b>💬</b>で「ニュース案内係」に質問できます。解説のQ&A・ことば辞典・ニュースの記録から、アプリの中で答えをさがします(質問はどこにも送りません)。","もっと深く知りたいときは「Claudeでもっと深く聞く」で、Claude(AI)に聞けます(アプリの外で開きます)。"]],
-  ["🎨","自分好みにする",["「マイ」の<b>🎨 着せかえ</b>で、色・文字の大きさ・詰め具合・「きょう」の並び・下のタブの並びを変えられます。","右上の<b>「設定」</b>で、文字の大きさと明るさをすぐ変えられます。"]],
-  ["📲","スマホの画面にボタンを置く",["iPhone: 画面の下(または上)の「□に↑」のマーク →「ホーム画面に追加」→「追加」。","Android: 画面の右上の「︙」→「ホーム画面に追加」→「追加」。","絵つきのやり方は、マイ→⚙️設定の「📲 スマホの画面に、このアプリのボタンを置く」→「📖 絵つきのやり方」。","一度開いた内容は、電波がないところでも読めます。"]],
-  ["🔒","記録について",["あなたの記録・保存・着せかえは、<b>このスマホ(ブラウザ)の中だけ</b>に保存されます。ほかの人や作った人には見えません。",...(STATS.on&&STATS.code?["サイトをよくするため、<b>どの画面・解説・ジャンルが何回開かれたか</b>だけを数えています(だれが見たかはわかりません)。質問の文章やメモは送りません。"]:[]),"更新は1日5回(朝・昼・午後・夕方・夜)です。"]]
+// ===== 使い方ガイド(2026-11-06: 「説明が足りない」という声で作り直し) =====
+// HELP=[キー, 絵文字, 見出し, [文…]]。画面のあちこちの「？ これは何?」(helpBtn(キー))から、その見出しを開く。機能を足したらここも直す。
+const HELP=[
+  ["start","🚀","まずはここから",["時間がない日は<b>☀️ 今日の3行</b>だけ読めばOKです。","<b>📰 今日のニュース10</b>は、その日に関心が高かった順のニュースです。見出しを押すと、くわしいページが開きます。","<b>🔊 聞く</b>を押すと、天気とニュースを声で読み上げます。","わからないことがあったら、画面の<b>「？ これは何?」</b>を押してください。その場所の説明が出ます。"]],
+  ["marks","🔖","マークの意味",["<b>✅ 確認ずみ</b>…別々の報道機関<b>2社以上</b>が伝えたニュース。","<b>⚠️</b>…まだ1社だけ・見出しだけのニュース。あとで確かめられたら✅に変わります。","<b>📌 話題</b>…レシピ・新商品・イベント・研究など、暮らしや趣味の話題。会社や役所の発表から集めています(ニュース10には入りません)。","✅や⚠️を<b>押すと</b>、どこが伝えたかが出ます。","<b>点線のことば</b>は、押すと意味が出ます。","<b>💗</b> あなたが選んだ「好きなこと」のニュース ／ <b>🙋</b> あなたのくらしに関係ありそう ／ <b>🏠</b> わたしの街のニュース ／ <b>🆕・NEW</b> 前に開いたあとに増えたもの。"]],
+  ["ten","📰","ニュース10の読み方",["上から順に、その日に大きく伝えられたニュースです。","右上の<b>「短く／くわしく」</b>で、見出しだけにするか、説明も出すかを切りかえられます。","<b>「くわしい解説 →」</b>があるものは、図や流れつきの解説ページが読めます。","<b>🏷️ 保存</b>で「マイ」にとっておけます。<b>📤 送る</b>で家族や友だちに見出しを送れます(あなたの記録は送りません)。"]],
+  ["ex","💡","解説ページの読み方",["大きな話題を1つずつ、やさしく説明するページです。上から読めば全体がわかります。","<b>ひとことで言うと</b>…まずここだけ読めば大まかにわかります。","<b>目次</b>を押すと、その場所に飛びます。","<b>🙋 わたしたちへの影響</b>…くらしにどう関係するか。","<b>📅 流れ</b>…これまでに起きたことの年表。<b>🔭 これから</b>…次に注目する日。","<b>🔔 続きを追う</b>を押すと、新しい動きがあったとき「きょう」でお知らせします。","<b>💬 話しながら読む</b>・<b>📖 連載で読む</b>…同じ中身を、会話や1日1話の形で読めます。","画面を<b>左右にすべらせる</b>と、前後の解説に移ります。"]],
+  ["manga","🎨","4コマの見かた",["解説の中身を、4つのコマで説明するマンガです。","左にいるのは<b>あなたのペット</b>(名札はペットの名前)。ニュースにくわしくない生徒で、わたしたちと同じ立場で質問します。","右の<b>🦉 ホー先生</b>がやさしく答えます。","上から<b>①はてな? → ②なにがあった? → ③どうなるの? → ④これから</b>の順に読みます。","いちばん下の<b>📝 ホー先生の黒板</b>が、まとめです。"]],
+  ["listen","🔊","聞く・読み上げ",["<b>🔊 聞く</b>のボタンで、文を読み上げます。もう一度押すと止まります。","速さ・声の高さ・声の種類は、<b>マイ → ⚙️設定 →「🔊 読み上げの速さと声」</b>で変えられます。","声は<b>スマホに入っている声</b>を使います。もっと自然な声にしたいときは、同じ場所の「もっと自然な声にするには」を見てください。","<b>🌙 寝る前ラジオ</b>(おたのしみ)は、3分でニュースを耳で聞けます。うしろの音は「オルゴール・波の音・音なし」から選べます。"]],
+  ["pet","🐣","ペットの育て方",["ペットはニュースといっしょに育ちます。はじめはたまごで、何が生まれるかはお楽しみです。","<b>🧠 クイズ</b>に正解すると🍙ごはんがもらえます。ごはんをあげたり、毎日開いたり、解説を読んだりすると育ちます。","名前は<b>マイ → 🐣 ペット の「✏️ 名前」</b>で変えられます。変えた名前は4コマなどにも出ます。","服・部屋・色は、育つと選べるものが増えます。ごはんやお世話をしなくても、困ることはありません。"]],
+  ["plan","📅","予定と予測",["<b>📅 予定</b>…これから決まっている日(選挙・発表・値上げなど)。","<b>🎯 予測</b>…Claude(AI)が「こうなりそう」と考えたもの。あたるとは限りません。","あなたも<b>予想</b>して、答え合わせができます。"]],
+  ["search","🔎","さがす・地図・数字",["<b>🔎 さがす</b>…ことばやジャンルで、これまでのニュースを探せます。","<b>🗺️ 地図</b>…ニュースがどこで起きたか。2本の指で大きくできます。","<b>📈 数字</b>…日経平均・円・原油のグラフと、くらしの便利。","地図と数字は、「さがす」の上のボタンから開けます。"]],
+  ["bousai","🛟","防災",["天気カードの<b>「🛟 防災」</b>で、地震・津波・警報・雨雲・にげる場所が見られます。","地震や警報は<b>気象庁の発表</b>をそのまま出しています。","ゆれる前の速報は、スマホの<b>緊急速報(エリアメール)</b>で受けとるのが正式な方法です。"]],
+  ["ask","💬","聞いてみる",["右下の<b>💬</b>で質問できます。アプリの中の解説やことば辞典から答えを探します(質問はどこにも送りません)。","もっと深く知りたいときは「Claudeでもっと深く聞く」で、アプリの外のClaude(AI)に聞けます。"]],
+  ["custom","🎨","自分好みにする",["右上の<b>「設定」</b>で、文字の大きさ・画面の色・モード(かんたん/ふつう)を変えられます。","<b>かんたん</b>…文字が大きく、天気・ニュース・聞くボタンだけ。<b>ふつう</b>…ペットやクイズなど、ぜんぶの機能。","「きょう」の並びや下のボタンも、好きなように変えられます。"]],
+  ["install","📲","スマホの画面にボタンを置く",["iPhone: 画面の「□に↑」のマーク →「ホーム画面に追加」→「追加」。","Android: 右上の「︙」→「ホーム画面に追加」→「追加」。","絵つきのやり方は、右上の「設定」→「📲 スマホの画面にボタンを置く」。"]],
+  ["privacy","🔒","記録について",["あなたの記録・保存・着せかえは、<b>このスマホ(ブラウザ)の中だけ</b>に保存されます。ほかの人や作った人には見えません。",...(STATS.on&&STATS.code?["サイトをよくするため、<b>どの画面・解説・ジャンルが何回開かれたか</b>だけを数えています(だれが見たかはわかりません)。質問の文章やメモは送りません。"]:[]),"ニュースの更新は1日5回(朝・昼・午後・夕方・夜)です。"]]
 ];
-function guideBlock(){
-  return `<details class="faq plain" id="guide"><summary>📘 このアプリの使い方</summary>
-    <div style="display:flex;flex-direction:column;gap:12px;padding:8px 0 14px">${GUIDE.map(([i,t,L])=>`<div><b>${i} ${esc(t)}</b><ul class="us" style="margin-top:4px">${L.map(x=>`<li>${x}</li>`).join("")}</ul></div>`).join("")}</div></details>`;
-}
+function helpBtn(k,label){ return `<button class="hp-q" data-help="${k}" aria-label="説明を見る: ${esc((HELP.find(h=>h[0]===k)||[])[2]||"")}">？ ${label||"これは何?"}</button>`; }
+function openHelp(k){ const sh=document.getElementById("sheet");
+  sh.innerHTML=`<div class="bar"><div class="wrap"><button class="iconbtn" id="hpx" aria-label="もどる">← もどる</button><span class="ttl">📖 使い方ガイド</span></div></div>
+  <div class="wrap body"><p class="hint" style="margin:0 0 10px">知りたいところを押すと開きます。</p>
+   ${HELP.map(([key,ic,t,L])=>`<details class="faq plain hp-sec" id="hp-${key}"${key===k?" open":""}><summary>${ic} ${esc(t)}</summary><ul class="us" style="margin:6px 0 4px">${L.map(x=>`<li>${x}</li>`).join("")}</ul></details>`).join("")}
+   <button class="fchip" id="hpOb" style="margin-top:12px">🔰 はじめての案内をもう一度見る</button></div>`;
+  sh.querySelector("#hpx").onclick=()=>{ sh.hidden=true; sh.innerHTML=""; document.body.style.overflow=""; };
+  sh.querySelector("#hpOb").onclick=()=>{ sh.hidden=true; sh.innerHTML=""; document.body.style.overflow=""; onboard(true); };
+  sh.hidden=false; sh.scrollTop=0; document.body.style.overflow="hidden"; track("/help","使い方ガイド");
+  if(k){ const el=sh.querySelector("#hp-"+k); if(el) setTimeout(()=>{ el.scrollIntoView({block:"start"}); sh.scrollTop=Math.max(0,sh.scrollTop-64); el.classList.add("hp-hl"); },60); } }
+document.addEventListener("click",ev=>{ const b=ev.target.closest("[data-help]"); if(!b) return; ev.preventDefault(); ev.stopPropagation(); const pp=document.getElementById("pop"); if(pp) pp.hidden=true; document.querySelectorAll(".ob").forEach(o=>o.remove()); openHelp(b.dataset.help); },true);
+function guideBlock(){ return `<button class="tp-open" data-help="start"><span aria-hidden="true">📖</span><span><b>使い方ガイド</b><small>マークの意味・解説や4コマの読み方・ペット・読み上げなど</small></span></button>`; }
 
 // ===== マイ =====
 let MYTAB="pet";
@@ -5187,6 +5265,10 @@ function renderMy(){
     ${footer()}
   </div>`;
   main.querySelectorAll("[data-tab]").forEach(b=>b.onclick=()=>go(b.dataset.tab));
+  { const vn=main.querySelector("#vName"); if(vn){ const fill=()=>{ const cur=vn.value; vn.innerHTML=voiceOpts(); vn.value=store.get("nw-vname")||cur||""; }; try{ window.speechSynthesis&&window.speechSynthesis.addEventListener("voiceschanged",fill,{once:true}); }catch(_){}
+    vn.onchange=()=>{ store.set("nw-vname",vn.value); sayJa("こんにちは。この声で、今日のニュースを読み上げます。"); };
+    main.querySelector("#vTry").onclick=()=>sayJa(`こんにちは。${petName()}です。今日のニュースを、この声で読み上げます。`);
+    main.querySelectorAll("#vPitch [data-pitch]").forEach(b=>b.onclick=()=>{ store.set("nw-pitch",b.dataset.pitch); main.querySelectorAll("#vPitch [data-pitch]").forEach(x=>x.setAttribute("aria-pressed",String(x===b))); sayJa("この高さで読み上げます"); }); } }
   main.querySelectorAll("#vRate [data-rate]").forEach(b=>b.onclick=()=>{ store.set("nw-rate",b.dataset.rate); main.querySelectorAll("#vRate [data-rate]").forEach(x=>x.setAttribute("aria-pressed",String(x===b))); sayJa("この速さで読み上げます"); });
   main.querySelectorAll("#vThumb [data-thumb]").forEach(b=>b.onclick=()=>{ store.set("nw-thumb",b.dataset.thumb); main.querySelectorAll("#vThumb [data-thumb]").forEach(x=>x.setAttribute("aria-pressed",String(x===b))); toast(b.dataset.thumb==="1"?"📷 写真を出します":"写真を出さないようにしました"); });
   { const toc=main.querySelector("#setToc"); if(toc){ const box=toc.parentElement; const nm=x=>{ const h=x.getAttribute("aria-label")||((x.querySelector("h2,b,summary")||x).textContent||""); let t=h.replace(/\s+/g," ").trim().replace(/[(（].*$/,"").split(/[、・]/)[0].replace(/NEW.*$/,"").trim(); const FIX={"🔔 朝と夕方に":"🔔 朝と夕方のお知らせ","📲 スマホの画面に":"📲 アプリのボタンを置く","お知らせ":"🔔 新しくなったところ","読み上げ":"🔊 読み上げ・ふりがな","わたしに関係あるニュース":"🙋 わたしに関係あるニュース","色の見分けやすさ":"👁️ 色の見分けやすさ","記録について":"🔒 記録について"}; t=FIX[t]||t; return t.slice(0,16); }; const L=[...box.children].filter(x=>x!==toc&&/^(SECTION|DETAILS|BUTTON|DIV)$/.test(x.tagName)&&x.id!=="obAgain"&&nm(x));
@@ -5634,7 +5716,7 @@ function sayRate(){ const r=+(store.get("nw-rate")||1); return r>=.6&&r<=1.4?r:1
 function speakEx(k,btn){ const e=D.explainers[k]; if(!e) return; try{ const s=window.speechSynthesis; if(!s) return;
   if(s.speaking){ s.cancel(); btn.textContent="🔊 聞く"; return; }
   const txt=[e.name,"ひとことで言うと。",e.kid,e.more[0],e.more[1],"わたしたちへの影響。",...e.us.map(u=>u.replace(/\*\*/g,"")),...e.faq.map(([q,a])=>q+" "+a)].join("。 ");
-  const u=new SpeechSynthesisUtterance(txt); u.lang="ja-JP"; u.rate=1.05*sayRate(); u.onend=()=>{ btn.textContent="🔊 聞く"; }; s.speak(u); btn.textContent="■ 止める"; }catch(_){} }
+  sayQueue(txt,1,()=>{ btn.textContent="🔊 聞く"; }); btn.textContent="■ 止める"; }catch(_){} }
 
 // 起動
 try{ applySky(); setInterval(applySky,10*60*1000); }catch(_){}
@@ -6047,7 +6129,7 @@ document.addEventListener("click",ev=>{ const x=ev.target.closest("[data-alx]");
 document.addEventListener("keydown",ev=>{ if((ev.key==="Enter"||ev.key===" ")&&ev.target.matches&&ev.target.matches(".al-band[data-quake]")){ ev.preventDefault(); openQuake(); } });
 try{ loadAlerts(); setInterval(()=>{ if(document.visibilityState==="visible") loadAlerts(); },3*60*1000); document.addEventListener("visibilitychange",()=>{ if(document.visibilityState==="visible") loadAlerts(); }); }catch(_){}
 // テスト用の手がかり(localhost で動かしたときだけ。本番では出さない)
-if(/^(localhost|127\.0\.0\.1)$/.test(location.hostname)) window.NW_TEST={placeOf,localCard,get NEWS(){return NEWS;},petSVG,PET_KINDS,PET_COLORS,petColorsFor,WEAR,petStage,petXP,petKind,petHall,petName,petRestart,get ME(){return ME;},get LOOK(){return LOOK;},TOPIC_GROUPS,FUN,SECS,openFun,openEx,fillQs,hhNews,ktQs,serialChapters,go,openLife,trendWords,openShimen};
+if(/^(localhost|127\.0\.0\.1)$/.test(location.hostname)) window.NW_TEST={openRadio,bgmStart,ttsChunks,ttsClean,bestJaVoice,openHelp,placeOf,localCard,get NEWS(){return NEWS;},petSVG,PET_KINDS,PET_COLORS,petColorsFor,WEAR,petStage,petXP,petKind,petHall,petName,petRestart,get ME(){return ME;},get LOOK(){return LOOK;},TOPIC_GROUPS,FUN,SECS,openFun,openEx,fillQs,hhNews,ktQs,serialChapters,go,openLife,trendWords,openShimen};
 const h=(location.hash||"").slice(1);
 if(h==="quake"){ go("today"); setTimeout(openQuake,50); } else if(h==="shimen"){ go("today"); setTimeout(openShimen,50); } else if(D.explainers[h]){ go("explain"); openEx(h); }
 else if(h.startsWith("t=")) openTHash(h);
