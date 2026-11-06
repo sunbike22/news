@@ -499,28 +499,41 @@ mark{background:#ffe066;color:#141b2d;border-radius:3px;padding:0 1px}
 .qk li{display:flex;gap:8px;align-items:flex-start;line-height:1.5}.qk li span{font-size:1.2rem}.qk b{font-size:1.05rem}
 .more-btn{display:flex;justify-content:center;width:100%;margin-top:10px;padding:12px;font-weight:700}
 /* 4コマでわかる(自作SVG・吹き出しはふつうの文字)。横長のコマで、左にペット・右にホー先生 */
-.manga{display:grid;gap:6px;margin-top:8px}
-.mg-p{position:relative;display:grid;grid-template-columns:54px minmax(0,1fr) 54px;gap:6px;align-items:end;border:2.5px solid #1d1d1f;border-radius:8px;overflow:hidden;background:#fffdf7;color:#1d1d1f;padding:8px 6px 4px;min-height:96px}
-.mg-p .mg-bg{position:absolute;inset:0;width:100%;height:100%;z-index:0;opacity:.55}
-.mg-n{position:absolute;left:4px;top:4px;background:#1d1d1f;color:#fff;font-weight:800;font-size:.82rem;border-radius:5px;padding:0 6px;z-index:3}
-.mg-cap{position:absolute;right:4px;top:4px;z-index:3;background:#ffe8a3;border:1.5px solid #1d1d1f;font-size:.82rem;font-weight:700;padding:0 6px;border-radius:4px}
-.mg-c{position:relative;z-index:1;line-height:0;align-self:end}
-.mg-c svg{width:50px;height:auto}
-.mg-nm{display:block;line-height:1.2;margin-top:1px;text-align:center;font-size:13px;letter-spacing:-.04em;font-weight:800;color:#1d1d1f;background:#fffdf7cc;border-radius:4px;white-space:nowrap}
+/* 4コマ(2026-11-06 に作り直し): 縦に4つ。上=コマ見出し(起承転結)・中=吹き出し(白い紙の上)・下=舞台(背景・キャラ・看板)。紙の色は明るい/暗い画面で同じ */
+.manga{display:grid;gap:10px;margin-top:8px;background:#fffdf7;border:2.5px solid #1d1d1f;border-radius:10px;padding:10px;color:#1d1d1f}
+.mg-ttl{display:flex;align-items:center;gap:8px;flex-wrap:wrap;border-bottom:2.5px solid #1d1d1f;padding-bottom:8px}
+.mg-ttl span{background:#1d1d1f;color:#fffdf7;font-weight:800;font-size:.82rem;border-radius:4px;padding:1px 7px}
+.mg-ttl b{font-family:"Dela Gothic One",var(--font,inherit);font-weight:400;font-size:1.3rem;line-height:1.35;min-width:0}
+.mg-p{position:relative;margin:0;border:2.5px solid #1d1d1f;border-radius:4px;overflow:hidden;background:#fff;display:flex;flex-direction:column}
+.mg-hd{display:flex;align-items:center;gap:6px;flex-wrap:wrap;padding:6px 8px 0}
+.mg-n{background:#1d1d1f;color:#fff;font-weight:800;font-size:.82rem;border-radius:4px;min-width:1.6em;text-align:center;padding:0 5px}
+.mg-k{font-weight:900;color:#c2410c;font-size:.95rem}
+.mg-h{font-weight:800;font-size:.95rem;min-width:0}
+.mg-cap{margin-left:auto;background:#fff;border:2px solid #1d1d1f;font-size:.82rem;font-weight:700;padding:0 7px;line-height:1.6}
+.mg-talk{display:flex;flex-direction:column;gap:14px;padding:10px 10px 18px}
+.mg-b{--bb:#fff;position:relative;max-width:84%;margin:0;background:var(--bb);border:2.5px solid #1d1d1f;border-radius:18px;padding:6px 13px;font-size:1.05rem;line-height:1.5;font-weight:800;color:#1d1d1f}
+.mg-b.l{align-self:flex-start}
+.mg-b.r{align-self:flex-end;--bb:#fff6dc}
+.mg-b::before,.mg-b::after{content:"";position:absolute;width:0;height:0;border-style:solid}
+.mg-b::before{bottom:-14px;border-width:14px 7px 0 7px;border-color:#1d1d1f transparent transparent transparent}
+.mg-b::after{bottom:-9.5px;border-width:10px 4.6px 0 4.6px;border-color:var(--bb) transparent transparent transparent}
+.mg-b.l::before{left:22px;transform:skewX(-25deg)}.mg-b.l::after{left:24.4px;transform:skewX(-25deg)}
+.mg-b.r::before{right:22px;transform:skewX(25deg)}.mg-b.r::after{right:24.4px;transform:skewX(25deg)}
+.mg-stage{position:relative;display:grid;grid-template-columns:64px minmax(0,1fr) 64px;align-items:end;gap:4px;min-height:112px;padding:6px 6px 4px;border-top:2px dashed #d6d0c2;isolation:isolate}
+.mg-stage .mg-bg{position:absolute;inset:0;width:100%;height:100%;z-index:-1}
+.mg-c{position:relative;line-height:0;text-align:center}
+.mg-c svg{width:56px;height:auto}
+.mg-c.r svg{width:50px}
+.mg-nm{display:block;line-height:1.3;margin-top:2px;text-align:center;font-size:13px;letter-spacing:-.04em;font-weight:800;color:#1d1d1f;background:#ffffffd9;border-radius:4px;white-space:nowrap}
 .mg-c.r .mg-nm{color:#5b3a12}
-.mg-b.t{background:#fdf6e3}.mg-b.t::after{background:#fdf6e3}
-.mg-sum{margin-top:8px;background:#2f4f3a;color:#f4f1e6;border:3px solid #8a5a2b;border-radius:8px;padding:8px 12px;font-weight:700;line-height:1.6}
+.mg-mark{position:absolute;top:-6px;font-size:1.15rem;line-height:1;font-style:normal;z-index:1}
+.mg-c.l .mg-mark{right:0}.mg-c.r .mg-mark{left:0}
+.mg-ctr{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:4px;min-width:0;padding-bottom:6px}
+.mg-e{font-size:2.2rem;line-height:1.1;letter-spacing:.05em}
+.mg-big{position:relative;background:#fff;border:3px solid #1d1d1f;color:#c62828;border-radius:6px;padding:3px 8px;font-weight:900;font-size:1rem;text-align:center;line-height:1.4;white-space:pre-line;box-shadow:3px 3px 0 #1d1d1f;max-width:100%;overflow-wrap:anywhere}
+.mg-sum{background:#2f4f3a;color:#f4f1e6;border:4px solid #a37b52;border-radius:6px;padding:8px 12px;font-weight:700;line-height:1.7}
 .mg-sum b{display:block;font-size:.88rem;color:#fde68a;margin-bottom:2px}
-.mg-mark{position:absolute;top:-10px;font-size:1rem;line-height:1;font-style:normal}
-.mg-c.l .mg-mark{right:-2px}.mg-c.r .mg-mark{left:-2px}
-.mg-mid{position:relative;z-index:2;display:flex;flex-direction:column;gap:6px;padding-top:14px;align-self:center}
-.mg-b{position:relative;max-width:96%;background:#fff;border:2px solid #1d1d1f;border-radius:14px;padding:5px 11px;font-size:1.05rem;line-height:1.4;font-weight:800}
-.mg-e{align-self:center;font-size:2.4rem;line-height:1.1;letter-spacing:.05em}
-.mg-b.l{align-self:flex-start;border-bottom-left-radius:4px}.mg-b.r{align-self:flex-end;border-bottom-right-radius:4px}
-.mg-b::after{content:"";position:absolute;bottom:4px;width:9px;height:9px;background:#fff;border:2px solid #1d1d1f;transform:rotate(45deg)}
-.mg-b.l::after{left:-6px;border-top:0;border-right:0}.mg-b.r::after{right:-6px;border-bottom:0;border-left:0}
-.mg-big{align-self:center;background:#fff;border:2.5px solid #e5484d;color:#c62828;border-radius:8px;padding:2px 12px;font-weight:900;font-size:1.25rem;text-align:center;line-height:1.35;white-space:pre-line;box-shadow:2px 2px 0 #1d1d1f}
-.mg-cast{font-size:.84rem;color:var(--muted);margin-top:4px}
+.mg-cast{font-size:.84rem;color:var(--muted);margin-top:6px}
 
 
 /* 地震・津波・特別警報(気象庁発表)の帯 */
@@ -2428,23 +2441,29 @@ document.addEventListener("click",e=>{ const g=e.target.closest(".gl"); if(g){ e
 
 
 // ===== 4コマでわかる。台本(data.js の解説の manga)をアプリが絵にする。絵は自作SVGだけ。実在の人は描かない =====
-// manga: {t:"題", sum:"黒板のまとめ(60字まで)", p:[{bg:"shop|diet|home|city|sea|space|stadium|tv|school", cap:"ナレーション", e:"大きな絵文字(1〜3こ)", big:"看板(2行まで)", l:[["y"=生徒(わたし)|"m"=ホー先生, 顔, "せりふ(30字まで)"], …最大4つ]}] ×4}  ※古い形 y/m/o2 も読める
+// manga: {t:"題", sum:"黒板のまとめ(60字まで)", p:[{bg:"shop|diet|home|city|sea|space|stadium|tv|school|weather|world|money", h:"コマの見出し", cap:"ナレーション", e:"大きな絵文字(1〜3こ)", big:"看板(2行まで)", l:[["y"=生徒(わたし)|"m"=ホー先生, 顔, "せりふ(30字まで)"], …最大4つ]}] ×4}  ※古い形 y/m/o2 も読める
 // y=あなたのペット(よむまる)、m=ホー先生。顔: q(はてな) o(びっくり) s(にっこり) t(考える) n(ふつう)
-function owlSVG(f,size){ const S=size||78; const eye=f==="o"?`<circle cx="31" cy="38" r="7" fill="#fff" stroke="#3a2a14" stroke-width="2"/><circle cx="49" cy="38" r="7" fill="#fff" stroke="#3a2a14" stroke-width="2"/><circle cx="31" cy="38" r="3" fill="#3a2a14"/><circle cx="49" cy="38" r="3" fill="#3a2a14"/>`
+function owlSVG(f,size,hat){ const S=size||78; const eye=f==="o"?`<circle cx="31" cy="38" r="7" fill="#fff" stroke="#3a2a14" stroke-width="2"/><circle cx="49" cy="38" r="7" fill="#fff" stroke="#3a2a14" stroke-width="2"/><circle cx="31" cy="38" r="3" fill="#3a2a14"/><circle cx="49" cy="38" r="3" fill="#3a2a14"/>`
   : f==="s"?`<path d="M25 39q6-6 12 0M43 39q6-6 12 0" stroke="#3a2a14" stroke-width="3" fill="none" stroke-linecap="round"/>`
   : f==="t"?`<path d="M25 38h12M43 38h12" stroke="#3a2a14" stroke-width="3" stroke-linecap="round"/>`
   : `<circle cx="31" cy="38" r="6" fill="#fff"/><circle cx="49" cy="38" r="6" fill="#fff"/><circle cx="32" cy="39" r="3.2" fill="#3a2a14"/><circle cx="48" cy="39" r="3.2" fill="#3a2a14"/>`;
-  return `<svg viewBox="0 0 80 90" width="${S}" height="${S*90/80}" aria-hidden="true"><path d="M14 30q-4-16 8-20l6 10M66 30q4-16-8-20l-6 10" fill="#8a6a4a"/><ellipse cx="40" cy="54" rx="28" ry="32" fill="#a17b55"/><ellipse cx="40" cy="64" rx="17" ry="18" fill="#f3e3c8"/><path d="M40 66l-3 3 3 3 3-3z" fill="#e0a43a"/>${eye}<path d="M37 45l3 5 3-5z" fill="#e0a43a"/><path d="M22 31q8-5 15 0M43 31q8-5 15 0" stroke="#5a3f28" stroke-width="2.5" fill="none"/><rect x="26" y="33" width="28" height="11" rx="5" fill="none" stroke="#3a2a14" stroke-width="1.6"/><path d="M40 37v2" stroke="#3a2a14" stroke-width="1.6"/><path d="M26 82l-4 6M34 84l-2 5M46 84l2 5M54 82l4 6" stroke="#e0a43a" stroke-width="3" stroke-linecap="round"/><path d="M12 56q-6 12 4 20M68 56q6 12-4 20" stroke="#7a5a3a" stroke-width="5" fill="none" stroke-linecap="round"/></svg>`; }
+  return `<svg viewBox="0 0 80 90" width="${S}" height="${S*90/80}" aria-hidden="true"><path d="M14 30q-4-16 8-20l6 10M66 30q4-16-8-20l-6 10" fill="#8a6a4a"/><ellipse cx="40" cy="54" rx="28" ry="32" fill="#a17b55"/><ellipse cx="40" cy="64" rx="17" ry="18" fill="#f3e3c8"/><path d="M40 66l-3 3 3 3 3-3z" fill="#e0a43a"/>${eye}<path d="M37 45l3 5 3-5z" fill="#e0a43a"/><path d="M22 31q8-5 15 0M43 31q8-5 15 0" stroke="#5a3f28" stroke-width="2.5" fill="none"/><rect x="26" y="33" width="28" height="11" rx="5" fill="none" stroke="#3a2a14" stroke-width="1.6"/><path d="M40 37v2" stroke="#3a2a14" stroke-width="1.6"/><path d="M26 82l-4 6M34 84l-2 5M46 84l2 5M54 82l4 6" stroke="#e0a43a" stroke-width="3" stroke-linecap="round"/><path d="M12 56q-6 12 4 20M68 56q6 12-4 20" stroke="#7a5a3a" stroke-width="5" fill="none" stroke-linecap="round"/>${hat?`<path d="M18 17l22-10 22 10-22 10z" fill="#1d1d1f"/><path d="M30 21v6q10 5 20 0v-6" fill="#1d1d1f"/><path d="M60 17v10" stroke="#e0a43a" stroke-width="2"/><circle cx="60" cy="28" r="2.4" fill="#e0a43a"/>`:""}</svg>`; }
+// 4コマの舞台(2026-11-06 に作り直し): 下の「舞台」の帯だけに描く(せりふの後ろには描かない)。色はうすく・形は少なく
 const MG_BG={
- home:`<rect width="320" height="220" fill="#fff4e0"/><rect y="160" width="320" height="60" fill="#e9c99a"/><rect x="200" y="40" width="80" height="60" fill="#cfe8ff" stroke="#1d1d1f" stroke-width="2"/><path d="M240 40v60M200 70h80" stroke="#1d1d1f" stroke-width="2"/><rect x="30" y="120" width="70" height="40" rx="4" fill="#d9a066"/>`,
- shop:`<rect width="320" height="220" fill="#f3fbf0"/><rect y="170" width="320" height="50" fill="#dfe7e2"/><g stroke="#1d1d1f" stroke-width="2">${[0,1,2].map(i=>`<rect x="${20+i*100}" y="60" width="80" height="100" fill="#fff"/><path d="M${20+i*100} 93h80M${20+i*100} 126h80"/>`).join("")}</g>${["🍎","🥕","🍞","🥛","🐟","🍙"].map((e,i)=>`<text x="${34+(i%3)*100}" y="${88+Math.floor(i/3)*33}" font-size="20">${e}</text><text x="${64+(i%3)*100}" y="${88+Math.floor(i/3)*33}" font-size="18">${["🍇","🥬","🧀","🍳","🥚","🍌"][i]}</text>`).join("")}<rect x="0" y="0" width="320" height="34" fill="#ff7a59"/><text x="160" y="23" text-anchor="middle" font-size="16" font-weight="700" fill="#fff">SUPER</text>`,
- diet:`<rect width="320" height="220" fill="#eaf2ff"/><rect y="175" width="320" height="45" fill="#cfd8e3"/><g fill="#f4f1ea" stroke="#1d1d1f" stroke-width="2"><rect x="40" y="95" width="240" height="80"/><rect x="130" y="55" width="60" height="40"/><path d="M125 55l35-25 35 25z"/></g><g stroke="#1d1d1f" stroke-width="2">${[0,1,2,3,4,5,6].map(i=>`<path d="M${60+i*33} 105v60"/>`).join("")}</g>`,
- city:`<rect width="320" height="220" fill="#e8f4ff"/><g fill="#c9d6e8" stroke="#1d1d1f" stroke-width="2"><rect x="10" y="70" width="60" height="120"/><rect x="80" y="40" width="50" height="150"/><rect x="190" y="60" width="55" height="130"/><rect x="255" y="90" width="55" height="100"/></g><rect y="185" width="320" height="35" fill="#b9c0c9"/>`,
- sea:`<rect width="320" height="220" fill="#e6f6ff"/><circle cx="270" cy="45" r="22" fill="#ffd34d"/><path d="M0 130q40-12 80 0t80 0 80 0 80 0V220H0z" fill="#5bb3e8"/><path d="M0 150q40-10 80 0t80 0 80 0 80 0" stroke="#fff" stroke-width="3" fill="none"/><path d="M150 110h60l-10 15h-40z" fill="#6b4e3a" stroke="#1d1d1f" stroke-width="2"/><path d="M178 110V75l22 30z" fill="#fff" stroke="#1d1d1f" stroke-width="2"/>`,
- space:`<rect width="320" height="220" fill="#1c2340"/>${Array.from({length:26},(_,i)=>`<circle cx="${(i*73)%320}" cy="${(i*41)%150}" r="${i%3?1.2:2}" fill="#fff"/>`).join("")}<circle cx="250" cy="60" r="30" fill="#d9653b"/><circle cx="240" cy="52" r="6" fill="#b8502c"/><rect y="180" width="320" height="40" fill="#8a8fa6"/>`,
- stadium:`<rect width="320" height="220" fill="#e7f7ff"/><path d="M0 70q160-40 320 0v30H0z" fill="#d9dee6" stroke="#1d1d1f" stroke-width="2"/><rect y="100" width="320" height="120" fill="#7ccf72"/><path d="M160 210l-60-60 60-40 60 40z" fill="#d9b27c" stroke="#fff" stroke-width="3"/>`,
- tv:`<rect width="320" height="220" fill="#fff4e0"/><rect y="170" width="320" height="50" fill="#e9c99a"/><rect x="90" y="40" width="140" height="95" rx="8" fill="#1d1d1f"/><rect x="98" y="48" width="124" height="79" fill="#9fd3ff"/><text x="160" y="95" text-anchor="middle" font-size="16" font-weight="800" fill="#1d1d1f">NEWS</text><rect x="140" y="135" width="40" height="10" fill="#1d1d1f"/>`,
- school:`<rect width="320" height="220" fill="#f6f1e6"/><rect x="40" y="30" width="240" height="110" fill="#2f5d46" stroke="#8a6a4a" stroke-width="6"/><rect y="175" width="320" height="45" fill="#d6b98c"/>`};
+ home:`<rect width="320" height="120" fill="#fff3df"/><rect y="92" width="320" height="28" fill="#e8c597"/><rect x="128" y="14" width="64" height="44" rx="3" fill="#d6ecff" stroke="#c9a77a" stroke-width="3"/><path d="M160 14v44M128 36h64" stroke="#c9a77a" stroke-width="2"/><rect x="138" y="70" width="44" height="22" rx="3" fill="#d8a46a"/>`,
+ shop:`<rect width="320" height="120" fill="#f1faef"/><rect y="94" width="320" height="26" fill="#dfe7e2"/><rect width="320" height="16" fill="#ff8a6b"/>${[0,1,2].map(i=>`<rect x="${92+i*46}" y="26" width="40" height="66" rx="2" fill="#fff" stroke="#cfd8d2" stroke-width="2"/><path d="M${92+i*46} 48h40M${92+i*46} 70h40" stroke="#cfd8d2" stroke-width="2"/><circle cx="${104+i*46}" cy="42" r="5" fill="${["#f87171","#fbbf24","#86efac"][i]}"/><circle cx="${120+i*46}" cy="64" r="5" fill="${["#fde68a","#fca5a5","#93c5fd"][i]}"/>`).join("")}`,
+ diet:`<rect width="320" height="120" fill="#eaf2ff"/><rect y="96" width="320" height="24" fill="#cfd8e3"/><g fill="#f4f1ea" stroke="#b9c3d3" stroke-width="2"><rect x="92" y="56" width="136" height="40"/><rect x="140" y="30" width="40" height="26"/><path d="M136 30l24-16 24 16z"/></g><path d="M104 62v30M120 62v30M136 62v30M184 62v30M200 62v30M216 62v30" stroke="#b9c3d3" stroke-width="2"/>`,
+ city:`<rect width="320" height="120" fill="#e8f4ff"/><g fill="#d3deec"><rect x="90" y="30" width="30" height="66"/><rect x="126" y="12" width="32" height="84"/><rect x="164" y="40" width="28" height="56"/><rect x="198" y="22" width="34" height="74"/></g><g fill="#fff">${[0,1,2,3].map(i=>`<rect x="${132}" y="${20+i*16}" width="6" height="6"/><rect x="${146}" y="${20+i*16}" width="6" height="6"/>`).join("")}</g><rect y="96" width="320" height="24" fill="#c3c9d1"/>`,
+ sea:`<rect width="320" height="120" fill="#e6f6ff"/><circle cx="160" cy="34" r="16" fill="#ffe08a"/><path d="M0 74q40-8 80 0t80 0 80 0 80 0V120H0z" fill="#7cc4ee"/><path d="M0 90q40-7 80 0t80 0 80 0 80 0" stroke="#fff" stroke-width="3" fill="none" opacity=".8"/><path d="M140 62h40l-6 10h-28z" fill="#8a6a50"/><path d="M158 62V40l16 20z" fill="#fff" stroke="#c9d6e0"/>`,
+ space:`<rect width="320" height="120" fill="#232a4d"/>${Array.from({length:22},(_,i)=>`<circle cx="${(i*67)%320}" cy="${(i*37)%86}" r="${i%3?1.1:1.8}" fill="#fff"/>`).join("")}<circle cx="160" cy="40" r="18" fill="#e07a52"/><rect y="98" width="320" height="22" fill="#5a6080"/>`,
+ stadium:`<rect width="320" height="120" fill="#e7f7ff"/><path d="M0 40q160-26 320 0v18H0z" fill="#dde3ea"/><rect y="58" width="320" height="62" fill="#86d47c"/><path d="M160 112l-36-26 36-20 36 20z" fill="#dcb886" stroke="#fff" stroke-width="2"/>`,
+ tv:`<rect width="320" height="120" fill="#f4efe6"/><rect y="96" width="320" height="24" fill="#e2cfaf"/><rect x="112" y="14" width="96" height="64" rx="6" fill="#2b2b2b"/><rect x="118" y="20" width="84" height="52" fill="#bfe3ff"/><rect x="146" y="78" width="28" height="8" fill="#2b2b2b"/>`,
+ school:`<rect width="320" height="120" fill="#f6f1e6"/><rect x="96" y="12" width="128" height="62" fill="#3c6e55" stroke="#a37b52" stroke-width="5"/><path d="M110 30h40M110 44h60M110 58h30" stroke="#e8efe9" stroke-width="2.5" stroke-linecap="round" opacity=".7"/><rect y="96" width="320" height="24" fill="#d9bd92"/>`,
+ weather:`<rect width="320" height="120" fill="#e3ecf5"/><g fill="#fff" stroke="#c4d0dc" stroke-width="2"><ellipse cx="130" cy="34" rx="28" ry="16"/><ellipse cx="160" cy="26" rx="24" ry="18"/><ellipse cx="190" cy="36" rx="26" ry="14"/></g><g stroke="#7fb2e5" stroke-width="3" stroke-linecap="round">${[0,1,2,3,4,5].map(i=>`<path d="M${120+i*16} 58l-4 12"/>`).join("")}</g><rect y="96" width="320" height="24" fill="#b9c4cf"/>`,
+ world:`<rect width="320" height="120" fill="#eef6fb"/><circle cx="160" cy="48" r="34" fill="#9fd3f2" stroke="#7ab4d6" stroke-width="2"/><path d="M140 28q10 4 8 14t10 12q4 10-4 18M170 22q-6 10 4 16t14 6M176 66q6-6 14-4" fill="none" stroke="#7cc47a" stroke-width="7" stroke-linecap="round"/><rect y="98" width="320" height="22" fill="#d7e2ea"/>`,
+ money:`<rect width="320" height="120" fill="#f3f8f0"/><rect x="100" y="16" width="120" height="70" rx="4" fill="#fff" stroke="#cfd8d2" stroke-width="2"/><path d="M112 72l22-18 18 10 22-24 20 14 14-20" fill="none" stroke="#ef4444" stroke-width="3" stroke-linejoin="round"/><path d="M112 76h96" stroke="#cfd8d2" stroke-width="2"/><rect y="96" width="320" height="24" fill="#d9e2d7"/>`};
+// コマの見出し(p.h がないときの目安)
+const MG_KI=["起","承","転","結"], MG_HDEF=["はてな?","なにがあった?","どうなるの?","これから"];
 const MG_MARK={q:"❓",o:"❗",t:"💭",s:"♪"};
 // 1コマの会話(2026-11-06〜): l:[["y"|"m", 顔, せりふ], ...] 最大4つ。古い形(y・m・o2)も読む
 function mgLines(p){ if(Array.isArray(p.l)&&p.l.length) return p.l.filter(x=>x&&x[2]).slice(0,4);
@@ -2453,14 +2472,17 @@ function mangaHTML(m){ if(!m||!(m.p||[]).length) return ""; const st=petStage();
   const P=m.p.slice(0,4).map((p,i)=>{ const L=mgLines(p);
     const yl=L.filter(x=>x[0]==="y"), ml=L.filter(x=>x[0]==="m");
     const yf=yl.length?yl[yl.length-1][1]:"n", of=ml.length?ml[ml.length-1][1]:"n";
-    return `<div class="mg-p" role="img" aria-label="${i+1}コマ目: ${esc([p.cap,...L.map(x=>(x[0]==="m"?"ホー先生":"わたし")+"「"+x[2]+"」"),p.big].filter(Boolean).join(" "))}">
-      <svg class="mg-bg" viewBox="0 0 320 220" preserveAspectRatio="none" aria-hidden="true">${MG_BG[p.bg]||MG_BG.home}</svg>
-      <span class="mg-n">${i+1}</span>${p.cap?`<span class="mg-cap">${esc(p.cap)}</span>`:""}
-      <span class="mg-c l">${petSVG(st.i,yf==="s"||yf==="o"?"happy":"hungry",null,50,wear)}${yl.length&&MG_MARK[yf]?`<i class="mg-mark">${MG_MARK[yf]}</i>`:""}<b class="mg-nm">わたし</b></span>
-      <div class="mg-mid">${p.e?`<span class="mg-e" aria-hidden="true">${esc(p.e)}</span>`:""}${p.big?`<span class="mg-big">${esc(p.big)}</span>`:""}${L.map(x=>`<div class="mg-b ${x[0]==="m"?"r t":"l"}">${esc(x[2])}</div>`).join("")}</div>
-      <span class="mg-c r">${owlSVG(of,46)}${ml.length&&MG_MARK[of]?`<i class="mg-mark">${MG_MARK[of]}</i>`:""}<b class="mg-nm">ホー先生</b></span>
-</div>`; }).join("");
-  return `<div class="blk"><h3>🎨 4コマでわかる${m.t?`「${esc(m.t)}」`:""}</h3><div class="manga">${P}</div>${m.sum?`<div class="mg-sum"><b>📝 ホー先生の黒板</b>${esc(m.sum)}</div>`:""}<div class="mg-cast">左: わたし(生徒=あなたのペット ${esc(petName())})・右: 🦉ホー先生(やさしい先生)</div></div>`; }
+    const bg=MG_BG[p.bg]?p.bg:"home";
+    return `<figure class="mg-p" aria-label="${i+1}コマ目: ${esc([p.h,p.cap,...L.map(x=>(x[0]==="m"?"ホー先生":"わたし")+"「"+x[2]+"」"),p.big].filter(Boolean).join(" "))}">
+      <figcaption class="mg-hd"><span class="mg-n">${i+1}</span><span class="mg-k">${MG_KI[i]}</span><span class="mg-h">${esc(p.h||MG_HDEF[i])}</span>${p.cap?`<span class="mg-cap">${esc(p.cap)}</span>`:""}</figcaption>
+      <div class="mg-talk" aria-hidden="true">${L.map(x=>`<p class="mg-b ${x[0]==="m"?"r":"l"}">${esc(x[2])}</p>`).join("")}</div>
+      <div class="mg-stage" aria-hidden="true"><svg class="mg-bg" viewBox="0 0 320 120" preserveAspectRatio="xMidYMax slice">${MG_BG[bg]}</svg>
+        <span class="mg-c l">${yl.length&&MG_MARK[yf]?`<i class="mg-mark">${MG_MARK[yf]}</i>`:""}${petSVG(st.i,yf==="s"||yf==="o"?"happy":"hungry",null,62,wear)}<b class="mg-nm">わたし</b></span>
+        <span class="mg-ctr">${p.e?`<span class="mg-e">${esc(p.e)}</span>`:""}${p.big?`<span class="mg-big">${esc(p.big)}</span>`:""}</span>
+        <span class="mg-c r">${ml.length&&MG_MARK[of]?`<i class="mg-mark">${MG_MARK[of]}</i>`:""}${owlSVG(of,54,1)}<b class="mg-nm">ホー先生</b></span>
+      </div>
+</figure>`; }).join("");
+  return `<div class="blk"><h3>🎨 4コマでわかる</h3><div class="manga"><div class="mg-ttl"><span>4コマでわかる</span><b>${esc(m.t||"きょうのニュース")}</b></div>${P}${m.sum?`<div class="mg-sum"><b>📝 ホー先生の黒板</b>${esc(m.sum)}</div>`:""}</div><div class="mg-cast">「わたし」=生徒(わたしたち。絵はあなたのペット ${esc(petName())})・🦉ホー先生=やさしい先生</div></div>`; }
 // ===== 解説の前後へ(左右スワイプ・ボタン) =====
 function exKeys(){ return Object.entries(D.explainers).filter(([,e])=>e&&e.name).map(([k])=>k); }
 function exNavHTML(k){ const K=exKeys(); const i=K.indexOf(k); if(i<0||K.length<2) return "";
@@ -4899,6 +4921,7 @@ function openShimen(){ const sh=document.getElementById("sheet"); const w=D.weat
 document.addEventListener("click",e=>{ const b=e.target.closest("[data-shimen]"); if(!b) return; e.preventDefault(); openShimen(); });
 // ===== お知らせ(新しくなったところ)。機能を足したら、いちばん上に1つ足す =====
 const UPDATES=[
+  {id:"2026-11-06b",d:"2026-11-06",t:"🎨 4コマの見た目を新しくしました",L:["吹き出しを白い紙の上に出して、背景はキャラのいる「舞台」だけにしたので、せりふが読みやすくなりました。","コマごとに「起・承・転・結」と見出しがつき、天気・地球・グラフの背景も増えました。ホー先生は先生の帽子をかぶっています。"]},
   {id:"2026-11-06a",d:"2026-11-06",t:"🎨 4コマが先生と生徒の会話に",L:["解説の4コマを、🦉ホー先生と「わたし」(生徒)のやりとりに作り直しました。1コマのせりふが増えて、自然な会話で中身がよくわかるようになりました。","4コマの下には「📝 ホー先生の黒板」のまとめも出ます。"]},
   {id:"2026-11-04c",d:"2026-11-04",t:"👕 ペットの服を直しました",L:["ランドセルを背中にしょう形に、ハンチング帽を前にひさしのある形に直しました。レインコートのフード・郵便屋さんのかばん・旅のカメラ・救命どうい・かみかざりの位置も自然に。けろまるは帽子やヘルメットで目がかくれないようにしました。服と小物(マフラー・ポップコーンなど)が重なるときは、小物をしまうようにしました。"]},
   {id:"2026-11-04b",d:"2026-11-04",t:"🗺️ 地図からもニュースのページへ",L:["地図の下の一覧、わたしのキーワード、💬しつもんの答え、捜査ボード、あのとき何してた?などに出てくる見出しも、押すとそのニュースのページ(概要・出典・同じ話題の記録)が開きます。"]},
