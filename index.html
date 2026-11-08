@@ -2609,9 +2609,12 @@ function exNavHTML(k){ const K=exKeys(); const i=K.indexOf(k); if(i<0||K.length<
   return `<div class="ex-nav"><button class="fchip" data-exgo="${esc(pv)}">← ${esc(D.explainers[pv].icon)} ${esc(D.explainers[pv].name)}</button><button class="fchip" data-exgo="${esc(nx)}">${esc(D.explainers[nx].icon)} ${esc(D.explainers[nx].name)} →</button></div><div class="hint" style="text-align:center">← 画面を横にスワイプしても、前後の解説に移れます →</div>`; }
 function bindExNav(sh,k){ sh.querySelectorAll("[data-exgo]").forEach(b=>b.onclick=()=>{ SH_SIDE=true; openEx(b.dataset.exgo); });
   // 横スワイプ(年表や地図など、横に動かすものの上では反応しない)
+  // 2026-11-08: 前は #sheet そのものに付けていたので、解説からほかの画面(おすすめ・寝る前ラジオなど)に移っても
+  // 横スワイプで解説に飛んでいた。解説の中身(.exv)にだけ付ける(画面が変われば中身ごと消えるので反応しない)。
   let st=null; const K=exKeys(); const i=K.indexOf(k); if(i<0||K.length<2) return;
-  sh.addEventListener("touchstart",e=>{ if(e.touches.length!==1||e.target.closest(".htl-wrap,.zwrap,.tspark,.chat,textarea,input,.mg,.flow,.board-wrap")){ st=null; return; } st={x:e.touches[0].clientX,y:e.touches[0].clientY,t:Date.now()}; },{passive:true});
-  sh.addEventListener("touchend",e=>{ if(!st) return; const t=e.changedTouches[0]; const dx=t.clientX-st.x, dy=t.clientY-st.y; const ok=Math.abs(dx)>90&&Math.abs(dy)<60&&Date.now()-st.t<700; st=null; if(!ok) return;
+  const root=sh.querySelector(".exv:not(.nv)"); if(!root) return;
+  root.addEventListener("touchstart",e=>{ if(e.touches.length!==1||e.target.closest(".htl-wrap,.zwrap,.tspark,.chat,textarea,input,.mg,.flow,.board-wrap")){ st=null; return; } st={x:e.touches[0].clientX,y:e.touches[0].clientY,t:Date.now()}; },{passive:true});
+  root.addEventListener("touchend",e=>{ if(!st) return; if(!root.isConnected||sh.hidden){ st=null; return; } const t=e.changedTouches[0]; const dx=t.clientX-st.x, dy=t.clientY-st.y; const ok=Math.abs(dx)>90&&Math.abs(dy)<60&&Date.now()-st.t<700; st=null; if(!ok) return;
     const to=dx<0?K[(i+1)%K.length]:K[(i-1+K.length)%K.length]; SH_SIDE=true; openEx(to); toast((dx<0?"次":"前")+"の解説へ"); },{passive:true}); }
 // ===== 🧩 ならべかえ: 年表から4つを取り出して、起きた順にタップ(解説に書いてあることだけ) =====
 function orderQuizHTML(e,k){ const T=(e.timeline||[]).filter(x=>x[1]&&x[1].length<=46); if(T.length<4) return "";
