@@ -439,7 +439,7 @@ mark{background:#ffe066;color:#141b2d;border-radius:3px;padding:0 1px}
 .ms.new{border-color:var(--accent);background:var(--accent-soft)}
 .newchip{background:var(--accent-soft);color:var(--accent-ink,var(--accent))}
 .result{border-color:var(--ok);background:var(--ok-soft)}
-.toast{position:fixed;left:50%;transform:translateX(-50%);top:calc(76px + env(safe-area-inset-top,0px));bottom:auto;z-index:90;background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:999px;font-weight:700;font-size:.9rem;box-shadow:0 8px 24px rgba(0,0,0,.25);animation:rise .4s ease both;max-width:calc(100% - 32px);text-align:center}
+.toast{position:fixed;left:50%;transform:translateX(-50%);top:calc(76px + env(safe-area-inset-top,0px));bottom:auto;z-index:90;background:var(--ink);color:var(--bg);padding:10px 16px;border-radius:999px;font-weight:700;font-size:.9rem;box-shadow:0 3px 10px rgba(0,0,0,.18);animation:rise .4s ease both;max-width:calc(100% - 32px);text-align:center}
 .toast.out{opacity:0;transition:opacity .5s}
 /* かんたんモード: ボタンに言葉・押しやすく */
 .listen-big{display:flex;align-items:center;gap:14px;width:100%;text-align:left;border:0;cursor:pointer;border-radius:var(--radius);padding:14px 16px;background:var(--accent-btn,var(--accent));color:var(--on-accent)}
@@ -682,11 +682,15 @@ mark{background:#ffe066;color:#141b2d;border-radius:3px;padding:0 1px}
 .blk h3{font-size:1.08rem;margin-bottom:8px;display:flex;align-items:center;gap:8px}
 .blk p{margin:0}
 .flow{display:flex;flex-direction:column;align-items:stretch;gap:0}
-.fstep{background:var(--surface);border:2px solid var(--line);border-radius:14px;padding:12px 14px;display:grid;grid-template-columns:40px 1fr;gap:10px;align-items:center;transition:opacity .45s ease, transform .45s ease, border-color .3s}
-.fstep .fi{font-size:1.6rem;text-align:center}
+.fstep{background:var(--surface);border:2px solid var(--line);border-left:6px solid var(--accent);border-radius:14px;padding:12px 14px;display:grid;grid-template-columns:52px minmax(0,1fr);gap:10px;align-items:center;transition:opacity .45s ease, transform .45s ease, border-color .3s}
+.fstep .fi{font-size:1.6rem;width:48px;height:48px;border-radius:50%;background:var(--accent-soft);display:grid;place-items:center;position:relative}
+.fstep .fn{position:absolute;top:-6px;left:-6px;width:22px;height:22px;border-radius:50%;background:var(--accent-btn,var(--accent));color:var(--on-accent,#fff);font-style:normal;font-size:.82rem;font-weight:800;display:grid;place-items:center;line-height:1}
 .fstep b{display:block;font-size:1.02rem}
 .fstep small{display:block;color:var(--muted);font-size:.9rem}
-.farrow{text-align:center;color:var(--muted);font-size:.9rem;padding:4px 0;transition:opacity .45s ease}
+.farrow{display:flex;align-items:center;gap:8px;color:var(--muted);font-size:.9rem;padding:2px 0 2px 31px;min-height:34px;transition:opacity .45s ease}
+.fa-ln{position:relative;width:3px;align-self:stretch;min-height:30px;background:var(--accent);opacity:.6;border-radius:2px}
+.fa-ln::after{content:"";position:absolute;left:50%;bottom:-2px;transform:translateX(-50%);border:7px solid transparent;border-top:9px solid var(--accent);border-bottom:0}
+.fa-via{background:var(--accent-soft);color:var(--accent-ink,var(--accent));border-radius:99px;padding:2px 10px;font-size:.84rem}
 .flow.anim .fstep,.flow.anim .farrow{opacity:.3;transform:translateY(8px)}
 .flow.anim .on{opacity:1;transform:none}
 .flow .fstep.now{border-color:var(--accent)}
@@ -840,6 +844,10 @@ details.faq p{margin:10px 0 12px}
 .plan .tx{font-weight:700;font-size:.95rem}
 .plan .pmm{font-size:.9rem;color:var(--muted);margin-top:2px}
 .plan .ics{flex-direction:column;gap:0;padding:4px 8px;min-width:44px;min-height:44px;line-height:1.1;font-size:1.1rem}.plan .ics small{font-size:.7rem;font-weight:700}
+/* スマホでは日付を上の行に出して、本文を横いっぱいに(2026-11-10: 本文の列がせまく、1行が7〜8字になっていた) */
+@media (max-width:560px){ .plan li{grid-template-columns:minmax(0,1fr) auto;grid-template-areas:"d ics" "m m";row-gap:2px;align-items:start}
+  .plan .d{grid-area:d;display:flex;gap:6px;align-items:baseline;text-align:left}.plan li>div:nth-child(2){grid-area:m}
+  .plan .ics{grid-area:ics;flex-direction:row;gap:4px;min-height:40px}.plan .ics small{font-size:.82rem} }
 .cd-fold{margin-bottom:10px}
 .pref-l text{fill:var(--muted);font-weight:700;opacity:0;pointer-events:none;paint-order:stroke;stroke:var(--map-sea);transition:opacity .2s}.mapsvg path{vector-effect:non-scaling-stroke}.mapsvg svg.z2 .pref-l text{opacity:.95}.mapsvg .pref-l text.hid{opacity:0!important}
 .mapsvg .pin-leg{stroke:var(--ink);fill:var(--ink);opacity:.55;pointer-events:none}.map-rg{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}.map-rg::-webkit-scrollbar{display:none}.map-rg .fchip{flex:none}
@@ -1364,7 +1372,36 @@ svg.eat{animation:petEat .7s ease both!important}
 .ex-cr{font-size:.82rem;color:var(--muted);margin-top:-14px}
 .exv .kid{padding:18px 18px 16px;border-left:6px solid #f2b705}
 .exv .kid h2{font-size:1.3rem;line-height:1.6}
-.ex-toc{display:flex;gap:6px;overflow-x:auto;padding:2px 0 6px;scrollbar-width:none;align-items:center}
+.exv.nv .kid h2{font-size:1.12rem;line-height:1.75;font-weight:700} /* ニュースのページの概要は長い文なので、見出しほど太く大きくしない(2026-11-10) */
+.ex-toc{display:flex;gap:6px;overflow-x:auto;padding:2px 24px 6px 0;scrollbar-width:none;align-items:center;-webkit-mask-image:linear-gradient(to right,#000 88%,transparent);mask-image:linear-gradient(to right,#000 88%,transparent)}
+.exv .ex-acts{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:8px}
+.exv .ex-acts>button{width:100%;min-height:46px;justify-content:center;margin:0;white-space:normal;word-break:keep-all}
+.src-i{font-size:.82rem;color:var(--muted);font-weight:400}
+mark .src-i{background:none}
+.src-fold>summary{cursor:pointer;font-weight:700;color:var(--muted);min-height:40px;display:flex;align-items:center}
+.src-fold p{margin:6px 0 0}
+/* 縦の年表(2026-11-10) */
+/* ひと目でわかる */
+.glance{background:var(--surface);border:1px solid var(--line);border-radius:16px;padding:10px 12px;margin:10px 0;display:flex;flex-direction:column;gap:8px}
+.gl-h{font-weight:800;font-size:.9rem;color:var(--muted)}
+.gl-r{display:grid;grid-template-columns:40px minmax(0,1fr);gap:10px;align-items:start}
+.gl-ic{width:40px;height:40px;border-radius:12px;background:var(--accent-soft);display:grid;place-items:center;font-size:1.3rem}
+.gl-b{display:flex;flex-direction:column;gap:2px;min-width:0}
+.gl-l{font-size:.82rem;color:var(--accent-on-surface,var(--accent))}
+.gl-t{line-height:1.55;display:-webkit-box;-webkit-line-clamp:3;-webkit-box-orient:vertical;overflow:hidden}
+.gl-t em{font-style:normal;font-weight:800}
+.gl-cast{display:flex;flex-wrap:wrap;gap:6px}.gl-c{border:1px solid var(--line);border-radius:99px;padding:2px 10px;font-size:.88rem;font-weight:700;background:var(--bg)}
+.vtl{list-style:none;margin:8px 0 0;padding:0 0 0 4px;position:relative}
+.vtl-i{position:relative;padding:0 0 14px 26px;display:flex;flex-direction:column;gap:2px}
+.vtl-i::before{content:"";position:absolute;left:5px;top:6px;bottom:-6px;width:2px;background:var(--accent);opacity:.35}
+.vtl-i:last-child::before{display:none}
+.vtl-i::after{content:"";position:absolute;left:0;top:4px;width:12px;height:12px;border-radius:50%;background:var(--surface);border:3px solid var(--accent);box-sizing:border-box}
+.vtl-i.now::after{background:var(--accent);box-shadow:0 0 0 4px var(--accent-soft)}
+.vtl-i.fut::after{border-style:dashed;border-color:var(--muted)}.vtl-i.fut .vtl-d,.vtl-i.fut .vtl-t{color:var(--muted)}
+.vtl-d{font-weight:800;font-size:.9rem;color:var(--accent-on-surface,var(--accent))}
+.vtl-t{line-height:1.65}
+.vtl-i.fresh .vtl-t{background:var(--accent-soft);border-radius:6px;padding:2px 6px;margin-left:-6px}
+.vtl-old{margin:4px 0 6px}
 .ex-toc::-webkit-scrollbar{display:none}
 .ex-toc-l{font-size:.82rem;color:var(--muted);white-space:nowrap;font-weight:700}
 .ex-toc button{white-space:nowrap;border:1px solid var(--line);background:var(--surface);color:var(--ink);border-radius:99px;padding:8px 12px;font:inherit;font-size:.88rem;font-weight:700;cursor:pointer;min-height:40px}
@@ -2643,10 +2680,28 @@ function exHeroHTML(k,e){ const ph=PHOTOS[k]; const st=e.status==="done"?"✅ �
 function exTocHTML(e){ const L=[e.manga&&["ex-mg","🎨 4コマ"],["ex-more","💡 くわしく"],(e.us||[]).length&&["ex-us","🙋 わたしへの影響"],(e.faq||[]).length&&["ex-faq","❓ 疑問"],(e.timeline||[]).length&&["ex-tl","📅 流れ"],(e.next||[]).length&&["ex-nx","🔭 これから"]].filter(Boolean);
   return `<nav class="ex-toc" aria-label="このページの中身"><span class="ex-toc-l">このページ</span>${L.map(([id,t])=>`<button data-exj="${id}">${t}</button>`).join("")}</nav>
     <div class="hint" style="margin-top:-8px">点線のことばは、タップすると意味が出ます。</div>`; }
+// 本文の中の「(中日新聞)」「(CBC・TBS)」のような出典のかっこは、文の流れをじゃましないよう小さくうすく(2026-11-10)
+function srcSoft(h){ return String(h).replace(/[（(]([^（(）)<>]{1,60})[）)]/g,(m,x)=>{ try{ return ttsIsSrc(x)?`<span class="src-i">${m}</span>`:m; }catch(_){ return m; } }); }
+function exTxt(t){ return glossify(srcSoft(esc(t))); }
 function exParas(t){ const S=String(t||"").split(/(?<=。)/).map(x=>x.trim()).filter(Boolean); const P=[]; for(let i=0;i<S.length;i+=2) P.push(S.slice(i,i+2).join(""));
-  return P.map(x=>`<p class="ex-p">${glossify(esc(x))}</p>`).join(""); }
+  return P.map(x=>`<p class="ex-p">${exTxt(x)}</p>`).join(""); }
+// 🔎 ひと目でわかる(2026-11-10): 解説にすでに書いてあること(最新の流れ・出てくる人・次の山場・わたしへの影響)を、絵の札で1枚に
+function glanceHTML(e){ const T=e.timeline||[]; const last=T[T.length-1]; const nx=(e.next||[])[0]; const us=(e.us||[])[0]; const C=(e.cast||[]).slice(0,4);
+  const row=(ic,l,body)=>`<div class="gl-r"><span class="gl-ic" aria-hidden="true">${ic}</span><div class="gl-b"><b class="gl-l">${l}</b>${body}</div></div>`;
+  const R=[last&&row("📅","いま",`<span class="gl-t"><em>${esc(last[0])}</em> ${exTxt(last[1])}</span>`),
+    C.length&&row("👥","だれ",`<span class="gl-cast">${C.map(c=>`<span class="gl-c">${c[0]} ${esc(c[1])}</span>`).join("")}</span>`),
+    us&&row("🙋","わたしへ",`<span class="gl-t">${glossify(srcSoft(bold(String(us).replace(/^\p{Extended_Pictographic}[\u{FE0F}\u{200D}\p{Extended_Pictographic}]*\s*/u,""))))}</span>`),
+    nx&&row("🔭","つぎ",`<span class="gl-t">${esc(nextTxt(nx))}</span>`)].filter(Boolean);
+  return R.length>=2?`<div class="glance" aria-label="ひと目でわかる"><div class="gl-h">🔎 ひと目でわかる</div>${R.join("")}</div>`:""; }
+// 年表は縦に(2026-11-10: 横スクロールは1つの文が「…」で切れて読めなかった)。古いものは閉じた「前の流れ」に
+function vtlHTML(e,seenAt){ const T=e.timeline||[]; const KEEP=5; const li=([d,t],cls)=>`<li class="vtl-i${cls||""}${isNewTl(d,seenAt)?" fresh":""}"><span class="vtl-d">${esc(d)}${isNewTl(d,seenAt)?' <i class="tl-new">🆕</i>':""}</span><span class="vtl-t">${exTxt(t)}</span></li>`;
+  const old=T.length>KEEP+1?T.slice(0,T.length-KEEP):[]; const now=old.length?T.slice(T.length-KEEP):T;
+  const fut=[]; /* これからの予定は、すぐ下の「🔭 次の山場」に出す */
+  return `${old.length?`<details class="faq plain vtl-old"><summary>これより前の流れ(${old.length}件)</summary><ol class="vtl">${old.map(x=>li(x)).join("")}</ol></details>`:""}
+    <ol class="vtl">${now.map((x,i)=>li(x,i===now.length-1?" now":"")).join("")}${fut.map(x=>li(x," fut")).join("")}</ol>
+    <div class="hint">● がいちばん新しい動きです。</div>`; }
 function exUsLi(u){ const m=/^(\p{Extended_Pictographic}[️‍\p{Extended_Pictographic}]*)\s*([\s\S]*)$/u.exec(String(u));
-  return m?`<li><span class="us-ic" aria-hidden="true">${m[1]}</span><span>${glossify(bold(m[2]))}</span></li>`:`<li><span class="us-ic" aria-hidden="true">・</span><span>${glossify(bold(u))}</span></li>`; }
+  return m?`<li><span class="us-ic" aria-hidden="true">${m[1]}</span><span>${glossify(srcSoft(bold(m[2])))}</span></li>`:`<li><span class="us-ic" aria-hidden="true">・</span><span>${glossify(srcSoft(bold(u)))}</span></li>`; }
 function bindExRead(sh){ const bar=sh.querySelector("#exProg"); const head=sh.querySelector(".bar");
   const upd=()=>{ if(!bar) return; const max=sh.scrollHeight-sh.clientHeight; bar.style.width=(max>0?Math.min(100,sh.scrollTop/max*100):0)+"%"; };
   sh.addEventListener("scroll",upd,{passive:true}); upd();
@@ -2659,33 +2714,32 @@ function openEx(k){
   const e=D.explainers[k]; if(!e) return; const sh=document.getElementById("sheet");
   if(!ME.readEx[k]) learn(e.g,2); const seenAt=ME.readEx[k]; ME.readEx[k]=TODAY; saveMe(); setTimeout(checkBadges,800);
   const rel = NEWS.filter(n=>{ const map={saudi:"サウジ・中東",tax:"消費減税",cyber:"不正アクセスとAI"}; if(map[k]) return (n.th||"").includes(map[k]); if(k==="sato") return /佐藤輝明/.test(n.h); if(k==="series") return /日本シリーズ|CS/.test(n.h); if(k==="yokohama") return /横浜市長/.test(n.h); if(k==="past") return n.d<"2026-10-04"; return false; }).slice(0,8);
-  const flow = e.flow.map((f,i)=>`${i>0?`<div class="farrow">⬇️ ${f.via?`<b>${esc(f.via)}</b>`:""}</div>`:""}<div class="fstep"><span class="fi">${f.i}</span><span><b>${esc(f.t)}</b>${f.s?`<small>${esc(f.s)}</small>`:""}</span></div>`).join("");
+  const flow = e.flow.map((f,i)=>`${i>0?`<div class="farrow"><span class="fa-ln" aria-hidden="true"></span>${f.via?`<b class="fa-via">${esc(f.via)}</b>`:""}</div>`:""}<div class="fstep"><span class="fi"><i class="fn">${i+1}</i>${f.i}</span><span><b>${esc(f.t)}</b>${f.s?`<small>${exTxt(f.s)}</small>`:""}</span></div>`).join("");
   sh.innerHTML=`<div class="bar"><div class="wrap"><button class="iconbtn" id="shx" aria-label="もどる">← もどる</button><span class="ttl">${e.icon} ${esc(e.name)}</span>${pinBtn({k:"ex|"+k,h:"解説: "+e.name,g:e.g,d:TODAY,ex:k},"iconbtn")}<button class="iconbtn" id="shshare" aria-label="この解説を送る">📤 送る</button></div><div class="ex-prog" aria-hidden="true"><i id="exProg"></i></div></div>
   <div class="wrap body exv">
     ${exHeroHTML(k,e)}
     <div class="kid"><div class="l">🧒 ひとことで言うと</div><h2>${esc(e.kid)}</h2>${EN&&EN.ex&&EN.ex[k]&&langMode()!=="ja"?`<p class="enx" lang="en" style="margin:6px 0 0">${esc(EN.ex[k])} <span class="ensay" role="button" tabindex="0" data-say="${esc(EN.ex[k])}">🔊</span></p>`:""}</div>
+    ${glanceHTML(e)}
     <div class="ex-acts"><button class="chat-go" id="exChat">💬 話しながら読む</button><button class="fchip" id="exSpeak">🔊 聞く</button><button class="fchip" data-serial="${k}">📖 連載で読む</button>${e.status!=="done"||fwOn(k)?fwBtn(k):""}</div>
     ${exTocHTML(e)}
     <div class="hp-line">${helpBtn("ex","この画面の読み方")}</div>
     ${e.manga?`<div id="ex-mg">${mangaHTML(e.manga)}</div>`:""}
     ${LOOK.mode==="easy"?`<details class="faq plain exmore"><summary>📖 もっとくわしく見る(くわしい説明・出てくる人・動く図)</summary>`:""}
-    <div class="blk" id="ex-more"><h3>💡 もう少しくわしく</h3><p class="ex-lead"><mark class="hl">${glossify(esc(e.more[0]))}</mark></p>${exParas(e.more[1])}</div>
+    <div class="blk" id="ex-more"><h3>💡 もう少しくわしく</h3><p class="ex-lead"><mark class="hl">${exTxt(e.more[0])}</mark></p>${exParas(e.more[1])}</div>
     ${castBlock(e)}
     ${e.stats?`<div class="stats">${e.stats.map(([k2,v])=>`<div class="stat"><div class="v num">${esc(v)}</div><div class="k">${esc(k2)}</div></div>`).join("")}</div>`:""}
     <div class="blk"><h3>🖼️ 動く図でわかる <button class="fplay" id="fplay">▶ もう一度</button></h3><div class="flow" id="flow">${flow}</div></div>
     ${e.calc?calcBlock():""}
     ${LOOK.mode==="easy"?`</details>`:""}
     <div class="blk" id="ex-us"><h3>🙋 わたしたちへの影響</h3><ul class="us us-cards">${e.us.map(u=>exUsLi(u)).join("")}</ul>${roleBlock(e)}</div>
-    <div class="blk" id="ex-faq"><h3>❓ よくある疑問</h3>${e.faq.map(([q,a],i)=>`<details class="faq"><summary>${esc(q)}</summary><p>${glossify(esc(a))}</p></details>`).join("")}</div>
+    <div class="blk" id="ex-faq"><h3>❓ よくある疑問</h3>${e.faq.map(([q,a],i)=>`<details class="faq"><summary>${esc(q)}</summary><p>${exTxt(a)}</p></details>`).join("")}</div>
     <div class="blk" id="ex-tl"><h3>📅 これまでの流れ</h3>
-      <div class="htl-wrap" aria-label="年表(横にスクロール)"><div class="htl">${e.timeline.map(([d,t],i)=>`<div class="htl-i${i===e.timeline.length-1?" now":""}${isNewTl(d,seenAt)?" fresh":""}"><span class="htl-d">${esc(d)}${isNewTl(d,seenAt)?' <i class="tl-new">🆕</i>':""}</span><span class="htl-dot"></span><span class="htl-t">${esc(t)}</span></div>`).join("")}${(e.next||[]).slice(0,3).map(x=>{ const t=Array.isArray(x)?x.join(" "):String(x); const m=t.match(/^(\S+)\s+(.*)$/); return `<div class="htl-i fut"><span class="htl-d">${esc(m?m[1]:"これから")}</span><span class="htl-dot"></span><span class="htl-t">${esc(m?m[2]:t)}</span></div>`; }).join("")}</div></div>
-      <div class="hint">← 横にスクロールできます。点線の先は「これからの予定」</div>
-      <details class="faq plain"><summary>リストで見る</summary><ol class="tl">${e.timeline.map(([d,t])=>`<li${isNewTl(d,seenAt)?' class="fresh"':""}><b>${esc(d)}</b>${esc(t)}${isNewTl(d,seenAt)?' <i class="tl-new">🆕</i>':""}</li>`).join("")}</ol></details></div>
+      ${vtlHTML(e,seenAt)}</div>
     ${orderQuizHTML(e,k)}
     ${e.next.length?`<div class="blk" id="ex-nx"><h3>🔭 次の山場</h3><ul class="us">${e.next.map(n=>`<li>${esc(nextTxt(n))}</li>`).join("")}</ul></div>`:""}
     ${rel.length?`<div class="blk" id="ex-rel"><h3>🗞️ 関係するニュースの記録</h3><div class="res">${(()=>{ const li=n=>`<li class="item"><div class="meta"><span class="hint">${mdLabel(n.d)}</span>${n.info?'<span class="badge-info">📌 話題</span>':n.ok?'<span class="badge-ok">✅</span>':'<span class="badge-one">⚠️ 1社</span>'}</div><div class="h nv-h" data-nv="${esc(nkey(n))}" role="button" tabindex="0">${esc(n.h)}</div></li>`; const ul=L=>`<ul class="ex-rel">${L.map(li).join("")}</ul>`; return ul(rel.slice(0,3))+(rel.length>3?`<details class="faq plain"><summary>ほかに ${rel.length-3}件 見る</summary>${ul(rel.slice(3))}</details>`:""); })()}</div></div>`:""}
     ${askBlock(k)}
-    <div class="src">📰 出典: ${esc(e.src)}</div>
+    ${(()=>{ const n=String(e.src||"").split(/[、,]/).filter(x=>x.trim()).length; return `<details class="src src-fold"><summary>📰 この解説の出典(${n}件)</summary><p>${esc(e.src)}</p></details>`; })()}
     ${exNavHTML(k)}
     <button class="iconbtn" id="shx2" style="align-self:flex-start">← 一覧にもどる</button>
   </div>`;
@@ -5083,6 +5137,7 @@ function openShimen(){ const sh=document.getElementById("sheet"); const w=D.weat
 document.addEventListener("click",e=>{ const b=e.target.closest("[data-shimen]"); if(!b) return; e.preventDefault(); openShimen(); });
 // ===== お知らせ(新しくなったところ)。機能を足したら、いちばん上に1つ足す =====
 const UPDATES=[
+  {id:"2026-11-10a",d:"2026-11-10",t:"💡 解説ページを見やすくしました",L:["上に「🔎 ひと目でわかる」(いま・だれ・わたしへ・つぎ)を足しました。","「これまでの流れ」を縦の年表にして、文が途中で切れずに全部読めるようにしました(古い出来事はたたんであります)。「動く図」も番号と矢印で流れがわかる形に。","文の中の出典(新聞社などの名前)は小さくうすく、予定のカードは文を横いっぱいに出すようにしました。"]},
   {id:"2026-11-07b",d:"2026-11-07",t:"🗣️ 読みまちがいを作った人に知らせられるように",L:["「AI」を「あい」と読んでいたのを「エーアイ」に直しました。NHK・TBS などの英字の略語も1文字ずつ読みます。","「🔊 今日のニュースを聞く」の下の「🗣️ 読み方がおかしいときは →」から、まちがえたことばを作った人に知らせられます。たしかめてから、みんなの読み上げを直します。","📖 使い方ガイドの説明ごとに「👍 わかった / 🤔 わかりにくい」を押せるようにしました。わかりにくいところから直していきます。"]},
   {id:"2026-11-07a",d:"2026-11-07",t:"🔊 読み上げの読みまちがいを直しました",L:["「最高値(さいたかね)」「米(べい)大統領」「震度5弱(じゃく)」「晴れ後(のち)くもり」、人の名前・地名、時刻や記号(℃・%・+)などを、正しい読み方で読むようにしました。かっこの中の出典(NHK・共同など)は読まずに飛ばします。","それでもまちがえることばは、マイ→⚙️設定の「📝 読みまちがいを直す」で、自分で正しい読み方を登録できます。"]},
   {id:"2026-11-06d",d:"2026-11-06",t:"📖 説明を増やし、読み上げの声と寝る前ラジオの音を見直しました",L:["4コマの生徒の名札が、あなたのペットの名前になりました(名前を変えていれば、その名前)。","画面のあちこちに「？ これは何?」を足し、「設定」→「📖 使い方ガイド」で、マークの意味や解説・4コマ・ペットの見かたを読めるようにしました。","読み上げは、スマホに入っている中でいちばん自然な声を選び、1文ずつ間をあけて読みます。マイ→⚙️設定で声・高さを選べます。寝る前ラジオのうしろの音は、オルゴール・波の音・音なしから選べます。"]},
