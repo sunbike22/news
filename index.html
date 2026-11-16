@@ -1539,14 +1539,16 @@ let SH_SIDE=false; const SH_STACK=[]; let SH_PEND=false;
     if(SH.hidden) return; doBack(); setTimeout(()=>{ if(!SH.hidden&&!GUARD){ try{ history.pushState({nwsh:1},"",location.href); GUARD=true; }catch(_){} } },0); });
   const EDGE=36; let st=null;
   const reset=()=>{ SH.style.transition="transform .18s ease"; SH.style.transform=""; const a=document.getElementById("swBack"); if(a) a.remove(); setTimeout(()=>{ SH.style.transition=""; },200); };
-  document.addEventListener("touchstart",e=>{ st=null; if(SH.hidden||e.touches.length!==1) return; const t=e.touches[0]; if(t.clientX>EDGE) return; if(e.target.closest&&e.target.closest(".zwrap,.board-wrap,input,textarea,canvas,.rm-room")) return; st={x:t.clientX,y:t.clientY,dx:0,go:false}; },{passive:true});
+  document.addEventListener("touchstart",e=>{ st=null; if(SH.hidden||e.touches.length!==1) return; const t=e.touches[0]; if(e.target.closest&&e.target.closest(".zwrap,.board-wrap,input,textarea,select,canvas,.rm-room,.htl-wrap,.tspark,.ord-q")) return;
+    // 横にすべらせる行(チップの列・表など)の上では、その行のスクロールを優先する(左のはしから始めたときは もどる)
+    if(t.clientX>EDGE){ for(let el=e.target;el&&el!==SH;el=el.parentElement){ if(el.scrollWidth>el.clientWidth+4){ const ox=getComputedStyle(el).overflowX; if(ox==="auto"||ox==="scroll") return; } } } st={x:t.clientX,y:t.clientY,dx:0,go:false}; },{passive:true});
   document.addEventListener("touchmove",e=>{ if(!st) return; const t=e.touches[0]; const dx=t.clientX-st.x, dy=t.clientY-st.y;
-    if(!st.go){ if(Math.abs(dy)>14&&Math.abs(dy)>Math.abs(dx)){ st=null; return; } if(dx>12) st.go=true; else return; }
+    if(!st.go){ if(Math.abs(dy)>14&&Math.abs(dy)>Math.abs(dx)*.8){ st=null; return; } if(dx<-12){ st=null; return; } if(dx>16&&dx>Math.abs(dy)*1.5) st.go=true; else return; }
     st.dx=Math.max(0,dx); let reduce=false; try{ reduce=matchMedia("(prefers-reduced-motion: reduce)").matches; }catch(_){}
     if(!reduce) SH.style.transform=`translateX(${Math.min(st.dx,220)*.6}px)`;
     let a=document.getElementById("swBack"); if(!a){ a=document.createElement("div"); a.id="swBack"; a.setAttribute("aria-hidden","true"); a.textContent="← もどる"; document.body.appendChild(a); }
-    a.classList.toggle("ok",st.dx>80); },{passive:true});
-  const end=()=>{ if(!st) return; const ok=st.go&&st.dx>80; st=null; reset(); if(ok) doBack(); };
+    a.classList.toggle("ok",st.dx>90); },{passive:true});
+  const end=()=>{ if(!st) return; const ok=st.go&&st.dx>90; st=null; reset(); if(ok) doBack(); };
   document.addEventListener("touchend",end,{passive:true}); document.addEventListener("touchcancel",()=>{ st=null; reset(); },{passive:true});
 })();
 const GN = {pol:"政治",eco:"経済",soc:"社会・災害",it:"情報・IT",intl:"国際",spo:"スポーツ",sci:"科学・健康",ent:"エンタメ",fas:"ファッション",home:"インテリア・DIY",food:"レシピ・料理",life:"ライフスタイル",trip:"旅行",pred:"予測の判定"};
@@ -2694,7 +2696,7 @@ function bindExNav(sh,k){ sh.querySelectorAll("[data-exgo]").forEach(b=>b.onclic
   let st=null; const K=exKeys(); const i=K.indexOf(k); if(i<0||K.length<2) return;
   const root=sh.querySelector(".exv:not(.nv)"); if(!root) return;
   root.addEventListener("touchstart",e=>{ if(e.touches.length!==1||e.touches[0].clientX<=40||e.target.closest(".htl-wrap,.zwrap,.tspark,.chat,textarea,input,.mg,.flow,.board-wrap")){ st=null; return; } st={x:e.touches[0].clientX,y:e.touches[0].clientY,t:Date.now()}; },{passive:true});
-  root.addEventListener("touchend",e=>{ if(!st) return; if(!root.isConnected||sh.hidden){ st=null; return; } const t=e.changedTouches[0]; const dx=t.clientX-st.x, dy=t.clientY-st.y; const ok=Math.abs(dx)>90&&Math.abs(dy)<60&&Date.now()-st.t<700; st=null; if(!ok) return;
+  root.addEventListener("touchend",e=>{ if(!st) return; if(!root.isConnected||sh.hidden){ st=null; return; } const t=e.changedTouches[0]; const dx=t.clientX-st.x, dy=t.clientY-st.y; const ok=dx<-90&&Math.abs(dy)<60&&Date.now()-st.t<700; st=null; if(!ok) return; // 右へのスワイプは「もどる」(2026-11-16)
     const to=dx<0?K[(i+1)%K.length]:K[(i-1+K.length)%K.length]; SH_SIDE=true; openEx(to); toast((dx<0?"次":"前")+"の解説へ"); },{passive:true}); }
 // ===== 🧩 ならべかえ: 年表から4つを取り出して、起きた順にタップ(解説に書いてあることだけ) =====
 function orderQuizHTML(e,k){ const T=(e.timeline||[]).filter(x=>x[1]&&x[1].length<=46); if(T.length<4) return "";
@@ -5189,7 +5191,7 @@ function openShimen(){ const sh=document.getElementById("sheet"); const w=D.weat
 document.addEventListener("click",e=>{ const b=e.target.closest("[data-shimen]"); if(!b) return; e.preventDefault(); openShimen(); });
 // ===== お知らせ(新しくなったところ)。機能を足したら、いちばん上に1つ足す =====
 const UPDATES=[
-  {id:"2026-11-16a",d:"2026-11-16",t:"🐣 ペットが出むかえ・スワイプでもどる・文を最後まで",L:["「きょう」のいちばん上で、あなたのペットがあいさつします。押すとなでられて、ひとことが変わります。","上に重なった画面は、左のはしから右へ指でなぞると「← もどる」と同じように1つ前へ。スマホの「もどる」でも、アプリから出ずにもどれます。","見出しや説明が「…」で途中で切れていたところを、最後まで読めるようにしました。見出しの文字や押したときの動きも、少しにぎやかにしました。"]},
+  {id:"2026-11-16a",d:"2026-11-16",t:"🐣 ペットが出むかえ・スワイプでもどる・文を最後まで",L:["「きょう」のいちばん上で、あなたのペットがあいさつします。押すとなでられて、ひとことが変わります。","上に重なった画面は、右へ指でなぞると「← もどる」と同じように1つ前へ。スマホの「もどる」でも、アプリから出ずにもどれます。","見出しや説明が「…」で途中で切れていたところを、最後まで読めるようにしました。見出しの文字や押したときの動きも、少しにぎやかにしました。"]},
   {id:"2026-11-10a",d:"2026-11-10",t:"💡 解説ページを見やすくしました",L:["上に「🔎 ひと目でわかる」(いま・だれ・わたしへ・つぎ)を足しました。","「これまでの流れ」を縦の年表にして、文が途中で切れずに全部読めるようにしました(古い出来事はたたんであります)。「動く図」も番号と矢印で流れがわかる形に。","文の中の出典(新聞社などの名前)は小さくうすく、予定のカードは文を横いっぱいに出すようにしました。"]},
   {id:"2026-11-07b",d:"2026-11-07",t:"🗣️ 読みまちがいを作った人に知らせられるように",L:["「AI」を「あい」と読んでいたのを「エーアイ」に直しました。NHK・TBS などの英字の略語も1文字ずつ読みます。","「🔊 今日のニュースを聞く」の下の「🗣️ 読み方がおかしいときは →」から、まちがえたことばを作った人に知らせられます。たしかめてから、みんなの読み上げを直します。","📖 使い方ガイドの説明ごとに「👍 わかった / 🤔 わかりにくい」を押せるようにしました。わかりにくいところから直していきます。"]},
   {id:"2026-11-07a",d:"2026-11-07",t:"🔊 読み上げの読みまちがいを直しました",L:["「最高値(さいたかね)」「米(べい)大統領」「震度5弱(じゃく)」「晴れ後(のち)くもり」、人の名前・地名、時刻や記号(℃・%・+)などを、正しい読み方で読むようにしました。かっこの中の出典(NHK・共同など)は読まずに飛ばします。","それでもまちがえることばは、マイ→⚙️設定の「📝 読みまちがいを直す」で、自分で正しい読み方を登録できます。"]},
@@ -5372,7 +5374,7 @@ function updCard(){ const u=UPDATES[0]; const n=updUnread();
 // ===== 使い方ガイド(2026-11-06: 「説明が足りない」という声で作り直し) =====
 // HELP=[キー, 絵文字, 見出し, [文…]]。画面のあちこちの「？ これは何?」(helpBtn(キー))から、その見出しを開く。機能を足したらここも直す。
 const HELP=[
-  ["start","🚀","まずはここから",["時間がない日は<b>☀️ 今日の3行</b>だけ読めばOKです。","<b>📰 今日のニュース10</b>は、その日に関心が高かった順のニュースです。見出しを押すと、くわしいページが開きます。","<b>🔊 聞く</b>を押すと、天気とニュースを声で読み上げます。","わからないことがあったら、画面の<b>「？ これは何?」</b>を押してください。その場所の説明が出ます。","上に重なった画面は、<b>画面の左のはしから右へ指でなぞる</b>と、「← もどる」を押したのと同じように1つ前の画面にもどります。スマホの「もどる」でももどれます。"]],
+  ["start","🚀","まずはここから",["時間がない日は<b>☀️ 今日の3行</b>だけ読めばOKです。","<b>📰 今日のニュース10</b>は、その日に関心が高かった順のニュースです。見出しを押すと、くわしいページが開きます。","<b>🔊 聞く</b>を押すと、天気とニュースを声で読み上げます。","わからないことがあったら、画面の<b>「？ これは何?」</b>を押してください。その場所の説明が出ます。","上に重なった画面は、<b>画面を右へ指でなぞる</b>と、「← もどる」を押したのと同じように1つ前の画面にもどります。スマホの「もどる」でももどれます。"]],
   ["marks","🔖","マークの意味",["<b>✅ 確認ずみ</b>…別々の報道機関<b>2社以上</b>が伝えたニュース。","<b>⚠️</b>…まだ1社だけ・見出しだけのニュース。あとで確かめられたら✅に変わります。","<b>📌 話題</b>…レシピ・新商品・イベント・研究など、暮らしや趣味の話題。会社や役所の発表から集めています(ニュース10には入りません)。","✅や⚠️を<b>押すと</b>、どこが伝えたかが出ます。","<b>点線のことば</b>は、押すと意味が出ます。","<b>💗</b> あなたが選んだ「好きなこと」のニュース ／ <b>🙋</b> あなたのくらしに関係ありそう ／ <b>🏠</b> わたしの街のニュース ／ <b>🆕・NEW</b> 前に開いたあとに増えたもの。"]],
   ["ten","📰","ニュース10の読み方",["上から順に、その日に大きく伝えられたニュースです。","右上の<b>「短く／くわしく」</b>で、見出しだけにするか、説明も出すかを切りかえられます。","<b>「くわしい解説 →」</b>があるものは、図や流れつきの解説ページが読めます。","<b>🏷️ 保存</b>で「マイ」にとっておけます。<b>📤 送る</b>で家族や友だちに見出しを送れます(あなたの記録は送りません)。"]],
   ["ex","💡","解説ページの読み方",["大きな話題を1つずつ、やさしく説明するページです。上から読めば全体がわかります。","<b>ひとことで言うと</b>…まずここだけ読めば大まかにわかります。","<b>目次</b>を押すと、その場所に飛びます。","<b>🙋 わたしたちへの影響</b>…くらしにどう関係するか。","<b>📅 流れ</b>…これまでに起きたことの年表。<b>🔭 これから</b>…次に注目する日。","<b>🔔 続きを追う</b>を押すと、新しい動きがあったとき「きょう」でお知らせします。","<b>💬 話しながら読む</b>・<b>📖 連載で読む</b>…同じ中身を、会話や1日1話の形で読めます。","画面を<b>左右にすべらせる</b>と、前後の解説に移ります。"]],
