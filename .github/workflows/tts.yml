@@ -25,6 +25,8 @@ jobs:
           mkdir -p /tmp/prev /tmp/out
           if git fetch --depth=1 origin audio 2>/dev/null; then git archive FETCH_HEAD | tar -x -C /tmp/prev; fi
           ls /tmp/prev/tts 2>/dev/null | head || true
+      - name: 音声の変換(ffmpeg)を入れる
+        run: command -v ffmpeg || (sudo apt-get update -qq && sudo apt-get install -y -qq ffmpeg >/dev/null)
       - name: VOICEVOX を動かす
         run: |
           docker run -d --name vv -p 50021:50021 voicevox/voicevox_engine:cpu-latest || docker run -d --name vv -p 50021:50021 voicevox/voicevox_engine:cpu-ubuntu20.04-latest
