@@ -1465,8 +1465,8 @@ ul.ex-rel{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;
 :is(.fchip,.three .t,.listen-big,.iconbtn,.seg button,.opt,.tabs button):active{transform:scale(.94)}
 .ten .row:active{transform:scale(.985)}
 :is(.mascot-av,.hello-av,.pet-av):active{transform:scale(.9) rotate(-4deg)}
-#swBack{position:fixed;left:8px;top:50%;z-index:95;transform:translateY(-50%);background:var(--surface);color:var(--ink);border:2px solid var(--ink);border-radius:999px;padding:8px 14px;font-weight:800;font-size:.95rem;box-shadow:2px 2px 0 var(--ink);opacity:.75;pointer-events:none}
-#swBack.ok{opacity:1;background:var(--ink);color:var(--bg)}
+#swBack{position:fixed;left:0;top:50%;z-index:95;width:44px;height:44px;border-radius:50%;display:grid;place-items:center;background:var(--surface);color:var(--ink);border:2px solid var(--line);font-weight:900;font-size:1.2rem;box-shadow:0 3px 10px rgba(0,0,0,.18);opacity:0;transform:translate(-44px,-50%);transition:opacity .15s,background .15s,color .15s,border-color .15s;pointer-events:none}
+#swBack.ok{background:var(--accent-btn,var(--accent));color:var(--on-accent,#fff);border-color:transparent}
 @media (prefers-reduced-motion: reduce){.hello-av svg{animation:none}:is(.fchip,.three .t,.listen-big,.iconbtn,.seg button,.opt,.tabs button,.ten .row,.mascot-av,.hello-av,.pet-av):active{transform:none}}
 
 /* ===== 2026-11-17 大事なところを目立たせる・呼び名 ===== */
@@ -1496,6 +1496,13 @@ b.kn{font-weight:800;text-decoration:underline 3px color-mix(in srgb,var(--accen
 .nick-ok{display:block;width:100%;margin:20px 0 8px;min-height:56px;border:0;border-radius:16px;background:var(--accent-btn,var(--accent));color:var(--on-accent,#fff);font-size:1.1rem;font-weight:800;cursor:pointer}
 .nick-del{display:block;margin:10px auto 0;min-height:44px}
 .map-days-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.map-days-row .seg{display:inline-flex;width:auto}
+
+/* 2026-11-17 部屋をすっきり */
+.rm-shelf{position:absolute;left:40%;right:3%;top:37%;height:7px;border-radius:3px;background:linear-gradient(#b07a46,#8a5a30);box-shadow:0 3px 0 rgba(0,0,0,.12);pointer-events:none}
+.rm-win{font-size:34px;width:40px;margin-left:-20px}
+.room .rm-pp{left:27%;right:auto;top:6%}
+.rm-stat{display:flex;gap:14px;flex-wrap:wrap;margin-top:8px;font-size:.92rem}
+.rm-tools .fchip{min-height:40px}
 </style>
 </head>
 <body>
@@ -1570,19 +1577,39 @@ let SH_SIDE=false; const SH_STACK=[]; let SH_PEND=false;
     else if(!open&&GUARD){ GUARD=false; IGN++; window.SH_HNAV=Date.now(); try{ history.back(); }catch(_){ IGN--; } } }).observe(SH,{attributes:true,attributeFilter:["hidden"]});
   window.addEventListener("popstate",()=>{ window.SH_HNAV=Date.now(); if(IGN>0){ IGN--; return; } if(!GUARD) return; GUARD=false;
     if(SH.hidden) return; doBack(); setTimeout(()=>{ if(!SH.hidden&&!GUARD){ try{ history.pushState({nwsh:1},"",location.href); GUARD=true; }catch(_){} } },0); });
-  const EDGE=36; let st=null;
-  const reset=()=>{ SH.style.transition="transform .18s ease"; SH.style.transform=""; const a=document.getElementById("swBack"); if(a) a.remove(); setTimeout(()=>{ SH.style.transition=""; },200); };
-  document.addEventListener("touchstart",e=>{ st=null; if(SH.hidden||e.touches.length!==1) return; const t=e.touches[0]; if(e.target.closest&&e.target.closest(".zwrap,.board-wrap,input,textarea,select,canvas,.rm-room,.htl-wrap,.tspark,.ord-q")) return;
+  // 2026-11-17: もっとなめらかに。指にぴったりついて動き(1:1)、はなすと残りを自動で右へすべらせてから前の画面がそっと出てくる。
+  // 速くはじいたとき(はやさ0.45px/ms以上)は短くても もどる。とちゅうでやめたら、ばねのようにもとの位置へ。
+  const EDGE=36; let st=null, raf=0, busy=false;
+  const reduce=()=>{ try{ return matchMedia("(prefers-reduced-motion: reduce)").matches; }catch(_){ return false; } };
+  const arrow=()=>{ let a=document.getElementById("swBack"); if(!a){ a=document.createElement("div"); a.id="swBack"; a.setAttribute("aria-hidden","true"); a.innerHTML="<span>←</span>"; document.body.appendChild(a); } return a; };
+  const dropArrow=()=>{ const a=document.getElementById("swBack"); if(a){ a.style.opacity="0"; setTimeout(()=>a.remove(),160); } };
+  const paint=()=>{ raf=0; if(!st) return; const W=window.innerWidth||390; const x=st.dx; const p=Math.min(1,x/(W*.32));
+    SH.style.transform=`translate3d(${x}px,0,0)`; SH.style.boxShadow=`-10px 0 28px rgba(0,0,0,${(.22*(1-x/W)).toFixed(3)})`;
+    const a=arrow(); a.style.opacity=String(Math.min(1,p*1.4)); a.style.transform=`translate(${Math.min(x*.35,56)-44}px,-50%) scale(${.7+.3*p})`; a.classList.toggle("ok",p>=1); };
+  const clean=()=>{ SH.style.transition=""; SH.style.transform=""; SH.style.boxShadow=""; SH.style.willChange=""; SH.style.opacity=""; };
+  document.addEventListener("touchstart",e=>{ st=null; if(busy||SH.hidden||e.touches.length!==1) return; const t=e.touches[0]; if(e.target.closest&&e.target.closest(".zwrap,.board-wrap,input,textarea,select,canvas,.rm-room,.room,.htl-wrap,.tspark,.ord-q")) return;
     // 横にすべらせる行(チップの列・表など)の上では、その行のスクロールを優先する(左のはしから始めたときは もどる)
-    if(t.clientX>EDGE){ for(let el=e.target;el&&el!==SH;el=el.parentElement){ if(el.scrollWidth>el.clientWidth+4){ const ox=getComputedStyle(el).overflowX; if(ox==="auto"||ox==="scroll") return; } } } st={x:t.clientX,y:t.clientY,dx:0,go:false}; },{passive:true});
+    if(t.clientX>EDGE){ for(let el=e.target;el&&el!==SH;el=el.parentElement){ if(el.scrollWidth>el.clientWidth+4){ const ox=getComputedStyle(el).overflowX; if(ox==="auto"||ox==="scroll") return; } } }
+    st={x:t.clientX,y:t.clientY,dx:0,go:false,lx:t.clientX,lt:performance.now(),v:0}; },{passive:true});
   document.addEventListener("touchmove",e=>{ if(!st) return; const t=e.touches[0]; const dx=t.clientX-st.x, dy=t.clientY-st.y;
-    if(!st.go){ if(Math.abs(dy)>14&&Math.abs(dy)>Math.abs(dx)*.8){ st=null; return; } if(dx<-12){ st=null; return; } if(dx>16&&dx>Math.abs(dy)*1.5) st.go=true; else return; }
-    st.dx=Math.max(0,dx); let reduce=false; try{ reduce=matchMedia("(prefers-reduced-motion: reduce)").matches; }catch(_){}
-    if(!reduce) SH.style.transform=`translateX(${Math.min(st.dx,220)*.6}px)`;
-    let a=document.getElementById("swBack"); if(!a){ a=document.createElement("div"); a.id="swBack"; a.setAttribute("aria-hidden","true"); a.textContent="← もどる"; document.body.appendChild(a); }
-    a.classList.toggle("ok",st.dx>90); },{passive:true});
-  const end=()=>{ if(!st) return; const ok=st.go&&st.dx>90; st=null; reset(); if(ok) doBack(); };
-  document.addEventListener("touchend",end,{passive:true}); document.addEventListener("touchcancel",()=>{ st=null; reset(); },{passive:true});
+    if(!st.go){ if(Math.abs(dy)>12&&Math.abs(dy)>Math.abs(dx)*.8){ st=null; return; } if(dx<-10){ st=null; return; } if(dx>12&&dx>Math.abs(dy)*1.4){ st.go=true; st.x=t.clientX-1; SH.style.transition="none"; SH.style.willChange="transform"; } else return; }
+    const now=performance.now(), dt=Math.max(1,now-st.lt); st.v=.7*st.v+.3*((t.clientX-st.lx)/dt); st.lx=t.clientX; st.lt=now;
+    st.dx=Math.max(0,t.clientX-st.x); if(reduce()){ const a=arrow(); a.style.opacity="1"; a.classList.toggle("ok",st.dx>90); return; }
+    if(!raf) raf=requestAnimationFrame(paint); },{passive:true});
+  const end=()=>{ if(!st) return; const s0=st; st=null; if(raf){ cancelAnimationFrame(raf); raf=0; } if(!s0.go){ return; }
+    const W=window.innerWidth||390; const ok=s0.dx>W*.32||(s0.v>.45&&s0.dx>30);
+    if(reduce()){ dropArrow(); clean(); if(ok) doBack(); return; }
+    if(!ok){ SH.style.transition="transform .32s cubic-bezier(.2,.9,.25,1.15),box-shadow .32s"; SH.style.transform="translate3d(0,0,0)"; SH.style.boxShadow="none"; dropArrow(); setTimeout(clean,340); return; }
+    busy=true; const left=Math.max(80,Math.min(260,(W-s0.dx)/Math.max(.6,s0.v||.6))); // 残りのきょりを、はなしたときの速さに合わせてすべらせる
+    SH.style.transition=`transform ${left}ms cubic-bezier(.25,.8,.3,1),box-shadow ${left}ms`; SH.style.transform=`translate3d(${W}px,0,0)`; SH.style.boxShadow="none"; dropArrow();
+    setTimeout(()=>{ SH.style.transition="none"; doBack();
+      if(!SH.hidden){ // 前の画面(重なっていた画面)が、左からそっと出てくる
+        SH.style.transform="translate3d(-28%,0,0)"; SH.style.opacity=".55"; void SH.offsetWidth;
+        SH.style.transition="transform .26s cubic-bezier(.2,.8,.3,1),opacity .26s"; SH.style.transform="translate3d(0,0,0)"; SH.style.opacity="1";
+        setTimeout(()=>{ clean(); busy=false; },280);
+      } else { clean(); busy=false; } }, left); };
+  document.addEventListener("touchend",end,{passive:true});
+  document.addEventListener("touchcancel",()=>{ if(!st) return; st.dx=0; st.v=0; st.go&&end(); st=null; },{passive:true});
 })();
 const GN = {pol:"政治",eco:"経済",soc:"社会・災害",it:"情報・IT",intl:"国際",spo:"スポーツ",sci:"科学・健康",ent:"エンタメ",fas:"ファッション",home:"インテリア・DIY",food:"レシピ・料理",life:"ライフスタイル",trip:"旅行",pred:"予測の判定"};
 const GORDER = ["pol","eco","soc","it","intl","spo","sci","ent","fas","home","food","life","trip"];
@@ -4022,18 +4049,21 @@ function roomCell(i){ const r=i<7?0:1, c=i<7?i:i-7; return [7+c*14.3, r?36:10]; 
 function petLove(){ return +(ME.pet||{}).love||0; }
 function roomHTML(){ const got=GORDER.filter(g=>(ME.auto||{})[g]>=3); const st=petStage(); const fr=friendOn(); const R=petRoom();
   const W=ROOM_WALL.find(x=>x[0]===R.wall)||ROOM_WALL[0], F=ROOM_FLOOR.find(x=>x[0]===R.floor)||ROOM_FLOOR[0];
-  const it=(key,i,html,cls,t)=>{ const [x,y]=R.pos[key]||roomCell(i); return `<span class="rm-it${cls}" data-rk="${key}" style="left:${x}%;top:${y}%"${t?` title="${esc(t)}"`:""}>${html}</span>`; };
+  // 2026-11-17: 部屋をすっきり。窓は左上、家具は「かべの棚(6こまで)」と「床のおく(のこり)」にならべる。まだない家具の「・」は出さない
+  const DEF={win:[13,9]}; got.forEach((g,j)=>{ DEF[g]= j<6 ? [46+j*9,26] : [8+(j-6)*12.5,58]; });
+  const it=(key,i,html,cls,t)=>{ const [x,y]=R.pos[key]||DEF[key]||roomCell(i); return `<span class="rm-it${cls}" data-rk="${key}" style="left:${x}%;top:${y}%"${t?` title="${esc(t)}"`:""}>${html}</span>`; };
   const sky=(()=>{ const w=D.weather; if(w&&relDay(w.iso)==="今日"&&/雪/.test(w.sky)) return "❄️"; if(w&&relDay(w.iso)==="今日"&&/雨/.test(w.sky)) return "🌧️"; const t=skyTOD(); return t==="night"?"🌙":t==="evening"?"🌇":"☀️"; })(); // 窓の外は いまの空(時間と、きょうの天気)
-  const slots=GORDER.map((g,i)=>{ const has=got.includes(g); return has?it(g,i,ROOM[g]," mv",GN[g]):`<span class="rm-it off" style="left:${roomCell(i)[0]}%;top:${roomCell(i)[1]}%" title="${esc(GN[g])}(まだ)">・</span>`; }).join("")+it("win",13,`🪟<i class="rm-sky" aria-hidden="true">${sky}</i>`," mv","窓(外は"+sky+")");
+  const slots=(got.length?`<i class="rm-shelf" aria-hidden="true"></i>`:"")+GORDER.map((g,i)=>got.includes(g)?it(g,i,ROOM[g]," mv",GN[g]):"").join("")+it("win",13,`🪟<i class="rm-sky" aria-hidden="true">${sky}</i>`," mv rm-win","窓(外は"+sky+")");
   const egg=st.i===0;
   return `<div class="room" id="room" style="--w1:${W[2]};--w2:${W[3]};--f1:${F[2]};--f2:${F[3]}"><div class="rm-wall"></div><div class="rm-floor"></div>${slots}
-    ${isMonthBd()?`<span class="rm-it" style="left:30%;top:66%">🎂</span>`:""}${ppToday()?`<button class="rm-pp" data-poppo="1" aria-label="ぽっぽの絵はがきを受けとる">${poppoSVG(54)}<span>📮</span></button>`:""}
+    ${isMonthBd()?`<span class="rm-it" style="left:70%;top:68%">🎂</span>`:""}${ppToday()?`<button class="rm-pp" data-poppo="1" aria-label="ぽっぽの絵はがきを受けとる">${poppoSVG(54)}<span>📮</span></button>`:""}
     ${fr?`<button class="rm-fr" data-ffeed="1" aria-label="${esc(friendName())}にごはん">${friendSVG(56)}</button>`:""}<div class="rm-pet" id="rmPet" style="left:50%" role="button" tabindex="0" aria-label="${esc(petName())}をなでる"><div class="rm-pi">${petSVG(st.i,petMood(),null,84,petWear())}</div></div></div>
-    <div class="rm-tools"><button class="fchip" data-rplay="pet">🤚 なでる</button>${fr?`<button class="fchip" data-ffeed="1">🍙 ${esc(friendName())}にごはん</button>`:""}${egg?"":`<button class="fchip" data-rplay="ball">⚽ ボールで遊ぶ</button><button class="fchip" data-rplay="snack">🍪 おやつ</button>`}<button class="fchip" data-rplay="deco" aria-expanded="false">🎨 もようがえ</button></div>
+    <div class="rm-tools"><button class="fchip" data-rplay="pet">🤚 なでる</button>${egg?"":`<button class="fchip" data-rplay="ball">⚽ ボール</button><button class="fchip" data-rplay="snack">🍪 おやつ</button>`}${fr?`<button class="fchip" data-ffeed="1">🍙 ${esc(friendName())}</button>`:""}<button class="fchip" data-rplay="deco" aria-expanded="false">🎨 もようがえ</button></div>
     <div class="rm-deco" id="rmDeco" hidden><div><b>壁紙</b> ${ROOM_WALL.map(w=>`<button class="rm-sw${W===w?" on":""}" data-rwall="${w[0]}" style="background:linear-gradient(${w[2]},${w[3]})" aria-label="${w[1]}" aria-pressed="${W===w}"><small>${w[1]}</small></button>`).join("")}</div>
       <div><b>床</b> ${ROOM_FLOOR.map(f=>`<button class="rm-sw${F===f?" on":""}" data-rfloor="${f[0]}" style="background:repeating-linear-gradient(90deg,${f[2]} 0 10px,${f[3]} 10px 12px)" aria-label="${f[1]}" aria-pressed="${F===f}"><small>${f[1]}</small></button>`).join("")}</div>
       <button class="fchip" data-rreset="1">↺ 家具を元の並びにもどす</button></div>
-    <div class="hint" style="margin-top:6px">🏠 家具 ${got.length}/${GORDER.length}こ(そのジャンルをよく読むと増えます) ・ 家具と窓は指で動かせます ・ 💞 なかよし <b id="rmLove">${petLove()}</b></div>`; }
+    <div class="rm-stat"><span>🏠 家具 <b>${got.length}</b>/${GORDER.length}</span><span>💞 なかよし <b id="rmLove">${petLove()}</b></span></div>
+    <div class="hint" style="margin-top:2px">家具は、そのジャンルをよく読むと増えます。家具と窓は指で好きな場所へ動かせます。</div>`; }
 function bindRoom(){ const room=document.getElementById("room"); if(!room) return; const pet=document.getElementById("rmPet"); const pi=pet.querySelector(".rm-pi");
   const R=petRoom(); const still=matchMedia("(prefers-reduced-motion: reduce)").matches; const egg=petStage().i===0;
   let x=50, busy=false, tm=0;
@@ -5281,6 +5311,7 @@ function openShimen(){ const sh=document.getElementById("sheet"); const w=D.weat
 document.addEventListener("click",e=>{ const b=e.target.closest("[data-shimen]"); if(!b) return; e.preventDefault(); openShimen(); });
 // ===== お知らせ(新しくなったところ)。機能を足したら、いちばん上に1つ足す =====
 const UPDATES=[
+  {id:"2026-11-17c",d:"2026-11-17",t:"🏠 部屋をすっきり・👈 もどるをなめらかに",L:["ペットの部屋をすっきりさせました。窓は左上、家具は「かべの棚」と「床のおく」にならびます(指で好きな場所へ動かせるのは前と同じ)。","右へなぞって「もどる」とき、画面が指にぴったりついてきて、はなすとスッとすべって前の画面にもどります。速くはじいても、もどれます。"]},
   {id:"2026-11-17b",d:"2026-11-17",t:"🆕 新着の数・🗺️ 地図を見やすく",L:["上の「🆕」は、前に開いたあとに増えたニュースの数を「きのうから +◯件」のように出します(これまでは古いニュースまで数えていました)。","🗺️ ニュースの地図は、はじめは直近3日分だけ。「きょう・3日・7日」で切りかえられます。","👤 呼び名の画面を「名前 → 呼ばれ方 → 見本」の順にして、使いやすくしました。"]},
   {id:"2026-11-17a",d:"2026-11-17",t:"✨ 大事なところが目立つように・👤 呼び名",L:["今日の3行・ニュース10・解説で、いちばん伝えたい1文に黄色い線、数字(◯円・◯%・震度など)に太字と下線をつけました。ニュース10を「くわしく」にすると、上に「👉 ひとことで」が出ます。","「きょう」のペットのところや マイ→⚙️設定 で「呼び名」をきめると、ペットが名前で呼んでくれます(「さん・くん・ちゃん・つけない」も選べて、見本を見ながら決められます)。名前はスマホの中だけに入り、どこにも送られません。"]},
   {id:"2026-11-16a",d:"2026-11-16",t:"🐣 ペットが出むかえ・スワイプでもどる・文を最後まで",L:["「きょう」のいちばん上で、あなたのペットがあいさつします。押すとなでられて、ひとことが変わります。","上に重なった画面は、右へ指でなぞると「← もどる」と同じように1つ前へ。スマホの「もどる」でも、アプリから出ずにもどれます。","見出しや説明が「…」で途中で切れていたところを、最後まで読めるようにしました。見出しの文字や押したときの動きも、少しにぎやかにしました。"]},
