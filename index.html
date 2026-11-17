@@ -1482,6 +1482,20 @@ b.kn{font-weight:800;text-decoration:underline 3px color-mix(in srgb,var(--accen
 .ten-pt{margin:6px 0 2px;padding:8px 10px;border-radius:10px;background:var(--surface2);border-left:4px solid var(--accent);font-weight:700;line-height:1.6}
 .nick-row{display:flex;gap:8px;align-items:center;margin-top:8px}.nick-row input{flex:1;min-width:0;font-size:1rem;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--ink)}
 .hello-nick{font-weight:800}
+
+/* 2026-11-17 夕方 呼び名の画面 */
+.nick-now{margin:6px 0 10px;line-height:1.6}
+.nick-sh .nick-lb{display:flex;align-items:center;gap:8px;font-weight:800;margin:16px 0 8px}
+.nick-no{display:inline-grid;place-items:center;width:26px;height:26px;border-radius:50%;background:var(--accent-btn,var(--accent));color:var(--on-accent,#fff);font-size:.9rem;flex:none}
+.nick-sh #nickIn{width:100%;font-size:1.15rem;min-height:52px;padding:10px 14px;border:2px solid var(--line);border-radius:14px;background:var(--surface);color:var(--ink);box-sizing:border-box}
+.nick-sh #nickIn:focus{outline:3px solid color-mix(in srgb,var(--accent) 45%,transparent);border-color:var(--accent)}
+.nick-cnt{text-align:right;margin-top:4px}
+.nick-hon .fchip{min-height:44px}
+.nick-pv{display:flex;align-items:center;gap:10px}.nick-av{flex:none}
+.nick-bb{flex:1;min-width:0;background:var(--surface);border:2px solid var(--ink);border-radius:16px;padding:10px 14px;font-weight:800;font-size:1.05rem;line-height:1.5;box-shadow:2px 2px 0 color-mix(in srgb,var(--ink) 70%,transparent)}
+.nick-ok{display:block;width:100%;margin:20px 0 8px;min-height:56px;border:0;border-radius:16px;background:var(--accent-btn,var(--accent));color:var(--on-accent,#fff);font-size:1.1rem;font-weight:800;cursor:pointer}
+.nick-del{display:block;margin:10px auto 0;min-height:44px}
+.map-days-row{display:flex;align-items:center;gap:10px;flex-wrap:wrap}.map-days-row .seg{display:inline-flex;width:auto}
 </style>
 </head>
 <body>
@@ -2449,8 +2463,8 @@ async function rptSend(kind,fields){ let r={}; try{ r=JSON.parse(store.get("nw-r
 function openYomiFix(word,yomi){ const sh=document.getElementById("sheet");
   sh.innerHTML=`<div class="bar"><div class="wrap"><button class="iconbtn" id="yfx" aria-label="もどる">← もどる</button><span class="ttl">🗣️ 読み方を直す・知らせる</span></div></div>
   <div class="wrap body"><p class="hint" style="margin:0 0 10px">読み上げで、まちがえて読まれたことばを教えてください。<b>「このスマホで直す」</b>はすぐにあなたのスマホで直り、<b>「作った人に知らせる」</b>と、みんなの読み上げも直します(たしかめてから直すので、少し時間がかかります)。</p>
-   <label class="yo-lb">まちがえて読まれたことば<input id="yfW" maxlength="20" placeholder="例: 百音" value="${esc(word||"")}"></label>
-   <label class="yo-lb">正しい読み方(ひらがな。わからなければ空のままでOK)<input id="yfY" maxlength="40" placeholder="例: もね" value="${esc(yomi||"")}"></label>
+   <label class="yo-lb">まちがえて読まれたことば<input id="yfW" maxlength="20" placeholder="例: 御嶽山" value="${esc(word||"")}"></label>
+   <label class="yo-lb">正しい読み方(ひらがな。わからなければ空のままでOK)<input id="yfY" maxlength="40" placeholder="例: おんたけさん" value="${esc(yomi||"")}"></label>
    <label class="yo-lb">どこで聞きましたか?<select id="yfP">${["今日のニュースを聞く","解説の🔊 聞く","ニュースのページ","ことば辞典","寝る前ラジオ","そのほか"].map(x=>`<option>${x}</option>`).join("")}</select></label>
    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-top:12px"><button class="fchip" id="yfTry">🔊 いまの読み方を聞く</button><button class="fchip" id="yfMine">✏️ このスマホで直す</button><button class="fchip pet-feed" id="yfSend">📮 作った人に知らせる</button></div>
    <p class="hint" style="margin-top:12px">作った人に届くのは、ここに入れたことば・読み方・聞いた場所だけです(あなたの名前や記録は送りません)。名前や住所などは書かないでください。1日5回まで。</p></div>`;
@@ -3422,7 +3436,7 @@ function voiceCard(){ const r=sayRate();
       <p style="margin:6px 0"><b>パソコン</b>: Microsoft Edge で開くと「Nanami(Natural)」などの自然な声が使えます。</p></details>
     <div class="sec-h" style="margin-top:12px"><h2 style="font-size:1rem">📝 読みまちがいを直す</h2></div>
     <div class="hint" style="margin-bottom:6px">まちがえて読まれることばと、正しい読み方(ひらがな)を入れると、次からその読み方で読みます。このスマホの中だけに保存します。</div>
-    <div class="vc-row yo-row"><input id="yoW" maxlength="20" placeholder="書き方(例: 百音)" aria-label="書き方"><input id="yoY" maxlength="40" placeholder="読み方(例: もね)" aria-label="読み方"><button class="fchip" id="yoAdd">＋ 足す</button></div>
+    <div class="vc-row yo-row"><input id="yoW" maxlength="20" placeholder="書き方(例: 御嶽山)" aria-label="書き方"><input id="yoY" maxlength="40" placeholder="読み方(例: おんたけさん)" aria-label="読み方"><button class="fchip" id="yoAdd">＋ 足す</button></div>
     <div id="yoList">${yoListHTML()}</div>
     <button class="fchip" data-yofix="1" style="margin-top:8px">📮 読みまちがいを作った人に知らせる</button>
     <div class="sec-h" style="margin-top:12px"><h2 style="font-size:1rem">🈁 ふりがな</h2></div>
@@ -3451,8 +3465,11 @@ function bestStreak(){ const ds=[...ME.days].sort(); let best=0,cur=0,prev=null;
 // 新着(前回見たあとに増えたニュース)
 const FIRST_VISIT = ME.seen.length===0;
 const PREV_SEEN = new Set(ME.seen);
-const NEW_KEYS = new Set(FIRST_VISIT?[]:NEWS.filter(n=>!PREV_SEEN.has(nkey(n))).map(nkey));
-ME.seen = NEWS.map(nkey).slice(0,800); saveMe();
+const PREV_AT = typeof ME.seenAt==="string"?ME.seenAt:""; // 前に開いた日(YYYY-MM-DD)
+const NEW_FROM = new Date(Date.parse(TODAY)-2*864e5).toISOString().slice(0,10); // 3日以内だけ数える
+const NEW_KEYS = new Set(FIRST_VISIT?[]:NEWS.filter(n=>n.d>=NEW_FROM&&!PREV_SEEN.has(nkey(n))).map(nkey));
+const NEW_LBL = PREV_AT===TODAY?"さっきから":PREV_AT===new Date(Date.parse(TODAY)-864e5).toISOString().slice(0,10)?"きのうから":"この3日で";
+ME.seen = NEWS.filter(n=>n.d>=new Date(Date.parse(TODAY)-6*864e5).toISOString().slice(0,10)).map(nkey).slice(0,3000); ME.seenAt=TODAY; saveMe();
 const isNew = n => NEW_KEYS.has(nkey(n));
 // 関心(自分で選んだもの+読んだものから少しずつ学ぶ)
 // ===== 💗 好きなこと(こまかい興味。Pinterest のように たくさんの中から選ぶ) =====
@@ -3647,7 +3664,7 @@ function personalCards(){
   out.push(`<section class="me-strip" aria-label="あなたの記録">
     <button class="ms" data-tab="my">🔥 <b class="num">${s}日</b>連続${sgoalTxt()}</button>
     <button class="ms" data-tab="my">⭐ <b>レベル${lv.i+1}</b></button>
-    ${newCount?`<button class="ms new" id="newBtn">🆕 <b class="num">${newCount}件</b>前回から</button>`:`<button class="ms" id="weekBtn">📅 ふりかえり</button>`}
+    ${newCount?`<button class="ms new" id="newBtn">🆕 ${NEW_LBL} <b class="num">+${newCount}件</b></button>`:`<button class="ms" id="weekBtn">📅 ふりかえり</button>`}
   </section>`);
   const vr=voteResults(); const fresh=vr.settled.filter(x=>!ME.notified[x.p.no]);
   if(fresh.length){ out.push(`<section class="card result" aria-label="予想の結果"><b>🎯 あなたの予想の結果が出ました</b><ul class="us" style="margin-top:6px">${fresh.map(x=>`<li>${esc(x.p.t)} → <b>${x.ok==="win"?"⭕ 当たり!":x.ok==="lose"?"❌ はずれ":"🔶 半分当たり"}</b></li>`).join("")}</ul></section>`);
@@ -4402,21 +4419,41 @@ const MASCOT={
   words:["book",["知らないことばは、ここでしらべよう。","ことばを調べると、ぼくも少し育つよ。"]]
 };
 // ===== 👤 呼び名(2026-11-17): スマホの中だけの、かんたんなアカウント名。どこにも送らない(記録の引っこし・Googleに記録をあずける には入る) =====
+// 2026-11-17 夕方: 呼び名の画面を「① 名前 → ② 呼ばれ方(さん・くん・ちゃん・なし) → 見本を見て ✅ 決める」の1枚に。設定のカードは今の名前とボタンだけ。
+const NICK_HON=[["さん","さん"],["くん","くん"],["ちゃん","ちゃん"],["","つけない"]];
 function nickName(){ return String(ME.nick||"").trim(); }
+function nickHon(){ const h=ME.nickHon; return typeof h==="string"&&NICK_HON.some(x=>x[0]===h)?h:"さん"; }
+function nickCall(n,h){ n=n==null?nickName():n; h=h==null?nickHon():h; return n?n+h:""; }
 function nickClean(v){ return String(v||"").normalize("NFC").replace(/[\u0000-\u001f\u007f<>"'`\\]/g,"").replace(/\s+/g," ").trim().slice(0,12); }
 function nickHTML(){ const n=nickName(); return `<section class="card" id="nickCard"><b>👤 あなたの呼び名</b>
-  <div class="hint" style="margin-top:4px">ペットや画面が、この名前で呼びかけます。名前はこのスマホの中だけに入り、どこにも送られません。別のスマホに移すときは「記録をとっておく」でいっしょに移ります。</div>
-  <div class="nick-row"><input id="nickIn" maxlength="12" autocomplete="nickname" placeholder="例: すぐる(12文字まで)" value="${esc(n)}" aria-label="呼び名"><button class="fchip" id="nickSave">保存</button></div>
-  ${n?`<button class="linkish" id="nickDel" style="margin-top:6px">呼び名を消す</button>`:""}</section>`; }
-function nickSave(card){ const i=card.querySelector("#nickIn"); const v=nickClean(i&&i.value); if(!v){ toast("呼び名を入れてください"); i&&i.focus(); return false; } ME.nick=v; saveMe(); try{ track("/nick/set"); }catch(_){} toast(`${v}さん、よろしくね!`); return true; }
-function nickAfter(card){ const sh=document.getElementById("sheet"); if(card.closest("#sheet")){ sh.hidden=true; sh.innerHTML=""; if(current==="today") renderToday(); } else card.outerHTML=nickHTML(); }
-document.addEventListener("click",e=>{ const card=e.target.closest("#nickCard"); if(!card) return;
-  if(e.target.closest("#nickSave")){ if(nickSave(card)) nickAfter(card); }
-  else if(e.target.closest("#nickDel")){ delete ME.nick; saveMe(); toast("呼び名を消しました"); nickAfter(card); } });
-document.addEventListener("keydown",e=>{ if(e.key!=="Enter"||!e.target.matches||!e.target.matches("#nickIn")) return; e.preventDefault(); const card=e.target.closest("#nickCard"); if(card&&nickSave(card)) nickAfter(card); });
-function openNick(){ const sh=document.getElementById("sheet");
-  sh.innerHTML=`<div class="bar"><button class="iconbtn" id="nkBack">← もどる</button><div class="ttl">👤 呼び名</div></div><div class="wrap" style="padding:14px 16px 40px">${nickHTML()}</div>`;
-  sh.hidden=false; document.getElementById("nkBack").onclick=()=>{ sh.hidden=true; sh.innerHTML=""; }; setTimeout(()=>{ const i=document.getElementById("nickIn"); i&&i.focus(); },150); }
+  <div class="nick-now">${n?`いまは <b>「${esc(nickCall())}」</b> と呼ばれています`:"まだ決めていません。決めると、ペットが名前で呼んでくれます"}</div>
+  <button class="fchip nick-go" data-nick="1">✏️ ${n?"呼び名を変える":"呼び名を決める"}</button></section>`; }
+function nickPrev(sh){ const i=sh.querySelector("#nickIn"), p=sh.querySelector("#nickPv"); if(!i||!p) return; const v=nickClean(i.value); const h=sh.querySelector("[data-hon][aria-pressed=true]"); const hon=h?h.dataset.hon:"さん";
+  p.textContent=v?`${v}${hon}、${helloGreet()}`:"(ここに見本が出ます)"; const c=sh.querySelector("#nickCnt"); if(c) c.textContent=`${[...i.value].length} / 12文字`; }
+function openNick(){ const sh=document.getElementById("sheet"); const n=nickName(), h=nickHon(); const st=petStage();
+  sh.innerHTML=`<div class="bar"><div class="wrap"><button class="iconbtn" id="nkBack">← もどる</button><span class="ttl">👤 呼び名を決める</span></div></div>
+  <div class="wrap body nick-sh">
+    <p class="hint" style="margin:0 0 12px">${esc(petName())}やホー先生が、あなたをこの名前で呼びます。名前は<b>このスマホの中だけ</b>に入り、どこにも送られません。本名でなくても大丈夫です。</p>
+    <label class="nick-lb" for="nickIn"><span class="nick-no">1</span>呼んでほしい名前</label>
+    <input id="nickIn" maxlength="12" autocomplete="nickname" enterkeyhint="done" placeholder="例: たろう・はなちゃん・ニュース好き" value="${esc(n)}">
+    <div class="hint nick-cnt" id="nickCnt"></div>
+    <div class="nick-lb"><span class="nick-no">2</span>呼ばれ方</div>
+    <div class="chips nick-hon">${NICK_HON.map(([k,l])=>`<button class="fchip" data-hon="${k}" aria-pressed="${k===h}">${k?"◯◯"+l:"◯◯(そのまま)"}</button>`).join("")}</div>
+    <div class="nick-lb"><span class="nick-no">3</span>こんなふうに呼ばれます</div>
+    <div class="nick-pv"><span class="nick-av" aria-hidden="true">${petSVG(st.i,"happy",null,56)}</span><div class="nick-bb" id="nickPv"></div></div>
+    <button class="nick-ok" id="nickOk">✅ この呼び名にする</button>
+    ${n?`<button class="linkish nick-del" id="nickDel">呼び名を消す(名前で呼ばれなくなります)</button>`:""}
+  </div>`;
+  sh.hidden=false; const close=()=>{ sh.hidden=true; sh.innerHTML=""; };
+  document.getElementById("nkBack").onclick=close;
+  const i=sh.querySelector("#nickIn"); i.oninput=()=>nickPrev(sh);
+  sh.querySelectorAll("[data-hon]").forEach(b=>b.onclick=()=>{ sh.querySelectorAll("[data-hon]").forEach(x=>x.setAttribute("aria-pressed",String(x===b))); nickPrev(sh); });
+  const save=()=>{ const v=nickClean(i.value); if(!v){ toast("呼んでほしい名前を入れてください"); i.focus(); return; } const hb=sh.querySelector("[data-hon][aria-pressed=true]");
+    ME.nick=v; ME.nickHon=hb?hb.dataset.hon:"さん"; saveMe(); try{ track("/nick/set"); }catch(_){} toast(`${nickCall()}、よろしくね!`); close(); nickRefresh(); };
+  sh.querySelector("#nickOk").onclick=save; i.onkeydown=e=>{ if(e.key==="Enter"){ e.preventDefault(); save(); } };
+  const d=sh.querySelector("#nickDel"); if(d) d.onclick=()=>{ delete ME.nick; delete ME.nickHon; saveMe(); toast("呼び名を消しました"); close(); nickRefresh(); };
+  nickPrev(sh); }
+function nickRefresh(){ const c=document.getElementById("nickCard"); if(c) c.outerHTML=nickHTML(); if(current==="today") renderToday(); }
 document.addEventListener("click",e=>{ if(e.target.closest("[data-nick]")){ e.preventDefault(); openNick(); } });
 // ===== 🐣 「きょう」のいちばん上のあいさつ(2026-11-16): いまのペットが出迎える。押すとなでられて、ひとことが変わる =====
 function helloGreet(){ const h=new Date(Date.now()+9*3600e3).getUTCHours(); return h<4?"夜ふかしさんだね🌙":h<10?"おはよう!":h<17?"こんにちは!":h<22?"こんばんは!":"今日もおつかれさま🌙"; }
@@ -4424,7 +4461,7 @@ function helloLines(){ const st=petStage(); if(st.i===0) return ["コトコト�
   return ["えへへ、くすぐったい!","いっしょに読むと、ニュースってこわくないね","きょうの3行だけでも読めたら、えらい!","わからないことばは、点線をタップしてね","ぼく、きのうより ちょっと賢くなった気がする!","クイズに正解すると、ごはんがもらえるんだ🍙","おすすめは「💡 解説」。むずかしい話もやさしくなるよ"]; }
 function helloCard(){ if(LOOK.mascot===false) return ""; const st=petStage(); const mood=petMood(); const acc=petTopGenre(); const p=petInit();
   return `<section class="hello" aria-label="${esc(petName())}のあいさつ"><button class="hello-av" data-hello="0" aria-label="${esc(petName())}をなでる">${petSVG(st.i,mood,acc&&PET_ACC[acc][0],68,petWear()||"newsboy")}</button>
-    <div class="hello-b"><b class="hello-h">${nickName()?`<span class="hello-nick">${esc(nickName())}さん</span>、`:""}${esc(helloGreet())}</b><span class="hello-t">${esc(petLine(mood,st))}</span>
+    <div class="hello-b"><b class="hello-h">${nickName()?`<span class="hello-nick">${esc(nickCall())}</span>、`:""}${esc(helloGreet())}</b><span class="hello-t">${esc(petLine(mood,st))}</span>
       <span class="hello-go">${p.food>0&&st.i>0?`<button class="fchip pet-feed" data-feed="1">🍙 ×${p.food} あげる</button>`:""}<button class="fchip" data-tab="my">🏠 ${esc(petName())}のへや</button>${nickName()?"":`<button class="fchip" data-nick="1">✏️ 呼び名をきめる</button>`}</span></div></section>`; }
 document.addEventListener("click",e=>{ const b=e.target.closest(".hello-av"); if(!b) return; const L=helloLines(); const i=(+b.dataset.hello+1)%L.length; b.dataset.hello=i;
   const t=b.parentElement.querySelector(".hello-t"); if(t) t.textContent=L[i]; const sv=b.querySelector("svg"); if(sv){ sv.classList.remove("eat"); void sv.getBoundingClientRect(); sv.classList.add("eat"); } });
@@ -5244,7 +5281,8 @@ function openShimen(){ const sh=document.getElementById("sheet"); const w=D.weat
 document.addEventListener("click",e=>{ const b=e.target.closest("[data-shimen]"); if(!b) return; e.preventDefault(); openShimen(); });
 // ===== お知らせ(新しくなったところ)。機能を足したら、いちばん上に1つ足す =====
 const UPDATES=[
-  {id:"2026-11-17a",d:"2026-11-17",t:"✨ 大事なところが目立つように・👤 呼び名",L:["今日の3行・ニュース10・解説で、いちばん伝えたい1文に黄色い線、数字(◯円・◯%・震度など)に太字と下線をつけました。ニュース10を「くわしく」にすると、上に「👉 ひとことで」が出ます。","「きょう」のペットのところや マイ→⚙️設定 で「呼び名」をきめると、ペットが名前で呼んでくれます。名前はスマホの中だけに入り、どこにも送られません。"]},
+  {id:"2026-11-17b",d:"2026-11-17",t:"🆕 新着の数・🗺️ 地図を見やすく",L:["上の「🆕」は、前に開いたあとに増えたニュースの数を「きのうから +◯件」のように出します(これまでは古いニュースまで数えていました)。","🗺️ ニュースの地図は、はじめは直近3日分だけ。「きょう・3日・7日」で切りかえられます。","👤 呼び名の画面を「名前 → 呼ばれ方 → 見本」の順にして、使いやすくしました。"]},
+  {id:"2026-11-17a",d:"2026-11-17",t:"✨ 大事なところが目立つように・👤 呼び名",L:["今日の3行・ニュース10・解説で、いちばん伝えたい1文に黄色い線、数字(◯円・◯%・震度など)に太字と下線をつけました。ニュース10を「くわしく」にすると、上に「👉 ひとことで」が出ます。","「きょう」のペットのところや マイ→⚙️設定 で「呼び名」をきめると、ペットが名前で呼んでくれます(「さん・くん・ちゃん・つけない」も選べて、見本を見ながら決められます)。名前はスマホの中だけに入り、どこにも送られません。"]},
   {id:"2026-11-16a",d:"2026-11-16",t:"🐣 ペットが出むかえ・スワイプでもどる・文を最後まで",L:["「きょう」のいちばん上で、あなたのペットがあいさつします。押すとなでられて、ひとことが変わります。","上に重なった画面は、右へ指でなぞると「← もどる」と同じように1つ前へ。スマホの「もどる」でも、アプリから出ずにもどれます。","見出しや説明が「…」で途中で切れていたところを、最後まで読めるようにしました。見出しの文字や押したときの動きも、少しにぎやかにしました。"]},
   {id:"2026-11-10a",d:"2026-11-10",t:"💡 解説ページを見やすくしました",L:["上に「🔎 ひと目でわかる」(いま・だれ・わたしへ・つぎ)を足しました。","「これまでの流れ」を縦の年表にして、文が途中で切れずに全部読めるようにしました(古い出来事はたたんであります)。「動く図」も番号と矢印で流れがわかる形に。","文の中の出典(新聞社などの名前)は小さくうすく、予定のカードは文を横いっぱいに出すようにしました。"]},
   {id:"2026-11-07b",d:"2026-11-07",t:"🗣️ 読みまちがいを作った人に知らせられるように",L:["「AI」を「あい」と読んでいたのを「エーアイ」に直しました。NHK・TBS などの英字の略語も1文字ずつ読みます。","「🔊 今日のニュースを聞く」の下の「🗣️ 読み方がおかしいときは →」から、まちがえたことばを作った人に知らせられます。たしかめてから、みんなの読み上げを直します。","📖 使い方ガイドの説明ごとに「👍 わかった / 🤔 わかりにくい」を押せるようにしました。わかりにくいところから直していきます。"]},
@@ -5622,7 +5660,7 @@ function placeOf(n){ let hp=null; for(const p of PLACES){ if(p[0].test(n.h+" "+(
   return hp; }
 /* そのニュースの都道府県(記録の欄 → なければ見出しの場所から) */
 function newsPrefs(n){ if(n.pf&&n.pf.length) return n.pf; const p=placeOf(n); const pf=p&&PLACE_PREF[p[3]]; return pf?[pf]:[]; }
-let mapState={view:"japan",sel:null};
+let mapState={view:"japan",sel:null,days:(()=>{ const v=+store.get("nw-mapdays"); return [1,3,7].includes(v)?v:3; })()};
 const SCRIPTS={};
 // グラフの部品(Chart.js)は、グラフを出すページを開いたときだけ読み込む(最初の表示を軽くするため)
 function loadChart(){ return window.Chart?Promise.resolve():loadScript("https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.js"); }
@@ -5740,10 +5778,11 @@ const CN_JA={"United States of America":"アメリカ","Canada":"カナダ","Mex
  "Afghanistan":"アフガニスタン","Pakistan":"パキスタン","India":"インド","Nepal":"ネパール","Bangladesh":"バングラデシュ","Sri Lanka":"スリランカ","Myanmar":"ミャンマー","Thailand":"タイ","Laos":"ラオス","Cambodia":"カンボジア","Vietnam":"ベトナム","Malaysia":"マレーシア","Indonesia":"インドネシア","Philippines":"フィリピン","China":"中国","Mongolia":"モンゴル","Kazakhstan":"カザフスタン","Uzbekistan":"ウズベキスタン","North Korea":"北朝鮮","South Korea":"韓国","Taiwan":"台湾","Japan":"日本","Australia":"オーストラリア","New Zealand":"ニュージーランド","Papua New Guinea":"パプアニューギニア","Greenland":"グリーンランド"};
 const JP_REGIONS=[["北海道",143.2,43.4,2.6],["東北",140.7,39.3,2.6],["関東",139.7,35.8,5],["中部",137.5,36.2,2.8],["近畿",135.6,34.7,4.5],["中国・四国",133.3,34.3,3.4],["九州",130.8,32.6,3.2],["沖縄",127.8,26.4,3.0]];
 function renderMap(){
-  const recentDays=[...new Set(NEWS.map(n=>n.d))].slice(0,7);
+  const MD=mapState.days||3; const recentDays=[...new Set(NEWS.map(n=>n.d))].slice(0,MD);
   main.innerHTML=`<div class="view">
-    <div class="sec-h"><h2>🗺️ ニュースの地図</h2><span class="sub">直近7日分</span></div>
+    <div class="sec-h"><h2>🗺️ ニュースの地図</h2><span class="sub">${MD===1?"いちばん新しい日":`直近${MD}日分`}</span></div>
     <div class="seg map-seg" role="group" aria-label="地図の種類"><button data-v="japan" aria-pressed="${mapState.view==="japan"}">🗾 日本</button><button data-v="world" aria-pressed="${mapState.view==="world"}">🌏 世界</button><button data-v="board" aria-pressed="${mapState.view==="board"}">🧷 捜査ボード</button></div>
+    <div class="map-days-row"><span class="hint">いつのニュース?</span><div class="seg map-days" role="group" aria-label="いつのニュースを出すか">${[[1,"きょう"],[3,"3日"],[7,"7日"]].map(([d,l])=>`<button data-md="${d}" aria-pressed="${d===MD}">${l}</button>`).join("")}</div></div>
     ${mapState.view==="japan"||mapState.view==="world"?`<div class="map-rg" aria-label="地域をえらぶ"><button class="fchip" data-rg="all" aria-pressed="true">${mapState.view==="japan"?"全国":"世界全体"}</button>${(mapState.view==="japan"?JP_REGIONS:WORLD_REGIONS).map((r,i)=>`<button class="fchip" data-rg="${i}" aria-pressed="false">${r[0]}</button>`).join("")}</div>`:""}
     <div class="card mapbox"><div id="map" class="mapsvg"><div class="empty">地図を読み込んでいます…</div></div></div>
     <p class="hint" style="margin:0">丸をタップすると、その場所のニュースが下に出ます。${mapState.view==="japan"?"大きくすると、近い場所がわかれて県の名前も出ます。":""}</p>
@@ -5753,6 +5792,7 @@ function renderMap(){
     ${footer()}
   </div>`;
   main.querySelectorAll("[data-v]").forEach(b=>b.onclick=()=>{ mapState.view=b.dataset.v; mapState.sel=null; renderMap(); });
+  main.querySelectorAll("[data-md]").forEach(b=>b.onclick=()=>{ mapState.days=+b.dataset.md; store.set("nw-mapdays",String(mapState.days)); mapState.sel=null; renderMap(); });
   if(mapState.view==="board"){ renderBoard(recentDays); return; }
   if(mapState.view==="world") petFlag("world");
   const all7=NEWS.filter(n=>recentDays.includes(n.d)); const items=all7.map(n=>({n,p:placeOf(n)})).filter(x=>x.p);
