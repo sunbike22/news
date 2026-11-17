@@ -157,7 +157,7 @@ main{padding-block:18px 32px}
 .ten.short li{border:0;border-radius:0;border-top:1px solid var(--line);background:none}
 .ten.short li:first-child{border-top:0}
 .ten.short .row{padding:8px 12px 8px 10px;gap:8px;grid-template-columns:26px 1fr!important}
-.ten.short .th,.ten.short .ten-ft,.ten.short .th-cr{display:none!important}
+.ten.short .ten-ft{display:none!important}
 .ten.fy.short .row{grid-template-columns:1fr!important;display:block}.ten.fy.short .row p{display:none}
 .ten.short .rank{font-size:1rem}
 .ten.short .meta{margin-bottom:0;gap:6px}
@@ -1503,6 +1503,56 @@ b.kn{font-weight:800;text-decoration:underline 3px color-mix(in srgb,var(--accen
 .room .rm-pp{left:27%;right:auto;top:6%}
 .rm-stat{display:flex;gap:14px;flex-wrap:wrap;margin-top:8px;font-size:.92rem}
 .rm-tools .fchip{min-height:40px}
+
+/* ===== 2026-11-17 夜: ジャンルの帯・写真つきの一覧・メニュー・設定のまとまり ===== */
+.gbar{display:flex;gap:6px;overflow-x:auto;padding:2px 2px 6px;margin:0 -2px;scrollbar-width:none;-webkit-overflow-scrolling:touch;scroll-snap-type:x proximity}
+.gbar::-webkit-scrollbar{display:none}
+.gb{flex:none;display:inline-flex;align-items:center;gap:6px;min-height:40px;padding:0 13px;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--ink);font:inherit;font-weight:700;font-size:.95rem;white-space:nowrap;cursor:pointer;scroll-snap-align:start;transition:transform .12s}
+.gb:active{transform:scale(.95)}
+.gb i{width:10px;height:10px;border-radius:50%;display:inline-block}
+.gb[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.gb-menu{background:var(--accent-btn,var(--accent));color:var(--on-accent,#fff);border-color:transparent}
+:root[data-mode="easy"] .gb{min-height:46px;font-size:1rem}
+.gp{display:flex;flex-direction:column;gap:12px}
+.gp-day{margin:6px 0 0;font-size:1.05rem;display:flex;align-items:baseline;gap:8px}.gp-day small{color:var(--muted);font-weight:400;font-size:.85rem}
+.gp-ul{list-style:none;margin:0;padding:0;border:1px solid var(--line);border-radius:14px;background:var(--surface);overflow:hidden}
+.gp-it{display:flex;gap:10px;align-items:center;padding:10px 12px;border-top:1px solid var(--line)}.gp-it:first-child{border-top:0}
+.gp-it .th{flex:none;width:64px;height:64px;border-radius:10px;overflow:hidden;background:var(--surface2);display:block}
+.gp-it .th img{width:100%;height:100%;object-fit:cover;display:block}
+.gp-it .th-e{display:flex;align-items:center;justify-content:center;font-size:1.3rem;font-weight:800;background:var(--cs);color:var(--c)}
+.gp-tx{flex:1;min-width:0}.gp-tx .meta{display:flex;gap:6px;align-items:center;flex-wrap:wrap;margin-bottom:3px}.gp-tx .chip{font-size:.82rem;padding:1px 7px}
+.gp-tx .h{font-weight:700;line-height:1.5;cursor:pointer}
+.gp-exs{border:1px solid var(--line);border-radius:14px;background:var(--surface);overflow:hidden}.gp-exs>.hint{padding:8px 12px 4px}
+/* ニュース10(短く): 1本目は大きな写真、2本目からは小さな写真に順位を重ねる */
+.ten.short .th{display:block!important;grid-column:1;grid-row:1;width:60px!important;height:60px!important;border-radius:10px;margin:0;align-self:center}
+.ten.short .row:has(> .th){grid-template-columns:60px 1fr!important;align-items:center}
+.ten.short .row:has(> .th) .rank{grid-column:1;grid-row:1;z-index:1;align-self:start;justify-self:start;margin:-5px 0 0 -5px;width:24px;height:24px;border-radius:50%;background:var(--ink);color:var(--bg);font-size:.82rem;display:grid;place-items:center;box-shadow:0 0 0 2px var(--surface)}
+.ten.short .row:has(> .th)>span:not(.rank):not(.th){grid-column:2;grid-row:1;min-width:0}
+.ten.short li:first-child .row:has(> .th-big){grid-template-columns:1fr!important;row-gap:8px;padding-right:12px!important}
+.ten.short li:first-child .th-big{width:100%!important;height:auto!important;aspect-ratio:2/1;border-radius:12px}
+.ten.short li:first-child .th-big img{width:100%;height:100%;object-fit:cover;display:block}
+.ten.short li:first-child .row:has(> .th-big)>span:not(.rank):not(.th){grid-column:1;grid-row:2;padding-right:44px}
+.ten.short li:first-child .row:has(> .th-big) .rank{margin:8px 0 0 8px;width:30px;height:30px;font-size:1rem}
+.ten.short li:first-child:has(.th-big) h3{font-size:1.15rem;line-height:1.45}
+.ten.short li:first-child:has(.th-big) .pin-btn.abs{top:auto;bottom:8px}
+/* メニュー */
+.mn{display:flex;flex-direction:column;gap:14px}
+.mn #mnQ{width:100%;box-sizing:border-box;font-size:1rem;min-height:48px;padding:10px 14px;border:2px solid var(--line);border-radius:14px;background:var(--surface);color:var(--ink)}
+.mn-sec h3{margin:0 0 8px;font-size:1rem}
+.mn-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}
+.mn-it{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;min-height:76px;padding:8px 4px;border:1px solid var(--line);border-radius:14px;background:var(--surface);color:var(--ink);font:inherit;cursor:pointer;box-shadow:0 2px 0 var(--line);transition:transform .12s}
+.mn-it:active{transform:scale(.95)}
+.mn-ic{font-size:1.5rem;line-height:1}.mn-nm{font-size:.85rem;font-weight:700;line-height:1.3;text-align:center;overflow-wrap:anywhere}
+@media (min-width:560px){.mn-grid{grid-template-columns:repeat(4,minmax(0,1fr))}}
+/* 設定のまとまり */
+.set-grp{border:1px solid var(--line);border-radius:16px;background:var(--surface);box-shadow:0 3px 0 var(--line)}
+.set-grp>summary{display:flex;align-items:center;gap:12px;min-height:64px;padding:8px 14px;cursor:pointer;list-style:none}
+.set-grp>summary::-webkit-details-marker{display:none}
+.set-grp>summary::after{content:"▼";margin-left:auto;color:var(--muted);font-size:.85rem;transition:transform .15s}
+.set-grp[open]>summary::after{transform:rotate(180deg)}
+.sg-i{font-size:1.6rem;flex:none}.sg-t{display:flex;flex-direction:column;min-width:0}.sg-t b{font-size:1.05rem}.sg-t small{color:var(--muted);font-size:.85rem;line-height:1.4}
+.sg-b{display:flex;flex-direction:column;gap:12px;padding:4px 10px 12px}
+.sg-b>.card,.sg-b>section{box-shadow:none}
 </style>
 </head>
 <body>
@@ -2262,13 +2312,13 @@ function renderToday(){
       <div class="sec-h"><h2>📰 今日のニュース10</h2><span class="seg len-seg" role="group" aria-label="長さ">${[["short","短く"],["full","くわしく"]].map(([k,l])=>`<button data-len="${k}" aria-pressed="${(LOOK.len||"short")===k}">${l}</button>`).join("")}</span></div>
       <div class="hint rd-min">📖 ここから約${readMin()}分で、きょうの大事なニュースを読み終われます</div>
       <div class="rd-acts"><button class="fchip" data-shimen="1">🗞️ 新聞の形で読む</button>${helpBtn("marks","✅⚠️の意味")}${ME.lifeSet?"":`<button class="fchip" data-lifeopen="1">🙋 自分に関係あるものに印</button>`}</div>
-      <ol class="ten${(LOOK.len||"short")==="short"?" short":""}" style="margin-top:10px">${t.map((n,i)=>{
+      <ol class="ten${(LOOK.len||"short")==="short"?" short":""}" style="margin-top:10px">${(()=>{ TEN_USED=new Set(); return ""; })()}${t.map((n,i)=>{
         const big=i<3; const sr=srcOf(n); const nv=(!n.ex&&!n.tab&&sr&&sr.nk)?sr.nk:""; const link=n.ex||n.tab||nv; const wt=newsWeight(n); const mine=isLocal(n.title+" "+(n.text||""),sr);
         return `<li class="${big?'big':''} w${wt.lv}${mine?' mytown':''}">${pinBtn({k:"t|"+n.title,h:n.title,g:n.g,d:(NEWS[0]||{}).d,ex:n.ex},"abs")}<button class="row${link?' link':''}"${n.ex?` data-ex="${n.ex}"`:''}${n.tab?` data-tab="${n.tab}"`:''}${nv?` data-nv="${esc(nv)}"`:''} ${link?'':'tabindex="-1"'}>
           <span class="rank">${i+1}</span>
           <span>${big&&ILL[n.ill||n.ex]?`<div class="ill">${ILL[n.ill||n.ex]}</div>`:""}<span class="meta"><span class="chip ${n.g}">${GN[n.g]}</span>${topicChip(n)}${whoChip(n)}${n.ok?`<span class="badge-ok tap" role="button" tabindex="0" data-trust="${esc(n.title)}" data-ok="1" title="タップで出典">✅<small style="font-size:.82rem;font-weight:700;margin-left:2px">確認ずみ</small></span>`:`<span class="badge-one tap" role="button" tabindex="0" data-trust="${esc(n.title)}" data-ok="0" title="タップでわけ">⚠️ 1社</span>`}${mine?'<span class="heat town">🏠 あなたの街</span>':""}${wt.lv>=2?`<span class="heat" title="この3日で関連ニュース${wt.n}件">🔥</span>`:""}</span>
           ${(()=>{ const e=enOf("top10",i); if(langMode()==="en"&&e) return `<h3 lang="en">${n.icon} ${esc(e.t)}</h3>${e.x?`<p lang="en">${esc(e.x)}</p>`:""}<p class="jsub">${esc(n.title)}</p>${(e.w||[]).length?`<span class="enw">${e.w.map(([a,b])=>`<i>📘 ${esc(a)} = ${esc(b)}</i>`).join("")}</span>`:""}<span class="ensay" role="button" tabindex="0" data-say="${esc(e.t+". "+(e.x||""))}">🔊 English</span>`; return `<h3>${n.icon} <span class="tl-long">${kn(hlMk(esc(n.titleM||n.title)))}</span>${n.s?`<span class="tl-s">${kn(hlMk(esc(n.sM||n.s)))}</span>`:""}</h3>${n.point&&(LOOK.len||"short")!=="short"?`<p class="ten-pt">👉 ${kn(hlMk(esc(n.pointM||n.point)))}</p>`:""}${n.text?`<p class="kt">${keyText(n.textM||n.text)}</p>`:""}${enBlock(e)}`; })()}
-          ${srcLine(n)}<span class="ten-ft">${link?`<span class="more">${n.ex?'くわしい解説 →':n.tab?'グラフを見る →':'📰 くわしく →'}</span>`:''}<span class="sh-btn" role="button" tabindex="0" data-share="t:${i}" aria-label="このニュースを送る">📤 送る</span></span></span>${thumbHTML(n)}</button>${n.point&&(LOOK.len||"short")==="short"?`<details class="pt"><summary>💭 ここがポイント</summary>${kn(hlMk(esc(n.pointM||n.point)))}</details>`:""}</li>`;}).join("")}</ol>
+          ${srcLine(n)}<span class="ten-ft">${link?`<span class="more">${n.ex?'くわしい解説 →':n.tab?'グラフを見る →':'📰 くわしく →'}</span>`:''}<span class="sh-btn" role="button" tabindex="0" data-share="t:${i}" aria-label="このニュースを送る">📤 送る</span></span></span>${thumbHTML(n,i===0&&(LOOK.len||"short")==="short",TEN_USED)}</button>${n.point&&(LOOK.len||"short")==="short"?`<details class="pt"><summary>💭 ここがポイント</summary>${kn(hlMk(esc(n.pointM||n.point)))}</details>`:""}</li>`;}).join("")}</ol>
       ${thumbCredit(t)}
     </section>`;
   S.mood=moodCard();
@@ -2298,6 +2348,7 @@ function renderToday(){
   const body=mainK.map(k=>S[k]).join("");
   const extHTML=extK.length?extCard(extK.filter(k=>k!=="other"),S)+(extK.includes("other")?S.other:""):"";
   main.innerHTML = `<div class="view">
+    ${genreBar("")}
     ${helloCard()}
     ${vsCard()}
     ${LOOK.off.notes?seasonCard():""}
@@ -2306,6 +2357,7 @@ function renderToday(){
     ${navigator.onLine===false?'<div class="offline">📴 いまはオフラインです。前に読み込んだ内容を表示しています。</div>':''}
     ${body||'<div class="card"><b>表示する項目がありません</b><div class="hint">着せかえで、見たい項目をオンにしてください。</div></div>'}
     ${body?doneCard():""}
+    ${ME.days.length>=2?installCard():""}
     ${extHTML}
     ${LOOK.mode==="easy"?`<button class="card ms-card" data-modesw="normal"><span class="ms-i" aria-hidden="true">📱</span><span><b>もっと使ってみる?</b><small>ふつうモードで何が増えるか見る(すぐには変わりません)→</small></span></button>`:""}
     <button class="fchip" id="lookBtnToday" style="align-self:flex-start">🎨 この画面の並びを変える</button>
@@ -4488,6 +4540,68 @@ const MASCOT={
   plan:["fortune",["未来を予想するのはむずかしい…でも当たるとうれしい!","📰 未来の新聞、のぞいてみる?","きみも予想して、ぼくと勝負しよう!"]],
   words:["book",["知らないことばは、ここでしらべよう。","ことばを調べると、ぼくも少し育つよ。"]]
 };
+// ===== 🧭 ジャンルの帯とジャンルのページ(2026-11-17 夜): 新聞サイトのように、上の帯から読みたいジャンルへすぐ飛べる =====
+function genreOrder(){ const mine=GORDER.filter(g=>ME.interests&&ME.interests[g]); return [...mine,...GORDER.filter(g=>!mine.includes(g))]; }
+function genreBar(cur){ return `<nav class="gbar" aria-label="ジャンルをえらぶ"><button class="gb gb-menu" data-menu="1">☰ メニュー</button><button class="gb" data-gopen="mine" aria-pressed="${cur==="mine"}">🎯 あなた向け</button>${genreOrder().map(g=>`<button class="gb" data-gopen="${g}" aria-pressed="${cur===g}"><i style="background:var(--g-${g})" aria-hidden="true"></i>${GN[g]}</button>`).join("")}</nav>`; }
+let GP={g:null,lim:30};
+function gpList(g){ const from=new Date(Date.parse(TODAY)-6*864e5).toISOString().slice(0,10); const mine=g==="mine";
+  return NEWS.filter(n=>n.d>=from&&(mine?(!!(ME.interests||{})[n.g]||!!topicHit(n)):n.g===g)); }
+function gpItem(n,used){ return `<li class="gp-it">${thumbHTML({h:n.h,g:n.g,icon:ROOM[n.g]||"📰"},false,used)||""}<div class="gp-tx"><div class="meta"><span class="chip ${n.g}">${GN[n.g]}</span>${n.info?'<span class="badge-info">📌 話題</span>':n.ok?'<span class="badge-ok">✅</span>':'<span class="badge-one">⚠️ 1社</span>'}${topicHit(n)?'<span class="heat">💗</span>':""}</div><div class="h nv-h" data-nv="${esc(nkey(n))}" role="button" tabindex="0">${kn(esc(n.h))}</div></div></li>`; }
+function openGenre(g,keep){ const sh=document.getElementById("sheet"); if(g!=="mine"&&!GN[g]) g="mine"; if(!keep||GP.g!==g) GP={g,lim:30};
+  const mine=g==="mine"; const L=gpList(g); const noPick=mine&&!GORDER.some(x=>(ME.interests||{})[x])&&!myTopics().length;
+  const exs=mine?[]:Object.entries(D.explainers||{}).filter(([k,e])=>e&&e.g===g&&e.status!=="done"&&String(mdIso(e.updated))>=new Date(Date.parse(TODAY)-EX_QUIET*864e5).toISOString().slice(0,10)).sort((a,b)=>String(mdIso(b[1].updated)).localeCompare(String(mdIso(a[1].updated)))).slice(0,3);
+  const days=[...new Set(L.map(n=>n.d))]; let shown=0;
+  const body=days.map(d=>{ if(shown>=GP.lim) return ""; const items=L.filter(n=>n.d===d).slice(0,GP.lim-shown); shown+=items.length; const used=new Set(); return `<h3 class="gp-day">${esc(relDay(d))}<small>${esc(mdLabel(d))}</small></h3><ul class="gp-ul">${items.map(n=>gpItem(n,used)).join("")}</ul>`; }).join("");
+  if(!sh.hidden&&sh.querySelector(".gp")) SH_SIDE=true; // ジャンルの切りかえは横の移動(もどる は1回で元の画面へ)
+  sh.innerHTML=`<div class="bar"><div class="wrap"><button class="iconbtn" id="gpx">← もどる</button><span class="ttl">${mine?"🎯 あなた向けのニュース":esc(GN[g])+"のニュース"}</span></div></div>
+  <div class="wrap body gp">${genreBar(g)}
+    ${noPick?`<div class="card"><b>まだ「気になるジャンル」「好きなこと」を選んでいません</b><div class="hint" style="margin:4px 0 10px">選ぶと、ここにあなた向けのニュースだけが集まります(スマホの中だけに保存します)。</div><button class="fchip" data-topics="1">💗 好きなことを選ぶ</button> <button class="fchip" data-setgo="me">🎯 気になるジャンルを選ぶ</button></div>`:""}
+    ${mine&&!noPick?`<div class="hint">気になるジャンル・好きなこと(💗)に合うニュースを、この7日分から集めました。<button class="linkish" data-setgo="me">えらび直す</button></div>`:""}
+    ${exs.length?`<div class="gp-exs"><div class="hint">💡 このジャンルの解説(いま動いている話題)</div>${exs.map(([k,e])=>exRow(k,e)).join("")}</div>`:""}
+    ${L.length?body:(noPick?"":`<div class="card"><b>この7日のニュースは、まだありません</b><div class="hint">ほかのジャンルを上の帯から選べます。</div></div>`)}
+    ${L.length>GP.lim?`<button class="fchip" id="gpMore" style="align-self:center">▼ もっと見る(あと${L.length-GP.lim}件)</button>`:""}
+    ${thumbOn()&&L.length?`<div class="hint" style="font-size:.82rem">📷 写真はイメージです(ニュースの現場の写真ではありません)。Unsplash の無料写真を使っています。</div>`:""}
+  </div>`;
+  sh.hidden=false; if(!keep) sh.scrollTop=0; document.body.style.overflow="hidden";
+  sh.querySelector("#gpx").onclick=()=>{ sh.hidden=true; sh.innerHTML=""; document.body.style.overflow=""; };
+  sh.querySelectorAll("[data-ex]").forEach(b=>b.onclick=()=>openEx(b.dataset.ex));
+  const m=sh.querySelector("#gpMore"); if(m) m.onclick=()=>{ const y=sh.scrollTop; GP.lim+=30; openGenre(g,true); sh.scrollTop=y; };
+  const cur=sh.querySelector('.gbar [aria-pressed="true"]'); if(cur) try{ cur.scrollIntoView({block:"nearest",inline:"center"}); }catch(_){}
+  track("/genre/"+g,"ジャンル: "+(mine?"あなた向け":GN[g])); }
+// ☰ メニュー: どこで何ができるかを1まいに(ことばで探せる)
+function menuItems(){ const fun=FUN.map(f=>[f[1],f[2],"fun:"+f[0]]);
+  return [["📰 ニュースを読む",[["📰","きょうのニュース","tab:today"],["🎯","あなた向け","g:mine"],["💡","解説(くわしく)","tab:explain"],["🔎","さがす","tab:search"],["🗺️","ニュースの地図","tab:map"],["📈","数字・グラフ","tab:numbers"],["📅","予定・予測","tab:plan"],["🗞️","新聞の形で読む","fn:shimen"],["📖","ことば辞典","tab:words"]]],
+    ["🗂️ ジャンルから読む",genreOrder().map(g=>[ROOM[g]||"●",GN[g],"g:"+g])],
+    ["🔊 聞く",[["🔊","今日のニュースを聞く","fn:listen"],["🌙","寝る前ラジオ","fun:radio"],["▶️","1分で見る","fun:play"]]],
+    ["🎮 あそぶ・まなぶ",fun.filter(f=>!/^fun:(radio|play)$/.test(f[2]))],
+    ["🐣 ペット",[["🏠",petName()+"のへや","tab:my"],["✏️","あなたの呼び名","fn:nick"]]],
+    ["🛟 防災・天気",[["🛟","地震・津波・警報","fn:quake"],["☔","雨雲の動き","fn:radar"],["🗺️","家のまわりの危ない場所","fn:bmap"]]],
+    ["⚙️ 設定・使い方",[["🔠","文字の大きさ・画面の色","fn:pop"],["🎨","色・画面の並びを変える","fn:look"],["🧭","下のボタンを選ぶ","fn:tabs"],["🔊","読み上げの声・速さ","set:sound"],["💗","好きなこと・気になるジャンル","set:me"],["🔔","お知らせ(朝・夕方)","set:app"],["📲","スマホの画面にボタンを置く","fn:install"],["💾","記録をとっておく・移す","set:data"],["📖","使い方ガイド","fn:help"],["🔰","はじめての案内","fn:onboard"]]]]; }
+function openMenu(){ const sh=document.getElementById("sheet"); const M=menuItems();
+  sh.innerHTML=`<div class="bar"><div class="wrap"><button class="iconbtn" id="mnx">← もどる</button><span class="ttl">☰ メニュー(ぜんぶの機能)</span></div></div>
+  <div class="wrap body mn"><input id="mnQ" type="search" placeholder="🔎 やりたいことを入れる(例: クイズ・文字・地図)" aria-label="機能をさがす" autocomplete="off">
+    ${M.map(([ttl,items])=>`<section class="mn-sec"><h3>${esc(ttl)}</h3><div class="mn-grid">${items.map(([ic,nm,act,g])=>`<button class="mn-it" data-act="${esc(act)}" data-nm="${esc(nm)}"><span class="mn-ic" aria-hidden="true"${g?` style="color:var(--g-${g})"`:""}>${ic}</span><span class="mn-nm">${esc(nm)}</span></button>`).join("")}</div></section>`).join("")}
+    <div class="hint" id="mnNone" hidden>見つかりませんでした。右下の「💬」で聞くこともできます。</div></div>`;
+  sh.hidden=false; sh.scrollTop=0; document.body.style.overflow="hidden";
+  const close=shCloseAll; // メニューから別の場所へ行くときは、重なった画面をぜんぶ閉じる
+  sh.querySelector("#mnx").onclick=()=>{ sh.hidden=true; sh.innerHTML=""; document.body.style.overflow=""; };
+  const q=sh.querySelector("#mnQ"); q.oninput=()=>{ const v=q.value.trim(); let any=false; sh.querySelectorAll(".mn-sec").forEach(sec=>{ let n=0; sec.querySelectorAll(".mn-it").forEach(b=>{ const ok=!v||b.dataset.nm.includes(v)||sec.querySelector("h3").textContent.includes(v); b.hidden=!ok; if(ok) n++; }); sec.hidden=!n; if(n) any=true; }); sh.querySelector("#mnNone").hidden=any; };
+  sh.querySelectorAll(".mn-it").forEach(b=>b.onclick=()=>{ const [t,v]=b.dataset.act.split(":"); track("/menu/"+b.dataset.act,"メニュー");
+    if(t==="tab"){ close(); if(v==="my") MYTAB="pet"; go(v); window.scrollTo(0,0); }
+    else if(t==="g"){ openGenre(v); }
+    else if(t==="fun"){ openFun(v); }
+    else if(t==="set"){ close(); setGo(v); }
+    else if(t==="fn"){ const F={shimen:()=>openShimen(),listen:()=>{ close(); speak(listenText()); toast("🔊 読み上げています(止めるときは「きょう」の🔊ボタン)"); },nick:()=>openNick(),quake:()=>openQuake(),radar:()=>openRadar(),bmap:()=>openBMap("flood"),
+        pop:()=>{ close(); document.getElementById("setBtn").click(); },look:()=>openLook(),tabs:()=>openTabs(),install:()=>openInstall(),help:()=>openHelp("start"),onboard:()=>{ close(); onboard(true); }}; (F[v]||(()=>{}))(); } }); }
+function shCloseAll(){ const sh=document.getElementById("sheet"); if(sh.hidden) return; SH_STACK.length=0; sh.hidden=true; sh.innerHTML=""; document.body.style.overflow="";
+  setTimeout(()=>{ try{ if(location.hash!=="#"+current) history.replaceState(null,"","#"+current); }catch(_){} },150); }
+// 設定のまとまりを開いて、そこへ行く
+function setGo(grp){ MYTAB="set"; go("my"); setTimeout(()=>{ const d=document.querySelector(`details.set-grp[data-sg="${grp}"]`); if(d){ d.open=true; try{ d.scrollIntoView({block:"start"}); }catch(_){} } },60); }
+document.addEventListener("click",e=>{ const g=e.target.closest("[data-gopen]"); if(g){ e.preventDefault(); openGenre(g.dataset.gopen); return; }
+  if(e.target.closest("[data-menu]")){ e.preventDefault(); openMenu(); return; }
+  const sg=e.target.closest("[data-setgo]"); if(sg){ e.preventDefault(); shCloseAll(); setGo(sg.dataset.setgo); } });
+// 閉じたまとまりの中の場所へ飛ぶときは、先に開く
+(function(){ const f=Element.prototype.scrollIntoView; Element.prototype.scrollIntoView=function(){ try{ const d=this.closest&&this.closest("details.set-grp:not([open])"); if(d&&d!==this) d.open=true; }catch(_){} return f.apply(this,arguments); }; })();
 // ===== 👤 呼び名(2026-11-17): スマホの中だけの、かんたんなアカウント名。どこにも送らない(記録の引っこし・Googleに記録をあずける には入る) =====
 // 2026-11-17 夕方: 呼び名の画面を「① 名前 → ② 呼ばれ方(さん・くん・ちゃん・なし) → 見本を見て ✅ 決める」の1枚に。設定のカードは今の名前とボタンだけ。
 const NICK_HON=[["さん","さん"],["くん","くん"],["ちゃん","ちゃん"],["","つけない"]];
@@ -4691,10 +4805,11 @@ function onboard(force){ if(!force && (store.get("nw-onboard")==="1" || ME.days.
   // 画面のミニ見本(番号つき)。いまのモードとタブに合わせて描く
   const mock=()=>{ const tabs=LOOK.tabs.filter(k=>!LOOK.tabOff[k]).map(k=>TABS.find(t=>t[0]===k)).filter(Boolean);
     return `<div class="obm" aria-hidden="true"><div class="obm-top"><span>まいにちニュース帳</span><span class="obm-b">🔔</span><span class="obm-b">設定</span></div>
-      <div class="obm-row"><i>1</i>🌤️ 今日の天気・傘</div>${LOOK.mode==="easy"?`<div class="obm-row acc"><i>2</i>🔊 今日のニュースを聞く</div>`:""}
-      <div class="obm-row"><i>${LOOK.mode==="easy"?3:2}</i>☀️ 今日の3行</div><div class="obm-row"><i>${LOOK.mode==="easy"?4:3}</i>📰 今日のニュース</div>
-      <div class="obm-tabs"><i class="obm-n">${LOOK.mode==="easy"?5:4}</i>${tabs.map(t=>`<span>${t[1]}<small>${esc(t[2])}</small></span>`).join("")}</div></div>`; };
-  const legend=()=>{ const e=LOOK.mode==="easy"; const L=[["🌤️ 天気","今日の天気と、傘がいるか"]]; if(e) L.push(["🔊 聞く","押すと、天気とニュースを読み上げます"]);
+      <div class="obm-row acc"><i>1</i>☰ メニュー ・ 🎯 あなた向け ・ 政治 ・ 経済 …</div>
+      <div class="obm-row"><i>2</i>🌤️ 今日の天気・傘</div>${LOOK.mode==="easy"?`<div class="obm-row"><i>3</i>🔊 今日のニュースを聞く</div>`:""}
+      <div class="obm-row"><i>${LOOK.mode==="easy"?4:3}</i>☀️ 今日の3行</div><div class="obm-row"><i>${LOOK.mode==="easy"?5:4}</i>📰 今日のニュース</div>
+      <div class="obm-tabs"><i class="obm-n">${LOOK.mode==="easy"?6:5}</i>${tabs.map(t=>`<span>${t[1]}<small>${esc(t[2])}</small></span>`).join("")}</div></div>`; };
+  const legend=()=>{ const e=LOOK.mode==="easy"; const L=[["☰ メニューとジャンル","<b>どこに何があるかは、ぜんぶ「☰ メニュー」に</b>。となりのジャンルを押すと、読みたいジャンルのニュースだけが出ます"],["🌤️ 天気","今日の天気と、傘がいるか"]]; if(e) L.push(["🔊 聞く","押すと、天気とニュースを読み上げます"]);
     L.push(["☀️ 今日の3行","いちばん大事なニュース3つ。時間がない日はここだけでOK"],["📰 今日のニュース","見出しを押すと、くわしい説明が開きます"],["下のボタン","押すとページが変わります(好きなボタンに変えられます)"]);
     return `<ol class="obl">${L.map(([a,b],i)=>`<li><i>${i+1}</i><span><b>${a}</b><br>${b}</span></li>`).join("")}</ol>`; };
   const steps=[
@@ -4713,6 +4828,7 @@ function onboard(force){ if(!force && (store.get("nw-onboard")==="1" || ME.days.
       <li><span class="obk">💡</span><span>「くわしい解説」は、図・4コマ・流れつきで、ゆっくりわかるページ</span></li>
       <li><span class="obk">🔊</span><span>押すと読み上げます。もう一度押すと止まります</span></li></ul>`},
     {t:"こまったときは",pet:"detective",h:()=>`<ul class="obh">
+      <li><span class="obk">☰ メニュー</span><span>「きょう」のいちばん上。<b>このアプリでできることが、ぜんぶ並んでいます</b>(ことばで探せます)</span></li>
       <li><span class="obk">← もどる</span><span>左上のボタンで、前の画面にもどります</span></li>
       <li><span class="obk">設定</span><span>右上。文字を大きくしたり、モードを変えたりできます</span></li>
       <li><span class="obk">💬</span><span>右下。わからないことを聞けます</span></li>
@@ -5351,6 +5467,7 @@ function openShimen(){ const sh=document.getElementById("sheet"); const w=D.weat
 document.addEventListener("click",e=>{ const b=e.target.closest("[data-shimen]"); if(!b) return; e.preventDefault(); openShimen(); });
 // ===== お知らせ(新しくなったところ)。機能を足したら、いちばん上に1つ足す =====
 const UPDATES=[
+  {id:"2026-11-17e",d:"2026-11-17",t:"🧭 読みたいジャンルへすぐ行ける・写真が増えた",L:["「きょう」のいちばん上に、ジャンルの帯ができました。押すと、そのジャンルのニュースだけを7日分まとめて読めます。「🎯 あなた向け」には、気になるジャンルと好きなこと(💗)のニュースが集まります。","「☰ メニュー」には、このアプリでできることがぜんぶ並んでいます。ことばを入れて探すこともできます。","ニュース10に写真(イメージ)がつきました。写真の種類も2倍にふやしました。","マイ→⚙️設定を、6つのまとまり(わたしのこと・見た目・読み上げ・アプリとお知らせ・記録・使い方)に整理しました。"]},
   {id:"2026-11-17d",d:"2026-11-17",t:"🎧 読み上げの声を選べるように",L:["マイ→⚙️設定の「🔊 読み上げの速さと声」で、声の種類を「📱 スマホの声」「🐣 キャラの声(ずんだもん)」から選べます。","キャラの声は、ニュースが新しくなるたびに前もって作った声です。「今日のニュースを聞く」「寝る前ラジオ」「最近の解説」で使います(声の準備ができるまでは、スマホの声で読みます)。"]},
   {id:"2026-11-17c",d:"2026-11-17",t:"🏠 部屋をすっきり・👈 もどるをなめらかに",L:["ペットの部屋をすっきりさせました。窓は左上、家具は「かべの棚」と「床のおく」にならびます(指で好きな場所へ動かせるのは前と同じ)。","右へなぞって「もどる」とき、画面が指にぴったりついてきて、はなすとスッとすべって前の画面にもどります。速くはじいても、もどれます。"]},
   {id:"2026-11-17b",d:"2026-11-17",t:"🆕 新着の数・🗺️ 地図を見やすく",L:["上の「🆕」は、前に開いたあとに増えたニュースの数を「きのうから +◯件」のように出します(これまでは古いニュースまで数えていました)。","🗺️ ニュースの地図は、はじめは直近3日分だけ。「きょう・3日・7日」で切りかえられます。","👤 呼び名の画面を「名前 → 呼ばれ方 → 見本」の順にして、使いやすくしました。"]},
@@ -5538,7 +5655,7 @@ function updCard(){ const u=UPDATES[0]; const n=updUnread();
 // ===== 使い方ガイド(2026-11-06: 「説明が足りない」という声で作り直し) =====
 // HELP=[キー, 絵文字, 見出し, [文…]]。画面のあちこちの「？ これは何?」(helpBtn(キー))から、その見出しを開く。機能を足したらここも直す。
 const HELP=[
-  ["start","🚀","まずはここから",["時間がない日は<b>☀️ 今日の3行</b>だけ読めばOKです。","<b>📰 今日のニュース10</b>は、その日に関心が高かった順のニュースです。見出しを押すと、くわしいページが開きます。","<b>🔊 聞く</b>を押すと、天気とニュースを声で読み上げます。","わからないことがあったら、画面の<b>「？ これは何?」</b>を押してください。その場所の説明が出ます。","上に重なった画面は、<b>画面を右へ指でなぞる</b>と、「← もどる」を押したのと同じように1つ前の画面にもどります。スマホの「もどる」でももどれます。"]],
+  ["start","🚀","まずはここから",["<b>どこに何があるか わからなくなったら、「きょう」のいちばん上の「☰ メニュー」</b>を押してください。このアプリでできることが、ぜんぶ並んでいます(上のらんに ことばを入れて探せます)。","「☰ メニュー」のとなりの<b>ジャンル(🎯 あなた向け・政治・経済・スポーツ…)</b>を押すと、そのジャンルのニュースだけを、この7日分まとめて読めます。","時間がない日は<b>☀️ 今日の3行</b>だけ読めばOKです。","<b>📰 今日のニュース10</b>は、その日に関心が高かった順のニュースです。見出しを押すと、くわしいページが開きます。","<b>🔊 聞く</b>を押すと、天気とニュースを声で読み上げます。","わからないことがあったら、画面の<b>「？ これは何?」</b>を押してください。その場所の説明が出ます。","上に重なった画面は、<b>画面を右へ指でなぞる</b>と、「← もどる」を押したのと同じように1つ前の画面にもどります。スマホの「もどる」でももどれます。"]],
   ["marks","🔖","マークの意味",["<mark class=\"hl\">黄色い線</mark>…その話で、いちばん伝えたいところ。<b class=\"kn\">太字に下線</b>…大事な数字(金額・%・人数など)。","<b>✅ 確認ずみ</b>…別々の報道機関<b>2社以上</b>が伝えたニュース。","<b>⚠️</b>…まだ1社だけ・見出しだけのニュース。あとで確かめられたら✅に変わります。","<b>📌 話題</b>…レシピ・新商品・イベント・研究など、暮らしや趣味の話題。会社や役所の発表から集めています(ニュース10には入りません)。","✅や⚠️を<b>押すと</b>、どこが伝えたかが出ます。","<b>点線のことば</b>は、押すと意味が出ます。","<b>💗</b> あなたが選んだ「好きなこと」のニュース ／ <b>🙋</b> あなたのくらしに関係ありそう ／ <b>🏠</b> わたしの街のニュース ／ <b>🆕・NEW</b> 前に開いたあとに増えたもの。"]],
   ["ten","📰","ニュース10の読み方",["上から順に、その日に大きく伝えられたニュースです。","右上の<b>「短く／くわしく」</b>で、見出しだけにするか、説明も出すかを切りかえられます。","<b>「くわしい解説 →」</b>があるものは、図や流れつきの解説ページが読めます。","<b>🏷️ 保存</b>で「マイ」にとっておけます。<b>📤 送る</b>で家族や友だちに見出しを送れます(あなたの記録は送りません)。"]],
   ["ex","💡","解説ページの読み方",["大きな話題を1つずつ、やさしく説明するページです。上から読めば全体がわかります。","<b>ひとことで言うと</b>…まずここだけ読めば大まかにわかります。","<b>目次</b>を押すと、その場所に飛びます。","<b>🙋 わたしたちへの影響</b>…くらしにどう関係するか。","<b>📅 流れ</b>…これまでに起きたことの年表。<b>🔭 これから</b>…次に注目する日。","<b>🔔 続きを追う</b>を押すと、新しい動きがあったとき「きょう」でお知らせします。","<b>💬 話しながら読む</b>・<b>📖 連載で読む</b>…同じ中身を、会話や1日1話の形で読めます。","画面を<b>左右にすべらせる</b>と、前後の解説に移ります。"]],
@@ -5620,22 +5737,34 @@ function renderMy(){
       </ul></section>
     </div>
     <div class="mysec" data-mysec="set" ${MYTAB==="set"?"":"hidden"}>
-    <nav class="set-toc" id="setToc" aria-label="設定の目次"></nav>
+    <div class="hint" style="margin:0 2px 2px">変えたいものを押すと開きます。右上の「設定」でも、文字の大きさと画面の色をすぐ変えられます。</div>
+    <details class="set-grp" data-sg="me"><summary><span class="sg-i" aria-hidden="true">👤</span><span class="sg-t"><b>わたしのこと</b><small>呼び名・気になるジャンル・好きなこと・くらしの立場</small></span></summary><div class="sg-b">
     ${nickHTML()}
-    ${updCard()}
-    ${installCard()}
-    ${backupHTML()}
-    <button class="lookcard" id="lookBtnMy"><span class="pal" aria-hidden="true" style="padding-left:5px">${COLORS.slice(1,6).map(c=>`<i style="background:${c[2]}"></i>`).join("")}</span><span><b>🎨 着せかえ</b><span class="hint" style="display:block">色・文字・画面の並び・タブを、わたし好みに</span></span></button>
-    ${notifyHTML()}
-    ${voiceCard()}
-    ${lifeSetHTML()}
-    ${cvdCard()}
     <section class="card" id="myIntCard"><b>🎯 気になるジャンル</b><div class="hint" style="margin:4px 0 8px">押すと入ったり外れたりします。「あなた向け」と「🎁 ジャンル別おすすめ」に使います。</div>
       <button class="tp-open" data-topics="1"><span aria-hidden="true">💗</span><span><b>好きなことを、もっとこまかく選ぶ</b><small>${myTopics().length?`いま ${myTopics().length}こ: ${esc(myTopics().slice(0,4).map(k=>TOPIC[k][2]).join("・"))}${myTopics().length>4?" など":""}`:`野球・アニメ・料理・宇宙・AI など ${TOPICS.length}こ から`}</small></span><span aria-hidden="true">→</span></button>
       <div class="chips" id="myInt">${GORDER.map(g=>`<button class="fchip" data-g="${g}" aria-pressed="${!!ME.interests[g]}"><span class="c" style="background:var(--g-${g})"></span>${GN[g]}</button>`).join("")}</div><div style="margin-top:10px">${recIntHTML()}</div></section>
+    ${lifeSetHTML()}
+    </div></details>
+    <details class="set-grp" data-sg="look"><summary><span class="sg-i" aria-hidden="true">🎨</span><span class="sg-t"><b>見た目</b><small>色・画面の並び・色の見分けやすさ</small></span></summary><div class="sg-b">
+    <button class="lookcard" id="lookBtnMy"><span class="pal" aria-hidden="true" style="padding-left:5px">${COLORS.slice(1,6).map(c=>`<i style="background:${c[2]}"></i>`).join("")}</span><span><b>🎨 着せかえ</b><span class="hint" style="display:block">色・文字・画面の並び・タブを、わたし好みに</span></span></button>
+    ${cvdCard()}
+    </div></details>
+    <details class="set-grp" data-sg="sound"><summary><span class="sg-i" aria-hidden="true">🔊</span><span class="sg-t"><b>読み上げ</b><small>声の種類・速さ・読みまちがいを直す・ふりがな</small></span></summary><div class="sg-b">
+    ${voiceCard()}
+    </div></details>
+    <details class="set-grp" data-sg="app"><summary><span class="sg-i" aria-hidden="true">📲</span><span class="sg-t"><b>アプリ・お知らせ</b><small>スマホの画面にボタンを置く・朝と夕方のお知らせ・新しくなったところ</small></span></summary><div class="sg-b">
+    ${installCard()}
+    ${notifyHTML()}
+    ${updCard()}
+    </div></details>
+    <details class="set-grp" data-sg="data"><summary><span class="sg-i" aria-hidden="true">💾</span><span class="sg-t"><b>記録</b><small>記録をとっておく・別のスマホに移す・Googleにあずける</small></span></summary><div class="sg-b">
+    ${backupHTML()}
+    <details class="faq plain"><summary>記録について</summary><p>記録は、あなたのスマホ(ブラウザ)の中だけに保存されます。ほかの人や作った人には見えません。スマホの「閲覧履歴やデータを消す」をすると記録も消えるので、上の「📦 記録をとっておく」でときどき保存しておくと安心です。Googleにあずけたときは、あなた自身のGoogleの中にだけ保存されます。 <a href="privacy.html" target="_blank" rel="noopener">記録の守り方</a></p><button class="fchip" id="resetMe" style="margin-bottom:12px">記録をすべて消す</button><div id="resetConfirm"></div></details>
+    </div></details>
+    <details class="set-grp" data-sg="help"><summary><span class="sg-i" aria-hidden="true">📖</span><span class="sg-t"><b>使い方</b><small>使い方ガイド・はじめての案内</small></span></summary><div class="sg-b">
     ${guideBlock()}
     <button class="fchip" id="obAgain" style="align-self:flex-start">🐣 はじめての案内をもう一度見る</button>
-    <details class="faq plain"><summary>記録について</summary><p>記録は、あなたのスマホ(ブラウザ)の中だけに保存されます。ほかの人や作った人には見えません。スマホの「閲覧履歴やデータを消す」をすると記録も消えるので、上の「📦 記録をとっておく」でときどき保存しておくと安心です。Googleにあずけたときは、あなた自身のGoogleの中にだけ保存されます。 <a href="privacy.html" target="_blank" rel="noopener">記録の守り方</a></p><button class="fchip" id="resetMe" style="margin-bottom:12px">記録をすべて消す</button><div id="resetConfirm"></div></details>
+    </div></details>
     </div>
     ${footer()}
   </div>`;
@@ -6072,26 +6201,50 @@ const TH={
   capitol:["1787355784347-e7d918e901af","DL314 Lin"], med:["1546659934-038aab8f3f3b","Christopher Boswell"],
   cinema:["1789470808845-b51eff0b4db2","Shane Monarc"], clothes:["1785870500429-c40dc0892918","moniek van rosse"],
   room:["1632119580908-ae947d4c7691","Spacejoy"], cook:["1789925941455-8200c6d456be","engin akyurt"],
-  coffee:["1636178959459-f87816fd4498","Prateek Gautam"], trip:["1515622472995-1a06094d2224","Emanuela Picone"]
+  coffee:["1636178959459-f87816fd4498","Prateek Gautam"], trip:["1515622472995-1a06094d2224","Emanuela Picone"],
+  // 2026-11-17 に足した20まい(どれも 人の顔・会社のロゴ・事件の現場でない「イメージ」)
+  snow:["1579385509017-a5864e8c7c4d","Harrison Kugler"], train:["1514337224818-9787cf717f2a","Fikri Rasyid"],
+  traffic:["1530685932526-48ec92998eaa","Aleksandr Popov"], power:["1473341304170-971dccb5ac1e","Matthew Henry"],
+  rice:["1724681019113-c4a6a869abe8","Gaku Suyama"], coins:["1638879706487-646f8631b0a2","Franck V."],
+  factory:["1578776349090-de61da00ff1a","Alex Simpson"], chip:["1562408590-e32931084e23","Umberto"],
+  gavel:["1767972463877-b64ba4283cd0","Sasun Bughdaryan"], school:["1740635341299-3b8e3490f546","Nathan Cima"],
+  cargo:["1606185540834-d6e7483ee1a4","william william"], earth:["1614730321146-b6fa6a46bcb4","NASA"],
+  tennis:["1567220720374-a67f33b2a6b9","Tim Chow"], golf:["1562204320-31975a5e09ce","Will Porada"],
+  track:["1474546652694-a33dd8161d66","Austris Augusts"], bear:["1551792714-9a8b35338793","Zdeněk Macháček"],
+  books:["1625053376622-e462848c453f","Peter Herrmann"], fuji:["1509023464722-18d996393ca8","Clay Banks"],
+  mountain:["1465220183275-1faa863377e3","Chris Biron"], solar:["1509391366360-2e959784a276","American Public Power Association"]
 };
 // 上から順に当てはめる(広いことばは下に)
 const TH_RULES=[
+  [/クマ|熊(?!本)/,"bear"],[/富士山/,"fuji"],[/大雪|積雪|寒波|吹雪|降雪|初雪/,"snow"],
   [/台風|大雨|豪雨|暴風|高波|線状降水/,"storm"],[/真夏日|猛暑|熱中症|気温|℃/,"heat"],
+  [/新幹線|鉄道|電車|列車|運休|ダイヤ改正|JR(?![A-Za-z])/,"train"],[/高速道路|渋滞|自動車|EV(?![A-Za-z])|トヨタ|日産|ホンダ|運転免許/,"traffic"],
+  [/半導体|(?<![A-Za-z])AI(?![A-Za-z])|エヌビディア|データセンター|生成AI/,"chip"],
+  [/裁判|判決|地裁|高裁|最高裁|逮捕|起訴|容疑|訴訟|有罪|無罪|書類送検/,"gavel"],
+  [/コメ|米価|稲作|農家|農業|田んぼ|新米/,"rice"],[/電気代|電力|停電|送電/,"power"],[/太陽光|再生可能|風力発電|脱炭素/,"solar"],
+  [/貿易|関税|輸出|輸入|コンテナ|タンカー|海運/,"cargo"],[/工場|製造業|鉄鋼|操業|生産ライン/,"factory"],
+  [/温暖化|気候変動|COP\d|環境省/,"earth"],
+  [/テニス/,"tennis"],[/ゴルフ/,"golf"],[/陸上|マラソン|駅伝|競歩/,"track"],[/スキー|スノーボード|ノルディック|ジャンプ女子|ジャンプ男子/,"mountain"],
+  [/芥川賞|直木賞|書店|図書館|出版|文庫|小説|作家/,"books"],
+  [/学校|授業|教員|入試|受験|小学校|中学校|高校|大学|文科省|教育/,"school"],
   [/不正アクセス|漏れ|流出|漏えい|サイバー|ハッキング|ランサム|不正なプログラム|ウイルス|パスワード|乗っ取り/,"cyber"],
-  [/日経平均|株価|株が|円安|円高|為替|市場/,"market"],[/消費税|食料品|物価|値上げ|値下げ|スーパー|米価|コメ/,"shop"],
+  [/日経平均|株価|株が|株安|株高|市場/,"market"],[/消費税|食料品|物価|値上げ|値下げ|スーパー/,"shop"],
+  [/円安|円高|為替|1ドル|賃金|給料|年金|減税|増税|予算|補助金|給付|金利|利上げ|日銀/,"coins"],
   [/サウジ|イエメン|フーシ|中東|イラン|イスラエル|ガザ|原油/,"desert"],
   [/ロケット|宇宙|衛星|探査|火星|月面|JAXA|NASA/,"rocket"],[/病院|医療|ワクチン|感染|薬|健康|手術/,"med"],
   [/NBA|バスケ/,"hoop"],[/野球|阪神|巨人|日本シリーズ|MLB|大谷|ドジャース|CS/,"ballpark"],[/サッカー|Jリーグ|W杯|ワールドカップ/,"soccer"],
-  [/映画|ドラマ|アニメ|俳優|小説|作家|音楽|ライブ/,"cinema"],[/旅行|観光|空港|ホテル/,"trip"],
+  [/映画|ドラマ|アニメ|俳優|音楽|ライブ/,"cinema"],[/旅行|観光|空港|ホテル/,"trip"],
   [/首脳|会談|特使|外相|国連|大使|サミット|停戦|和平/,"flags"],[/国会|法案|首相|内閣|選挙|衆院|参院|与党|野党|知事|市長/,"capitol"]
 ];
 const TH_G={pol:"capitol",eco:"market",it:"it",intl:"flags",spo:"ballpark",sci:"rocket",ent:"cinema",fas:"clothes",home:"room",food:"cook",life:"coffee",trip:"trip"};
+let TEN_USED=null;
 function thumbOn(){ if(store.get("nw-thumb")==="0") return false; try{ if(navigator.connection&&navigator.connection.saveData) return false; }catch(_){} return true; }
 // 解説に写真があればそれ、なければ見出しのことば → ジャンル の順
 function thumbOf(n){ if(n.ex&&PHOTOS[n.ex]) return {u:PHOTOS[n.ex][0].replace(/\?.*$/,""),by:PHOTOS[n.ex][1]};
   const t=(n.title||n.h||"")+" "+(n.text||""); let k=null; for(const [re,key] of TH_RULES){ if(re.test(t)){ k=key; break; } } k=k||TH_G[n.g];
   const p=k&&TH[k]; return p?{u:"https://images.unsplash.com/photo-"+p[0],by:p[1]}:null; }
-function thumbHTML(n){ if(!thumbOn()) return ""; const p=thumbOf(n);
+function thumbHTML(n,big,used){ if(!thumbOn()) return ""; let p=thumbOf(n); if(p&&used){ if(used.has(p.u)) p=null; else used.add(p.u); }
+  if(p&&big) return `<span class="th th-big"><img src="${p.u}?w=800&h=400&fit=crop&q=60&auto=format" alt="" decoding="async" width="800" height="400" onerror="this.parentNode.remove()"></span>`;
   if(!p) return `<span class="th th-e" aria-hidden="true" style="--c:var(--g-${n.g});--cs:var(--g-${n.g}-s)">${n.icon||"📰"}</span>`;
   return `<span class="th"><img src="${p.u}?w=176&h=176&fit=crop&q=60&auto=format" alt="" loading="lazy" decoding="async" width="88" height="88" onerror="this.parentNode.remove()"></span>`; }
 function thumbCredit(list){ if(!thumbOn()) return ""; const by=[...new Set(list.map(thumbOf).filter(Boolean).map(p=>p.by))]; if(!by.length) return "";
@@ -6517,7 +6670,7 @@ document.addEventListener("click",ev=>{ const x=ev.target.closest("[data-alx]");
 document.addEventListener("keydown",ev=>{ if((ev.key==="Enter"||ev.key===" ")&&ev.target.matches&&ev.target.matches(".al-band[data-quake]")){ ev.preventDefault(); openQuake(); } });
 try{ loadAlerts(); setInterval(()=>{ if(document.visibilityState==="visible") loadAlerts(); },3*60*1000); document.addEventListener("visibilitychange",()=>{ if(document.visibilityState==="visible") loadAlerts(); }); }catch(_){}
 // テスト用の手がかり(localhost で動かしたときだけ。本番では出さない)
-if(/^(localhost|127\.0\.0\.1)$/.test(location.hostname)) window.NW_TEST={ttsPlan,ttsKey,listenText,sayQueue,openRadio,bgmStart,ttsChunks,ttsClean,bestJaVoice,openHelp,placeOf,localCard,get NEWS(){return NEWS;},petSVG,PET_KINDS,PET_COLORS,petColorsFor,WEAR,petStage,petXP,petKind,petHall,petName,petRestart,get ME(){return ME;},get LOOK(){return LOOK;},TOPIC_GROUPS,FUN,SECS,openFun,openEx,fillQs,hhNews,ktQs,serialChapters,go,openLife,trendWords,openShimen};
+if(/^(localhost|127\.0\.0\.1)$/.test(location.hostname)) window.NW_TEST={openGenre,openMenu,setGo,ttsPlan,ttsKey,listenText,sayQueue,openRadio,bgmStart,ttsChunks,ttsClean,bestJaVoice,openHelp,placeOf,localCard,get NEWS(){return NEWS;},petSVG,PET_KINDS,PET_COLORS,petColorsFor,WEAR,petStage,petXP,petKind,petHall,petName,petRestart,get ME(){return ME;},get LOOK(){return LOOK;},TOPIC_GROUPS,FUN,SECS,openFun,openEx,fillQs,hhNews,ktQs,serialChapters,go,openLife,trendWords,openShimen};
 const h=(location.hash||"").slice(1);
 if(h==="quake"){ go("today"); setTimeout(openQuake,50); } else if(h==="shimen"){ go("today"); setTimeout(openShimen,50); } else if(D.explainers[h]){ go("explain"); openEx(h); }
 else if(h.startsWith("t=")) openTHash(h);
