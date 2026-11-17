@@ -1553,6 +1553,42 @@ b.kn{font-weight:800;text-decoration:underline 3px color-mix(in srgb,var(--accen
 .sg-i{font-size:1.6rem;flex:none}.sg-t{display:flex;flex-direction:column;min-width:0}.sg-t b{font-size:1.05rem}.sg-t small{color:var(--muted);font-size:.85rem;line-height:1.4}
 .sg-b{display:flex;flex-direction:column;gap:12px;padding:4px 10px 12px}
 .sg-b>.card,.sg-b>section{box-shadow:none}
+
+/* ===== 2026-11-17 夜(2): 3行の続き・年表・ページの形 ===== */
+.three .t .t-rest{display:none}.three .t.t-open .t-rest{display:block}
+.t-mbtn{align-self:flex-start;margin-top:6px;padding:6px 12px;min-height:36px;display:inline-flex;align-items:center;border-radius:999px;border:1px solid var(--line);background:var(--surface);color:var(--accent-on-surface,var(--accent));font-weight:700;font-size:.9rem}
+:root[data-mode="easy"] .t-mbtn{min-height:44px;font-size:1rem}
+.vtl-g{position:relative;padding:0 0 16px 26px;list-style:none}
+.vtl-g::before{content:"";position:absolute;left:5px;top:8px;bottom:-4px;width:2px;background:var(--accent);opacity:.35}
+.vtl>.vtl-g:last-child::before{display:none}
+.vtl-g::after{content:"";position:absolute;left:0;top:5px;width:12px;height:12px;border-radius:50%;background:var(--surface);border:3px solid var(--accent);box-sizing:border-box}
+.vtl-g.now::after{background:var(--accent);box-shadow:0 0 0 4px var(--accent-soft)}
+.vtl-g.start::after{border-color:var(--muted)}
+.vtl-g .vtl-d{font-size:1rem;margin-bottom:4px}
+.vtl-tag{display:inline-block;margin-left:6px;padding:1px 8px;border-radius:999px;background:var(--surface2);color:var(--ink);font-size:.82rem;font-weight:700}
+.vtl-tag.now{background:var(--accent-soft);color:var(--accent-ink,var(--accent))}
+.vtl-ul{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.vtl-ul .vtl-i{padding:8px 10px;border-radius:10px;background:var(--surface2);display:flex;flex-direction:column;gap:2px;line-height:1.7}
+.vtl-ul .vtl-i::before,.vtl-ul .vtl-i::after{display:none}
+.vtl-ul .vtl-i.now{background:var(--accent-soft);color:var(--ink)}
+.vtl-tm{font-size:.85rem;font-weight:700;color:var(--muted)}
+.vtl-old>summary{margin:2px 0 10px 26px}
+.fm{display:flex;flex-direction:column;gap:12px}
+.fm-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+.fm-c{display:flex;flex-direction:column;align-items:stretch;gap:4px;text-align:left;padding:10px;border:2px solid var(--line);border-radius:16px;background:var(--surface);color:var(--ink);font:inherit;cursor:pointer;position:relative}
+.fm-c[aria-pressed="true"]{border-color:var(--accent);box-shadow:0 0 0 3px var(--accent-soft)}
+.fm-c b{font-size:1rem}.fm-c small{color:var(--muted);font-size:.85rem;line-height:1.45}
+.fm-mock{margin-top:4px;padding:6px;border-radius:10px;background:var(--bg);border:1px solid var(--line);display:flex;flex-direction:column;gap:4px}
+.fm-bar{font-size:.82rem;color:var(--muted);white-space:nowrap;overflow:hidden}
+.fm-row{font-size:.82rem;font-weight:700;padding:4px 6px;border-radius:6px;background:var(--surface);border:1px solid var(--line)}
+.fm-row.fm-ten{background:var(--accent-soft);color:var(--accent-ink,var(--accent));padding:10px 6px}
+.fm-row.fm-ext{border-style:dashed;color:var(--muted);font-weight:400;background:none}
+.fm-on{align-self:flex-start;padding:1px 8px;border-radius:999px;background:var(--accent-soft);font-size:.82rem;font-weight:800;color:var(--accent-ink,var(--accent))}
+@media (max-width:370px){.fm-grid{grid-template-columns:minmax(0,1fr)}}
+
+#sayBar{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom));z-index:60;display:flex;align-items:center;gap:10px;padding:8px 8px 8px 16px;border-radius:999px;background:var(--ink);color:var(--bg);box-shadow:0 4px 14px rgba(0,0,0,.25);font-weight:700;max-width:calc(100% - 32px)}
+#sayBar[hidden]{display:none}
+#sayBar button{min-height:44px;padding:0 16px;border-radius:999px;border:0;background:var(--bg);color:var(--ink);font:inherit;font-weight:800;cursor:pointer}
 </style>
 </head>
 <body>
@@ -1603,7 +1639,7 @@ let SH_SIDE=false; const SH_STACK=[]; let SH_PEND=false;
   // 同じ画面の描きなおし(タイトルが同じ)は取っておかない
   window.shTitle=v=>{ const m=/class="ttl"[^>]*>([\s\S]*?)<\/span>/.exec(v||""); if(!m) return null; const d=document.createElement("div"); iH.set.call(d,m[1]); return d.textContent.trim(); };
   const restore=()=>{ SH_PEND=false; const p=SH_STACK.pop(); if(!p){ hd.set.call(SH,true); return; }
-    try{ window.speechSynthesis&&window.speechSynthesis.cancel(); }catch(_){}
+    stopSpeak();
     iH.set.call(SH,""); SH.appendChild(p.frag); hd.set.call(SH,false); document.body.style.overflow="hidden";
     SH.scrollTop=p.top; requestAnimationFrame(()=>{ SH.scrollTop=p.top; document.body.style.overflow="hidden"; });
     const f=SH.querySelector(".bar .iconbtn"); if(f) try{ f.focus({preventScroll:true}); }catch(_){}
@@ -2113,7 +2149,7 @@ function quickCard(){ const w=D.weather; const kwN=kwList().reduce((a,k)=>a+NEWS
       ${D.three.map(x=>`<li><span>📰</span><b>${esc(x.title)}</b></li>`).join("")}
       ${kwList().length?`<li><span>🔖</span><b>キーワードの新しいニュース ${kwN}件</b></li>`:""}
       <li><span>🗓️</span><b>${gl?`今週の目標は あと${gl}つ`:"今週の目標はぜんぶ達成!"}</b></li></ol></section>`; }
-function bindQuick(){ const b=document.getElementById("qkSay"); if(b) b.onclick=()=>{ if(window.speechSynthesis&&window.speechSynthesis.speaking){ stopSpeak(); b.textContent="🔊 聞く"; return; } speak([...document.querySelectorAll(".qk b")].map(x=>x.textContent).join("。")); b.textContent="■ 止める"; };
+function bindQuick(){ const b=document.getElementById("qkSay"); if(b) b.onclick=()=>{ if(isSpeaking()){ stopSpeak(); b.textContent="🔊 聞く"; return; } speak([...document.querySelectorAll(".qk b")].map(x=>x.textContent).join("。")); b.textContent="■ 止める"; };
   const lo=document.getElementById("ltOk"); if(lo) lo.onclick=()=>{ const L=letterData(); if(L){ ME.letterSeen=L.ws; saveMe(); } lo.closest("section").remove(); };
   const ms=document.getElementById("mSeen"); if(ms) ms.onclick=()=>{ const pm=new Date(Date.parse(TODAY.slice(0,7)+"-01")-864e5).toISOString().slice(0,7); ME.monthSeen=pm; saveMe(); ms.closest("section").remove(); };
   document.querySelectorAll("[data-corr]").forEach(b=>b.onclick=()=>{ const s0=(store.get("nw-corr")||"")+","+b.dataset.corr; store.set("nw-corr",s0.split(",").filter(Boolean).slice(-40).join(",")); b.closest("li").remove(); toast("✏️ 読んだことにしました"); });
@@ -2305,7 +2341,7 @@ function renderToday(){
   S.weather=weatherCard();
   S.three=`<section aria-label="今日の3行">
       <div class="sec-h"><h2>☀️ 今日の3行</h2>${EN?langSeg():`<span class="sub">時間がない日はここだけでOK</span>`}</div>
-      <div class="three" style="margin-top:10px">${D.three.map((x,i)=>{ const e=enOf("three",i); const en1=langMode()==="en"&&e; return `<button class="t ${x.tone}"${exLink(x.ex)}>${en1?`<h3 lang="en">${esc(e.t)}</h3><p lang="en">${esc(e.x||"")}</p><p class="jsub">${esc(x.title)}</p>`:`<h3>${kn(hlMk(esc(x.titleM||x.title)))}</h3><p class="kt">${keyText(x.textM||x.text)}</p>${enBlock(e)}`}${en1?`<span class="ensay" role="button" tabindex="0" data-say="${esc(e.t+". "+(e.x||""))}">🔊 English</span>`:""}${x.ex?'<span class="more">くわしく →</span>':''}</button>`; }).join("")}</div>
+      <div class="three" style="margin-top:10px">${D.three.map((x,i)=>{ const e=enOf("three",i); const en1=langMode()==="en"&&e; return `<button class="t ${x.tone}"${exLink(x.ex)}>${en1?`<h3 lang="en">${esc(e.t)}</h3><p lang="en">${esc(e.x||"")}</p><p class="jsub">${esc(x.title)}</p>`:`<h3>${kn(hlMk(esc(x.titleM||x.title)))}</h3>${threeBody(x.textM||x.text)}${enBlock(e)}`}${en1?`<span class="ensay" role="button" tabindex="0" data-say="${esc(e.t+". "+(e.x||""))}">🔊 English</span>`:""}${x.ex?'<span class="more">くわしく →</span>':''}</button>`; }).join("")}</div>
       <button class="fchip" id="shareImg" style="margin-top:10px">🖼️ 画像にして送る</button>
     </section>`;
   S.ten=`<section aria-label="今日のニュース10">
@@ -2344,7 +2380,7 @@ function renderToday(){
   // 🏁「きょう」を短く(2026-11-02): ふつうモードでは、天気・3行・ニュース10・小さな知らせ のあとに「ここまで」を置き、
   // そのほかのカード(数字・クイズ・ペット・おたのしみ・あなた向け など)は「➕ ほかにも」の中に1行ずつ(押すと開く)。何も消さない
   const keys=LOOK.order.filter(k=>!LOOK.off[k]&&S[k]); const fold=LOOK.mode!=="easy";
-  const mainK=fold?keys.filter(k=>TODAY_MAIN.includes(k)):keys, extK=fold?keys.filter(k=>!TODAY_MAIN.includes(k)):[];
+  const MAINS=(Array.isArray(LOOK.main)&&LOOK.main.length)?LOOK.main:TODAY_MAIN; const mainK=fold?keys.filter(k=>MAINS.includes(k)):keys, extK=fold?keys.filter(k=>!MAINS.includes(k)):[];
   const body=mainK.map(k=>S[k]).join("");
   const extHTML=extK.length?extCard(extK.filter(k=>k!=="other"),S)+(extK.includes("other")?S.other:""):"";
   main.innerHTML = `<div class="view">
@@ -2360,11 +2396,11 @@ function renderToday(){
     ${ME.days.length>=2?installCard():""}
     ${extHTML}
     ${LOOK.mode==="easy"?`<button class="card ms-card" data-modesw="normal"><span class="ms-i" aria-hidden="true">📱</span><span><b>もっと使ってみる?</b><small>ふつうモードで何が増えるか見る(すぐには変わりません)→</small></span></button>`:""}
-    <button class="fchip" id="lookBtnToday" style="align-self:flex-start">🎨 この画面の並びを変える</button>
+    <div class="chips"><button class="fchip" data-forms="1">🧩 ページの形をえらぶ</button><button class="fchip" id="lookBtnToday">🎨 色・こまかい並び</button></div>
     ${footer()}
   </div>`;
   bindDone(); bindExt();
-  const lb=document.getElementById("listenBtn"); if(lb) lb.onclick=()=>{ if(window.speechSynthesis&&window.speechSynthesis.speaking){ stopSpeak(); lb.classList.remove("on"); lb.querySelector("b").textContent="今日のニュースを聞く"; return; }
+  const lb=document.getElementById("listenBtn"); if(lb) lb.onclick=()=>{ if(isSpeaking()){ stopSpeak(); lb.classList.remove("on"); lb.querySelector("b").textContent="今日のニュースを聞く"; return; }
     speak(listenText()); lb.classList.add("on"); lb.querySelector("b").textContent="■ 止める"; track("/listen","聞く"); };
   const pb=document.getElementById("playBtn"); if(pb) pb.onclick=openStory; const rb=document.getElementById("radioBtn"); if(rb) rb.onclick=openRadio;
   const vg=document.getElementById("vsGo"); if(vg) vg.onclick=()=>{ const q=document.getElementById("quiz"); if(q) q.scrollIntoView({behavior:"smooth",block:"center"}); else toast("いまはクイズがお休みです"); };
@@ -2632,17 +2668,26 @@ function ttsKey(t){ let h=0x811c9dc5; const s=String(t); for(let i=0;i<s.length;
 let TTS_IDX=null, TTS_IDX_AT=0;
 async function ttsIdx(force){ if(!force&&TTS_IDX&&Date.now()-TTS_IDX_AT<10*60e3) return TTS_IDX; try{ const r=await fetch(TTS_BASE+"index.json?t="+Math.floor(Date.now()/300000),{cache:"no-store"}); if(r.ok){ TTS_IDX=await r.json(); TTS_IDX_AT=Date.now(); } }catch(_){} return TTS_IDX; }
 function ttsHas(src,key){ return !!(TTS_IDX&&TTS_IDX[src]&&TTS_IDX[src][key]); }
-let AUD=null; // いま流している音声
-function audStop(){ if(AUD){ try{ AUD.onended=AUD.onerror=null; AUD.pause(); AUD.src=""; }catch(_){} AUD=null; } }
-(function(){ const S=window.speechSynthesis; if(!S) return; try{ const c0=S.cancel.bind(S); S.cancel=function(){ SAY_ID++; audStop(); c0(); };
-  const g=Object.getOwnPropertyDescriptor(Object.getPrototypeOf(S),"speaking"); if(g&&g.get) Object.defineProperty(S,"speaking",{configurable:true,get(){ return !!AUD||g.get.call(S); }}); }catch(_){} })();
-function sayQueue(txt,rate,onend){ try{ const s=window.speechSynthesis; if(!s&&vsrc()==="dev") return; if(s) s.cancel(); else audStop(); const id=++SAY_ID; const ch=ttsChunks(txt); if(!ch.length){ onend&&onend(); return; }
-  const src=vsrc();
+let AUD=null; // いま流している音声(AUD_EL を使い回す。新しい Audio を作らないので、2つ同時には鳴らない=2026-11-17 夜の不具合)
+const AUD_EL=(()=>{ try{ const a=new Audio(); a.preload="auto"; return a; }catch(_){ return null; } })();
+let SAY_ON=false; // sayQueue が読んでいる間 true
+function audStop(){ if(AUD_EL){ try{ AUD_EL.onended=AUD_EL.onerror=null; AUD_EL.pause(); AUD_EL.removeAttribute("src"); AUD_EL.load(); }catch(_){} } AUD=null; }
+function isSpeaking(){ let n=false; try{ n=!!(window.speechSynthesis&&SPEAK_NATIVE()); }catch(_){} return SAY_ON||!!AUD||n; }
+let SPEAK_NATIVE=()=>false;
+function sayBar(on){ let b=document.getElementById("sayBar"); if(!on){ if(b) b.hidden=true; return; }
+  if(!b){ b=document.createElement("div"); b.id="sayBar"; b.setAttribute("role","status"); b.innerHTML='<span>🔊 読み上げています</span><button type="button" id="sayBarStop">⏹ 止める</button>'; document.body.appendChild(b); b.querySelector("#sayBarStop").onclick=()=>{ try{ if(RADIO&&RADIO.bgm) RADIO.bgm.stop(); RADIO=null; }catch(_){} stopSpeak(); toast("⏹ 読み上げを止めました"); }; }
+  b.hidden=false; }
+(function(){ const S=window.speechSynthesis; if(!S) return; try{ const g=Object.getOwnPropertyDescriptor(Object.getPrototypeOf(S),"speaking"); if(g&&g.get) SPEAK_NATIVE=()=>g.get.call(S); else SPEAK_NATIVE=()=>false; }catch(_){}
+  try{ const c0=S.cancel.bind(S); S.cancel=function(){ SAY_ID++; SAY_ON=false; audStop(); sayBar(false); c0(); };
+  Object.defineProperty(S,"speaking",{configurable:true,get(){ return isSpeaking(); }}); }catch(_){} })();
+function sayQueue(txt,rate,onend0){ try{ const s=window.speechSynthesis; if(!s&&vsrc()==="dev") return; stopSpeak(); const id=++SAY_ID; const ch=ttsChunks(txt); if(!ch.length){ onend0&&onend0(); return; }
+  const onend=()=>{ if(id!==SAY_ID) return; SAY_ON=false; AUD=null; sayBar(false); onend0&&onend0(); };
+  SAY_ON=true; const src=vsrc(); if(src!=="dev") sayBar(true);
   if(src==="dev"||!TTS_IDX||!ch.some(c=>ttsHas(src,ttsKey(c)))){ if(src!=="dev"&&!TTS_IDX) ttsIdx(); if(!s) return;
-    ch.forEach((c,i)=>{ const u=jaUtter(c,rate); if(i===ch.length-1) u.onend=u.onerror=()=>{ if(id===SAY_ID&&onend) onend(); }; s.speak(u); }); return; }
+    ch.forEach((c,i)=>{ const u=jaUtter(c,rate); if(i===ch.length-1) u.onend=u.onerror=()=>{ if(id===SAY_ID) onend(); }; s.speak(u); }); return; }
   // 外の声: 1文ずつ順に。ファイルがない文だけスマホの声で
-  let i=0; const next=()=>{ if(id!==SAY_ID) return; if(i>=ch.length){ AUD=null; onend&&onend(); return; } const c=ch[i++]; const k=ttsKey(c);
-    if(ttsHas(src,k)){ const a=new Audio(TTS_BASE+src+"/"+k+".mp3"); a.preload="auto"; try{ a.preservesPitch=true; a.webkitPreservesPitch=true; }catch(_){} a.playbackRate=Math.max(.5,Math.min(2,(rate||1)*sayRate()));
+  let i=0; const next=()=>{ if(id!==SAY_ID) return; if(i>=ch.length){ onend(); return; } const c=ch[i++]; const k=ttsKey(c);
+    if(ttsHas(src,k)&&AUD_EL){ const a=AUD_EL; a.onended=a.onerror=null; try{ a.pause(); }catch(_){} a.src=TTS_BASE+src+"/"+k+".mp3"; try{ a.preservesPitch=true; a.webkitPreservesPitch=true; }catch(_){} a.playbackRate=Math.max(.5,Math.min(2,(rate||1)*sayRate()));
       AUD=a; a.onended=()=>{ if(id===SAY_ID) next(); }; a.onerror=()=>{ if(id!==SAY_ID) return; AUD=null; if(s){ const u=jaUtter(c,rate); u.onend=u.onerror=()=>{ if(id===SAY_ID) next(); }; s.speak(u); } else next(); };
       // 次の文を先に読みこんでおく(切れ目を短く)
       const nx=ch[i]; if(nx&&ttsHas(src,ttsKey(nx))){ try{ const pre=new Audio(); pre.preload="auto"; pre.src=TTS_BASE+src+"/"+ttsKey(nx)+".mp3"; }catch(_){} }
@@ -2659,7 +2704,8 @@ function ttsPlan(){ const out=[]; const add=t=>ttsChunks(t).forEach(c=>out.push(
   add(TTS_SAMPLE); add("この速さで読み上げます"); add(listenText()); [21,12].forEach(h=>radioScript(h).forEach(add));
   Object.values(D.explainers||{}).filter(e=>e&&e.updated&&(Date.parse(TODAY)-Date.parse(mdIso(e.updated)))<=7*864e5).slice(0,12).forEach(e=>add(exSpeakText(e)));
   return [...new Set(out)]; }
-function stopSpeak(){ SAY_ID++; audStop(); try{ window.speechSynthesis && window.speechSynthesis.cancel(); }catch(e){} }
+document.addEventListener("visibilitychange",()=>{ if(document.hidden&&(SAY_ON||AUD)&&!RADIO) stopSpeak(); });
+function stopSpeak(){ SAY_ID++; SAY_ON=false; audStop(); sayBar(false); try{ window.speechSynthesis && window.speechSynthesis.cancel(); }catch(e){} }
 function setPause(p){ st.paused=p; const b=document.getElementById("stPause"); b.textContent=p?"▶":"❚❚"; b.setAttribute("aria-label",p?"再生":"一時停止"); if(!p){ st.t0=performance.now()-st.el; tick(); } else { cancelAnimationFrame(st.raf);} }
 function show(i){
   if(!st) return; if(i<0) i=0; if(i>=st.S.length){ closeStory(); return; }
@@ -2879,12 +2925,19 @@ const KN_RX=/((?:約|およそ|最大|最高|最低|計|少なくとも|前年�
 function kn(html){ return String(html).replace(/(<[^>]+>)|([^<]+)/g,(m,tag,text)=>tag?tag:text.replace(KN_RX,'<b class="kn">$1</b>')); }
 function hlMk(escHtml){ return String(escHtml).replace(/\*\*([^*<>]{1,80}?)\*\*/g,'<mark class="hl">$1</mark>').replace(/\*\*/g,""); }
 // 長い文を「いちばん大事な1文(蛍光ペン)」と「そのほか(出典は小さく)」に分ける。「🆕」「これまで:」で行を分ける。
+// 今日の3行: 1文目(大事なところ)だけ見せ、のこりは「▼ 続きを読む」で開く(2026-11-17 夜・持ち主の希望。全文はそのまま、切らない)
+function threeBody(raw){ const t=String(raw||""); const m=/^[^。]*。/.exec(t); if(!m||m[0].length>=t.length-8) return `<p class="kt">${keyText(t)}</p>`;
+  const lead=m[0], rest=t.slice(m[0].length).trim(); const restMk=(rest.match(/\*\*/g)||[]).length%2===0?rest:rest.replace(/\*\*/g,"");
+  return `<p class="kt">${keyText(lead)}</p><div class="t-rest"><p class="kt">${keyText(restMk,{noLead:true})}</p></div><span class="t-mbtn" role="button" tabindex="0" data-tmore="1" aria-expanded="false">▼ 続きを読む</span>`; }
+document.addEventListener("click",e=>{ const b=e.target.closest&&e.target.closest("[data-tmore]"); if(!b) return; e.preventDefault(); e.stopPropagation();
+  const t=b.closest(".t"); const op=!t.classList.contains("t-open"); t.classList.toggle("t-open",op); b.setAttribute("aria-expanded",String(op)); b.textContent=op?"▲ とじる":"▼ 続きを読む"; },true);
+document.addEventListener("keydown",e=>{ if((e.key==="Enter"||e.key===" ")&&e.target.matches&&e.target.matches("[data-tmore]")){ e.target.click(); e.preventDefault(); e.stopPropagation(); } },true);
 function keyText(raw,opt){ opt=opt||{}; const t=String(raw||""); if(!t) return "";
   const hasMk=/\*\*[^*]+\*\*/.test(t);
   const segs=t.split(/(?=🆕)|(?=これまで[:：])/).map(x=>x.trim()).filter(Boolean);
   return segs.map((sg,si)=>{ const isOld=/^これまで[:：]/.test(sg); const isNew=/^🆕/.test(sg); let body=sg.replace(/^🆕\s*/,"");
     let lead="", rest=body;
-    if(!hasMk&&si===0&&!isOld){ const m=/^[^。]*。/.exec(body); if(m&&m[0].length<=90){ lead=m[0]; rest=body.slice(m[0].length); } }
+    if(!hasMk&&si===0&&!isOld&&!opt.noLead){ const m=/^[^。]*。/.exec(body); if(m&&m[0].length<=90){ lead=m[0]; rest=body.slice(m[0].length); } }
     const f=x=>kn(srcSoft(hlMk(esc(x))));
     const head=isNew?'<span class="kt-new">🆕</span>':isOld?'':'';
     const html=(lead?`<mark class="hl">${kn(srcSoft(esc(lead.replace(/\*\*/g,""))))}</mark>`:"")+f(rest);
@@ -2902,12 +2955,17 @@ function glanceHTML(e){ const T=e.timeline||[]; const last=T[T.length-1]; const 
     nx&&row("🔭","つぎ",`<span class="gl-t">${esc(nextTxt(nx))}</span>`)].filter(Boolean);
   return R.length>=2?`<div class="glance" aria-label="ひと目でわかる"><div class="gl-h">🔎 ひと目でわかる</div>${R.join("")}</div>`:""; }
 // 年表は縦に(2026-11-10: 横スクロールは1つの文が「…」で切れて読めなかった)。古いものは閉じた「前の流れ」に
-function vtlHTML(e,seenAt){ const T=e.timeline||[]; const KEEP=5; const li=([d,t],cls)=>`<li class="vtl-i${cls||""}${isNewTl(d,seenAt)?" fresh":""}"><span class="vtl-d">${esc(d)}${isNewTl(d,seenAt)?' <i class="tl-new">🆕</i>':""}</span><span class="vtl-t">${exTxt(t)}</span></li>`;
-  const old=T.length>KEEP+1?T.slice(0,T.length-KEEP):[]; const now=old.length?T.slice(T.length-KEEP):T;
-  const fut=[]; /* これからの予定は、すぐ下の「🔭 次の山場」に出す */
-  return `${old.length?`<details class="faq plain vtl-old"><summary>これより前の流れ(${old.length}件)</summary><ol class="vtl">${old.map(x=>li(x)).join("")}</ol></details>`:""}
-    <ol class="vtl">${now.map((x,i)=>li(x,i===now.length-1?" now":"")).join("")}${fut.map(x=>li(x," fut")).join("")}</ol>
-    <div class="hint">● がいちばん新しい動きです。</div>`; }
+function vtlHTML(e,seenAt){ const T=(e.timeline||[]).filter(x=>Array.isArray(x)&&x[1]);
+  // 同じ日の出来事は1つの日付の下にまとめる(日付をくり返さない)。いちばん古い日=「はじまり」はいつも見せ、まん中はたたむ
+  const G=[]; T.forEach(([d,t])=>{ const m=/^(\S+)\s*(.*)$/.exec(String(d||""))||["",String(d||""),""]; const last=G[G.length-1];
+    if(last&&last.day===m[1]) last.it.push([m[2],t,d]); else G.push({day:m[1],it:[[m[2],t,d]]}); });
+  if(!G.length) return "";
+  const grp=(g,cls,tag)=>`<li class="vtl-g${cls||""}"><div class="vtl-d">${esc(g.day)}${tag||""}${g.it.some(x=>isNewTl(x[2],seenAt))?' <i class="tl-new">🆕</i>':""}</div><ul class="vtl-ul">${g.it.map(([tm,t,d],j)=>`<li class="vtl-i${cls===" now"&&j===g.it.length-1?" now":""}${isNewTl(d,seenAt)?" fresh":""}">${tm?`<span class="vtl-tm">${esc(tm)}</span>`:""}<span class="vtl-t">${exTxt(t)}</span></li>`).join("")}</ul></li>`;
+  const KEEP=4; const fold=G.length>KEEP+2; const first=fold?G[0]:null; const mid=fold?G.slice(1,G.length-KEEP):[]; const tail=fold?G.slice(G.length-KEEP):G;
+  return `<ol class="vtl">${first?grp(first," start",' <span class="vtl-tag">🏁 はじまり</span>'):""}</ol>
+    ${mid.length?`<details class="faq plain vtl-old"><summary>とちゅうの流れ(${mid.reduce((n,g)=>n+g.it.length,0)}件)を見る</summary><ol class="vtl">${mid.map(g=>grp(g)).join("")}</ol></details>`:""}
+    <ol class="vtl">${tail.map((g,i)=>grp(g,i===tail.length-1?" now":"",i===tail.length-1?' <span class="vtl-tag now">いま</span>':"")).join("")}</ol>
+    <div class="hint">上から古い順。● がいちばん新しい動きです。</div>`; }
 function exUsLi(u){ const m=/^(\p{Extended_Pictographic}[️‍\p{Extended_Pictographic}]*)\s*([\s\S]*)$/u.exec(String(u));
   return m?`<li><span class="us-ic" aria-hidden="true">${m[1]}</span><span>${glossify(srcSoft(bold(m[2])))}</span></li>`:`<li><span class="us-ic" aria-hidden="true">・</span><span>${glossify(srcSoft(bold(u)))}</span></li>`; }
 function bindExRead(sh){ const bar=sh.querySelector("#exProg"); const head=sh.querySelector(".bar");
@@ -2953,7 +3011,7 @@ function openEx(k){
   </div>`;
   sh.hidden=false; sh.scrollTop=0; document.body.style.overflow="hidden";
   bindOrderQuiz(sh); bindExNav(sh,k); bindExRead(sh);
-  const close=()=>{ try{ window.speechSynthesis&&window.speechSynthesis.cancel(); }catch(_){} sh.hidden=true; sh.innerHTML=""; document.body.style.overflow=""; document.removeEventListener("keydown",esck); try{ history.replaceState(null,"","#"+(current||"today")); }catch(_){} };
+  const close=()=>{ stopSpeak(); sh.hidden=true; sh.innerHTML=""; document.body.style.overflow=""; document.removeEventListener("keydown",esck); try{ history.replaceState(null,"","#"+(current||"today")); }catch(_){} };
   const esck=ev=>{ if(ev.key==="Escape") close(); };
   document.addEventListener("keydown",esck);
   sh.querySelector("#shx").onclick=close; sh.querySelector("#shx2").onclick=close; sh.querySelector("#shx").focus();
@@ -3070,7 +3128,7 @@ function openNews(n,side){ if(!n) return; if(side) SH_SIDE=true; track("/news/"+
     <button class="iconbtn" id="nvx2" style="align-self:flex-start">← もどる</button>
   </div>`;
   sh.hidden=false; sh.scrollTop=0; document.body.style.overflow="hidden"; bindExRead(sh);
-  const close=()=>{ try{ window.speechSynthesis&&window.speechSynthesis.cancel(); }catch(_){} sh.hidden=true; sh.innerHTML=""; document.body.style.overflow=""; };
+  const close=()=>{ stopSpeak(); sh.hidden=true; sh.innerHTML=""; document.body.style.overflow=""; };
   sh.querySelector("#nvx").onclick=close; sh.querySelector("#nvx2").onclick=close; sh.querySelector("#nvx").focus();
   sh.querySelector("#nvshare").onclick=()=>openShare("n:"+nkey(n));
   sh.querySelector("#nvFind").onclick=()=>{ close(); sState.q=n.h.replace(/[、。「」()（）]/g," ").split(/\s+/).filter(x=>x.length>=2).slice(0,2).join(" "); go("search"); };
@@ -3458,7 +3516,7 @@ function openLook(){
       <div class="hint">あなた好みのニュースアプリに作りかえられます。変えるとすぐ反映され、このスマホの中だけに保存されます。</div>
       <section class="lk-sec"><h3>モード</h3><div class="mode-cards">${[["easy","🔰","かんたん","文字が大きく、天気・ニュース・聞くボタンだけ。あとから好きな機能を足せます"],["normal","📱","ふつう","ペット・クイズ・おたのしみなど、ぜんぶの機能"]].map(([k,i,n,d])=>`<button class="mode-c" data-lmode="${k}" aria-pressed="${LOOK.mode===k}"><span class="mi">${i}</span><b>${n}</b><small>${d}</small></button>`).join("")}</div>
         <div class="hint" style="margin-top:6px">モードごとに、下の「きょうの並び」とボタンを別々に覚えます。かんたんモードでも、下の一覧で「✅ 出している」にすれば、ふつうの機能を足せます。</div></section>
-      <section class="lk-sec"><h3>おまかせセット</h3><div class="presets">${PRESETS.map(p=>`<button data-preset="${p[0]}"><b>${p[1]}</b><span>${esc(p[2])}</span></button>`).join("")}</div></section>
+      <section class="lk-sec"><h3>ページの形</h3><div class="hint">いまの形: ${esc((PAGE_FORMS.find(f=>f[0]===formNow())||PAGE_FORMS[0])[1])}。できあがった形から選べます。</div><button class="fchip" data-forms="1" style="margin-top:6px">🧩 ページの形をえらぶ</button></section>
       <section class="lk-sec"><h3>ボタンと見出しの色</h3><div class="hint">ボタンや見出しの色と、画面全体の色が変わります。</div><div class="sw">${COLORS.map(c=>`<button data-col="${c[0]}" aria-pressed="${LOOK.color===c[0]}" aria-label="${c[1]}" title="${c[1]}" style="background:linear-gradient(135deg,${c[2]} 55%,${c[4]} 55%)"></button>`).join("")}</div>
         <div class="setrow"><span style="min-width:5em">画面</span><span class="seg">${[["system","スマホに合わせる"],["light","明るい"],["dark","暗い"]].map(([k,l])=>`<button data-lt="${k}" aria-pressed="${th===k}">${l}</button>`).join("")}</span></div></section>
       <section class="lk-sec"><h3>季節の飾り</h3><div class="hint">ハロウィンなどの期間中は、色と飾りが自動で変わります(選んだ色より先に使います)。</div>
@@ -3492,7 +3550,7 @@ function openLook(){
     sh.querySelectorAll("[data-mv]").forEach(b=>b.onclick=()=>{ const arr=b.dataset.mv==="sec"?LOOK.order:LOOK.tabs; const i=+b.dataset.i, j=i+(+b.dataset.d); if(j<0||j>=arr.length) return; [arr[i],arr[j]]=[arr[j],arr[i]]; saveLook(); drawTabs(); redraw(`[data-mv="${b.dataset.mv}"][data-i="${j}"][data-d="${b.dataset.d}"]`); });
     sh.querySelectorAll("[data-sw]").forEach(b=>b.onclick=()=>{ const o=b.dataset.sw==="sec"?LOOK.off:LOOK.tabOff; o[b.dataset.k]=!o[b.dataset.k]; saveLook(); drawTabs(); redraw(); });
     sh.querySelectorAll("[data-preset]").forEach(b=>b.onclick=()=>{ const p=PRESETS.find(x=>x[0]===b.dataset.preset); if(!p) return; LOOK.density=p[3].density; const want=["weather",...p[3].order.filter(k=>k!=="weather")]; const all=SECS.map(x=>x[0]); LOOK.order=[...want,...all.filter(k=>!want.includes(k))]; LOOK.off={}; all.forEach(k=>{ if(!want.includes(k)||p[3].off[k]) LOOK.off[k]=true; }); saveLook(); applySettings(); redraw(); toast(`「${p[1]}」にしました`); });
-    sh.querySelector("#lkreset").onclick=()=>{ LOOK.color="blue"; LOOK.season="auto"; LOOK.preview=""; LOOK.density="normal"; { const c=MODE_PRESET[LOOK.mode](); LOOK.order=c.order; LOOK.off=c.off; LOOK.tabs=c.tabs; LOOK.tabOff=c.tabOff; store.set("nw-size",c.size); } store.set("nw-theme","system"); saveLook(); applySettings(); drawTabs(); redraw(); };
+    sh.querySelector("#lkreset").onclick=()=>{ LOOK.color="blue"; delete LOOK.form; delete LOOK.main; LOOK.season="auto"; LOOK.preview=""; LOOK.density="normal"; { const c=MODE_PRESET[LOOK.mode](); LOOK.order=c.order; LOOK.off=c.off; LOOK.tabs=c.tabs; LOOK.tabOff=c.tabOff; store.set("nw-size",c.size); } store.set("nw-theme","system"); saveLook(); applySettings(); drawTabs(); redraw(); };
   };
   const redraw=(focusSel)=>{ const y=sh.scrollTop; draw(); sh.scrollTop=y; if(focusSel){ const f=sh.querySelector(focusSel); if(f&&!f.disabled) f.focus(); } };
   const close=()=>{ sh.hidden=true; sh.innerHTML=""; document.body.style.overflow=""; document.removeEventListener("keydown",esck); go(current||"today",{keepScroll:true}); };
@@ -4453,7 +4511,7 @@ function openRadio(){
     <div class="chips" id="rdBgm" role="group" aria-label="うしろの音" style="justify-content:center">${[["box","🎵 オルゴール"],["wave","🌊 波の音"],["off","🔇 音なし"]].map(([k,l])=>`<button class="fchip" data-bgm="${k}" aria-pressed="${rdBgmKind()===k}">${l}</button>`).join("")}</div>
     <div class="hint" style="text-align:center">うしろの音は小さめです。声だけで聞きたいときは「音なし」に。声の種類や速さは マイ→⚙️設定 で変えられます。</div>
     <details class="faq plain"><summary>読み上げる文</summary>${L.map(t=>`<p style="margin:6px 0">${esc(t)}</p>`).join("")}</details></div>`;
-  const stop=()=>{ try{ window.speechSynthesis&&window.speechSynthesis.cancel(); }catch(_){} if(RADIO&&RADIO.bgm) RADIO.bgm.stop(); RADIO=null; const b=document.getElementById("rdPlay"); if(b) b.innerHTML='<span class="pi">▶</span><span><b>再生</b></span>'; };
+  const stop=()=>{ stopSpeak(); if(RADIO&&RADIO.bgm) RADIO.bgm.stop(); RADIO=null; const b=document.getElementById("rdPlay"); if(b) b.innerHTML='<span class="pi">▶</span><span><b>再生</b></span>'; };
   const close=()=>{ stop(); sh.hidden=true; sh.innerHTML=""; document.body.style.overflow=""; };
   sh.querySelector("#rdx").onclick=close;
   sh.querySelectorAll("#rdBgm [data-bgm]").forEach(b=>b.onclick=()=>{ store.set("nw-rdbgm",b.dataset.bgm); sh.querySelectorAll("#rdBgm [data-bgm]").forEach(x=>x.setAttribute("aria-pressed",String(x===b))); if(RADIO){ if(RADIO.bgm) RADIO.bgm.stop(); RADIO.bgm=bgmStart(); } });
@@ -4540,6 +4598,33 @@ const MASCOT={
   plan:["fortune",["未来を予想するのはむずかしい…でも当たるとうれしい!","📰 未来の新聞、のぞいてみる?","きみも予想して、ぼくと勝負しよう!"]],
   words:["book",["知らないことばは、ここでしらべよう。","ことばを調べると、ぼくも少し育つよ。"]]
 };
+// ===== 🧩 ページの形をえらぶ(2026-11-17 夜): 指で並べかえる代わりに、できあがった形から選ぶ(重なり・くずれが起きない) =====
+// [キー, 名前, ひとこと, 上に出すもの(この順), 詰め具合, ニュース10の長さ]。どの形でもニュース10は上から3つ目までに置く
+const PAGE_FORMS=[
+  ["news","📰 ニュースを読む","いまの形。天気・3行・ニュース10・小さな知らせ",["weather","listen","three","ten","notes"],"normal","short"],
+  ["photo","📷 写真で見る","ニュース10が いちばん上。写真で見出しをながめる",["ten","three","weather","notes"],"normal","short"],
+  ["quick","⚡ さっと見る","朝の数分で。天気・3行・ニュース10だけ",["weather","three","ten"],"compact","short"],
+  ["deep","📚 じっくり読む","ニュース10をくわしく、あなた向け・数字も",["three","ten","foryou","number"],"roomy","full"],
+  ["money","💴 お金と暮らし","数字とニュースを先に",["weather","number","ten","three"],"normal","short"],
+  ["fun","🎈 たのしみながら","ニュースのあとにクイズとペット",["weather","three","ten","quiz","pet"],"normal","short"]];
+const FORM_LBL={weather:"🌤️ 天気",listen:"🔊 聞く",three:"☀️ 今日の3行",ten:"📰 ニュース10",notes:"📌 小さな知らせ",foryou:"🎯 あなた向け",number:"🔢 今日の数字",quiz:"🧠 クイズ",pet:"🐣 ペット"};
+function formNow(){ return LOOK.form||"news"; }
+function formMock(f){ return `<div class="fm-mock" aria-hidden="true"><div class="fm-bar">☰ ・ 🎯 ・ 政治 ・ 経済 …</div>${f[3].map(k=>`<div class="fm-row fm-${k}">${FORM_LBL[k]||k}</div>`).join("")}<div class="fm-row fm-ext">➕ ほかにも(押すと開く)</div></div>`; }
+function applyForm(key){ const f=PAGE_FORMS.find(x=>x[0]===key); if(!f) return; const main=f[3].slice();
+  LOOK.form=key; LOOK.main=main; LOOK.density=f[4]; LOOK.len=f[5];
+  LOOK.order=[...main,...LOOK.order.filter(k=>!main.includes(k))]; main.forEach(k=>{ if(LOOK.off) LOOK.off[k]=false; });
+  saveLook(); applySettings(); }
+function openForms(){ const sh=document.getElementById("sheet"); const cur=formNow();
+  sh.innerHTML=`<div class="bar"><div class="wrap"><button class="iconbtn" id="fmx">← もどる</button><span class="ttl">🧩 ページの形をえらぶ</span></div></div>
+  <div class="wrap body fm"><div class="hint">「きょう」の画面の形を、下から選んでください。押すとすぐ変わります。いつでも別の形にもどせます。<br>選ばなかったもの(クイズ・ペット・おたのしみなど)は、画面の下の「➕ ほかにも」の中にあります。</div>
+    <div class="fm-grid">${PAGE_FORMS.map(f=>`<button class="fm-c" data-form="${f[0]}" aria-pressed="${cur===f[0]}">${cur===f[0]?'<span class="fm-on">✓ いまの形</span>':""}<b>${f[1]}</b><small>${esc(f[2])}</small>${formMock(f)}</button>`).join("")}</div>
+    <div class="hint">色や、もっとこまかい並びは「🎨 色・こまかい並び」で変えられます。</div><button class="fchip" id="fmLook" style="align-self:flex-start">🎨 色・こまかい並び</button></div>`;
+  sh.hidden=false; sh.scrollTop=0; document.body.style.overflow="hidden";
+  sh.querySelector("#fmx").onclick=()=>{ sh.hidden=true; sh.innerHTML=""; document.body.style.overflow=""; };
+  sh.querySelector("#fmLook").onclick=()=>openLook();
+  sh.querySelectorAll("[data-form]").forEach(b=>b.onclick=()=>{ const f=PAGE_FORMS.find(x=>x[0]===b.dataset.form); applyForm(f[0]); track("/form/"+f[0],"ページの形");
+    shCloseAll(); go("today"); window.scrollTo(0,0); toast(`「${f[1]}」の形にしました`); }); }
+document.addEventListener("click",e=>{ if(e.target.closest&&e.target.closest("[data-forms]")){ e.preventDefault(); openForms(); } });
 // ===== 🧭 ジャンルの帯とジャンルのページ(2026-11-17 夜): 新聞サイトのように、上の帯から読みたいジャンルへすぐ飛べる =====
 function genreOrder(){ const mine=GORDER.filter(g=>ME.interests&&ME.interests[g]); return [...mine,...GORDER.filter(g=>!mine.includes(g))]; }
 function genreBar(cur){ return `<nav class="gbar" aria-label="ジャンルをえらぶ"><button class="gb gb-menu" data-menu="1">☰ メニュー</button><button class="gb" data-gopen="mine" aria-pressed="${cur==="mine"}">🎯 あなた向け</button>${genreOrder().map(g=>`<button class="gb" data-gopen="${g}" aria-pressed="${cur===g}"><i style="background:var(--g-${g})" aria-hidden="true"></i>${GN[g]}</button>`).join("")}</nav>`; }
@@ -4576,7 +4661,7 @@ function menuItems(){ const fun=FUN.map(f=>[f[1],f[2],"fun:"+f[0]]);
     ["🎮 あそぶ・まなぶ",fun.filter(f=>!/^fun:(radio|play)$/.test(f[2]))],
     ["🐣 ペット",[["🏠",petName()+"のへや","tab:my"],["✏️","あなたの呼び名","fn:nick"]]],
     ["🛟 防災・天気",[["🛟","地震・津波・警報","fn:quake"],["☔","雨雲の動き","fn:radar"],["🗺️","家のまわりの危ない場所","fn:bmap"]]],
-    ["⚙️ 設定・使い方",[["🔠","文字の大きさ・画面の色","fn:pop"],["🎨","色・画面の並びを変える","fn:look"],["🧭","下のボタンを選ぶ","fn:tabs"],["🔊","読み上げの声・速さ","set:sound"],["💗","好きなこと・気になるジャンル","set:me"],["🔔","お知らせ(朝・夕方)","set:app"],["📲","スマホの画面にボタンを置く","fn:install"],["💾","記録をとっておく・移す","set:data"],["📖","使い方ガイド","fn:help"],["🔰","はじめての案内","fn:onboard"]]]]; }
+    ["⚙️ 設定・使い方",[["🔠","文字の大きさ・画面の色","fn:pop"],["🧩","ページの形をえらぶ","fn:forms"],["🎨","色・こまかい並び","fn:look"],["🧭","下のボタンを選ぶ","fn:tabs"],["🔊","読み上げの声・速さ","set:sound"],["💗","好きなこと・気になるジャンル","set:me"],["🔔","お知らせ(朝・夕方)","set:app"],["📲","スマホの画面にボタンを置く","fn:install"],["💾","記録をとっておく・移す","set:data"],["📖","使い方ガイド","fn:help"],["🔰","はじめての案内","fn:onboard"]]]]; }
 function openMenu(){ const sh=document.getElementById("sheet"); const M=menuItems();
   sh.innerHTML=`<div class="bar"><div class="wrap"><button class="iconbtn" id="mnx">← もどる</button><span class="ttl">☰ メニュー(ぜんぶの機能)</span></div></div>
   <div class="wrap body mn"><input id="mnQ" type="search" placeholder="🔎 やりたいことを入れる(例: クイズ・文字・地図)" aria-label="機能をさがす" autocomplete="off">
@@ -4592,7 +4677,7 @@ function openMenu(){ const sh=document.getElementById("sheet"); const M=menuItem
     else if(t==="fun"){ openFun(v); }
     else if(t==="set"){ close(); setGo(v); }
     else if(t==="fn"){ const F={shimen:()=>openShimen(),listen:()=>{ close(); speak(listenText()); toast("🔊 読み上げています(止めるときは「きょう」の🔊ボタン)"); },nick:()=>openNick(),quake:()=>openQuake(),radar:()=>openRadar(),bmap:()=>openBMap("flood"),
-        pop:()=>{ close(); document.getElementById("setBtn").click(); },look:()=>openLook(),tabs:()=>openTabs(),install:()=>openInstall(),help:()=>openHelp("start"),onboard:()=>{ close(); onboard(true); }}; (F[v]||(()=>{}))(); } }); }
+        pop:()=>{ close(); document.getElementById("setBtn").click(); },look:()=>openLook(),forms:()=>openForms(),tabs:()=>openTabs(),install:()=>openInstall(),help:()=>openHelp("start"),onboard:()=>{ close(); onboard(true); }}; (F[v]||(()=>{}))(); } }); }
 function shCloseAll(){ const sh=document.getElementById("sheet"); if(sh.hidden) return; SH_STACK.length=0; sh.hidden=true; sh.innerHTML=""; document.body.style.overflow="";
   setTimeout(()=>{ try{ if(location.hash!=="#"+current) history.replaceState(null,"","#"+current); }catch(_){} },150); }
 // 設定のまとまりを開いて、そこへ行く
@@ -4855,7 +4940,7 @@ function reporterCard(){ const st=petStage(); if(st.i<1) return ""; const g=petT
   return `<section class="card reporter" aria-label="ペット記者"><div class="rp-h"><span class="rp-av">${petSVG(st.i,"happy",null,64,kc)}</span><span><small class="hint">🎙️ 今日の${esc(GN[g])}担当</small><b>${esc(petName())}記者がお伝えします</b></span></div>
     <p class="rp-t"><b>${esc(title)}</b>${text?`<br>${esc(text)}`:""}</p><div style="display:flex;gap:6px;flex-wrap:wrap"><button class="fchip" id="rpSpeak">🔊 読み上げてもらう</button>${n.ex?`<button class="fchip" data-ex="${n.ex}">くわしく →</button>`:""}</div>
     <div class="hint" style="margin-top:6px">あなたがよく読む「${esc(GN[g])}」から選んでいます(記事はニュース10と同じ内容です)。</div></section>`; }
-function bindReporter(){ const b=document.getElementById("rpSpeak"); if(!b) return; b.onclick=()=>{ const t=document.querySelector(".rp-t").innerText; if(window.speechSynthesis&&window.speechSynthesis.speaking){ stopSpeak(); b.textContent="🔊 読み上げてもらう"; return; } speak(`${petName()}記者がお伝えします。${t}。以上、${petName()}でした。`); b.textContent="■ 止める"; }; }
+function bindReporter(){ const b=document.getElementById("rpSpeak"); if(!b) return; b.onclick=()=>{ const t=document.querySelector(".rp-t").innerText; if(isSpeaking()){ stopSpeak(); b.textContent="🔊 読み上げてもらう"; return; } speak(`${petName()}記者がお伝えします。${t}。以上、${petName()}でした。`); b.textContent="■ 止める"; }; }
 function gachaCard(){ const g=ME.gacha||{}; const done=g.d===TODAY; const n=done?NEWS.find(x=>nkey(x)===g.k):null;
   return `<section class="card gacha" aria-label="今日の1本ガチャ"><div class="sec-h"><h2>🎰 今日の1本ガチャ</h2><span class="sub">1日1回</span></div>
     <div id="gaBox">${done&&n?gachaResult(n):`<div class="ga-m"><div class="ga-ball" aria-hidden="true"></div><button class="fchip pet-feed" id="gaGo">ガチャを回す!</button><div class="hint">これまでの記録(${NEWS.length}件)から、1本だけ出てきます。思いがけないニュースに出会えるかも。</div></div>`}</div></section>`; }
@@ -5467,6 +5552,8 @@ function openShimen(){ const sh=document.getElementById("sheet"); const w=D.weat
 document.addEventListener("click",e=>{ const b=e.target.closest("[data-shimen]"); if(!b) return; e.preventDefault(); openShimen(); });
 // ===== お知らせ(新しくなったところ)。機能を足したら、いちばん上に1つ足す =====
 const UPDATES=[
+  {id:"2026-11-17g",d:"2026-11-17",t:"🔊 ずんだもんの声が止まらない・重なるのを直しました",L:["キャラの声(ずんだもん)で読み上げているときは、画面の下に「⏹ 止める」が出ます。どの画面からでも止められます。","声は1つずつしか流れないようにしました(別の🔊を押すと、前の読み上げは止まります)。アプリを閉じたときも止まります。"]},
+  {id:"2026-11-17f",d:"2026-11-17",t:"🧩 ページの形を選べる・3行は「続きを読む」・年表を見やすく",L:["「きょう」のいちばん下の「🧩 ページの形をえらぶ」で、📰 ニュースを読む・📷 写真で見る・⚡ さっと見る・📚 じっくり読む などの形から選べます。見本の絵を見てから押すだけです。","今日の3行は、大事な1文だけを先に出し、のこりは「▼ 続きを読む」で開くようにしました。ニュース10まで早く届きます。","解説の「これまでの流れ」は、同じ日の出来事を1つの日付にまとめ、いちばん上に「🏁 はじまり」を出すようにしました。"]},
   {id:"2026-11-17e",d:"2026-11-17",t:"🧭 読みたいジャンルへすぐ行ける・写真が増えた",L:["「きょう」のいちばん上に、ジャンルの帯ができました。押すと、そのジャンルのニュースだけを7日分まとめて読めます。「🎯 あなた向け」には、気になるジャンルと好きなこと(💗)のニュースが集まります。","「☰ メニュー」には、このアプリでできることがぜんぶ並んでいます。ことばを入れて探すこともできます。","ニュース10に写真(イメージ)がつきました。写真の種類も2倍にふやしました。","マイ→⚙️設定を、6つのまとまり(わたしのこと・見た目・読み上げ・アプリとお知らせ・記録・使い方)に整理しました。"]},
   {id:"2026-11-17d",d:"2026-11-17",t:"🎧 読み上げの声を選べるように",L:["マイ→⚙️設定の「🔊 読み上げの速さと声」で、声の種類を「📱 スマホの声」「🐣 キャラの声(ずんだもん)」から選べます。","キャラの声は、ニュースが新しくなるたびに前もって作った声です。「今日のニュースを聞く」「寝る前ラジオ」「最近の解説」で使います(声の準備ができるまでは、スマホの声で読みます)。"]},
   {id:"2026-11-17c",d:"2026-11-17",t:"🏠 部屋をすっきり・👈 もどるをなめらかに",L:["ペットの部屋をすっきりさせました。窓は左上、家具は「かべの棚」と「床のおく」にならびます(指で好きな場所へ動かせるのは前と同じ)。","右へなぞって「もどる」とき、画面が指にぴったりついてきて、はなすとスッとすべって前の画面にもどります。速くはじいても、もどれます。"]},
@@ -6670,7 +6757,7 @@ document.addEventListener("click",ev=>{ const x=ev.target.closest("[data-alx]");
 document.addEventListener("keydown",ev=>{ if((ev.key==="Enter"||ev.key===" ")&&ev.target.matches&&ev.target.matches(".al-band[data-quake]")){ ev.preventDefault(); openQuake(); } });
 try{ loadAlerts(); setInterval(()=>{ if(document.visibilityState==="visible") loadAlerts(); },3*60*1000); document.addEventListener("visibilitychange",()=>{ if(document.visibilityState==="visible") loadAlerts(); }); }catch(_){}
 // テスト用の手がかり(localhost で動かしたときだけ。本番では出さない)
-if(/^(localhost|127\.0\.0\.1)$/.test(location.hostname)) window.NW_TEST={openGenre,openMenu,setGo,ttsPlan,ttsKey,listenText,sayQueue,openRadio,bgmStart,ttsChunks,ttsClean,bestJaVoice,openHelp,placeOf,localCard,get NEWS(){return NEWS;},petSVG,PET_KINDS,PET_COLORS,petColorsFor,WEAR,petStage,petXP,petKind,petHall,petName,petRestart,get ME(){return ME;},get LOOK(){return LOOK;},TOPIC_GROUPS,FUN,SECS,openFun,openEx,fillQs,hhNews,ktQs,serialChapters,go,openLife,trendWords,openShimen};
+if(/^(localhost|127\.0\.0\.1)$/.test(location.hostname)) window.NW_TEST={stopSpeak,openEx,openForms,applyForm,openGenre,openMenu,setGo,ttsPlan,ttsKey,listenText,sayQueue,openRadio,bgmStart,ttsChunks,ttsClean,bestJaVoice,openHelp,placeOf,localCard,get NEWS(){return NEWS;},petSVG,PET_KINDS,PET_COLORS,petColorsFor,WEAR,petStage,petXP,petKind,petHall,petName,petRestart,get ME(){return ME;},get LOOK(){return LOOK;},TOPIC_GROUPS,FUN,SECS,openFun,openEx,fillQs,hhNews,ktQs,serialChapters,go,openLife,trendWords,openShimen};
 const h=(location.hash||"").slice(1);
 if(h==="quake"){ go("today"); setTimeout(openQuake,50); } else if(h==="shimen"){ go("today"); setTimeout(openShimen,50); } else if(D.explainers[h]){ go("explain"); openEx(h); }
 else if(h.startsWith("t=")) openTHash(h);
