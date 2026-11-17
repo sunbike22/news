@@ -357,3 +357,4 @@
 - お金と上限: Google は1か月 `GG_MONTH_CAP`=80万字で止める(無料のわく100万字)。使った字数は index.json の `ggUsed`。VOICEVOX は無料。1回の作業は35分まで(`TIME_BUDGET`、のこりは次の回)。
 - 表記: 「音声: VOICEVOX:ずんだもん」を設定の声の説明に出す(ずんだもんの規約。政治活動・特定の人や団体への非難/応援には使わない=事実のニュースを読むだけ)。
 - 結果の確かめ方: `https://raw.githubusercontent.com/sunbike22/news/audio/tts/index.json` の `made`・`kept`・`log`。
+- 🎙️ **アナウンサー風(Google)は保留**(2026-11-17 夜、持ち主の判断。ほかの案が来るまで)。アプリの選択肢 `VSRC` から外してある(コードと tts.yml の gg の部分は残す。`GOOGLE_TTS_KEY` がなければ作らないので、お金はかからない)。
