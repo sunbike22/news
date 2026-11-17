@@ -2662,7 +2662,12 @@ let SAY_ID=0;
 // audio ブランチの tts/ に置く。アプリは同じ文(ttsChunks の結果)の「しるし」(ttsKey)で探して流すだけ。ない文はスマホの声で読む。
 // APIキーはサイトに置かない(GitHub の Secrets だけ)。見る人の情報はどこにも送らない(音声ファイルを読みに行くだけ)。
 const TTS_BASE="https://raw.githubusercontent.com/sunbike22/news/audio/tts/";
-const VSRC=[["dev","📱 スマホの声"],["vv","🐣 キャラの声(ずんだもん)"]]; // 🎙️ アナウンサー風(gg=Google)は持ち主の判断で保留中(2026-11-17)。もどすときは ["gg","🎙️ アナウンサー風"] を足す
+const VSRC=[["dev","📱 スマホの声"],["vv","🐣 ずんだもん"],["pet","🐾 ペットの声(育てている子で変わる)"]];
+// 🐾 ペットごとの声(2026-11-17 夜)。[音声の置き場所, キャラ名]。tools/tts/make.py の PET_VOICES と同じ。どれも「VOICEVOX:名前」と書けば使える規約を確かめたキャラ
+const PET_VOICE={maru:["vv","ずんだもん"],neko:["vneko","小夜/SAYO"],usagi:["vusagi","中国うさぎ"],kitsune:["vkitsune","四国めたん"],pengin:["vpengin","雨晴はう"],kaeru:["vkaeru","九州そら"],inu:["vinu","東北きりたん"]};
+function petEgg(){ try{ return petStage().i===0; }catch(_){ return false; } }
+// 実際に使う声の置き場所。たまごの間はスマホの声(声で何が生まれるかわからないように)
+function ttsSrc(){ const v=vsrc(); if(v!=="pet") return v; if(petEgg()) return "dev"; return (PET_VOICE[petKind()]||PET_VOICE.maru)[0]; } // 🎙️ アナウンサー風(gg=Google)は持ち主の判断で保留中(2026-11-17)。もどすときは ["gg","🎙️ アナウンサー風"] を足す
 function vsrc(){ const v=store.get("nw-vsrc"); return VSRC.some(x=>x[0]===v)?v:"dev"; }
 function ttsKey(t){ let h=0x811c9dc5; const s=String(t); for(let i=0;i<s.length;i++){ h^=s.charCodeAt(i); h=Math.imul(h,0x01000193)>>>0; } return h.toString(16).padStart(8,"0")+s.length.toString(36); } // tools/tts/make.py と同じ計算(FNV-1a)
 let TTS_IDX=null, TTS_IDX_AT=0;
@@ -2682,7 +2687,10 @@ function sayBar(on){ let b=document.getElementById("sayBar"); if(!on){ if(b) b.h
   Object.defineProperty(S,"speaking",{configurable:true,get(){ return isSpeaking(); }}); }catch(_){} })();
 function sayQueue(txt,rate,onend0){ try{ const s=window.speechSynthesis; if(!s&&vsrc()==="dev") return; stopSpeak(); const id=++SAY_ID; const ch=ttsChunks(txt); if(!ch.length){ onend0&&onend0(); return; }
   const onend=()=>{ if(id!==SAY_ID) return; SAY_ON=false; AUD=null; sayBar(false); onend0&&onend0(); };
-  SAY_ON=true; const src=vsrc(); if(src!=="dev") sayBar(true);
+  SAY_ON=true; let src=ttsSrc();
+  // ペットの声がまだ少ししかできていない文は、ぜんぶ ずんだもん で読む(1つの読み上げの中で声がまざらないように)
+  if(src!=="dev"&&src!=="vv"&&TTS_IDX){ const cov=k=>ch.filter(c=>ttsHas(k,ttsKey(c))).length/ch.length; if(cov(src)<0.8&&cov("vv")>=0.8) src="vv"; }
+  if(src!=="dev") sayBar(true);
   if(src==="dev"||!TTS_IDX||!ch.some(c=>ttsHas(src,ttsKey(c)))){ if(src!=="dev"&&!TTS_IDX) ttsIdx(); if(!s) return;
     ch.forEach((c,i)=>{ const u=jaUtter(c,rate); if(i===ch.length-1) u.onend=u.onerror=()=>{ if(id===SAY_ID) onend(); }; s.speak(u); }); return; }
   // 外の声: 1文ずつ順に。ファイルがない文だけスマホの声で
@@ -2695,7 +2703,7 @@ function sayQueue(txt,rate,onend0){ try{ const s=window.speechSynthesis; if(!s&&
     else if(s){ AUD=null; const u=jaUtter(c,rate); u.onend=u.onerror=()=>{ if(id===SAY_ID) next(); }; s.speak(u); } else next(); };
   next(); }catch(_){} }
 const TTS_SAMPLE="こんにちは。まいにちニュース帳です。今日のニュースを、この声で読み上げます。";
-function ttsCredit(src){ src=src||vsrc(); return src==="vv"?"音声: VOICEVOX:ずんだもん":src==="gg"?"音声: Google Cloud Text-to-Speech":""; }
+function ttsCredit(src){ src=src||ttsSrc(); const V=TTS_IDX&&TTS_IDX.voices; if(V&&typeof V[src]==="string") return "音声: "+V[src]; const pv=Object.values(PET_VOICE).find(x=>x[0]===src); return pv?"音声: VOICEVOX:"+pv[1]:src==="gg"?"音声: Google Cloud Text-to-Speech":""; }
 function speak(txt){ sayQueue(txt,1); }
 function listenText(){ const w=D.weather; return (w?`${relDay(w.iso)}の${w.place}は${w.sky}。最高${w.hi}度、最低${w.lo}度。${w.umbrella}。では、`:"")+"今日のニュースです。"+D.three.map((x,i)=>`${i+1}つ目。${x.title}。${x.text}`).join("。")+"。ニュース10の見出しです。"+D.top10.map((n,i)=>`${i+1}位、${n.title}`).join("。")+"。以上です。"; }
 function exSpeakText(e){ return [e.name,"ひとことで言うと。",e.kid,(e.more||[])[0],(e.more||[])[1],"わたしたちへの影響。",...(e.us||[]).map(u=>String(u).replace(/\*\*/g,"")),...(e.faq||[]).map(([q,a])=>q+" "+a)].filter(Boolean).join("。 "); }
@@ -3593,9 +3601,11 @@ function cvdCard(){ return `<section class="card" aria-label="色の見分けや
   <div class="chips" id="vCvd">${[["1","見分けやすくする"],["0","ふつう"]].map(([v,l])=>`<button class="fchip" data-cvd="${v}" aria-pressed="${cvdOn()===(v==="1")}">${l}</button>`).join("")}</div>
   <div class="hint" style="margin-top:6px">赤と緑など、色の見分けがつきにくい人向けです。「よい・悪い」の色を青とオレンジにかえ、色だけで分けていたところ(地図の丸・きょうの1問の結果など)に、形や文字もつけます。</div></section>`; }
 document.addEventListener("click",ev=>{ const b=ev.target.closest("#vCvd [data-cvd]"); if(!b) return; store.set("nw-cvd",b.dataset.cvd); applySettings(); document.querySelectorAll("#vCvd [data-cvd]").forEach(x=>x.setAttribute("aria-pressed",String(x===b))); toast(b.dataset.cvd==="1"?"🎨 色を見分けやすくしました":"🎨 ふつうの色にもどしました"); try{ track("/cvd/"+b.dataset.cvd,"色の見分けやすさ"); }catch(_){} });
-function vsrcNote(){ const s=vsrc(); if(s==="dev") return "スマホに入っている声で読みます。通信料(ギガ)はかかりません。";
-  const n=TTS_IDX&&TTS_IDX[s]?Object.keys(TTS_IDX[s]).length:0;
-  return (s==="vv"?"🐣 ずんだもんの声で読みます。":"🎙️ 落ち着いたアナウンサー風の声で読みます。")+"「今日のニュースを聞く」「寝る前ラジオ」「最近の解説」は、前もって作った声で読みます(1分で約0.3MBの通信)。まだ声のない文は、スマホの声で読みます。"+(TTS_IDX?(n?"":"(いまはまだ準備中です)"):"")+`<br><small>${esc(ttsCredit(s))}</small>`; }
+function vsrcNote(){ const v=vsrc(); if(v==="dev") return "スマホに入っている声で読みます。通信料(ギガ)はかかりません。";
+  if(v==="pet"&&petEgg()) return "🥚 たまごの間はスマホの声で読みます(どの子が生まれるかはヒミツ)。生まれたら、その子の声になります。"+`<br><small>音声: VOICEVOX:${Object.values(PET_VOICE).map(x=>x[1]).join("・")}</small>`;
+  const s=ttsSrc(); const n=TTS_IDX&&TTS_IDX[s]?Object.keys(TTS_IDX[s]).length:0;
+  const head=v==="pet"?`🐾 いまの子(${esc(petName())})の声=${esc((PET_VOICE[petKind()]||PET_VOICE.maru)[1])}で読みます。ペットを入れかえると声も変わります。<details class="faq plain"><summary>ほかの子の声</summary>${Object.entries(PET_VOICE).map(([k,x])=>`${esc((PET_KINDS[k]||[k])[0])}: ${esc(x[1])}`).join(" / ")}<br>まだ準備中の声のときは、ずんだもんで読みます。</details>`:s==="vv"?"🐣 ずんだもんの声で読みます。":"🎙️ 落ち着いたアナウンサー風の声で読みます。";
+  return head+"「今日のニュースを聞く」「寝る前ラジオ」「最近の解説」は、前もって作った声で読みます(1分で約0.3MBの通信)。まだ声のない文は、スマホの声で読みます。"+(TTS_IDX?(n?"":"(いまはまだ準備中です)"):"")+`<br><small>${esc(ttsCredit(s))}</small>`; }
 function voiceCard(){ const r=sayRate();
   return `<section class="card" aria-label="読み上げ"><div class="sec-h"><h2>🔊 読み上げの速さと声</h2></div>
     <div class="chips" id="vRate">${[[0.75,"🐢 ゆっくり"],[1,"ふつう"],[1.25,"🐇 はやい"]].map(([v,l])=>`<button class="fchip" data-rate="${v}" aria-pressed="${Math.abs(r-v)<.01}">${l}</button>`).join("")}</div>
@@ -5552,6 +5562,7 @@ function openShimen(){ const sh=document.getElementById("sheet"); const w=D.weat
 document.addEventListener("click",e=>{ const b=e.target.closest("[data-shimen]"); if(!b) return; e.preventDefault(); openShimen(); });
 // ===== お知らせ(新しくなったところ)。機能を足したら、いちばん上に1つ足す =====
 const UPDATES=[
+  {id:"2026-11-17h",d:"2026-11-17",t:"🐾 ペットごとに読み上げの声が変わる",L:["マイ→⚙️設定→「🔊 読み上げ」で「🐾 ペットの声」を選ぶと、育てている子の種類に合わせた声で読み上げます(みけまる=小夜/SAYO、ももまる=中国うさぎ など)。","新しい声は、いま順番に作っています。できるまでは ずんだもん の声で読みます。たまごの間はスマホの声です。"]},
   {id:"2026-11-17g",d:"2026-11-17",t:"🔊 ずんだもんの声が止まらない・重なるのを直しました",L:["キャラの声(ずんだもん)で読み上げているときは、画面の下に「⏹ 止める」が出ます。どの画面からでも止められます。","声は1つずつしか流れないようにしました(別の🔊を押すと、前の読み上げは止まります)。アプリを閉じたときも止まります。"]},
   {id:"2026-11-17f",d:"2026-11-17",t:"🧩 ページの形を選べる・3行は「続きを読む」・年表を見やすく",L:["「きょう」のいちばん下の「🧩 ページの形をえらぶ」で、📰 ニュースを読む・📷 写真で見る・⚡ さっと見る・📚 じっくり読む などの形から選べます。見本の絵を見てから押すだけです。","今日の3行は、大事な1文だけを先に出し、のこりは「▼ 続きを読む」で開くようにしました。ニュース10まで早く届きます。","解説の「これまでの流れ」は、同じ日の出来事を1つの日付にまとめ、いちばん上に「🏁 はじまり」を出すようにしました。"]},
   {id:"2026-11-17e",d:"2026-11-17",t:"🧭 読みたいジャンルへすぐ行ける・写真が増えた",L:["「きょう」のいちばん上に、ジャンルの帯ができました。押すと、そのジャンルのニュースだけを7日分まとめて読めます。「🎯 あなた向け」には、気になるジャンルと好きなこと(💗)のニュースが集まります。","「☰ メニュー」には、このアプリでできることがぜんぶ並んでいます。ことばを入れて探すこともできます。","ニュース10に写真(イメージ)がつきました。写真の種類も2倍にふやしました。","マイ→⚙️設定を、6つのまとまり(わたしのこと・見た目・読み上げ・アプリとお知らせ・記録・使い方)に整理しました。"]},
@@ -5747,7 +5758,7 @@ const HELP=[
   ["ten","📰","ニュース10の読み方",["上から順に、その日に大きく伝えられたニュースです。","右上の<b>「短く／くわしく」</b>で、見出しだけにするか、説明も出すかを切りかえられます。","<b>「くわしい解説 →」</b>があるものは、図や流れつきの解説ページが読めます。","<b>🏷️ 保存</b>で「マイ」にとっておけます。<b>📤 送る</b>で家族や友だちに見出しを送れます(あなたの記録は送りません)。"]],
   ["ex","💡","解説ページの読み方",["大きな話題を1つずつ、やさしく説明するページです。上から読めば全体がわかります。","<b>ひとことで言うと</b>…まずここだけ読めば大まかにわかります。","<b>目次</b>を押すと、その場所に飛びます。","<b>🙋 わたしたちへの影響</b>…くらしにどう関係するか。","<b>📅 流れ</b>…これまでに起きたことの年表。<b>🔭 これから</b>…次に注目する日。","<b>🔔 続きを追う</b>を押すと、新しい動きがあったとき「きょう」でお知らせします。","<b>💬 話しながら読む</b>・<b>📖 連載で読む</b>…同じ中身を、会話や1日1話の形で読めます。","画面を<b>左右にすべらせる</b>と、前後の解説に移ります。"]],
   ["manga","🎨","4コマの見かた",["解説の中身を、4つのコマで説明するマンガです。","左にいるのは<b>あなたのペット</b>(名札はペットの名前)。ニュースにくわしくない生徒で、わたしたちと同じ立場で質問します。","右の<b>🦉 ホー先生</b>がやさしく答えます。","上から<b>①はてな? → ②なにがあった? → ③どうなるの? → ④これから</b>の順に読みます。","いちばん下の<b>📝 ホー先生の黒板</b>が、まとめです。"]],
-  ["listen","🔊","聞く・読み上げ",["<b>🔊 聞く</b>のボタンで、文を読み上げます。もう一度押すと止まります。","速さ・声の高さ・声の種類は、<b>マイ → ⚙️設定 →「🔊 読み上げの速さと声」</b>で変えられます。","声の種類は「📱 スマホの声」「🐣 キャラの声(ずんだもん)」から選べます。キャラの声は、前もって作った声を読みこむので、1分で約0.3MBの通信がかかります。まだ声のない文はスマホの声で読みます。","読み方がおかしいことばは、<b>「🗣️ 読み方がおかしいときは →」</b>から、このスマホで直したり、作った人に知らせたりできます。","<b>🌙 寝る前ラジオ</b>(おたのしみ)は、3分でニュースを耳で聞けます。うしろの音は「オルゴール・波の音・音なし」から選べます。"]],
+  ["listen","🔊","聞く・読み上げ",["<b>🔊 聞く</b>のボタンで、文を読み上げます。もう一度押すと止まります。","速さ・声の高さ・声の種類は、<b>マイ → ⚙️設定 →「🔊 読み上げの速さと声」</b>で変えられます。","声の種類は「📱 スマホの声」「🐣 ずんだもん」「🐾 ペットの声」から選べます。🐾 は、いま育てている子の種類で声が変わります(たまごの間はスマホの声)。キャラの声は、前もって作った声を読みこむので、1分で約0.3MBの通信がかかります。まだ声のない文はスマホの声で読みます。","読み方がおかしいことばは、<b>「🗣️ 読み方がおかしいときは →」</b>から、このスマホで直したり、作った人に知らせたりできます。","<b>🌙 寝る前ラジオ</b>(おたのしみ)は、3分でニュースを耳で聞けます。うしろの音は「オルゴール・波の音・音なし」から選べます。"]],
   ["pet","🐣","ペットの育て方",["ペットはニュースといっしょに育ちます。「きょう」のいちばん上で出むかえてくれます。押すと、なでられてひとことが変わります。はじめはたまごで、何が生まれるかはお楽しみです。","<b>🧠 クイズ</b>に正解すると🍙ごはんがもらえます。ごはんをあげたり、毎日開いたり、解説を読んだりすると育ちます。","名前は<b>マイ → 🐣 ペット の「✏️ 名前」</b>で変えられます。変えた名前は4コマなどにも出ます。","服・部屋・色は、育つと選べるものが増えます。ごはんやお世話をしなくても、困ることはありません。"]],
   ["plan","📅","予定と予測",["<b>📅 予定</b>…これから決まっている日(選挙・発表・値上げなど)。","<b>🎯 予測</b>…Claude(AI)が「こうなりそう」と考えたもの。あたるとは限りません。","あなたも<b>予想</b>して、答え合わせができます。"]],
   ["search","🔎","さがす・地図・数字",["<b>🔎 さがす</b>…ことばやジャンルで、これまでのニュースを探せます。","<b>🗺️ 地図</b>…ニュースがどこで起きたか。2本の指で大きくできます。","<b>📈 数字</b>…日経平均・円・原油のグラフと、くらしの便利。","地図と数字は、「さがす」の上のボタンから開けます。"]],
@@ -5867,8 +5878,9 @@ function renderMy(){
     main.querySelector("#vTry").onclick=()=>sayJa(vsrc()==="dev"?`こんにちは。${petName()}です。今日のニュースを、この声で読み上げます。`:TTS_SAMPLE);
     main.querySelectorAll("#vSrc [data-vsrc]").forEach(b=>b.onclick=async()=>{ store.set("nw-vsrc",b.dataset.vsrc); main.querySelectorAll("#vSrc [data-vsrc]").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));
       const nt=main.querySelector("#vSrcNote"); if(b.dataset.vsrc!=="dev"){ nt.innerHTML="声を読みこんでいます…"; await ttsIdx(true); } nt.innerHTML=vsrcNote(); const row=main.querySelector("#vName")?.parentElement; if(row) row.style.opacity=b.dataset.vsrc==="dev"?"":".6";
-      if(b.dataset.vsrc!=="dev"&&!(TTS_IDX&&TTS_IDX[b.dataset.vsrc]&&Object.keys(TTS_IDX[b.dataset.vsrc]).length)){ toast("この声はまだ準備中です。準備ができるまではスマホの声で読みます"); return; }
-      sayJa(b.dataset.vsrc==="dev"?`こんにちは。${petName()}です。この声で読み上げます。`:TTS_SAMPLE); });
+      const rs=ttsSrc(); if(rs!=="dev"&&!(TTS_IDX&&TTS_IDX[rs]&&Object.keys(TTS_IDX[rs]).length)&&!(TTS_IDX&&TTS_IDX.vv&&Object.keys(TTS_IDX.vv).length)){ toast("この声はまだ準備中です。準備ができるまではスマホの声で読みます"); return; }
+      if(rs!=="dev"&&rs!=="vv"&&!(TTS_IDX&&TTS_IDX[rs]&&TTS_IDX[rs][ttsKey(TTS_SAMPLE)])) toast("この子の声はいま作っているところです。できるまでは ずんだもん で読みます");
+      sayJa(rs==="dev"?`こんにちは。${petName()}です。この声で読み上げます。`:TTS_SAMPLE); });
     main.querySelectorAll("#vPitch [data-pitch]").forEach(b=>b.onclick=()=>{ store.set("nw-pitch",b.dataset.pitch); main.querySelectorAll("#vPitch [data-pitch]").forEach(x=>x.setAttribute("aria-pressed",String(x===b))); sayJa("この高さで読み上げます"); }); } }
   main.querySelectorAll("#vRate [data-rate]").forEach(b=>b.onclick=()=>{ store.set("nw-rate",b.dataset.rate); main.querySelectorAll("#vRate [data-rate]").forEach(x=>x.setAttribute("aria-pressed",String(x===b))); sayJa("この速さで読み上げます"); });
   main.querySelectorAll("#vThumb [data-thumb]").forEach(b=>b.onclick=()=>{ store.set("nw-thumb",b.dataset.thumb); main.querySelectorAll("#vThumb [data-thumb]").forEach(x=>x.setAttribute("aria-pressed",String(x===b))); toast(b.dataset.thumb==="1"?"📷 写真を出します":"写真を出さないようにしました"); });
@@ -6347,7 +6359,7 @@ function speakEx(k,btn){ const e=D.explainers[k]; if(!e) return; try{ const s=wi
 
 // 起動
 try{ applySky(); setInterval(applySky,10*60*1000); }catch(_){}
-try{ if(vsrc()!=="dev") setTimeout(()=>ttsIdx(),1500); }catch(_){}
+try{ if(ttsSrc()!=="dev"||vsrc()!=="dev") setTimeout(()=>ttsIdx(),1500); }catch(_){}
 setTimeout(()=>{ try{ onboard(); }catch(_){} },600);
 try{ saveRival(); }catch(_){}
 document.getElementById("bellBtn").onclick=openUpdates; markBell();

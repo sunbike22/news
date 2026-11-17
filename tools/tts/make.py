@@ -10,10 +10,13 @@ import json, os, sys, time, base64, shutil, subprocess, urllib.request, urllib.p
 
 VV_URL = os.environ.get("VV_URL", "http://127.0.0.1:50021")
 VV_SPEAKER = int(os.environ.get("VV_SPEAKER", "3"))  # 3 = ずんだもん(ノーマル)
+# ペットごとの声(2026-11-17 夜)。[しるし, VOICEVOX のキャラ名]。どれも「VOICEVOX:名前」と書けば使える規約を確かめたキャラだけ
+# (ずんだもん・四国めたん・中国うさぎ・九州そら・東北きりたん=東北ずん子プロジェクト、小夜/SAYO、雨晴はう)。id は /speakers から名前で探す
+PET_VOICES = [("vneko", "小夜/SAYO"), ("vusagi", "中国うさぎ"), ("vkitsune", "四国めたん"), ("vpengin", "雨晴はう"), ("vkaeru", "九州そら"), ("vinu", "東北きりたん")]
 GG_KEY = os.environ.get("GOOGLE_TTS_KEY", "").strip()
 GG_VOICE = os.environ.get("GG_VOICE", "ja-JP-Neural2-B")
 GG_MONTH_CAP = int(os.environ.get("GG_MONTH_CAP", "800000"))
-TIME_BUDGET = int(os.environ.get("TIME_BUDGET", "2100"))
+TIME_BUDGET = int(os.environ.get("TIME_BUDGET", "2700"))
 T0 = time.time()
 
 def fnv(t):  # index.html の ttsKey と同じ(UTF-16 の1単位ずつ FNV-1a、うしろに UTF-16 の長さを36進で)
@@ -29,10 +32,11 @@ def fnv(t):  # index.html の ttsKey と同じ(UTF-16 の1単位ずつ FNV-1a、
 def to_mp3(src, dst):
     subprocess.run(["ffmpeg", "-loglevel", "error", "-y", "-i", src, "-ac", "1", "-ar", "24000", "-b:a", "40k", dst], check=True)
 
-def vv(text, dst):
-    q = urllib.request.urlopen(urllib.request.Request(f"{VV_URL}/audio_query?" + urllib.parse.urlencode({"text": text, "speaker": VV_SPEAKER}), method="POST"), timeout=120).read()
+def vv(text, dst, spk=None):
+    spk = VV_SPEAKER if spk is None else spk
+    q = urllib.request.urlopen(urllib.request.Request(f"{VV_URL}/audio_query?" + urllib.parse.urlencode({"text": text, "speaker": spk}), method="POST"), timeout=120).read()
     j = json.loads(q); j["speedScale"] = 1.08; j["prePhonemeLength"] = 0.05; j["postPhonemeLength"] = 0.12
-    wav = urllib.request.urlopen(urllib.request.Request(f"{VV_URL}/synthesis?speaker={VV_SPEAKER}", data=json.dumps(j).encode(), headers={"Content-Type": "application/json"}, method="POST"), timeout=300).read()
+    wav = urllib.request.urlopen(urllib.request.Request(f"{VV_URL}/synthesis?speaker={spk}", data=json.dumps(j).encode(), headers={"Content-Type": "application/json"}, method="POST"), timeout=300).read()
     open("/tmp/vv.wav", "wb").write(wav); to_mp3("/tmp/vv.wav", dst)
 
 def gg(text, dst):
@@ -54,22 +58,42 @@ def main():
     vv_ok = True
     try: urllib.request.urlopen(VV_URL + "/version", timeout=10).read()
     except Exception as e: vv_ok = False; log.append(f"VOICEVOX に つながらない: {e}")
-    for src in ("vv", "gg"):
-        os.makedirs(os.path.join(out, "tts", src), exist_ok=True)
-    made = {"vv": 0, "gg": 0}; kept = {"vv": 0, "gg": 0}; stopped = False
+    # ペットの声: キャラ名から id を探す(スタイルは「ノーマル」、なければ最初)
+    spk = {}
+    if vv_ok:
+        try:
+            sp = json.loads(urllib.request.urlopen(VV_URL + "/speakers", timeout=30).read())
+            norm = lambda x: x.replace("/", "").replace(" ", "").replace("＿", "_")
+            for src, name in PET_VOICES:
+                hit = [c for c in sp if norm(c.get("name", "")) == norm(name)]
+                if not hit: log.append(f"{name} の声が見つからない"); continue
+                st = hit[0].get("styles", []); n = [x for x in st if x.get("name") == "ノーマル"] or st
+                if n: spk[src] = n[0]["id"]; idx["voices"][src] = "VOICEVOX:" + name
+        except Exception as e: log.append(f"声の一覧が読めない: {e}")
+    srcs = ["vv", "gg"] + [s for s, _ in PET_VOICES if s in spk]
+    for src in srcs:
+        idx.setdefault(src, {}); os.makedirs(os.path.join(out, "tts", src), exist_ok=True)
+    made = {s: 0 for s in srcs}; kept = {s: 0 for s in srcs}; stopped = False
+    def one(src, key, text):
+        nonlocal used, stopped
+        dst = os.path.join(out, "tts", src, key + ".mp3"); old = os.path.join(prev, "tts", src, key + ".mp3")
+        if os.path.exists(old):
+            shutil.copy(old, dst); idx[src][key] = 1; kept[src] += 1; return
+        if time.time() - T0 > TIME_BUDGET: stopped = True; return
+        try:
+            if src == "vv" and vv_ok: vv(text, dst)
+            elif src == "gg" and GG_KEY and used + len(text) <= GG_MONTH_CAP: gg(text, dst); used += len(text)
+            elif src in spk: vv(text, dst, spk[src])
+            else: return
+            idx[src][key] = 1; made[src] += 1
+        except Exception as e:
+            log.append(f"{src} でエラー: {str(e)[:200]} 文: {text[:30]}")
+    # ずんだもん・Google を先にぜんぶ → そのあとペットの声を文の順に(どの子も「今日のニュースを聞く」から先にそろう)
     for key, text in plan:
-        for src in ("vv", "gg"):
-            dst = os.path.join(out, "tts", src, key + ".mp3"); old = os.path.join(prev, "tts", src, key + ".mp3")
-            if os.path.exists(old):
-                shutil.copy(old, dst); idx[src][key] = 1; kept[src] += 1; continue
-            if time.time() - T0 > TIME_BUDGET: stopped = True; continue
-            try:
-                if src == "vv" and vv_ok: vv(text, dst)
-                elif src == "gg" and GG_KEY and used + len(text) <= GG_MONTH_CAP: gg(text, dst); used += len(text)
-                else: continue
-                idx[src][key] = 1; made[src] += 1
-            except Exception as e:
-                log.append(f"{src} でエラー: {str(e)[:200]} 文: {text[:30]}")
+        for src in ("vv", "gg"): one(src, key, text)
+    for key, text in plan:
+        for src, _ in PET_VOICES:
+            if src in spk: one(src, key, text)
     idx["ggUsed"][month] = used
     idx["made"] = made; idx["kept"] = kept; idx["plan"] = len(plan); idx["stopped"] = stopped
     idx["at"] = time.strftime("%Y-%m-%dT%H:%M:%S+09:00", time.gmtime(time.time() + 9 * 3600))
