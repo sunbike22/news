@@ -56,7 +56,7 @@
 :root[data-size="l"]{--fs:18px} :root[data-size="xl"]{--fs:20px} :root[data-size="xxl"]{--fs:23px}
 *{box-sizing:border-box}
 /* ボタン・札・見出しは、ことばの途中で折り返さない(「1本ガ/チャ」「読み上/げ」のようにならない)。折り返すのは空白のところだけ。それでも入らないときだけ、ことばの途中で折る(2026-10-27) */
-.seg button,.fchip,.chip,.sub,.jmp,.sbtn,.iconbtn,.tabs button,.ttl,.wx-sky,[class^="res-"],[class*=" res-"]{word-break:keep-all;overflow-wrap:break-word}
+.seg button,.fchip,.chip,.sub,.jmp,.sbtn,.iconbtn,.tabs button,[class^="res-"],[class*=" res-"]{word-break:keep-all;overflow-wrap:break-word}
 .fchip,.chip,.jmp{max-width:100%}
 [hidden]{display:none!important}
 body{margin:0}
@@ -1468,6 +1468,20 @@ ul.ex-rel{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;
 #swBack{position:fixed;left:8px;top:50%;z-index:95;transform:translateY(-50%);background:var(--surface);color:var(--ink);border:2px solid var(--ink);border-radius:999px;padding:8px 14px;font-weight:800;font-size:.95rem;box-shadow:2px 2px 0 var(--ink);opacity:.75;pointer-events:none}
 #swBack.ok{opacity:1;background:var(--ink);color:var(--bg)}
 @media (prefers-reduced-motion: reduce){.hello-av svg{animation:none}:is(.fchip,.three .t,.listen-big,.iconbtn,.seg button,.opt,.tabs button,.ten .row,.mascot-av,.hello-av,.pet-av):active{transform:none}}
+
+/* ===== 2026-11-17 大事なところを目立たせる・呼び名 ===== */
+:root{--hl:#ffe58a}
+:root[data-theme="dark"]{--hl:rgba(255,214,0,.30)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--hl:rgba(255,214,0,.30)}}
+mark.hl{background:linear-gradient(transparent 55%,var(--hl) 55%);color:inherit;padding:0 1px}
+b.kn{font-weight:800;text-decoration:underline 3px color-mix(in srgb,var(--accent) 55%,transparent);text-underline-offset:3px;text-decoration-skip-ink:none}
+.kt{display:flex;flex-direction:column;gap:6px;margin:4px 0 0;line-height:1.75}
+.kt-l{display:block}.kt-l .src-i{white-space:normal}
+.kt-new{display:inline-block;font-size:.82rem;margin-right:4px}
+.kt-old{color:var(--muted);font-size:.9rem;border-top:1px dashed var(--line);padding-top:6px}
+.ten-pt{margin:6px 0 2px;padding:8px 10px;border-radius:10px;background:var(--surface2);border-left:4px solid var(--accent);font-weight:700;line-height:1.6}
+.nick-row{display:flex;gap:8px;align-items:center;margin-top:8px}.nick-row input{flex:1;min-width:0;font-size:1rem;padding:10px 12px;border:1px solid var(--line);border-radius:10px;background:var(--surface);color:var(--ink)}
+.hello-nick{font-weight:800}
 </style>
 </head>
 <body>
@@ -1503,6 +1517,11 @@ const D = window.NEWS_DATA;
   Object.values(D.explainers||{}).forEach(e=>{ if(!e) return; if(typeof e.more==="string") e.more=e.more.split(",").length===2?e.more.split(","):[e.more];
     ["more","faq","timeline","us","next","cast","flow"].forEach(f=>{ if(e[f]!==undefined) e[f]=arr(e[f]); });
     ["name","now","kid"].forEach(f=>{ if(typeof e[f]!=="string") e[f]=e[f]==null?"":String(e[f]); }); }); })();
+/* 2026-11-17: 文の中の大事なところ「**…**」(サイト更新が付ける)は、画面では蛍光ペンにする。読み上げ・画像・検索などほかの使い道では ** を消した文を使う(元の文は xM に残す) */
+(()=>{ const st=v=>typeof v==="string"?v.replace(/\*\*/g,""):v; const mk=(o,f)=>{ if(o&&typeof o[f]==="string"&&o[f].includes("**")){ o[f+"M"]=o[f]; o[f]=st(o[f]); } };
+  (D.three||[]).forEach(x=>{ mk(x,"text"); mk(x,"title"); }); (D.top10||[]).forEach(x=>{ mk(x,"text"); mk(x,"point"); mk(x,"title"); mk(x,"s"); });
+  Object.values(D.explainers||{}).forEach(e=>{ if(!e) return; ["kid","now"].forEach(f=>mk(e,f));
+    ["more","us"].forEach(f=>{ if(Array.isArray(e[f])&&e[f].some(v=>typeof v==="string"&&v.includes("**"))){ e[f+"M"]=e[f].slice(); e[f]=e[f].map(st); } }); }); })();
 const main = document.getElementById("main");
 // ===== 上に重なる画面(#sheet)の「← もどる」を、ひとつ前の画面にもどす =====
 // 画面の上で別の画面を開いたら、前の画面(中身・押せるところ・どこまで読んだか)をそのまま取っておき、
@@ -2195,7 +2214,7 @@ function renderToday(){
   S.weather=weatherCard();
   S.three=`<section aria-label="今日の3行">
       <div class="sec-h"><h2>☀️ 今日の3行</h2>${EN?langSeg():`<span class="sub">時間がない日はここだけでOK</span>`}</div>
-      <div class="three" style="margin-top:10px">${D.three.map((x,i)=>{ const e=enOf("three",i); const en1=langMode()==="en"&&e; return `<button class="t ${x.tone}"${exLink(x.ex)}>${en1?`<h3 lang="en">${esc(e.t)}</h3><p lang="en">${esc(e.x||"")}</p><p class="jsub">${esc(x.title)}</p>`:`<h3>${esc(x.title)}</h3><p>${esc(x.text)}</p>${enBlock(e)}`}${en1?`<span class="ensay" role="button" tabindex="0" data-say="${esc(e.t+". "+(e.x||""))}">🔊 English</span>`:""}${x.ex?'<span class="more">くわしく →</span>':''}</button>`; }).join("")}</div>
+      <div class="three" style="margin-top:10px">${D.three.map((x,i)=>{ const e=enOf("three",i); const en1=langMode()==="en"&&e; return `<button class="t ${x.tone}"${exLink(x.ex)}>${en1?`<h3 lang="en">${esc(e.t)}</h3><p lang="en">${esc(e.x||"")}</p><p class="jsub">${esc(x.title)}</p>`:`<h3>${kn(hlMk(esc(x.titleM||x.title)))}</h3><p class="kt">${keyText(x.textM||x.text)}</p>${enBlock(e)}`}${en1?`<span class="ensay" role="button" tabindex="0" data-say="${esc(e.t+". "+(e.x||""))}">🔊 English</span>`:""}${x.ex?'<span class="more">くわしく →</span>':''}</button>`; }).join("")}</div>
       <button class="fchip" id="shareImg" style="margin-top:10px">🖼️ 画像にして送る</button>
     </section>`;
   S.ten=`<section aria-label="今日のニュース10">
@@ -2207,8 +2226,8 @@ function renderToday(){
         return `<li class="${big?'big':''} w${wt.lv}${mine?' mytown':''}">${pinBtn({k:"t|"+n.title,h:n.title,g:n.g,d:(NEWS[0]||{}).d,ex:n.ex},"abs")}<button class="row${link?' link':''}"${n.ex?` data-ex="${n.ex}"`:''}${n.tab?` data-tab="${n.tab}"`:''}${nv?` data-nv="${esc(nv)}"`:''} ${link?'':'tabindex="-1"'}>
           <span class="rank">${i+1}</span>
           <span>${big&&ILL[n.ill||n.ex]?`<div class="ill">${ILL[n.ill||n.ex]}</div>`:""}<span class="meta"><span class="chip ${n.g}">${GN[n.g]}</span>${topicChip(n)}${whoChip(n)}${n.ok?`<span class="badge-ok tap" role="button" tabindex="0" data-trust="${esc(n.title)}" data-ok="1" title="タップで出典">✅<small style="font-size:.82rem;font-weight:700;margin-left:2px">確認ずみ</small></span>`:`<span class="badge-one tap" role="button" tabindex="0" data-trust="${esc(n.title)}" data-ok="0" title="タップでわけ">⚠️ 1社</span>`}${mine?'<span class="heat town">🏠 あなたの街</span>':""}${wt.lv>=2?`<span class="heat" title="この3日で関連ニュース${wt.n}件">🔥</span>`:""}</span>
-          ${(()=>{ const e=enOf("top10",i); if(langMode()==="en"&&e) return `<h3 lang="en">${n.icon} ${esc(e.t)}</h3>${e.x?`<p lang="en">${esc(e.x)}</p>`:""}<p class="jsub">${esc(n.title)}</p>${(e.w||[]).length?`<span class="enw">${e.w.map(([a,b])=>`<i>📘 ${esc(a)} = ${esc(b)}</i>`).join("")}</span>`:""}<span class="ensay" role="button" tabindex="0" data-say="${esc(e.t+". "+(e.x||""))}">🔊 English</span>`; return `<h3>${n.icon} <span class="tl-long">${esc(n.title)}</span>${n.s?`<span class="tl-s">${esc(n.s)}</span>`:""}</h3>${n.text?`<p>${esc(n.text)}</p>`:""}${enBlock(e)}`; })()}
-          ${srcLine(n)}<span class="ten-ft">${link?`<span class="more">${n.ex?'くわしい解説 →':n.tab?'グラフを見る →':'📰 くわしく →'}</span>`:''}<span class="sh-btn" role="button" tabindex="0" data-share="t:${i}" aria-label="このニュースを送る">📤 送る</span></span></span>${thumbHTML(n)}</button>${n.point?`<details class="pt"><summary>💭 ここがポイント</summary>${esc(n.point)}</details>`:""}</li>`;}).join("")}</ol>
+          ${(()=>{ const e=enOf("top10",i); if(langMode()==="en"&&e) return `<h3 lang="en">${n.icon} ${esc(e.t)}</h3>${e.x?`<p lang="en">${esc(e.x)}</p>`:""}<p class="jsub">${esc(n.title)}</p>${(e.w||[]).length?`<span class="enw">${e.w.map(([a,b])=>`<i>📘 ${esc(a)} = ${esc(b)}</i>`).join("")}</span>`:""}<span class="ensay" role="button" tabindex="0" data-say="${esc(e.t+". "+(e.x||""))}">🔊 English</span>`; return `<h3>${n.icon} <span class="tl-long">${kn(hlMk(esc(n.titleM||n.title)))}</span>${n.s?`<span class="tl-s">${kn(hlMk(esc(n.sM||n.s)))}</span>`:""}</h3>${n.point&&(LOOK.len||"short")!=="short"?`<p class="ten-pt">👉 ${kn(hlMk(esc(n.pointM||n.point)))}</p>`:""}${n.text?`<p class="kt">${keyText(n.textM||n.text)}</p>`:""}${enBlock(e)}`; })()}
+          ${srcLine(n)}<span class="ten-ft">${link?`<span class="more">${n.ex?'くわしい解説 →':n.tab?'グラフを見る →':'📰 くわしく →'}</span>`:''}<span class="sh-btn" role="button" tabindex="0" data-share="t:${i}" aria-label="このニュースを送る">📤 送る</span></span></span>${thumbHTML(n)}</button>${n.point&&(LOOK.len||"short")==="short"?`<details class="pt"><summary>💭 ここがポイント</summary>${kn(hlMk(esc(n.pointM||n.point)))}</details>`:""}</li>`;}).join("")}</ol>
       ${thumbCredit(t)}
     </section>`;
   S.mood=moodCard();
@@ -2726,8 +2745,25 @@ function exTocHTML(e){ const L=[e.manga&&["ex-mg","🎨 4コマ"],["ex-more","�
   return `<nav class="ex-toc" aria-label="このページの中身"><span class="ex-toc-l">このページ</span>${L.map(([id,t])=>`<button data-exj="${id}">${t}</button>`).join("")}</nav>
     <div class="hint" style="margin-top:-8px">点線のことばは、タップすると意味が出ます。</div>`; }
 // 本文の中の「(中日新聞)」「(CBC・TBS)」のような出典のかっこは、文の流れをじゃましないよう小さくうすく(2026-11-10)
+// ===== ✨ 大事なところを目立たせる(2026-11-17) =====
+// ①「**…**」=サイト更新がえらんだ、その文でいちばん伝えたいところ → 蛍光ペン(mark.hl)
+// ② 数字(◯円・◯%・◯人・震度・◯年ぶり・過去最高 など)→ 太字+下線(b.kn)。文を変えず、見た目だけ変える。
+const KN_RX=/((?:約|およそ|最大|最高|最低|計|少なくとも|前年比|前日比)?[+＋−\-]?\d[\d,，.]*(?:万|億|兆)?\d*[\d,，.]*(?:円|ドル|ユーロ|元|%|％|ポイント|人|件|機|棟|台|倍|か国|カ国|社|校|頭|戸|隻|発|議席|票|km|キロ|メートル|トン|ミリ|回目|回|位|番目|か月ぶり|年ぶり|期ぶり|週ぶり|日ぶり|年連続|日連続)(?:安|高|減|増|超|以上|割れ)?|震度\d[強弱]?|M\d(?:\.\d)?|歴代\d+番目|過去最[高低大小多少悪]|史上初|初めて)/g;
+function kn(html){ return String(html).replace(/(<[^>]+>)|([^<]+)/g,(m,tag,text)=>tag?tag:text.replace(KN_RX,'<b class="kn">$1</b>')); }
+function hlMk(escHtml){ return String(escHtml).replace(/\*\*([^*<>]{1,80}?)\*\*/g,'<mark class="hl">$1</mark>').replace(/\*\*/g,""); }
+// 長い文を「いちばん大事な1文(蛍光ペン)」と「そのほか(出典は小さく)」に分ける。「🆕」「これまで:」で行を分ける。
+function keyText(raw,opt){ opt=opt||{}; const t=String(raw||""); if(!t) return "";
+  const hasMk=/\*\*[^*]+\*\*/.test(t);
+  const segs=t.split(/(?=🆕)|(?=これまで[:：])/).map(x=>x.trim()).filter(Boolean);
+  return segs.map((sg,si)=>{ const isOld=/^これまで[:：]/.test(sg); const isNew=/^🆕/.test(sg); let body=sg.replace(/^🆕\s*/,"");
+    let lead="", rest=body;
+    if(!hasMk&&si===0&&!isOld){ const m=/^[^。]*。/.exec(body); if(m&&m[0].length<=90){ lead=m[0]; rest=body.slice(m[0].length); } }
+    const f=x=>kn(srcSoft(hlMk(esc(x))));
+    const head=isNew?'<span class="kt-new">🆕</span>':isOld?'':'';
+    const html=(lead?`<mark class="hl">${kn(srcSoft(esc(lead.replace(/\*\*/g,""))))}</mark>`:"")+f(rest);
+    return `<span class="kt-l${isOld?" kt-old":""}">${head}${html}</span>`; }).join(""); }
 function srcSoft(h){ return String(h).replace(/[（(]([^（(）)<>]{1,60})[）)]/g,(m,x)=>{ try{ return ttsIsSrc(x)?`<span class="src-i">${m}</span>`:m; }catch(_){ return m; } }); }
-function exTxt(t){ return glossify(srcSoft(esc(t))); }
+function exTxt(t){ return kn(glossify(srcSoft(hlMk(esc(t))))); }
 function exParas(t){ const S=String(t||"").split(/(?<=。)/).map(x=>x.trim()).filter(Boolean); const P=[]; for(let i=0;i<S.length;i+=2) P.push(S.slice(i,i+2).join(""));
   return P.map(x=>`<p class="ex-p">${exTxt(x)}</p>`).join(""); }
 // 🔎 ひと目でわかる(2026-11-10): 解説にすでに書いてあること(最新の流れ・出てくる人・次の山場・わたしへの影響)を、絵の札で1枚に
@@ -2770,7 +2806,7 @@ function openEx(k){
     <div class="hp-line">${helpBtn("ex","この画面の読み方")}</div>
     ${e.manga?`<div id="ex-mg">${mangaHTML(e.manga)}</div>`:""}
     ${LOOK.mode==="easy"?`<details class="faq plain exmore"><summary>📖 もっとくわしく見る(くわしい説明・出てくる人・動く図)</summary>`:""}
-    <div class="blk" id="ex-more"><h3>💡 もう少しくわしく</h3><p class="ex-lead"><mark class="hl">${exTxt(e.more[0])}</mark></p>${exParas(e.more[1])}</div>
+    <div class="blk" id="ex-more"><h3>💡 もう少しくわしく</h3><p class="ex-lead"><mark class="hl">${exTxt((e.moreM||e.more)[0]).replace(/<\/?mark[^>]*>/g,"")}</mark></p>${exParas((e.moreM||e.more)[1])}</div>
     ${castBlock(e)}
     ${e.stats?`<div class="stats">${e.stats.map(([k2,v])=>`<div class="stat"><div class="v num">${esc(v)}</div><div class="k">${esc(k2)}</div></div>`).join("")}</div>`:""}
     <div class="blk"><h3>🖼️ 動く図でわかる <button class="fplay" id="fplay">▶ もう一度</button></h3><div class="flow" id="flow">${flow}</div></div>
@@ -4365,14 +4401,31 @@ const MASCOT={
   plan:["fortune",["未来を予想するのはむずかしい…でも当たるとうれしい!","📰 未来の新聞、のぞいてみる?","きみも予想して、ぼくと勝負しよう!"]],
   words:["book",["知らないことばは、ここでしらべよう。","ことばを調べると、ぼくも少し育つよ。"]]
 };
+// ===== 👤 呼び名(2026-11-17): スマホの中だけの、かんたんなアカウント名。どこにも送らない(記録の引っこし・Googleに記録をあずける には入る) =====
+function nickName(){ return String(ME.nick||"").trim(); }
+function nickClean(v){ return String(v||"").normalize("NFC").replace(/[\u0000-\u001f\u007f<>"'`\\]/g,"").replace(/\s+/g," ").trim().slice(0,12); }
+function nickHTML(){ const n=nickName(); return `<section class="card" id="nickCard"><b>👤 あなたの呼び名</b>
+  <div class="hint" style="margin-top:4px">ペットや画面が、この名前で呼びかけます。名前はこのスマホの中だけに入り、どこにも送られません。別のスマホに移すときは「記録をとっておく」でいっしょに移ります。</div>
+  <div class="nick-row"><input id="nickIn" maxlength="12" autocomplete="nickname" placeholder="例: すぐる(12文字まで)" value="${esc(n)}" aria-label="呼び名"><button class="fchip" id="nickSave">保存</button></div>
+  ${n?`<button class="linkish" id="nickDel" style="margin-top:6px">呼び名を消す</button>`:""}</section>`; }
+function nickSave(card){ const i=card.querySelector("#nickIn"); const v=nickClean(i&&i.value); if(!v){ toast("呼び名を入れてください"); i&&i.focus(); return false; } ME.nick=v; saveMe(); try{ track("/nick/set"); }catch(_){} toast(`${v}さん、よろしくね!`); return true; }
+function nickAfter(card){ const sh=document.getElementById("sheet"); if(card.closest("#sheet")){ sh.hidden=true; sh.innerHTML=""; if(current==="today") renderToday(); } else card.outerHTML=nickHTML(); }
+document.addEventListener("click",e=>{ const card=e.target.closest("#nickCard"); if(!card) return;
+  if(e.target.closest("#nickSave")){ if(nickSave(card)) nickAfter(card); }
+  else if(e.target.closest("#nickDel")){ delete ME.nick; saveMe(); toast("呼び名を消しました"); nickAfter(card); } });
+document.addEventListener("keydown",e=>{ if(e.key!=="Enter"||!e.target.matches||!e.target.matches("#nickIn")) return; e.preventDefault(); const card=e.target.closest("#nickCard"); if(card&&nickSave(card)) nickAfter(card); });
+function openNick(){ const sh=document.getElementById("sheet");
+  sh.innerHTML=`<div class="bar"><button class="iconbtn" id="nkBack">← もどる</button><div class="ttl">👤 呼び名</div></div><div class="wrap" style="padding:14px 16px 40px">${nickHTML()}</div>`;
+  sh.hidden=false; document.getElementById("nkBack").onclick=()=>{ sh.hidden=true; sh.innerHTML=""; }; setTimeout(()=>{ const i=document.getElementById("nickIn"); i&&i.focus(); },150); }
+document.addEventListener("click",e=>{ if(e.target.closest("[data-nick]")){ e.preventDefault(); openNick(); } });
 // ===== 🐣 「きょう」のいちばん上のあいさつ(2026-11-16): いまのペットが出迎える。押すとなでられて、ひとことが変わる =====
 function helloGreet(){ const h=new Date(Date.now()+9*3600e3).getUTCHours(); return h<4?"夜ふかしさんだね🌙":h<10?"おはよう!":h<17?"こんにちは!":h<22?"こんばんは!":"今日もおつかれさま🌙"; }
 function helloLines(){ const st=petStage(); if(st.i===0) return ["コトコト…たまごがゆれた!","(なかで、なにかが動いた気がする…)","あたたかいね。ニュースを読むと、もうすぐ生まれるよ"];
   return ["えへへ、くすぐったい!","いっしょに読むと、ニュースってこわくないね","きょうの3行だけでも読めたら、えらい!","わからないことばは、点線をタップしてね","ぼく、きのうより ちょっと賢くなった気がする!","クイズに正解すると、ごはんがもらえるんだ🍙","おすすめは「💡 解説」。むずかしい話もやさしくなるよ"]; }
 function helloCard(){ if(LOOK.mascot===false) return ""; const st=petStage(); const mood=petMood(); const acc=petTopGenre(); const p=petInit();
   return `<section class="hello" aria-label="${esc(petName())}のあいさつ"><button class="hello-av" data-hello="0" aria-label="${esc(petName())}をなでる">${petSVG(st.i,mood,acc&&PET_ACC[acc][0],68,petWear()||"newsboy")}</button>
-    <div class="hello-b"><b class="hello-h">${esc(helloGreet())}</b><span class="hello-t">${esc(petLine(mood,st))}</span>
-      <span class="hello-go">${p.food>0&&st.i>0?`<button class="fchip pet-feed" data-feed="1">🍙 ×${p.food} あげる</button>`:""}<button class="fchip" data-tab="my">🏠 ${esc(petName())}のへや</button></span></div></section>`; }
+    <div class="hello-b"><b class="hello-h">${nickName()?`<span class="hello-nick">${esc(nickName())}さん</span>、`:""}${esc(helloGreet())}</b><span class="hello-t">${esc(petLine(mood,st))}</span>
+      <span class="hello-go">${p.food>0&&st.i>0?`<button class="fchip pet-feed" data-feed="1">🍙 ×${p.food} あげる</button>`:""}<button class="fchip" data-tab="my">🏠 ${esc(petName())}のへや</button>${nickName()?"":`<button class="fchip" data-nick="1">✏️ 呼び名をきめる</button>`}</span></div></section>`; }
 document.addEventListener("click",e=>{ const b=e.target.closest(".hello-av"); if(!b) return; const L=helloLines(); const i=(+b.dataset.hello+1)%L.length; b.dataset.hello=i;
   const t=b.parentElement.querySelector(".hello-t"); if(t) t.textContent=L[i]; const sv=b.querySelector("svg"); if(sv){ sv.classList.remove("eat"); void sv.getBoundingClientRect(); sv.classList.add("eat"); } });
 function mascot(page){ if(LOOK.mascot===false) return ""; const m=MASCOT[page]; if(!m) return ""; const L=m[1].map(x=>typeof x==="function"?x():x); const st=petStage(); const i=(new Date().getMinutes())%L.length;
@@ -5191,6 +5244,7 @@ function openShimen(){ const sh=document.getElementById("sheet"); const w=D.weat
 document.addEventListener("click",e=>{ const b=e.target.closest("[data-shimen]"); if(!b) return; e.preventDefault(); openShimen(); });
 // ===== お知らせ(新しくなったところ)。機能を足したら、いちばん上に1つ足す =====
 const UPDATES=[
+  {id:"2026-11-17a",d:"2026-11-17",t:"✨ 大事なところが目立つように・👤 呼び名",L:["今日の3行・ニュース10・解説で、いちばん伝えたい1文に黄色い線、数字(◯円・◯%・震度など)に太字と下線をつけました。ニュース10を「くわしく」にすると、上に「👉 ひとことで」が出ます。","「きょう」のペットのところや マイ→⚙️設定 で「呼び名」をきめると、ペットが名前で呼んでくれます。名前はスマホの中だけに入り、どこにも送られません。"]},
   {id:"2026-11-16a",d:"2026-11-16",t:"🐣 ペットが出むかえ・スワイプでもどる・文を最後まで",L:["「きょう」のいちばん上で、あなたのペットがあいさつします。押すとなでられて、ひとことが変わります。","上に重なった画面は、右へ指でなぞると「← もどる」と同じように1つ前へ。スマホの「もどる」でも、アプリから出ずにもどれます。","見出しや説明が「…」で途中で切れていたところを、最後まで読めるようにしました。見出しの文字や押したときの動きも、少しにぎやかにしました。"]},
   {id:"2026-11-10a",d:"2026-11-10",t:"💡 解説ページを見やすくしました",L:["上に「🔎 ひと目でわかる」(いま・だれ・わたしへ・つぎ)を足しました。","「これまでの流れ」を縦の年表にして、文が途中で切れずに全部読めるようにしました(古い出来事はたたんであります)。「動く図」も番号と矢印で流れがわかる形に。","文の中の出典(新聞社などの名前)は小さくうすく、予定のカードは文を横いっぱいに出すようにしました。"]},
   {id:"2026-11-07b",d:"2026-11-07",t:"🗣️ 読みまちがいを作った人に知らせられるように",L:["「AI」を「あい」と読んでいたのを「エーアイ」に直しました。NHK・TBS などの英字の略語も1文字ずつ読みます。","「🔊 今日のニュースを聞く」の下の「🗣️ 読み方がおかしいときは →」から、まちがえたことばを作った人に知らせられます。たしかめてから、みんなの読み上げを直します。","📖 使い方ガイドの説明ごとに「👍 わかった / 🤔 わかりにくい」を押せるようにしました。わかりにくいところから直していきます。"]},
@@ -5375,7 +5429,7 @@ function updCard(){ const u=UPDATES[0]; const n=updUnread();
 // HELP=[キー, 絵文字, 見出し, [文…]]。画面のあちこちの「？ これは何?」(helpBtn(キー))から、その見出しを開く。機能を足したらここも直す。
 const HELP=[
   ["start","🚀","まずはここから",["時間がない日は<b>☀️ 今日の3行</b>だけ読めばOKです。","<b>📰 今日のニュース10</b>は、その日に関心が高かった順のニュースです。見出しを押すと、くわしいページが開きます。","<b>🔊 聞く</b>を押すと、天気とニュースを声で読み上げます。","わからないことがあったら、画面の<b>「？ これは何?」</b>を押してください。その場所の説明が出ます。","上に重なった画面は、<b>画面を右へ指でなぞる</b>と、「← もどる」を押したのと同じように1つ前の画面にもどります。スマホの「もどる」でももどれます。"]],
-  ["marks","🔖","マークの意味",["<b>✅ 確認ずみ</b>…別々の報道機関<b>2社以上</b>が伝えたニュース。","<b>⚠️</b>…まだ1社だけ・見出しだけのニュース。あとで確かめられたら✅に変わります。","<b>📌 話題</b>…レシピ・新商品・イベント・研究など、暮らしや趣味の話題。会社や役所の発表から集めています(ニュース10には入りません)。","✅や⚠️を<b>押すと</b>、どこが伝えたかが出ます。","<b>点線のことば</b>は、押すと意味が出ます。","<b>💗</b> あなたが選んだ「好きなこと」のニュース ／ <b>🙋</b> あなたのくらしに関係ありそう ／ <b>🏠</b> わたしの街のニュース ／ <b>🆕・NEW</b> 前に開いたあとに増えたもの。"]],
+  ["marks","🔖","マークの意味",["<mark class=\"hl\">黄色い線</mark>…その話で、いちばん伝えたいところ。<b class=\"kn\">太字に下線</b>…大事な数字(金額・%・人数など)。","<b>✅ 確認ずみ</b>…別々の報道機関<b>2社以上</b>が伝えたニュース。","<b>⚠️</b>…まだ1社だけ・見出しだけのニュース。あとで確かめられたら✅に変わります。","<b>📌 話題</b>…レシピ・新商品・イベント・研究など、暮らしや趣味の話題。会社や役所の発表から集めています(ニュース10には入りません)。","✅や⚠️を<b>押すと</b>、どこが伝えたかが出ます。","<b>点線のことば</b>は、押すと意味が出ます。","<b>💗</b> あなたが選んだ「好きなこと」のニュース ／ <b>🙋</b> あなたのくらしに関係ありそう ／ <b>🏠</b> わたしの街のニュース ／ <b>🆕・NEW</b> 前に開いたあとに増えたもの。"]],
   ["ten","📰","ニュース10の読み方",["上から順に、その日に大きく伝えられたニュースです。","右上の<b>「短く／くわしく」</b>で、見出しだけにするか、説明も出すかを切りかえられます。","<b>「くわしい解説 →」</b>があるものは、図や流れつきの解説ページが読めます。","<b>🏷️ 保存</b>で「マイ」にとっておけます。<b>📤 送る</b>で家族や友だちに見出しを送れます(あなたの記録は送りません)。"]],
   ["ex","💡","解説ページの読み方",["大きな話題を1つずつ、やさしく説明するページです。上から読めば全体がわかります。","<b>ひとことで言うと</b>…まずここだけ読めば大まかにわかります。","<b>目次</b>を押すと、その場所に飛びます。","<b>🙋 わたしたちへの影響</b>…くらしにどう関係するか。","<b>📅 流れ</b>…これまでに起きたことの年表。<b>🔭 これから</b>…次に注目する日。","<b>🔔 続きを追う</b>を押すと、新しい動きがあったとき「きょう」でお知らせします。","<b>💬 話しながら読む</b>・<b>📖 連載で読む</b>…同じ中身を、会話や1日1話の形で読めます。","画面を<b>左右にすべらせる</b>と、前後の解説に移ります。"]],
   ["manga","🎨","4コマの見かた",["解説の中身を、4つのコマで説明するマンガです。","左にいるのは<b>あなたのペット</b>(名札はペットの名前)。ニュースにくわしくない生徒で、わたしたちと同じ立場で質問します。","右の<b>🦉 ホー先生</b>がやさしく答えます。","上から<b>①はてな? → ②なにがあった? → ③どうなるの? → ④これから</b>の順に読みます。","いちばん下の<b>📝 ホー先生の黒板</b>が、まとめです。"]],
@@ -5457,6 +5511,7 @@ function renderMy(){
     </div>
     <div class="mysec" data-mysec="set" ${MYTAB==="set"?"":"hidden"}>
     <nav class="set-toc" id="setToc" aria-label="設定の目次"></nav>
+    ${nickHTML()}
     ${updCard()}
     ${installCard()}
     ${backupHTML()}

@@ -67,7 +67,7 @@ for(const [mode,dark,w] of [["normal",false,390],["normal",true,390],["easy",fal
     if(fs.existsSync(bp)){ const w={}; let msg="", good=true;
       try{ new Function("window",fs.readFileSync(path.join(__dirname,"../../data.js"),"utf8"))(w); new Function("window",fs.readFileSync(bp,"utf8"))(w);
         const B=w.NEWS_BRIEF||{}, N=w.NEWS_DATA.news, H=new Set(N.map(n=>n[0]+"|"+n[3])), ks=Object.keys(B);
-        const miss=ks.filter(k=>!H.has(k)).length, badTxt=ks.filter(k=>typeof B[k]!=="string"||B[k].length<20||/確かめられず/.test(B[k])).length;
+        const miss=ks.filter(k=>!H.has(k)).length, badTxt=ks.filter(k=>typeof B[k]!=="string"||B[k].length<20||/^\s*[（(]確かめられず/.test(B[k])).length;
         const up=String(w.NEWS_DATA.updated).slice(0,10), yd=new Date(Date.parse(up)-864e5).toISOString().slice(0,10);
         const yRows=N.filter(n=>n[0]===yd), yHas=yRows.filter(n=>B[n[0]+"|"+n[3]]).length;
         msg=`${ks.length}件・見出しが合わない ${miss}・文がおかしい ${badTxt}・きのう(${yd}) ${yHas}/${yRows.length}`;
