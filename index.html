@@ -1589,6 +1589,8 @@ b.kn{font-weight:800;text-decoration:underline 3px color-mix(in srgb,var(--accen
 #sayBar{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom));z-index:60;display:flex;align-items:center;gap:10px;padding:8px 8px 8px 16px;border-radius:999px;background:var(--ink);color:var(--bg);box-shadow:0 4px 14px rgba(0,0,0,.25);font-weight:700;max-width:calc(100% - 32px)}
 #sayBar[hidden]{display:none}
 #sayBar button{min-height:44px;padding:0 16px;border-radius:999px;border:0;background:var(--bg);color:var(--ink);font:inherit;font-weight:800;cursor:pointer}
+
+.th-art{padding:0!important;overflow:hidden}.th-art svg{width:100%;height:100%}
 </style>
 </head>
 <body>
@@ -5562,6 +5564,7 @@ function openShimen(){ const sh=document.getElementById("sheet"); const w=D.weat
 document.addEventListener("click",e=>{ const b=e.target.closest("[data-shimen]"); if(!b) return; e.preventDefault(); openShimen(); });
 // ===== お知らせ(新しくなったところ)。機能を足したら、いちばん上に1つ足す =====
 const UPDATES=[
+  {id:"2026-11-17i",d:"2026-11-17",t:"🖼️ ジャンルの絵・🏁 解説の「はじまり」",L:["写真がないニュースや、同じ写真が続くところに、ジャンルごとの絵(政治=議事堂、経済=グラフ など)を出すようにしました。","解説の「これまでの流れ」に、その話の始まりの出来事を足しました(ウクライナ・イスラエル・FRB・浜岡原発 など)。"]},
   {id:"2026-11-17h",d:"2026-11-17",t:"🐾 ペットごとに読み上げの声が変わる",L:["マイ→⚙️設定→「🔊 読み上げ」で「🐾 ペットの声」を選ぶと、育てている子の種類に合わせた声で読み上げます(みけまる=小夜/SAYO、ももまる=中国うさぎ など)。","新しい声は、いま順番に作っています。できるまでは ずんだもん の声で読みます。たまごの間はスマホの声です。"]},
   {id:"2026-11-17g",d:"2026-11-17",t:"🔊 ずんだもんの声が止まらない・重なるのを直しました",L:["キャラの声(ずんだもん)で読み上げているときは、画面の下に「⏹ 止める」が出ます。どの画面からでも止められます。","声は1つずつしか流れないようにしました(別の🔊を押すと、前の読み上げは止まります)。アプリを閉じたときも止まります。"]},
   {id:"2026-11-17f",d:"2026-11-17",t:"🧩 ページの形を選べる・3行は「続きを読む」・年表を見やすく",L:["「きょう」のいちばん下の「🧩 ページの形をえらぶ」で、📰 ニュースを読む・📷 写真で見る・⚡ さっと見る・📚 じっくり読む などの形から選べます。見本の絵を見てから押すだけです。","今日の3行は、大事な1文だけを先に出し、のこりは「▼ 続きを読む」で開くようにしました。ニュース10まで早く届きます。","解説の「これまでの流れ」は、同じ日の出来事を1つの日付にまとめ、いちばん上に「🏁 はじまり」を出すようにしました。"]},
@@ -6336,6 +6339,22 @@ const TH_RULES=[
   [/首脳|会談|特使|外相|国連|大使|サミット|停戦|和平/,"flags"],[/国会|法案|首相|内閣|選挙|衆院|参院|与党|野党|知事|市長/,"capitol"]
 ];
 const TH_G={pol:"capitol",eco:"market",it:"it",intl:"flags",spo:"ballpark",sci:"rocket",ent:"cinema",fas:"clothes",home:"room",food:"cook",life:"coffee",trip:"trip"};
+// 🖼️ ジャンルの絵(2026-11-17 夜・自作SVG): 写真がないとき・同じ写真が続くときに、絵文字の代わりに出す。色はジャンルの色(明るい/暗い画面どちらでも)
+const GART={
+ pol:'<rect x="22" y="70" width="76" height="26" rx="3" fill="#fff" opacity=".9"/><path d="M30 70h60L60 48z" fill="C"/><circle cx="60" cy="44" r="10" fill="C"/><rect x="58" y="26" width="4" height="10" fill="C"/><g fill="C" opacity=".55"><rect x="32" y="76" width="6" height="18"/><rect x="47" y="76" width="6" height="18"/><rect x="67" y="76" width="6" height="18"/><rect x="82" y="76" width="6" height="18"/></g>',
+ eco:'<g fill="C"><rect x="24" y="66" width="14" height="28" rx="2" opacity=".55"/><rect x="44" y="52" width="14" height="42" rx="2" opacity=".75"/><rect x="64" y="38" width="14" height="56" rx="2"/></g><path d="M22 58 46 44l18 6 26-22" stroke="C" stroke-width="5" fill="none" stroke-linecap="round" stroke-linejoin="round"/><circle cx="90" cy="76" r="12" fill="#fff"/><circle cx="90" cy="76" r="9" fill="none" stroke="C" stroke-width="3"/>',
+ soc:'<path d="M20 94V60l20-16 20 16v34z" fill="#fff"/><path d="M60 94V54l20-16 20 16v40z" fill="C" opacity=".8"/><rect x="34" y="72" width="12" height="22" fill="C" opacity=".6"/><rect x="72" y="62" width="10" height="10" fill="#fff"/><rect x="72" y="78" width="10" height="10" fill="#fff"/><circle cx="96" cy="30" r="8" fill="C" opacity=".5"/>',
+ it:'<rect x="26" y="40" width="68" height="44" rx="5" fill="C"/><rect x="31" y="45" width="58" height="34" rx="2" fill="#fff"/><path d="M18 88h84l-6 8H24z" fill="C" opacity=".8"/><g fill="none" stroke="C" stroke-width="4" stroke-linecap="round"><path d="M48 60a17 17 0 0 1 24 0"/><path d="M53 66a9 9 0 0 1 14 0"/></g><circle cx="60" cy="71" r="3" fill="C"/>',
+ intl:'<circle cx="60" cy="60" r="32" fill="#fff"/><circle cx="60" cy="60" r="32" fill="none" stroke="C" stroke-width="4"/><path d="M28 60h64M60 28c-14 18-14 46 0 64M60 28c14 18 14 46 0 64" stroke="C" stroke-width="3" fill="none"/><path d="M42 44c6 2 8 8 4 12s2 10 8 8M70 72c4-6 12-4 14 0" stroke="C" stroke-width="5" fill="none" stroke-linecap="round" opacity=".5"/>',
+ spo:'<rect x="16" y="74" width="88" height="22" rx="4" fill="C" opacity=".35"/><path d="M60 74v22" stroke="#fff" stroke-width="3"/><circle cx="60" cy="50" r="22" fill="#fff"/><path d="M60 38l9 7-3 10H54l-3-10z" fill="C"/><path d="M60 28v10M41 45l10 0M79 45h-10M48 69l6-14M72 69l-6-14" stroke="C" stroke-width="3"/>',
+ sci:'<path d="M50 26h20M54 26v24L36 86a6 6 0 0 0 6 8h36a6 6 0 0 0 6-8L66 50V26" fill="#fff" stroke="C" stroke-width="4" stroke-linejoin="round"/><path d="M42 76h36l6 10a6 6 0 0 1-6 8H42a6 6 0 0 1-6-8z" fill="C" opacity=".75"/><circle cx="54" cy="66" r="4" fill="C" opacity=".6"/><circle cx="66" cy="58" r="3" fill="C" opacity=".6"/><g fill="none" stroke="C" stroke-width="2.5"><ellipse cx="92" cy="34" rx="12" ry="5"/><ellipse cx="92" cy="34" rx="12" ry="5" transform="rotate(60 92 34)"/></g>',
+ ent:'<rect x="24" y="46" width="72" height="46" rx="4" fill="C"/><path d="M24 46l8-16 70-2-6 18z" fill="#fff" stroke="C" stroke-width="3"/><path d="M44 31l-8 15M64 30l-8 16M84 29l-8 17" stroke="C" stroke-width="4"/><path d="M54 60v20l16-10z" fill="#fff"/>',
+ fas:'<path d="M60 28a7 7 0 1 1 7 7c-4 0-7 3-7 6v3" stroke="C" stroke-width="4" fill="none" stroke-linecap="round"/><path d="M60 44 22 66h76z" fill="none" stroke="C" stroke-width="4" stroke-linejoin="round"/><path d="M38 66l-6 28h56l-6-28" fill="#fff" stroke="C" stroke-width="3"/><path d="M48 66c0 10 24 10 24 0" fill="C" opacity=".6"/>',
+ home:'<rect x="22" y="62" width="62" height="24" rx="6" fill="C"/><rect x="28" y="50" width="50" height="20" rx="6" fill="C" opacity=".7"/><rect x="26" y="86" width="5" height="8" fill="C"/><rect x="75" y="86" width="5" height="8" fill="C"/><rect x="88" y="78" width="14" height="16" rx="2" fill="#fff" stroke="C" stroke-width="3"/><path d="M95 78c-8-10-4-22 0-26 4 4 8 16 0 26" fill="C" opacity=".7"/>',
+ food:'<path d="M26 62h68v8a20 20 0 0 1-20 20H46a20 20 0 0 1-20-20z" fill="C"/><rect x="20" y="56" width="80" height="8" rx="4" fill="C" opacity=".75"/><g fill="none" stroke="C" stroke-width="4" stroke-linecap="round" opacity=".6"><path d="M46 46c-4-6 4-10 0-16"/><path d="M60 46c-4-6 4-10 0-16"/><path d="M74 46c-4-6 4-10 0-16"/></g>',
+ life:'<circle cx="86" cy="34" r="12" fill="C" opacity=".55"/><path d="M30 54h50v20a18 18 0 0 1-18 18h-14a18 18 0 0 1-18-18z" fill="#fff" stroke="C" stroke-width="4"/><path d="M80 60h6a8 8 0 0 1 0 16h-6" fill="none" stroke="C" stroke-width="4"/><path d="M34 62h42v12a14 14 0 0 1-14 14h-14a14 14 0 0 1-14-14z" fill="C" opacity=".6"/><path d="M22 96h70" stroke="C" stroke-width="4" stroke-linecap="round"/>',
+ trip:'<rect x="30" y="50" width="48" height="42" rx="6" fill="C"/><path d="M44 50v-8h20v8" fill="none" stroke="C" stroke-width="4"/><path d="M30 64h48" stroke="#fff" stroke-width="3" opacity=".6"/><rect x="40" y="92" width="6" height="4" fill="C"/><rect x="62" y="92" width="6" height="4" fill="C"/><path d="M78 30l20-6-4 6 8 4-24 2z" fill="C" opacity=".7"/>'};
+function genreArt(g){ const a=GART[g]||GART.soc; return `<svg viewBox="0 0 120 120" aria-hidden="true" focusable="false" style="width:100%;height:100%;display:block"><rect width="120" height="120" fill="var(--g-${g}-s,var(--surface2))"/>${a.replace(/="C"/g,`="var(--g-${g},var(--accent))"`)}</svg>`; }
 let TEN_USED=null;
 function thumbOn(){ if(store.get("nw-thumb")==="0") return false; try{ if(navigator.connection&&navigator.connection.saveData) return false; }catch(_){} return true; }
 // 解説に写真があればそれ、なければ見出しのことば → ジャンル の順
@@ -6344,7 +6363,7 @@ function thumbOf(n){ if(n.ex&&PHOTOS[n.ex]) return {u:PHOTOS[n.ex][0].replace(/\
   const p=k&&TH[k]; return p?{u:"https://images.unsplash.com/photo-"+p[0],by:p[1]}:null; }
 function thumbHTML(n,big,used){ if(!thumbOn()) return ""; let p=thumbOf(n); if(p&&used){ if(used.has(p.u)) p=null; else used.add(p.u); }
   if(p&&big) return `<span class="th th-big"><img src="${p.u}?w=800&h=400&fit=crop&q=60&auto=format" alt="" decoding="async" width="800" height="400" onerror="this.parentNode.remove()"></span>`;
-  if(!p) return `<span class="th th-e" aria-hidden="true" style="--c:var(--g-${n.g});--cs:var(--g-${n.g}-s)">${n.icon||"📰"}</span>`;
+  if(!p) return `<span class="th th-e th-art" aria-hidden="true" style="--c:var(--g-${n.g});--cs:var(--g-${n.g}-s)">${genreArt(n.g)}</span>`;
   return `<span class="th"><img src="${p.u}?w=176&h=176&fit=crop&q=60&auto=format" alt="" loading="lazy" decoding="async" width="88" height="88" onerror="this.parentNode.remove()"></span>`; }
 function thumbCredit(list){ if(!thumbOn()) return ""; const by=[...new Set(list.map(thumbOf).filter(Boolean).map(p=>p.by))]; if(!by.length) return "";
   return `<details class="th-cr"><summary>📷 写真はイメージです(ニュースの現場の写真ではありません)</summary>撮影: ${by.map(esc).join("・")} / <a href="https://unsplash.com/?utm_source=mainichi_news&utm_medium=referral" target="_blank" rel="noopener">Unsplash</a></details>`; }
@@ -6769,7 +6788,7 @@ document.addEventListener("click",ev=>{ const x=ev.target.closest("[data-alx]");
 document.addEventListener("keydown",ev=>{ if((ev.key==="Enter"||ev.key===" ")&&ev.target.matches&&ev.target.matches(".al-band[data-quake]")){ ev.preventDefault(); openQuake(); } });
 try{ loadAlerts(); setInterval(()=>{ if(document.visibilityState==="visible") loadAlerts(); },3*60*1000); document.addEventListener("visibilitychange",()=>{ if(document.visibilityState==="visible") loadAlerts(); }); }catch(_){}
 // テスト用の手がかり(localhost で動かしたときだけ。本番では出さない)
-if(/^(localhost|127\.0\.0\.1)$/.test(location.hostname)) window.NW_TEST={stopSpeak,openEx,openForms,applyForm,openGenre,openMenu,setGo,ttsPlan,ttsKey,listenText,sayQueue,openRadio,bgmStart,ttsChunks,ttsClean,bestJaVoice,openHelp,placeOf,localCard,get NEWS(){return NEWS;},petSVG,PET_KINDS,PET_COLORS,petColorsFor,WEAR,petStage,petXP,petKind,petHall,petName,petRestart,get ME(){return ME;},get LOOK(){return LOOK;},TOPIC_GROUPS,FUN,SECS,openFun,openEx,fillQs,hhNews,ktQs,serialChapters,go,openLife,trendWords,openShimen};
+if(/^(localhost|127\.0\.0\.1)$/.test(location.hostname)) window.NW_TEST={genreArt,stopSpeak,openEx,openForms,applyForm,openGenre,openMenu,setGo,ttsPlan,ttsKey,listenText,sayQueue,openRadio,bgmStart,ttsChunks,ttsClean,bestJaVoice,openHelp,placeOf,localCard,get NEWS(){return NEWS;},petSVG,PET_KINDS,PET_COLORS,petColorsFor,WEAR,petStage,petXP,petKind,petHall,petName,petRestart,get ME(){return ME;},get LOOK(){return LOOK;},TOPIC_GROUPS,FUN,SECS,openFun,openEx,fillQs,hhNews,ktQs,serialChapters,go,openLife,trendWords,openShimen};
 const h=(location.hash||"").slice(1);
 if(h==="quake"){ go("today"); setTimeout(openQuake,50); } else if(h==="shimen"){ go("today"); setTimeout(openShimen,50); } else if(D.explainers[h]){ go("explain"); openEx(h); }
 else if(h.startsWith("t=")) openTHash(h);
