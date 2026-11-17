@@ -1,0 +1,54 @@
+name: 読み上げの声を作る
+# サイトのデータ(data.js・yomi.js・index.html)が変わったら、読み上げる文を音声ファイル(mp3)にして audio ブランチの tts/ に置く。
+# 🐣 VOICEVOX(ずんだもん): 無料・キー不要(この中で動かす)。 🎙️ Google Cloud Text-to-Speech: Secrets の GOOGLE_TTS_KEY があるときだけ。
+# audio ブランチはいつも1コミットだけに上書きする(main の履歴をふくらませない)。アプリは raw.githubusercontent.com から読む。
+on:
+  push:
+    branches: [main]
+    paths: ["data.js", "yomi.js", "index.html", "tools/tts/**", ".github/workflows/tts.yml"]
+  workflow_dispatch:
+permissions:
+  contents: write
+concurrency:
+  group: tts
+  cancel-in-progress: false
+jobs:
+  make:
+    runs-on: ubuntu-latest
+    timeout-minutes: 50
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+      - name: 前に作った声を読む
+        run: |
+          mkdir -p /tmp/prev /tmp/out
+          if git fetch --depth=1 origin audio 2>/dev/null; then git archive FETCH_HEAD | tar -x -C /tmp/prev; fi
+          ls /tmp/prev/tts 2>/dev/null | head || true
+      - name: VOICEVOX を動かす
+        run: |
+          docker run -d --name vv -p 50021:50021 voicevox/voicevox_engine:cpu-latest || docker run -d --name vv -p 50021:50021 voicevox/voicevox_engine:cpu-ubuntu20.04-latest
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: 読む文の一覧を作る(アプリと同じ文)
+        run: |
+          cd /tmp && npm init -y >/dev/null && npm i --no-audit --no-fund playwright@1.47.2 >/dev/null && npx playwright install --with-deps chromium >/dev/null
+          cd "$GITHUB_WORKSPACE" && (python3 -m http.server 8766 >/dev/null 2>&1 &) && sleep 2
+          NODE_PATH=/tmp/node_modules node tools/tts/plan.js http://localhost:8766/ /tmp/plan.json
+      - name: VOICEVOX の準備を待つ
+        run: |
+          for i in $(seq 1 90); do curl -sf http://127.0.0.1:50021/version && break; sleep 2; done; echo
+      - name: 声を作る
+        env:
+          GOOGLE_TTS_KEY: ${{ secrets.GOOGLE_TTS_KEY }}
+        run: python3 tools/tts/make.py /tmp/plan.json /tmp/prev /tmp/out
+      - name: audio ブランチに置く(いつも1コミットだけ)
+        run: |
+          cd /tmp/out
+          git init -q -b audio
+          git config user.name "tts-bot"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          git commit -qm "読み上げの声"
+          git push -qf "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/${{ github.repository }}.git" audio

@@ -2313,8 +2313,7 @@ function renderToday(){
   </div>`;
   bindDone(); bindExt();
   const lb=document.getElementById("listenBtn"); if(lb) lb.onclick=()=>{ if(window.speechSynthesis&&window.speechSynthesis.speaking){ stopSpeak(); lb.classList.remove("on"); lb.querySelector("b").textContent="今日のニュースを聞く"; return; }
-    const w=D.weather; const t=`${relDay(w.iso)}の${w.place}は${w.sky}。最高${w.hi}度、最低${w.lo}度。${w.umbrella}。では、今日のニュースです。`+D.three.map((x,i)=>`${i+1}つ目。${x.title}。${x.text}`).join("。")+"。ニュース10の見出しです。"+D.top10.map((n,i)=>`${i+1}位、${n.title}`).join("。")+"。以上です。";
-    speak(t); lb.classList.add("on"); lb.querySelector("b").textContent="■ 止める"; track("/listen","聞く"); };
+    speak(listenText()); lb.classList.add("on"); lb.querySelector("b").textContent="■ 止める"; track("/listen","聞く"); };
   const pb=document.getElementById("playBtn"); if(pb) pb.onclick=openStory; const rb=document.getElementById("radioBtn"); if(rb) rb.onclick=openRadio;
   const vg=document.getElementById("vsGo"); if(vg) vg.onclick=()=>{ const q=document.getElementById("quiz"); if(q) q.scrollIntoView({behavior:"smooth",block:"center"}); else toast("いまはクイズがお休みです"); };
   const sx=document.getElementById("seasonX"); if(sx) sx.onclick=()=>{ store.set("nw-season-hide",TODAY+(seasonNow()||{}).k); document.getElementById("seasonCard")?.remove(); };
@@ -2570,10 +2569,45 @@ function ttsChunks(t){ const a=ttsClean(t).split(/(?<=[。！？!?])\s*|\n+/).ma
   a.forEach(x=>{ while(x.length>140){ const i=x.lastIndexOf("、",140); const c=i>40?i+1:140; out.push(x.slice(0,c)); x=x.slice(c); } if(!x) return; if(out.length&&out[out.length-1].length+x.length<40) out[out.length-1]+=x; else out.push(x); }); return out; }
 function jaUtter(txt,rate){ const u=new SpeechSynthesisUtterance(txt); u.lang="ja-JP"; const v=bestJaVoice(); if(v){ u.voice=v; u.lang=v.lang; } u.rate=(rate||1)*sayRate(); u.pitch=sayPitch(); return u; }
 let SAY_ID=0;
-function sayQueue(txt,rate,onend){ try{ const s=window.speechSynthesis; if(!s) return; s.cancel(); const id=++SAY_ID; const ch=ttsChunks(txt); if(!ch.length){ onend&&onend(); return; }
-  ch.forEach((c,i)=>{ const u=jaUtter(c,rate); if(i===ch.length-1) u.onend=u.onerror=()=>{ if(id===SAY_ID&&onend) onend(); }; s.speak(u); }); }catch(_){} }
+// ===== 🎧 外の声(2026-11-17): VOICEVOX(キャラの声)・Google(アナウンサー風) =====
+// サイト更新のたびに GitHub の自動処理(.github/workflows/tts.yml → tools/tts/)が、読み上げる文を1文ずつ音声ファイル(mp3)にして
+// audio ブランチの tts/ に置く。アプリは同じ文(ttsChunks の結果)の「しるし」(ttsKey)で探して流すだけ。ない文はスマホの声で読む。
+// APIキーはサイトに置かない(GitHub の Secrets だけ)。見る人の情報はどこにも送らない(音声ファイルを読みに行くだけ)。
+const TTS_BASE="https://raw.githubusercontent.com/sunbike22/news/audio/tts/";
+const VSRC=[["dev","📱 スマホの声"],["vv","🐣 キャラの声(ずんだもん)"],["gg","🎙️ アナウンサー風"]];
+function vsrc(){ const v=store.get("nw-vsrc"); return v==="vv"||v==="gg"?v:"dev"; }
+function ttsKey(t){ let h=0x811c9dc5; const s=String(t); for(let i=0;i<s.length;i++){ h^=s.charCodeAt(i); h=Math.imul(h,0x01000193)>>>0; } return h.toString(16).padStart(8,"0")+s.length.toString(36); } // tools/tts/make.py と同じ計算(FNV-1a)
+let TTS_IDX=null, TTS_IDX_AT=0;
+async function ttsIdx(force){ if(!force&&TTS_IDX&&Date.now()-TTS_IDX_AT<10*60e3) return TTS_IDX; try{ const r=await fetch(TTS_BASE+"index.json?t="+Math.floor(Date.now()/300000),{cache:"no-store"}); if(r.ok){ TTS_IDX=await r.json(); TTS_IDX_AT=Date.now(); } }catch(_){} return TTS_IDX; }
+function ttsHas(src,key){ return !!(TTS_IDX&&TTS_IDX[src]&&TTS_IDX[src][key]); }
+let AUD=null; // いま流している音声
+function audStop(){ if(AUD){ try{ AUD.onended=AUD.onerror=null; AUD.pause(); AUD.src=""; }catch(_){} AUD=null; } }
+(function(){ const S=window.speechSynthesis; if(!S) return; try{ const c0=S.cancel.bind(S); S.cancel=function(){ SAY_ID++; audStop(); c0(); };
+  const g=Object.getOwnPropertyDescriptor(Object.getPrototypeOf(S),"speaking"); if(g&&g.get) Object.defineProperty(S,"speaking",{configurable:true,get(){ return !!AUD||g.get.call(S); }}); }catch(_){} })();
+function sayQueue(txt,rate,onend){ try{ const s=window.speechSynthesis; if(!s&&vsrc()==="dev") return; if(s) s.cancel(); else audStop(); const id=++SAY_ID; const ch=ttsChunks(txt); if(!ch.length){ onend&&onend(); return; }
+  const src=vsrc();
+  if(src==="dev"||!TTS_IDX||!ch.some(c=>ttsHas(src,ttsKey(c)))){ if(src!=="dev"&&!TTS_IDX) ttsIdx(); if(!s) return;
+    ch.forEach((c,i)=>{ const u=jaUtter(c,rate); if(i===ch.length-1) u.onend=u.onerror=()=>{ if(id===SAY_ID&&onend) onend(); }; s.speak(u); }); return; }
+  // 外の声: 1文ずつ順に。ファイルがない文だけスマホの声で
+  let i=0; const next=()=>{ if(id!==SAY_ID) return; if(i>=ch.length){ AUD=null; onend&&onend(); return; } const c=ch[i++]; const k=ttsKey(c);
+    if(ttsHas(src,k)){ const a=new Audio(TTS_BASE+src+"/"+k+".mp3"); a.preload="auto"; try{ a.preservesPitch=true; a.webkitPreservesPitch=true; }catch(_){} a.playbackRate=Math.max(.5,Math.min(2,(rate||1)*sayRate()));
+      AUD=a; a.onended=()=>{ if(id===SAY_ID) next(); }; a.onerror=()=>{ if(id!==SAY_ID) return; AUD=null; if(s){ const u=jaUtter(c,rate); u.onend=u.onerror=()=>{ if(id===SAY_ID) next(); }; s.speak(u); } else next(); };
+      // 次の文を先に読みこんでおく(切れ目を短く)
+      const nx=ch[i]; if(nx&&ttsHas(src,ttsKey(nx))){ try{ const pre=new Audio(); pre.preload="auto"; pre.src=TTS_BASE+src+"/"+ttsKey(nx)+".mp3"; }catch(_){} }
+      const pr=a.play(); if(pr&&pr.catch) pr.catch(()=>{ if(id===SAY_ID&&a.onerror) a.onerror(); }); }
+    else if(s){ AUD=null; const u=jaUtter(c,rate); u.onend=u.onerror=()=>{ if(id===SAY_ID) next(); }; s.speak(u); } else next(); };
+  next(); }catch(_){} }
+const TTS_SAMPLE="こんにちは。まいにちニュース帳です。今日のニュースを、この声で読み上げます。";
+function ttsCredit(src){ src=src||vsrc(); return src==="vv"?"音声: VOICEVOX:ずんだもん":src==="gg"?"音声: Google Cloud Text-to-Speech":""; }
 function speak(txt){ sayQueue(txt,1); }
-function stopSpeak(){ try{ window.speechSynthesis && window.speechSynthesis.cancel(); }catch(e){} }
+function listenText(){ const w=D.weather; return (w?`${relDay(w.iso)}の${w.place}は${w.sky}。最高${w.hi}度、最低${w.lo}度。${w.umbrella}。では、`:"")+"今日のニュースです。"+D.three.map((x,i)=>`${i+1}つ目。${x.title}。${x.text}`).join("。")+"。ニュース10の見出しです。"+D.top10.map((n,i)=>`${i+1}位、${n.title}`).join("。")+"。以上です。"; }
+function exSpeakText(e){ return [e.name,"ひとことで言うと。",e.kid,(e.more||[])[0],(e.more||[])[1],"わたしたちへの影響。",...(e.us||[]).map(u=>String(u).replace(/\*\*/g,"")),...(e.faq||[]).map(([q,a])=>q+" "+a)].filter(Boolean).join("。 "); }
+// 音声ファイルを作る文の一覧(tools/tts/plan.js が読む)。今日のニュース・寝る前ラジオ(昼/夜)・最近7日に動いた解説
+function ttsPlan(){ const out=[]; const add=t=>ttsChunks(t).forEach(c=>out.push(c));
+  add(TTS_SAMPLE); add("この速さで読み上げます"); add(listenText()); [21,12].forEach(h=>radioScript(h).forEach(add));
+  Object.values(D.explainers||{}).filter(e=>e&&e.updated&&(Date.parse(TODAY)-Date.parse(mdIso(e.updated)))<=7*864e5).slice(0,12).forEach(e=>add(exSpeakText(e)));
+  return [...new Set(out)]; }
+function stopSpeak(){ SAY_ID++; audStop(); try{ window.speechSynthesis && window.speechSynthesis.cancel(); }catch(e){} }
 function setPause(p){ st.paused=p; const b=document.getElementById("stPause"); b.textContent=p?"▶":"❚❚"; b.setAttribute("aria-label",p?"再生":"一時停止"); if(!p){ st.t0=performance.now()-st.el; tick(); } else { cancelAnimationFrame(st.raf);} }
 function show(i){
   if(!st) return; if(i<0) i=0; if(i>=st.S.length){ closeStory(); return; }
@@ -3449,12 +3483,18 @@ function cvdCard(){ return `<section class="card" aria-label="色の見分けや
   <div class="chips" id="vCvd">${[["1","見分けやすくする"],["0","ふつう"]].map(([v,l])=>`<button class="fchip" data-cvd="${v}" aria-pressed="${cvdOn()===(v==="1")}">${l}</button>`).join("")}</div>
   <div class="hint" style="margin-top:6px">赤と緑など、色の見分けがつきにくい人向けです。「よい・悪い」の色を青とオレンジにかえ、色だけで分けていたところ(地図の丸・きょうの1問の結果など)に、形や文字もつけます。</div></section>`; }
 document.addEventListener("click",ev=>{ const b=ev.target.closest("#vCvd [data-cvd]"); if(!b) return; store.set("nw-cvd",b.dataset.cvd); applySettings(); document.querySelectorAll("#vCvd [data-cvd]").forEach(x=>x.setAttribute("aria-pressed",String(x===b))); toast(b.dataset.cvd==="1"?"🎨 色を見分けやすくしました":"🎨 ふつうの色にもどしました"); try{ track("/cvd/"+b.dataset.cvd,"色の見分けやすさ"); }catch(_){} });
+function vsrcNote(){ const s=vsrc(); if(s==="dev") return "スマホに入っている声で読みます。通信料(ギガ)はかかりません。";
+  const n=TTS_IDX&&TTS_IDX[s]?Object.keys(TTS_IDX[s]).length:0;
+  return (s==="vv"?"🐣 ずんだもんの声で読みます。":"🎙️ 落ち着いたアナウンサー風の声で読みます。")+"「今日のニュースを聞く」「寝る前ラジオ」「最近の解説」は、前もって作った声で読みます(1分で約0.3MBの通信)。まだ声のない文は、スマホの声で読みます。"+(TTS_IDX?(n?"":"(いまはまだ準備中です)"):"")+`<br><small>${esc(ttsCredit(s))}</small>`; }
 function voiceCard(){ const r=sayRate();
   return `<section class="card" aria-label="読み上げ"><div class="sec-h"><h2>🔊 読み上げの速さと声</h2></div>
     <div class="chips" id="vRate">${[[0.75,"🐢 ゆっくり"],[1,"ふつう"],[1.25,"🐇 はやい"]].map(([v,l])=>`<button class="fchip" data-rate="${v}" aria-pressed="${Math.abs(r-v)<.01}">${l}</button>`).join("")}</div>
     <div class="hint" style="margin-top:6px">「🔊 聞く」やことば辞典の読み上げの速さが変わります。お子さんや、ゆっくり聞きたいときは🐢がおすすめです。</div>
     <div class="sec-h" style="margin-top:12px"><h2 style="font-size:1rem">🗣️ 読み上げの声</h2></div>
-    <div class="vc-row"><select id="vName" aria-label="読み上げの声">${voiceOpts()}</select><button class="fchip" id="vTry">▶ ためしに聞く</button></div>
+    <div class="hint" style="margin:2px 0 6px">声の種類</div>
+    <div class="chips" id="vSrc" role="group" aria-label="声の種類">${VSRC.map(([k,l])=>`<button class="fchip" data-vsrc="${k}" aria-pressed="${vsrc()===k}">${l}</button>`).join("")}</div>
+    <div class="hint" id="vSrcNote" style="margin:6px 0 8px">${vsrcNote()}</div>
+    <div class="vc-row"${vsrc()==="dev"?"":` style="opacity:.6"`}><select id="vName" aria-label="スマホの声">${voiceOpts()}</select><button class="fchip" id="vTry">▶ ためしに聞く</button></div>
     <div class="chips" id="vPitch" style="margin-top:8px">${[[0.92,"声を低め"],[1,"ふつう"],[1.08,"声を高め"]].map(([v,l])=>`<button class="fchip" data-pitch="${v}" aria-pressed="${Math.abs(sayPitch()-v)<.01}">${l}</button>`).join("")}</div>
     <div class="hint" style="margin-top:6px">声はスマホに入っているものから選びます。「おまかせ」は、入っている中でいちばん自然な声を使います。</div>
     <details class="faq plain"><summary>もっと自然な声にするには</summary>
@@ -4326,7 +4366,7 @@ function talkCard(){ const L=D.top10.slice(0,3); if(!L.length) return "";
 function bindTalk(){ const b=document.getElementById("talkShare"); if(!b) return; b.onclick=async()=>{ const t="🍽️ 今日の話のタネ\n"+D.top10.slice(0,3).map(n=>`・${n.title}\n  → ${TALK[n.g]||"どう思う?"}`).join("\n")+"\n"+location.origin+location.pathname;
   try{ if(navigator.share){ await navigator.share({text:t}); return; } }catch(_){ return; } try{ await navigator.clipboard.writeText(t); toast("📋 コピーしました"); }catch(_){} }; }
 // ===== 寝る前ラジオ(読み上げ+自作のやさしい音) =====
-function radioScript(){ const h=new Date(Date.now()+9*3600e3).getUTCHours(); const w=D.weather; const L=[];
+function radioScript(hh){ const h=hh==null?new Date(Date.now()+9*3600e3).getUTCHours():hh; const w=D.weather; const L=[];
   L.push(h>=18||h<4?`こんばんは。まいにちニュース帳の、寝る前ラジオです。${D.updatedLabel}までのニュースを、3分でふりかえります。`:`こんにちは。まいにちニュース帳のラジオです。${D.updatedLabel}までのニュースをお届けします。`);
   D.three.forEach((x,i)=>L.push(`${["まずは","つぎは","さいごに"][i]||""}、${x.label}。${x.title}。${x.text}`));
   const rest=D.top10.slice(3,7); if(rest.length) L.push("ほかには、こんなニュースがありました。"+rest.map(n=>n.title).join("。 ")+"。");
@@ -4368,7 +4408,7 @@ function openRadio(){
   const pb=sh.querySelector("#rdPlay"); if(pb) pb.onclick=()=>{ if(RADIO){ stop(); return; } RADIO={i:0,bgm:bgmStart()}; pb.innerHTML='<span class="pi">■</span><span><b>止める</b></span>'; track("/radio","寝る前ラジオ");
     const next=()=>{ if(!RADIO) return; const i=RADIO.i++; if(i>=L.length){ document.getElementById("rdNow").textContent="おやすみなさい 🌙"; document.getElementById("rdProg").style.width="100%"; setTimeout(stop,1500); return; }
       document.getElementById("rdNow").textContent=L[i]; document.getElementById("rdProg").style.width=Math.round(i/L.length*100)+"%";
-      const u=jaUtter(ttsClean(L[i]),.9); u.pitch=sayPitch()*.96; u.onend=()=>setTimeout(next,900); u.onerror=()=>setTimeout(next,300); window.speechSynthesis.speak(u); };
+      sayQueue(L[i],.9,()=>{ if(RADIO) setTimeout(next,900); }); };
     setTimeout(next,1200); };
   sh.hidden=false; sh.scrollTop=0; document.body.style.overflow="hidden";
 }
@@ -5311,6 +5351,7 @@ function openShimen(){ const sh=document.getElementById("sheet"); const w=D.weat
 document.addEventListener("click",e=>{ const b=e.target.closest("[data-shimen]"); if(!b) return; e.preventDefault(); openShimen(); });
 // ===== お知らせ(新しくなったところ)。機能を足したら、いちばん上に1つ足す =====
 const UPDATES=[
+  {id:"2026-11-17d",d:"2026-11-17",t:"🎧 読み上げの声を選べるように",L:["マイ→⚙️設定の「🔊 読み上げの速さと声」で、声の種類を「📱 スマホの声」「🐣 キャラの声(ずんだもん)」「🎙️ アナウンサー風」から選べます。","キャラの声とアナウンサー風は、ニュースが新しくなるたびに前もって作った声です。「今日のニュースを聞く」「寝る前ラジオ」「最近の解説」で使います(声の準備ができるまでは、スマホの声で読みます)。"]},
   {id:"2026-11-17c",d:"2026-11-17",t:"🏠 部屋をすっきり・👈 もどるをなめらかに",L:["ペットの部屋をすっきりさせました。窓は左上、家具は「かべの棚」と「床のおく」にならびます(指で好きな場所へ動かせるのは前と同じ)。","右へなぞって「もどる」とき、画面が指にぴったりついてきて、はなすとスッとすべって前の画面にもどります。速くはじいても、もどれます。"]},
   {id:"2026-11-17b",d:"2026-11-17",t:"🆕 新着の数・🗺️ 地図を見やすく",L:["上の「🆕」は、前に開いたあとに増えたニュースの数を「きのうから +◯件」のように出します(これまでは古いニュースまで数えていました)。","🗺️ ニュースの地図は、はじめは直近3日分だけ。「きょう・3日・7日」で切りかえられます。","👤 呼び名の画面を「名前 → 呼ばれ方 → 見本」の順にして、使いやすくしました。"]},
   {id:"2026-11-17a",d:"2026-11-17",t:"✨ 大事なところが目立つように・👤 呼び名",L:["今日の3行・ニュース10・解説で、いちばん伝えたい1文に黄色い線、数字(◯円・◯%・震度など)に太字と下線をつけました。ニュース10を「くわしく」にすると、上に「👉 ひとことで」が出ます。","「きょう」のペットのところや マイ→⚙️設定 で「呼び名」をきめると、ペットが名前で呼んでくれます(「さん・くん・ちゃん・つけない」も選べて、見本を見ながら決められます)。名前はスマホの中だけに入り、どこにも送られません。"]},
@@ -5502,7 +5543,7 @@ const HELP=[
   ["ten","📰","ニュース10の読み方",["上から順に、その日に大きく伝えられたニュースです。","右上の<b>「短く／くわしく」</b>で、見出しだけにするか、説明も出すかを切りかえられます。","<b>「くわしい解説 →」</b>があるものは、図や流れつきの解説ページが読めます。","<b>🏷️ 保存</b>で「マイ」にとっておけます。<b>📤 送る</b>で家族や友だちに見出しを送れます(あなたの記録は送りません)。"]],
   ["ex","💡","解説ページの読み方",["大きな話題を1つずつ、やさしく説明するページです。上から読めば全体がわかります。","<b>ひとことで言うと</b>…まずここだけ読めば大まかにわかります。","<b>目次</b>を押すと、その場所に飛びます。","<b>🙋 わたしたちへの影響</b>…くらしにどう関係するか。","<b>📅 流れ</b>…これまでに起きたことの年表。<b>🔭 これから</b>…次に注目する日。","<b>🔔 続きを追う</b>を押すと、新しい動きがあったとき「きょう」でお知らせします。","<b>💬 話しながら読む</b>・<b>📖 連載で読む</b>…同じ中身を、会話や1日1話の形で読めます。","画面を<b>左右にすべらせる</b>と、前後の解説に移ります。"]],
   ["manga","🎨","4コマの見かた",["解説の中身を、4つのコマで説明するマンガです。","左にいるのは<b>あなたのペット</b>(名札はペットの名前)。ニュースにくわしくない生徒で、わたしたちと同じ立場で質問します。","右の<b>🦉 ホー先生</b>がやさしく答えます。","上から<b>①はてな? → ②なにがあった? → ③どうなるの? → ④これから</b>の順に読みます。","いちばん下の<b>📝 ホー先生の黒板</b>が、まとめです。"]],
-  ["listen","🔊","聞く・読み上げ",["<b>🔊 聞く</b>のボタンで、文を読み上げます。もう一度押すと止まります。","速さ・声の高さ・声の種類は、<b>マイ → ⚙️設定 →「🔊 読み上げの速さと声」</b>で変えられます。","声は<b>スマホに入っている声</b>を使います。もっと自然な声にしたいときは、同じ場所の「もっと自然な声にするには」を見てください。","読み方がおかしいことばは、<b>「🗣️ 読み方がおかしいときは →」</b>から、このスマホで直したり、作った人に知らせたりできます。","<b>🌙 寝る前ラジオ</b>(おたのしみ)は、3分でニュースを耳で聞けます。うしろの音は「オルゴール・波の音・音なし」から選べます。"]],
+  ["listen","🔊","聞く・読み上げ",["<b>🔊 聞く</b>のボタンで、文を読み上げます。もう一度押すと止まります。","速さ・声の高さ・声の種類は、<b>マイ → ⚙️設定 →「🔊 読み上げの速さと声」</b>で変えられます。","声の種類は「📱 スマホの声」「🐣 キャラの声(ずんだもん)」「🎙️ アナウンサー風」から選べます。キャラの声とアナウンサー風は、前もって作った声を読みこむので、1分で約0.3MBの通信がかかります。まだ声のない文はスマホの声で読みます。","読み方がおかしいことばは、<b>「🗣️ 読み方がおかしいときは →」</b>から、このスマホで直したり、作った人に知らせたりできます。","<b>🌙 寝る前ラジオ</b>(おたのしみ)は、3分でニュースを耳で聞けます。うしろの音は「オルゴール・波の音・音なし」から選べます。"]],
   ["pet","🐣","ペットの育て方",["ペットはニュースといっしょに育ちます。「きょう」のいちばん上で出むかえてくれます。押すと、なでられてひとことが変わります。はじめはたまごで、何が生まれるかはお楽しみです。","<b>🧠 クイズ</b>に正解すると🍙ごはんがもらえます。ごはんをあげたり、毎日開いたり、解説を読んだりすると育ちます。","名前は<b>マイ → 🐣 ペット の「✏️ 名前」</b>で変えられます。変えた名前は4コマなどにも出ます。","服・部屋・色は、育つと選べるものが増えます。ごはんやお世話をしなくても、困ることはありません。"]],
   ["plan","📅","予定と予測",["<b>📅 予定</b>…これから決まっている日(選挙・発表・値上げなど)。","<b>🎯 予測</b>…Claude(AI)が「こうなりそう」と考えたもの。あたるとは限りません。","あなたも<b>予想</b>して、答え合わせができます。"]],
   ["search","🔎","さがす・地図・数字",["<b>🔎 さがす</b>…ことばやジャンルで、これまでのニュースを探せます。","<b>🗺️ 地図</b>…ニュースがどこで起きたか。2本の指で大きくできます。","<b>📈 数字</b>…日経平均・円・原油のグラフと、くらしの便利。","地図と数字は、「さがす」の上のボタンから開けます。"]],
@@ -5607,7 +5648,11 @@ function renderMy(){
     yoBind();
     main.querySelector("#yoAdd").onclick=()=>{ const w=main.querySelector("#yoW").value.trim(), y=main.querySelector("#yoY").value.trim(); if(!w||!y){ toast("書き方と読み方の両方を入れてください"); return; }
       const L=userYomi().filter(x=>x[0]!==w); L.unshift([w,y]); store.set("nw-yomi",JSON.stringify(L.slice(0,100))); main.querySelector("#yoW").value=""; main.querySelector("#yoY").value=""; yoBind(); sayJa(w); toast(`「${w}」を「${y}」と読みます`); };
-    main.querySelector("#vTry").onclick=()=>sayJa(`こんにちは。${petName()}です。今日のニュースを、この声で読み上げます。`);
+    main.querySelector("#vTry").onclick=()=>sayJa(vsrc()==="dev"?`こんにちは。${petName()}です。今日のニュースを、この声で読み上げます。`:TTS_SAMPLE);
+    main.querySelectorAll("#vSrc [data-vsrc]").forEach(b=>b.onclick=async()=>{ store.set("nw-vsrc",b.dataset.vsrc); main.querySelectorAll("#vSrc [data-vsrc]").forEach(x=>x.setAttribute("aria-pressed",String(x===b)));
+      const nt=main.querySelector("#vSrcNote"); if(b.dataset.vsrc!=="dev"){ nt.innerHTML="声を読みこんでいます…"; await ttsIdx(true); } nt.innerHTML=vsrcNote(); const row=main.querySelector("#vName")?.parentElement; if(row) row.style.opacity=b.dataset.vsrc==="dev"?"":".6";
+      if(b.dataset.vsrc!=="dev"&&!(TTS_IDX&&TTS_IDX[b.dataset.vsrc]&&Object.keys(TTS_IDX[b.dataset.vsrc]).length)){ toast("この声はまだ準備中です。準備ができるまではスマホの声で読みます"); return; }
+      sayJa(b.dataset.vsrc==="dev"?`こんにちは。${petName()}です。この声で読み上げます。`:TTS_SAMPLE); });
     main.querySelectorAll("#vPitch [data-pitch]").forEach(b=>b.onclick=()=>{ store.set("nw-pitch",b.dataset.pitch); main.querySelectorAll("#vPitch [data-pitch]").forEach(x=>x.setAttribute("aria-pressed",String(x===b))); sayJa("この高さで読み上げます"); }); } }
   main.querySelectorAll("#vRate [data-rate]").forEach(b=>b.onclick=()=>{ store.set("nw-rate",b.dataset.rate); main.querySelectorAll("#vRate [data-rate]").forEach(x=>x.setAttribute("aria-pressed",String(x===b))); sayJa("この速さで読み上げます"); });
   main.querySelectorAll("#vThumb [data-thumb]").forEach(b=>b.onclick=()=>{ store.set("nw-thumb",b.dataset.thumb); main.querySelectorAll("#vThumb [data-thumb]").forEach(x=>x.setAttribute("aria-pressed",String(x===b))); toast(b.dataset.thumb==="1"?"📷 写真を出します":"写真を出さないようにしました"); });
@@ -6057,11 +6102,12 @@ function photoBlock(k){ const p=PHOTOS[k]; if(!p) return ""; return `<figure cla
 function sayRate(){ const r=+(store.get("nw-rate")||1); return r>=.6&&r<=1.4?r:1; }
 function speakEx(k,btn){ const e=D.explainers[k]; if(!e) return; try{ const s=window.speechSynthesis; if(!s) return;
   if(s.speaking){ s.cancel(); btn.textContent="🔊 聞く"; return; }
-  const txt=[e.name,"ひとことで言うと。",e.kid,e.more[0],e.more[1],"わたしたちへの影響。",...e.us.map(u=>u.replace(/\*\*/g,"")),...e.faq.map(([q,a])=>q+" "+a)].join("。 ");
+  const txt=exSpeakText(e);
   sayQueue(txt,1,()=>{ btn.textContent="🔊 聞く"; }); btn.textContent="■ 止める"; }catch(_){} }
 
 // 起動
 try{ applySky(); setInterval(applySky,10*60*1000); }catch(_){}
+try{ if(vsrc()!=="dev") setTimeout(()=>ttsIdx(),1500); }catch(_){}
 setTimeout(()=>{ try{ onboard(); }catch(_){} },600);
 try{ saveRival(); }catch(_){}
 document.getElementById("bellBtn").onclick=openUpdates; markBell();
@@ -6471,7 +6517,7 @@ document.addEventListener("click",ev=>{ const x=ev.target.closest("[data-alx]");
 document.addEventListener("keydown",ev=>{ if((ev.key==="Enter"||ev.key===" ")&&ev.target.matches&&ev.target.matches(".al-band[data-quake]")){ ev.preventDefault(); openQuake(); } });
 try{ loadAlerts(); setInterval(()=>{ if(document.visibilityState==="visible") loadAlerts(); },3*60*1000); document.addEventListener("visibilitychange",()=>{ if(document.visibilityState==="visible") loadAlerts(); }); }catch(_){}
 // テスト用の手がかり(localhost で動かしたときだけ。本番では出さない)
-if(/^(localhost|127\.0\.0\.1)$/.test(location.hostname)) window.NW_TEST={openRadio,bgmStart,ttsChunks,ttsClean,bestJaVoice,openHelp,placeOf,localCard,get NEWS(){return NEWS;},petSVG,PET_KINDS,PET_COLORS,petColorsFor,WEAR,petStage,petXP,petKind,petHall,petName,petRestart,get ME(){return ME;},get LOOK(){return LOOK;},TOPIC_GROUPS,FUN,SECS,openFun,openEx,fillQs,hhNews,ktQs,serialChapters,go,openLife,trendWords,openShimen};
+if(/^(localhost|127\.0\.0\.1)$/.test(location.hostname)) window.NW_TEST={ttsPlan,ttsKey,listenText,sayQueue,openRadio,bgmStart,ttsChunks,ttsClean,bestJaVoice,openHelp,placeOf,localCard,get NEWS(){return NEWS;},petSVG,PET_KINDS,PET_COLORS,petColorsFor,WEAR,petStage,petXP,petKind,petHall,petName,petRestart,get ME(){return ME;},get LOOK(){return LOOK;},TOPIC_GROUPS,FUN,SECS,openFun,openEx,fillQs,hhNews,ktQs,serialChapters,go,openLife,trendWords,openShimen};
 const h=(location.hash||"").slice(1);
 if(h==="quake"){ go("today"); setTimeout(openQuake,50); } else if(h==="shimen"){ go("today"); setTimeout(openShimen,50); } else if(D.explainers[h]){ go("explain"); openEx(h); }
 else if(h.startsWith("t=")) openTHash(h);
