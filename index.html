@@ -1613,6 +1613,16 @@ b.kn{font-weight:800;text-decoration:underline 3px color-mix(in srgb,var(--accen
 .st-ic{font-size:1.4rem;flex:none;width:32px;text-align:center}.st-tx{flex:1;min-width:0;display:flex;flex-direction:column}.st-tx b{font-size:1rem}.st-tx small{text-align:left;color:var(--muted)}
 .st-ar{font-size:1.5rem;color:var(--muted);flex:none}
 @media (max-width:370px){.st-size{grid-template-columns:repeat(2,minmax(0,1fr))}}
+
+/* ↻ 下に引っぱって新しくする */
+#ptr{position:fixed;left:50%;top:calc(env(safe-area-inset-top,0px) + 64px);z-index:25;display:flex;align-items:center;gap:8px;padding:6px 14px 6px 6px;border-radius:999px;background:var(--surface);color:var(--ink);border:1px solid var(--line);box-shadow:0 4px 14px rgba(0,0,0,.18);font-size:.85rem;font-weight:700;white-space:nowrap;pointer-events:none;transform:translate(-50%,-60px)}
+#ptr[hidden]{display:none}
+#ptr.back{transition:transform .2s ease}
+#ptr .ptr-c{width:32px;height:32px;border-radius:50%;display:grid;place-items:center;background:var(--surface2);color:var(--muted);transform:rotate(calc(var(--p,0) * 300deg))}
+#ptr.ok .ptr-c{background:var(--accent-btn,var(--accent));color:var(--on-accent,#fff)}
+#ptr.spin .ptr-c{animation:ptrspin .8s linear infinite}
+@keyframes ptrspin{to{transform:rotate(360deg)}}
+@media (prefers-reduced-motion:reduce){#ptr .ptr-c{transform:none}#ptr.spin .ptr-c{animation:none}}
 </style>
 </head>
 <body>
@@ -3508,6 +3518,27 @@ function footer(){ return `<footer class="foot">
   <div>まとめ: Claude(AI)。記事の文章はそのまま写さず、要点と出典を載せています。</div>
 </footer>`; }
 function bindFooter(){}
+// ===== ↻ 下に引っぱって新しくする(2026-11-18・持ち主の希望。スマホの画面に置いたアプリでは、ブラウザの「引っぱって更新」が使えないため) =====
+// いちばん上で指を下へ引くと、上に丸い矢印が出て、70pxをこえてはなすとページ全体を読みなおす(いまのタブはそのまま)。重なった画面・地図・入力中は動かない
+(function(){ const TH=70, MAX=110; let y0=null, x0=0, d=0, on=false, el=null;
+  const ui=()=>{ if(el) return el; el=document.createElement("div"); el.id="ptr"; el.setAttribute("aria-hidden","true"); el.innerHTML='<span class="ptr-c"><svg viewBox="0 0 24 24" width="22" height="22"><path d="M20 12a8 8 0 1 1-2.34-5.66" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"/><path d="M20 4v5h-5" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg></span><span class="ptr-t"></span>'; document.body.appendChild(el); return el; };
+  const blocked=t=>{ const sh=document.getElementById("sheet"); if(sh&&!sh.hidden) return true; if(document.querySelector(".ob:not([hidden]),#shareOv:not([hidden]),#pop:not([hidden])")) return true;
+    return !!(t.closest&&t.closest(".zwrap,.board-wrap,input,textarea,select,canvas,.rm-room,.room,[contenteditable]")); };
+  const show=v=>{ const e=ui(); const r=Math.min(v,MAX); e.style.setProperty("--p",String(Math.min(1,v/TH))); e.style.transform=`translate(-50%,${r-46}px)`; e.classList.toggle("ok",v>=TH); e.querySelector(".ptr-t").textContent=v>=TH?"はなすと新しくします":"下に引っぱって新しくする"; e.hidden=false; };
+  const hide=()=>{ if(!el) return; el.classList.add("back"); el.style.transform="translate(-50%,-60px)"; setTimeout(()=>{ if(el){ el.hidden=true; el.classList.remove("back"); } },220); };
+  document.addEventListener("touchstart",e=>{ if(e.touches.length!==1||window.scrollY>2||blocked(e.target)){ y0=null; return; } y0=e.touches[0].clientY; x0=e.touches[0].clientX; d=0; on=false; },{passive:true});
+  document.addEventListener("touchmove",e=>{ if(y0==null) return; const t=e.touches[0]; const dy=t.clientY-y0, dx=Math.abs(t.clientX-x0);
+    if(!on){ if(dy>12&&dy>dx*1.5&&window.scrollY<=2) on=true; else if(dy<-4||dx>16){ y0=null; return; } else return; }
+    d=dy*0.55; show(d); },{passive:true});
+  document.addEventListener("touchend",()=>{ if(y0==null||!on){ y0=null; return; } y0=null; on=false;
+    if(d>=TH){ const e=ui(); e.classList.add("spin"); e.querySelector(".ptr-t").textContent="新しくしています…"; e.style.transform=`translate(-50%,${TH-46}px)`; try{ track("/refresh","引っぱって更新"); }catch(_){}
+      try{ sessionStorage.setItem("nw-ptr",String(Date.now())); }catch(_){}
+      setTimeout(()=>location.reload(),350); }
+    else hide(); d=0; },{passive:true});
+  document.addEventListener("touchcancel",()=>{ y0=null; on=false; hide(); },{passive:true});
+  // 新しくしたあとに1回だけ知らせる
+  try{ const t=+sessionStorage.getItem("nw-ptr")||0; if(t&&Date.now()-t<15000){ sessionStorage.removeItem("nw-ptr"); setTimeout(()=>toast("↻ 新しくしました"+(D.updatedLabel?"(いまの内容: "+D.updatedLabel+")":"")),900); } }catch(_){}
+})();
 // ===== ⚙️ 設定のページ(2026-11-18・持ち主から「設定の吹き出しが見づらい・ごちゃついている・何ができるかわからない」) =====
 // 右上の「設定」で開く1まいのページ。上に「よく変えるもの」(文字・画面の色・モード)を絵つきで、下に「何を変えられるか」を まとまりごとの行で。下のタブには入れない
 const SET_ROWS=[
@@ -5599,6 +5630,7 @@ function openShimen(){ const sh=document.getElementById("sheet"); const w=D.weat
 document.addEventListener("click",e=>{ const b=e.target.closest("[data-shimen]"); if(!b) return; e.preventDefault(); openShimen(); });
 // ===== お知らせ(新しくなったところ)。機能を足したら、いちばん上に1つ足す =====
 const UPDATES=[
+  {id:"2026-11-18c",d:"2026-11-18",t:"↻ 下に引っぱって新しくできる",L:["画面のいちばん上で、指を下に引っぱってはなすと、ページ全体を新しくできます(スマホの画面に置いたアプリでも使えます)。"]},
   {id:"2026-11-18b",d:"2026-11-18",t:"⚙️ 設定を1まいのページに",L:["右上の「設定」を押すと、設定のページが開くようになりました。文字の大きさ・画面の明るさは見本の絵を見ながら選べます。","その下に「見た目」「わたしのこと」「読み上げ」など、変えられることがまとまりごとに並んでいます。"]},
   {id:"2026-11-18a",d:"2026-11-18",t:"📷 ニュースの写真を見直しました",L:["見出しと合わない写真が出ていたのを直しました(サッカーなのにバスケ、情報漏れなのに送電線、など)。見出しのことばを先に見て選ぶようにしました。","橋・選挙・石油・スマホ・スケートの写真を足しました。事件・事故・戦争のニュースは、写真ではなくジャンルの絵にしています。"]},
   {id:"2026-11-17i",d:"2026-11-17",t:"🖼️ ジャンルの絵・🏁 解説の「はじまり」",L:["写真がないニュースや、同じ写真が続くところに、ジャンルごとの絵(政治=議事堂、経済=グラフ など)を出すようにしました。","解説の「これまでの流れ」に、その話の始まりの出来事を足しました(ウクライナ・イスラエル・FRB・浜岡原発 など)。"]},
