@@ -5564,6 +5564,7 @@ function openShimen(){ const sh=document.getElementById("sheet"); const w=D.weat
 document.addEventListener("click",e=>{ const b=e.target.closest("[data-shimen]"); if(!b) return; e.preventDefault(); openShimen(); });
 // ===== お知らせ(新しくなったところ)。機能を足したら、いちばん上に1つ足す =====
 const UPDATES=[
+  {id:"2026-11-18a",d:"2026-11-18",t:"📷 ニュースの写真を見直しました",L:["見出しと合わない写真が出ていたのを直しました(サッカーなのにバスケ、情報漏れなのに送電線、など)。見出しのことばを先に見て選ぶようにしました。","橋・選挙・石油・スマホ・スケートの写真を足しました。事件・事故・戦争のニュースは、写真ではなくジャンルの絵にしています。"]},
   {id:"2026-11-17i",d:"2026-11-17",t:"🖼️ ジャンルの絵・🏁 解説の「はじまり」",L:["写真がないニュースや、同じ写真が続くところに、ジャンルごとの絵(政治=議事堂、経済=グラフ など)を出すようにしました。","解説の「これまでの流れ」に、その話の始まりの出来事を足しました(ウクライナ・イスラエル・FRB・浜岡原発 など)。"]},
   {id:"2026-11-17h",d:"2026-11-17",t:"🐾 ペットごとに読み上げの声が変わる",L:["マイ→⚙️設定→「🔊 読み上げ」で「🐾 ペットの声」を選ぶと、育てている子の種類に合わせた声で読み上げます(みけまる=小夜/SAYO、ももまる=中国うさぎ など)。","新しい声は、いま順番に作っています。できるまでは ずんだもん の声で読みます。たまごの間はスマホの声です。"]},
   {id:"2026-11-17g",d:"2026-11-17",t:"🔊 ずんだもんの声が止まらない・重なるのを直しました",L:["キャラの声(ずんだもん)で読み上げているときは、画面の下に「⏹ 止める」が出ます。どの画面からでも止められます。","声は1つずつしか流れないようにしました(別の🔊を押すと、前の読み上げは止まります)。アプリを閉じたときも止まります。"]},
@@ -6314,31 +6315,50 @@ const TH={
   tennis:["1567220720374-a67f33b2a6b9","Tim Chow"], golf:["1562204320-31975a5e09ce","Will Porada"],
   track:["1474546652694-a33dd8161d66","Austris Augusts"], bear:["1551792714-9a8b35338793","Zdeněk Macháček"],
   books:["1625053376622-e462848c453f","Peter Herrmann"], fuji:["1509023464722-18d996393ca8","Clay Banks"],
-  mountain:["1465220183275-1faa863377e3","Chris Biron"], solar:["1509391366360-2e959784a276","American Public Power Association"]
+  mountain:["1465220183275-1faa863377e3","Chris Biron"], solar:["1509391366360-2e959784a276","American Public Power Association"],
+  // 2026-11-18 に足した5まい
+  bridge:["1794846326702-2b55e6b343b4","Julia Taubitz"], vote:["1782998307726-f93ec14eda24","Jesse Paul"], oil:["1786532852011-443cba5dc9fe","Red Shuheart"],
+  phone:["1512428559087-560fa5ceab42","NordWood Themes"], rink:["1793217391758-b4f90daf5f17","Martin Leitgeb"]
 };
 // 上から順に当てはめる(広いことばは下に)
+// 見出しのことば → 写真。[ことば, 写真, 使ってよいジャンル(なければどれでも)]。せまいことばを先に。
+// 2026-11-18: 本文のついでのことば(「AI関連株」「電力」など)で、見出しと合わない写真が出ていた → まず見出しだけで探し、なければ本文。ジャンルでもしぼる
+const G_ALL=null, G_SPO=["spo"];
 const TH_RULES=[
-  [/クマ|熊(?!本)/,"bear"],[/富士山/,"fuji"],[/大雪|積雪|寒波|吹雪|降雪|初雪/,"snow"],
-  [/台風|大雨|豪雨|暴風|高波|線状降水/,"storm"],[/真夏日|猛暑|熱中症|気温|℃/,"heat"],
-  [/新幹線|鉄道|電車|列車|運休|ダイヤ改正|JR(?![A-Za-z])/,"train"],[/高速道路|渋滞|自動車|EV(?![A-Za-z])|トヨタ|日産|ホンダ|運転免許/,"traffic"],
-  [/半導体|(?<![A-Za-z])AI(?![A-Za-z])|エヌビディア|データセンター|生成AI/,"chip"],
+  [/映画|ドラマ|アニメ|俳優|主演|役に|ボンド|音楽|ライブ|歌手|紅白/,"cinema",["ent"]],
+  [/クマ|熊(?!本)/,"bear",["soc","sci","life","home"]],[/富士山/,"fuji"],[/大雪|積雪|寒波|寒気|吹雪|降雪|初雪/,"snow",["soc","life","trip","sci"]],
+  [/台風|大雨|豪雨|暴風|高波|線状降水|荒れた天気|荒天/,"storm",["soc","life","trip","sci"]],[/真夏日|猛暑|熱中症|℃/,"heat",["soc","life","sci"]],
+  [/フィギュア|スケート|ホッケー|カーリング/,"rink",G_SPO],[/テニス/,"tennis",G_SPO],[/ゴルフ/,"golf",G_SPO],[/陸上|マラソン|駅伝|競歩/,"track",G_SPO],
+  [/スキー|スノーボード|ノルディック|ジャンプ/,"mountain",["spo","trip"]],[/NBA|バスケ|Bリーグ/,"hoop",G_SPO],[/大相撲|九州場所|横綱|大関|幕内|力士/,"",G_SPO],
+  [/サッカー|Jリーグ|W杯|ワールドカップ|なでしこ|森保|日本代表.*(ゴール|[0-9]-[0-9])|ゴール/,"soccer",G_SPO],
+  [/野球|阪神|巨人|日本シリーズ|MLB|大谷|ドジャース|ホームラン|投手/,"ballpark",G_SPO],
+  [/不正アクセス|漏れ|流出|漏えい|サイバー|ハッキング|ランサム|不正なプログラム|コンピューターウイルス|パスワード|乗っ取り/,"cyber"],
   [/裁判|判決|地裁|高裁|最高裁|逮捕|起訴|容疑|訴訟|有罪|無罪|書類送検/,"gavel"],
-  [/コメ|米価|稲作|農家|農業|田んぼ|新米/,"rice"],[/電気代|電力|停電|送電/,"power"],[/太陽光|再生可能|風力発電|脱炭素/,"solar"],
-  [/貿易|関税|輸出|輸入|コンテナ|タンカー|海運/,"cargo"],[/工場|製造業|鉄鋼|操業|生産ライン/,"factory"],
+  [/選挙|投票|投開票|当選|出馬/,"vote",["pol","intl","soc"]],
+  [/日経平均|株価|株が|株安|株高|ダウ|ナスダック|上場/,"market",["eco","it","intl"]],
+  [/原油|ガソリン|石油|OPEC|灯油/,"oil",["eco","intl","life"]],
+  [/(?<![高石土倉舟板棚本岩])橋(?!本)/,"bridge",["intl","soc","trip"]],
+  [/爆発|爆弾|銃撃|空爆|戦闘|殺害|死亡|けが人|負傷/,"",["intl","soc"]], // 事件・戦争・事故は写真にしない(ジャンルの絵)
+  [/新幹線|鉄道|電車|列車|運休|ダイヤ改正|JR(?![A-Za-z])/,"train",["soc","eco","trip","life","pol"]],
+  [/高速道路|渋滞|自動車|EV(?![A-Za-z])|トヨタ|日産|ホンダ|運転免許/,"traffic",["soc","eco","it","life"]],
+  [/スマホ|アプリ|SNS|携帯電話/,"phone",["it","soc","life","eco"]],
+  [/半導体|(?<![A-Za-z])AI(?![A-Za-z])|エヌビディア|データセンター/,"chip",["it","eco","sci","intl"]],
+  [/コメ|米価|稲作|農家|農業|田んぼ|新米/,"rice",["eco","food","soc","pol","life"]],
+  [/電気代|電力|停電|送電/,"power",["eco","soc","sci","pol","life","home"]],[/太陽光|再生可能|風力発電|脱炭素/,"solar",["eco","sci","pol"]],
+  [/貿易|関税|輸出|輸入|コンテナ|タンカー|海運/,"cargo",["eco","intl","pol"]],[/工場|製造業|鉄鋼|操業|生産ライン/,"factory",["eco","it","sci"]],
   [/温暖化|気候変動|COP\d|環境省/,"earth"],
-  [/テニス/,"tennis"],[/ゴルフ/,"golf"],[/陸上|マラソン|駅伝|競歩/,"track"],[/スキー|スノーボード|ノルディック|ジャンプ女子|ジャンプ男子/,"mountain"],
-  [/芥川賞|直木賞|書店|図書館|出版|文庫|小説|作家/,"books"],
-  [/学校|授業|教員|入試|受験|小学校|中学校|高校|大学|文科省|教育/,"school"],
-  [/不正アクセス|漏れ|流出|漏えい|サイバー|ハッキング|ランサム|不正なプログラム|ウイルス|パスワード|乗っ取り/,"cyber"],
-  [/日経平均|株価|株が|株安|株高|市場/,"market"],[/消費税|食料品|物価|値上げ|値下げ|スーパー/,"shop"],
-  [/円安|円高|為替|1ドル|賃金|給料|年金|減税|増税|予算|補助金|給付|金利|利上げ|日銀/,"coins"],
-  [/サウジ|イエメン|フーシ|中東|イラン|イスラエル|ガザ|原油/,"desert"],
-  [/ロケット|宇宙|衛星|探査|火星|月面|JAXA|NASA/,"rocket"],[/病院|医療|ワクチン|感染|薬|健康|手術/,"med"],
-  [/NBA|バスケ/,"hoop"],[/野球|阪神|巨人|日本シリーズ|MLB|大谷|ドジャース|CS/,"ballpark"],[/サッカー|Jリーグ|W杯|ワールドカップ/,"soccer"],
-  [/映画|ドラマ|アニメ|俳優|音楽|ライブ/,"cinema"],[/旅行|観光|空港|ホテル/,"trip"],
-  [/首脳|会談|特使|外相|国連|大使|サミット|停戦|和平/,"flags"],[/国会|法案|首相|内閣|選挙|衆院|参院|与党|野党|知事|市長/,"capitol"]
+  [/芥川賞|直木賞|書店|図書館|出版|文庫|小説|作家/,"books",["ent","life","soc"]],
+  [/学校|授業|教員|入試|受験|小学校|中学校|高校|大学|文科省|教育/,"school",["soc","pol","life","sci"]],
+  [/消費税|食料品|物価|値上げ|値下げ|スーパー/,"shop",["eco","soc","life","food","pol"]],
+  [/円安|円高|為替|1ドル|賃金|給料|年金|減税|増税|予算|補助金|給付|金利|利上げ|日銀/,"coins",["eco","pol","life","soc"]],
+  [/サウジ|イエメン|フーシ|中東|イラン|イスラエル|ガザ/,"desert",["intl","eco","pol"]],
+  [/ロケット|宇宙|衛星|探査|火星|月面|JAXA|NASA/,"rocket",["sci","it","intl"]],[/病院|医療|ワクチン|感染|薬|健康|手術/,"med",["sci","soc","life"]],
+  [/映画|ドラマ|アニメ|俳優|音楽|ライブ/,"cinema",["ent","life"]],[/旅行|観光|空港|ホテル/,"trip",["trip","life","eco","soc"]],
+  [/首脳|会談|特使|外相|国連|大使|サミット|停戦|和平|APEC|G7|G20/,"flags",["intl","pol"]],
+  [/国会|法案|首相|内閣|衆院|参院|与党|野党|知事|市長|定数|議員|議席/,"capitol",["pol","intl"]]
 ];
-const TH_G={pol:"capitol",eco:"market",it:"it",intl:"flags",spo:"ballpark",sci:"rocket",ent:"cinema",fas:"clothes",home:"room",food:"cook",life:"coffee",trip:"trip"};
+const TH_BODY_SKIP=["capitol","flags","coins","shop","school","market","cinema","trip"];
+const TH_G={pol:"capitol",eco:"market",it:"it",intl:"flags",spo:"ballpark",ent:"cinema",fas:"clothes",home:"room",food:"cook",life:"coffee",trip:"trip"};
 // 🖼️ ジャンルの絵(2026-11-17 夜・自作SVG): 写真がないとき・同じ写真が続くときに、絵文字の代わりに出す。色はジャンルの色(明るい/暗い画面どちらでも)
 const GART={
  pol:'<rect x="22" y="70" width="76" height="26" rx="3" fill="#fff" opacity=".9"/><path d="M30 70h60L60 48z" fill="C"/><circle cx="60" cy="44" r="10" fill="C"/><rect x="58" y="26" width="4" height="10" fill="C"/><g fill="C" opacity=".55"><rect x="32" y="76" width="6" height="18"/><rect x="47" y="76" width="6" height="18"/><rect x="67" y="76" width="6" height="18"/><rect x="82" y="76" width="6" height="18"/></g>',
@@ -6359,7 +6379,9 @@ let TEN_USED=null;
 function thumbOn(){ if(store.get("nw-thumb")==="0") return false; try{ if(navigator.connection&&navigator.connection.saveData) return false; }catch(_){} return true; }
 // 解説に写真があればそれ、なければ見出しのことば → ジャンル の順
 function thumbOf(n){ if(n.ex&&PHOTOS[n.ex]) return {u:PHOTOS[n.ex][0].replace(/\?.*$/,""),by:PHOTOS[n.ex][1]};
-  const t=(n.title||n.h||"")+" "+(n.text||""); let k=null; for(const [re,key] of TH_RULES){ if(re.test(t)){ k=key; break; } } k=k||TH_G[n.g];
+  // 本文で探すときは、どこにでも出てくる広いことば(国会・首脳・お金・学校など)は使わない
+  const find=(t,body)=>{ if(!t) return null; for(const [re,key,gs] of TH_RULES){ if(gs&&n.g&&!gs.includes(n.g)) continue; if(body&&TH_BODY_SKIP.includes(key)) continue; if(re.test(t)) return key; } return null; };
+  let k=find((n.s||"")+" "+(n.title||n.h||"")); if(k==null) k=find(n.text||"",1); if(k==null) k=TH_G[n.g]; if(!k) return null; // ""=写真を使わずジャンルの絵
   const p=k&&TH[k]; return p?{u:"https://images.unsplash.com/photo-"+p[0],by:p[1]}:null; }
 function thumbHTML(n,big,used){ if(!thumbOn()) return ""; let p=thumbOf(n); if(p&&used){ if(used.has(p.u)) p=null; else used.add(p.u); }
   if(p&&big) return `<span class="th th-big"><img src="${p.u}?w=800&h=400&fit=crop&q=60&auto=format" alt="" decoding="async" width="800" height="400" onerror="this.parentNode.remove()"></span>`;
@@ -6788,7 +6810,7 @@ document.addEventListener("click",ev=>{ const x=ev.target.closest("[data-alx]");
 document.addEventListener("keydown",ev=>{ if((ev.key==="Enter"||ev.key===" ")&&ev.target.matches&&ev.target.matches(".al-band[data-quake]")){ ev.preventDefault(); openQuake(); } });
 try{ loadAlerts(); setInterval(()=>{ if(document.visibilityState==="visible") loadAlerts(); },3*60*1000); document.addEventListener("visibilitychange",()=>{ if(document.visibilityState==="visible") loadAlerts(); }); }catch(_){}
 // テスト用の手がかり(localhost で動かしたときだけ。本番では出さない)
-if(/^(localhost|127\.0\.0\.1)$/.test(location.hostname)) window.NW_TEST={genreArt,stopSpeak,openEx,openForms,applyForm,openGenre,openMenu,setGo,ttsPlan,ttsKey,listenText,sayQueue,openRadio,bgmStart,ttsChunks,ttsClean,bestJaVoice,openHelp,placeOf,localCard,get NEWS(){return NEWS;},petSVG,PET_KINDS,PET_COLORS,petColorsFor,WEAR,petStage,petXP,petKind,petHall,petName,petRestart,get ME(){return ME;},get LOOK(){return LOOK;},TOPIC_GROUPS,FUN,SECS,openFun,openEx,fillQs,hhNews,ktQs,serialChapters,go,openLife,trendWords,openShimen};
+if(/^(localhost|127\.0\.0\.1)$/.test(location.hostname)) window.NW_TEST={TH,TH_RULES,thumbOf,NEWS_ALL:()=>NEWS,genreArt,stopSpeak,openEx,openForms,applyForm,openGenre,openMenu,setGo,ttsPlan,ttsKey,listenText,sayQueue,openRadio,bgmStart,ttsChunks,ttsClean,bestJaVoice,openHelp,placeOf,localCard,get NEWS(){return NEWS;},petSVG,PET_KINDS,PET_COLORS,petColorsFor,WEAR,petStage,petXP,petKind,petHall,petName,petRestart,get ME(){return ME;},get LOOK(){return LOOK;},TOPIC_GROUPS,FUN,SECS,openFun,openEx,fillQs,hhNews,ktQs,serialChapters,go,openLife,trendWords,openShimen};
 const h=(location.hash||"").slice(1);
 if(h==="quake"){ go("today"); setTimeout(openQuake,50); } else if(h==="shimen"){ go("today"); setTimeout(openShimen,50); } else if(D.explainers[h]){ go("explain"); openEx(h); }
 else if(h.startsWith("t=")) openTHash(h);
