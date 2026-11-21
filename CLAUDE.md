@@ -396,3 +396,14 @@
   - 🤚 なでる `friendPat`(部屋のぴよた・なかまのカード。`ME.pet.flove`、1日 `LOVE_DAY` まで)。**部屋のぴよたを押すと「なでる」**(前はごはんが減っていた)。ごはんは「🐥 なかま」のボタン `[data-ffeed]`。
   - 🎒 **おつかい**(`TRIP_DEST`・`tripState()`=ready/out/back/done・`tripStart`・`tripClaim`・`openGift`): 1日1回(`ME.pet.ftripDay`)、`TRIP_MS`=1時間でもどる(`ME.pet.ftrip{at,dest}`)。行き先は にわ→こうえん→もり→うみ→そら(育つと増える)、おみやげは各4つ=20種類(`ME.pet.fgift{キー:こ数}`・回数 `ftrips`)。まだ持っていないものが出やすい(75%)。はじめてのおみやげは部屋に自動でかざる(`ME.pet.fshow`)。おでかけ中は部屋にいない(`.rm-note`)、もどると🎁(`.rm-gift`)。「きょう」のあいさつにも「🎁 おみやげ」のボタン。
   - **線引き**: おみやげは かざり だけ。🍙ごはん・そだちのルールは変えない。おみやげの絵文字は古いスマホでも出るものだけ(新しい絵文字 🪶🪸 などは使わない)。
+
+## 🎮 ペットの大型アップデート 第2弾(2026-11-21 夜)
+- タブは6つ `PET_TABS`(care・**play**・wear・room・friends・log)。6つは 400px 以下と xl/xxl で3列×2段。
+- **📸 成長アルバム**(`albumCheck`・`albumHTML`・`albumOf`・`ME.pet.album=[{s段階,d日付,c色,w服,l見た目,m手で,b あとから}]`): `petBig` のたびに、まだない段階を**自動で**1まいずつ足す(一度に何段も育っても全部)。アルバムを始める前に育っていた段階は `b:1`(あとからの思い出・日付なし)。手で残すのは10まいまで(`[data-albsnap]`)。`album`・`ttl` は `PET_INDIV`(入れかえ・殿堂でも持っていく)。`petRestart`・`petSwap` の前に `albumCheck()`。アルバムのない古い殿堂の子は `albumOf(h)` が 0〜その子の段階を「(あとから)」で作る(会いに行くページ)。
+- 🏅 称号 `PET_TITLE`(名人のとき、よく読むジャンルから。`p.ttl`)、🎭 せいかく `PERSONA`/`PERSONA_L`(ひとこと・あいさつに足す)、✨ とくいわざ `TRICKS`(なかよしの数で覚える。部屋の「✨ わざ」・あそぶタブ。CSS `.tk-◯◯`)、🌙 1日のリズム(夜は部屋が暗く `.rm-dark`・よく寝る、朝は1回のび)。
+- 🙏 きょうのおねがい `petWish()`(1日1つ・`ME.pet.wish`。読むことが少ないジャンルのニュース(`openNews` の `wishMark`)・解説・ことば・クイズ。かなえると なかよし +2。おせわの一覧とあいさつ)。
+- 🎮 あそぶ `petPlayHTML`/`bindPlay`: ⚽ ボールキャッチ(5回・3回以上で なかよし+1・`bgBest`)、🃏 ことば合わせ(ことば辞典の「ことば」と意味の1文目・4組)、👣 おさんぽ(`sanpoPlaces`=いちばん新しい日の ✅ ニュースの場所5つまで。見出しは `.nv-h`。なかまの家の子をさそえる `walkMate`)、🍳 ごはんづくり(`INGR`×`RECIPES`。つぎのごはんで食べる `p.dish`。そだちは同じ +5)。なかよしは `petLoveAdd`(1日 `LOVE_DAY` まで)。
+- 🏠 へや: テーマセット `ROOM_THEMES`(壁・床・ラグ+かざり2つ)・大きい家具 `BIG_FURN`(4こまで `R.big`)・窓のけしき `WIN_VIEWS`(`R.view`)・季節のかざり `seasonDeco()`(`R.noSeason`)・絵はがきの額(3まいまで `R.frames`。押すとはがき)・🌷 庭(`R.garden`、6マス。開いた日+水やりで育つ `plantGrow`、つむと なかよし+1・`picked`)。部屋のものは全部 `data-rk` で指で動かせる。**ペットの位置は `ROOM_X` に覚える**(ごはんなどで描きなおしても まん中にもどらない)。おつかい中の札は部屋の外(`.ph-trip`)。
+- 🐥 なかま: ✉️ おつかい日記(`TRIP_LINES`・`p.fdiary` 20件)、🗾 絵はがきのタイル地図(`prefTileHTML`・`PREF_TILE`=PREFS の順の [列,行])、🤝 ペットの名刺(`pcardSend`/`pcardReceive`・`?pcard=`。名前・種類・色・服・段階・呼び名だけ。受けとると `p.visitor` がその日だけ部屋に)、🏠 なかまの家の子を部屋に呼ぶ(`guestCall`・`p.guest{gen,kind,d}`・なでるとその子の なかよし)。
+- 📔 きろく: アルバム・日記・📓 ノート(読んだ解説の「ひとことで言うと」+ふくしゅう問題)・📚 図鑑(種類はシルエット)・そだちのうちわけ。
+- 👕 服を7つ足した(chefhat・nightcap・flowercrown・sailor・cap・earmuff・walker。条件は新しい遊び。`petFlag("nightpat"/"winter")`)。**服を足したら7種類×段階で絵を並べて見る**(このときも確かめた)。
