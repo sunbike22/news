@@ -51,6 +51,13 @@ for(const [mode,dark,w] of [["normal",false,390],["normal",true,390],["easy",fal
     return {bad,kinds:Object.keys(T.PET_KINDS).length,wear:T.WEAR.length,stage:T.petStage().name}; });
   ok("ペット: テスト用の手がかりがある", !r.noHook); if(!r.noHook){ ok("ペット: 絵がこわれていない(種類×段階×気分×服)", !r.bad.length, (r.bad||[]).slice(0,3).join(",")); ok("ペット: 7種類・服19以上", r.kinds>=7&&r.wear>=19, r.kinds+"/"+r.wear); ok("ペット: 名人になれる", r.stage==="ニュース名人", r.stage); }
   await p.evaluate(()=>document.getElementById("tab-my").click()); await p.waitForTimeout(600);
+  // ペットのページ(2026-11-21 作り直し): 部屋が上・5つのタブ・たたみ(details)なし・ともだちの絵
+  { const pg=await p.evaluate(()=>{ const T=window.NW_TEST; const tabs=[...document.querySelectorAll("[data-ptab]")].map(b=>b.dataset.ptab); const out={tabs:tabs.join(),room:!!document.getElementById("room"),det:document.querySelectorAll('[data-mysec="pet"] details').length,sw:document.documentElement.scrollWidth<=innerWidth+1,bad:[]};
+      tabs.forEach(k=>{ document.querySelector(`[data-ptab="${k}"]`).click(); const pn=document.querySelector(`[data-ppanel="${k}"]`); if(!pn||pn.hidden||!pn.textContent.trim()) out.bad.push(k); if(document.documentElement.scrollWidth>innerWidth+1) out.bad.push(k+":横"); });
+      document.querySelector('[data-ptab="care"]').click();
+      if(T.friendSVG){ for(let lv=0;lv<5;lv++) for(const c of T.FR_COLORS) for(const a of T.FR_ACC){ const svg=T.friendSVG(60,lv,c[0],a[0]); const d=new DOMParser().parseFromString(svg,"image/svg+xml"); if(d.querySelector("parsererror")) out.bad.push("fr"+lv+c[0]+a[0]); } } else out.bad.push("friendSVG");
+      return out; });
+    ok("ペットのページ: 部屋と5つのタブ・たたみなし", pg.room&&pg.tabs==="care,wear,room,friends,log"&&pg.det===0, JSON.stringify(pg)); ok("ペットのページ: どのタブも中身があり、横にはみ出さない・ともだちの絵", !pg.bad.length&&pg.sw, pg.bad.join(",")); }
   const hasBtn=await p.$("#petRestart"); ok("名人: 「新しいたまご」のボタンが出る", !!hasBtn);
   if(hasBtn){ await hasBtn.click(); await p.waitForTimeout(700); const a=await p.evaluate(()=>{const T=window.NW_TEST;return {st:T.petStage().i,hall:T.petHall().length,gen:T.ME.pet.gen};}); ok("名人: 新しいたまごになり、前の子は殿堂へ", a.st===0&&a.hall===1&&a.gen===2, JSON.stringify(a)); }
   ok("ペット画面: エラーなし", !errs.length, errs.slice(0,2).join(" | ")); await ctx.close(); }
