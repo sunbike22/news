@@ -1674,7 +1674,7 @@ button.fu-i{cursor:pointer}.fu-i.on{border-color:var(--accent-btn,var(--accent))
 @keyframes tkspin{to{transform:rotateY(720deg)}}@keyframes tkjump{30%{transform:translateY(-70px) rotate(-8deg)}60%{transform:translateY(0)}75%{transform:translateY(-18px)}}@keyframes tkbow{30%,60%{transform:rotate(18deg) translateY(6px)}}@keyframes tkdance{20%{transform:rotate(-14deg)}40%{transform:rotate(14deg)}60%{transform:rotate(-14deg) translateY(-8px)}80%{transform:rotate(14deg)}}@keyframes tkbanzai{30%,70%{transform:scale(1.18) translateY(-10px)}}@keyframes tkstretch{40%,60%{transform:scaleY(1.15) scaleX(.92)}}
 .rm-badge{position:absolute;left:50%;top:-4px;margin-left:-8px;font-size:15px;font-style:normal;z-index:5}
 .rm-dark{position:absolute;inset:0;background:rgba(15,23,60,.28);z-index:0;pointer-events:none}
-.rm-it.rm-big{font-size:40px;width:48px;margin-left:-24px}
+.rm-it.rm-big{font-size:40px;width:48px;margin-left:-24px}.room.dense .rm-it{font-size:19px;width:24px;margin-left:-12px}.room.dense .rm-it.rm-big{font-size:30px;width:36px;margin-left:-18px}.room.dense .rm-it.rm-frame{font-size:22px;width:44px;margin-left:-22px}
 .rm-it.rm-frame{font-size:30px;width:52px;margin-left:-26px;cursor:pointer}.rm-pfn{display:block;font-style:normal;font-size:12px;line-height:1.2;color:#3a2a14;background:rgba(255,255,255,.85);border-radius:4px;padding:0 2px;margin-top:-2px;white-space:nowrap}
 .rm-guest{position:absolute;bottom:4px;left:16%;border:0;background:none;padding:0;cursor:pointer;z-index:3;line-height:0}.rm-guest.eat svg{animation:rmhop .5s}.rm-vis{left:auto;right:22%}.rm-tag{position:absolute;left:50%;bottom:-2px;transform:translateX(-50%);font-size:12px;line-height:1.3;background:rgba(255,255,255,.9);color:#3a2a14;border-radius:8px;padding:0 6px;white-space:nowrap}
 .rm-guest .rm-say{bottom:66px}
@@ -4360,7 +4360,7 @@ function roomGot(){ return GORDER.filter(g=>(ME.auto||{})[g]>=3); }
 function roomStageHTML(){ const got=roomGot(); const st=petStage(); const fr=friendOn(); const R=petRoom(); const p=petInit();
   const W=ROOM_WALL.find(x=>x[0]===R.wall)||ROOM_WALL[0], F=ROOM_FLOOR.find(x=>x[0]===R.floor)||ROOM_FLOOR[0], RG=ROOM_RUG.find(x=>x[0]===(R.rug||""))||ROOM_RUG[0];
   // 窓は左上、家具は「かべの棚(6こまで)」と「床のおく(のこり)」、おみやげは床のおくの右から
-  const DEF={win:[12,9],season:[27,10],"td:0":[90,5],"td:1":[34,40]}; got.forEach((g,j)=>{ DEF[g]= j<6 ? [46+j*9,26] : [31+(j-6)*7,58]; }); const SV=frShow(); SV.forEach((k,j)=>{ DEF["sv:"+k]=[28+j*9,86]; });
+  const DEF={win:[12,9],season:[27,10],"td:0":[90,5],"td:1":[34,40]}; got.forEach((g,j)=>{ DEF[g]= j<6 ? [46+j*9,26] : [31+(j-6)*7,58]; }); const SV=frShow(); SV.forEach((k,j)=>{ DEF["sv:"+k]=[30+j*8,50]; });
   const BIG=(R.big||[]).filter(k=>BIG_FURN.some(b=>b[0]===k&&b[3]())); BIG.forEach((k,j)=>{ DEF["bf:"+k]=[[8,20,81,93][j],44]; }); const FR=(R.frames||[]).filter(k=>ppCards()[k]).slice(0,3); FR.forEach((k,j)=>{ DEF["pf:"+k]=[47+j*14,4]; });
   const it=(key,i,html,cls,t)=>{ const [x,y]=R.pos[key]||DEF[key]||roomCell(i); return `<span class="rm-it${cls}" data-rk="${key}" style="left:${x}%;top:${y}%"${t?` title="${esc(t)}"`:""}>${html}</span>`; };
   const VW=WIN_VIEWS.find(v=>v[0]===(R.view||"")&&v[2]()); const TH=ROOM_THEMES.find(t=>t[0]===R.theme); const SE=R.noSeason?null:seasonDeco();
@@ -4371,13 +4371,28 @@ function roomStageHTML(){ const got=roomGot(); const st=petStage(); const fr=fri
     +(SE?it("season",0,SE[0]," mv",SE[1]):"")+(TH?it("td:0",0,TH[5]," mv",TH[1])+it("td:1",0,TH[6]," mv",TH[1]):"");
   const gk=guestKid(); const vis=(p.visitor&&p.visitor.d===TODAY)?p.visitor:null; const tt=petTitle(); const night=skyTOD()==="night";
   const ts=fr?tripState():null; const out=ts&&ts.s==="out", back=ts&&ts.s==="back";
-  return `<div class="room" id="room" style="--w1:${W[2]};--w2:${W[3]};--f1:${F[2]};--f2:${F[3]}"><div class="rm-wall"></div><div class="rm-floor"></div>${night?'<i class="rm-dark" aria-hidden="true"></i>':""}${RG[0]?`<i class="rm-rug" aria-hidden="true" style="background:${RG[2]}"></i>`:""}${slots}
+  return `<div class="room" id="room" style="--w1:${W[2]};--w2:${W[3]};--f1:${F[2]};--f2:${F[3]}"><div class="rm-wall"></div><div class="rm-floor"></div>${RG[0]?`<i class="rm-rug" aria-hidden="true" style="background:${RG[2]}"></i>`:""}${slots}
     ${isMonthBd()?`<span class="rm-it" style="left:70%;top:68%">🎂</span>`:""}${ppToday()?`<button class="rm-pp" data-poppo="1" aria-label="ぽっぽの絵はがきを受けとる">${poppoSVG(54)}<span>📮</span></button>`:""}
     ${fr&&!out?`<button class="rm-fr" data-fpat="1" aria-label="${esc(friendName())}${back?"のおみやげを受けとる":"をなでる"}">${friendSVG(56)}${back?`<span class="rm-gift" aria-hidden="true">🎁</span>`:""}</button>`:""}
     ${gk?`<button class="rm-guest" data-gpat="1" aria-label="${esc(friendNm(gk.h))}(なかまの家から遊びに来た)をなでる">${petSVG(friendStageOf(gk.h),"happy",null,64,gk.h.wear||null,gk.h.kind,gk.h.color||null,gk.h.look||{})}</button>`:""}
     ${vis?`<button class="rm-guest rm-vis" data-vpat="1" aria-label="${esc(vis.o?vis.o+"さんの":"")}${esc(vis.n)}(名刺で遊びに来た)">${petSVG(vis.s,"happy",null,60,vis.w,vis.k,vis.c)}<span class="rm-tag">🤝 ${esc(vis.n)}</span></button>`:""}
-    <div class="rm-pet" id="rmPet" style="left:${ROOM_X}%" role="button" tabindex="0" aria-label="${esc(petName())}をなでる">${tt?`<i class="rm-badge" aria-hidden="true">${tt[1]}</i>`:""}<div class="rm-pi">${petSVG(st.i,petMood(),(petTopGenre()&&PET_ACC[petTopGenre()][0])||null,84,petWear())}</div></div></div>`; }
-function bindRoom(){ const room=document.getElementById("room"); if(!room) return; const pet=document.getElementById("rmPet"); const pi=pet.querySelector(".rm-pi"); const scope=room.closest(".mysec")||document;
+    <div class="rm-pet" id="rmPet" style="left:${ROOM_X}%" role="button" tabindex="0" aria-label="${esc(petName())}をなでる"><div class="rm-pi">${petSVG(st.i,petMood(),(petTopGenre()&&PET_ACC[petTopGenre()][0])||null,84,petWear())}</div></div></div>`; }
+// 🪑 家具どうしの重なりをなくす(2026-11-21 夜・持ち主から「重なって見えない」): 描いたあとに実際の大きさを測り、重なるものを近くのあいている所へずらす。
+// 自分で動かした物(R.pos にある物)を先に置き、のこりをずらす。ペットが歩く床(下の4割)には置かない。見た目だけ動かし、R.pos は変えない
+function roomUnclutter(room,dense){ if(!room||!room.isConnected) return; if(!dense) room.classList.remove("dense"); const rr=room.getBoundingClientRect(); if(!rr.width) return; const W=rr.width, H=rr.height, R=petRoom();
+  const box=el=>{ const b=el.getBoundingClientRect(); return {x:b.left-rr.left,y:b.top-rr.top,w:b.width,h:b.height}; };
+  const hit=(a,b)=>a.x<b.x+b.w+1&&a.x+a.w>b.x-1&&a.y<b.y+b.h+1&&a.y+a.h>b.y-1;
+  const placed=[...room.querySelectorAll(".rm-pp")].map(box).map(b=>({x:b.x-4,y:b.y-8,w:b.w+8,h:b.h+16}));
+  const els=[...room.querySelectorAll(".rm-it")].sort((a,b)=>((R.pos[b.dataset.rk]?1:0)-(R.pos[a.dataset.rk]?1:0)));
+  const maxY=H*.6; if(!dense) els.forEach(el=>{ if(!el.dataset.l0){ el.dataset.l0=el.style.left; el.dataset.t0=el.style.top; } });
+  els.forEach(el=>{ let b=box(el); const inPet=!R.pos[el.dataset.rk]&&b.y+b.h>H*.64; if(!inPet&&!placed.some(p=>hit(b,p))){ placed.push(b); return; }
+    let best=null, bd=1e9; for(let y=3;y+b.h<=Math.max(maxY,b.y+b.h);y+=4) for(let x=3;x+b.w<=W-3;x+=4){ const c={x,y,w:b.w,h:b.h}; if(placed.some(p=>hit(c,p))) continue; const d=(x-b.x)**2+(y-b.y)**2; if(d<bd){ bd=d; best=c; } }
+    if(!best&&!dense){ room.dataset.full="1"; return; }
+    if(!best){ for(let y=Math.round(maxY);y+b.h<=H-3;y+=6) for(let x=3;x+b.w<=W-3;x+=6){ const c={x,y,w:b.w,h:b.h}; if(placed.some(p=>hit(c,p))) continue; const d=(x-b.x)**2+(y-b.y)**2; if(d<bd){ bd=d; best=c; } } }
+    if(best){ el.style.left=((best.x+b.w/2)/W*100).toFixed(1)+"%"; el.style.top=(best.y/H*100).toFixed(1)+"%"; b=best; }
+    placed.push(b); });
+  if(room.dataset.full&&!dense){ delete room.dataset.full; room.classList.add("dense"); els.forEach(el=>{ const k=el.dataset.rk; const v=R.pos[k]; if(v){ el.style.left=v[0]+"%"; el.style.top=v[1]+"%"; } else if(el.dataset.l0){ el.style.left=el.dataset.l0; el.style.top=el.dataset.t0; } }); roomUnclutter(room,true); } }
+function bindRoom(){ const room=document.getElementById("room"); if(!room) return; requestAnimationFrame(()=>roomUnclutter(room)); if(document.fonts&&document.fonts.ready) document.fonts.ready.then(()=>roomUnclutter(room)); const pet=document.getElementById("rmPet"); const pi=pet.querySelector(".rm-pi"); const scope=room.closest(".mysec")||document;
   const R=petRoom(); const still=matchMedia("(prefers-reduced-motion: reduce)").matches; const egg=petStage().i===0; const accOf=()=>(petTopGenre()&&PET_ACC[petTopGenre()][0])||null;
   let x=ROOM_X, busy=false, tm=0;
   const alive=()=>room.isConnected;
@@ -6080,6 +6095,7 @@ function openShimen(){ const sh=document.getElementById("sheet"); const w=D.weat
 document.addEventListener("click",e=>{ const b=e.target.closest("[data-shimen]"); if(!b) return; e.preventDefault(); openShimen(); });
 // ===== お知らせ(新しくなったところ)。機能を足したら、いちばん上に1つ足す =====
 const UPDATES=[
+  {id:"2026-11-21d",d:"2026-11-21",t:"🏠 部屋を明るく・家具が重ならないように",L:["夜に部屋が暗くなるのをやめました(どの壁紙でも明るく見えます)。","家具・おみやげ・額などが重なっていたら、あいている所へ自動でずらします。物が多いときは少し小さくして、ぜんぶ見えるようにします(自分で動かした物の場所はそのままです)。"]},
   {id:"2026-11-21c",d:"2026-11-21",t:"👕 新しい服が7つ",L:["コック帽とフライパン・ナイトキャップ・花かんむり・マリンぼうし・野球ぼう・耳あて・おさんぽぼうし。新しい遊び(料理・庭・おつかい・ボールキャッチ・おさんぽ)をすると着られます。","ごはんをあげても、ペットがまん中にもどらなくなりました。ともだちの「おつかい中」の札は、部屋の下に出すようにしました(ペットに重なっていました)。"]},
   {id:"2026-11-21b",d:"2026-11-21",t:"🎮 ペットと もっと遊べるように",L:["新しく「🎮 あそぶ」(とくいわざ・ボールキャッチ・ことば合わせ・おさんぽ・ごはんづくり)と、「🙏 きょうのおねがい」「🎭 せいかく」「🏅 名人の称号」を足しました。","部屋に テーマセット・大きい家具・窓のけしき・季節のかざり・絵はがきの額・庭。夜は部屋が暗くなって、よく寝ます。","📸 成長アルバム(育つたびに自動で1まい)、📓 ノート、📚 図鑑、🗾 絵はがきの地図、🤝 ペットの名刺。なかまの家の子は、部屋に呼んだり、おさんぽに さそったりできます。"]},
   {id:"2026-11-21a",d:"2026-11-21",t:"🐣 ペットのページを作り直しました",L:["マイ → ペットは、いちばん上に部屋(ペットが歩いている所)、その下に「🍙 おせわ・👕 きがえ・🏠 へや・🐥 なかま・📔 きろく」の5つのボタン。押して開くたたみをやめて、切りかえるだけにしました。「きょうのおせわ」で、きょうできることがひと目でわかります。","🐥 ともだち(ぴよた)に、🎒 おつかい(1日1回・おみやげを持ってくる。ぜんぶで20種類)・色・かざり・なでる を足しました。50回のごはんで新しい姿にも。","🏠 部屋に、ラグ・新しい壁紙と床・おみやげのかざりつけ を足しました。"]},
