@@ -4648,7 +4648,7 @@ document.addEventListener("click",e=>{ const g=e.target.closest("[data-guest]");
 function petPlayHTML(){ const p=petInit(); const st=petStage(); const egg=st.i===0; const T=tricksGot(); const nx=TRICKS.find(t=>petLove()<t[2]);
   const walk=sanpoPlaces(); const mates=petFriends().filter(({h})=>friendStageOf(h)>0);
   return `<section class="card" aria-label="とくいわざ"><div class="sec-h"><h2>✨ とくいわざ</h2><span class="sub">${T.length}/${TRICKS.length}</span></div>
-    ${egg?`<div class="hint">たまごから生まれると、💞 なかよしが増えるたびに わざを覚えます。</div>`:`<div class="tk-grid">${TRICKS.map(t=>{ const ok=petLove()>=t[2]; return `<button class="fchip" data-trick="${t[0]}" ${ok?"":"disabled"}>${ok?"✨":"🔒"} ${esc(t[1])}${ok?"":`<small>なかよし${t[2]}</small>`}</button>`; }).join("")}</div>
+    ${egg?`<div class="hint">たまごから生まれると、💞 なかよしが増えるたびに わざを覚えます。</div>`:`<div class="tk-grid">${TRICKS.map(t=>{ const ok=petLove()>=t[2]; return `<button class="fchip" data-trick="${t[0]}" ${ok?"":"disabled"}>${ok?"✨":"🔒"} ${esc(t[1])}${ok?"":` <small>なかよし${t[2]}</small>`}</button>`; }).join("")}</div>
     <div class="hint">押すと、上の部屋で${esc(petName())}が見せてくれます。${nx?`つぎは なかよし ${nx[2]} で「${esc(nx[1])}」(いま ${petLove()})。`:"ぜんぶ覚えました!"}</div>`}</section>
   <section class="card" aria-label="ボールキャッチ"><div class="sec-h"><h2>⚽ ボールキャッチ</h2><span class="sub">${p.bgBest?`さいこう ${p.bgBest}/5`:"5回勝負"}</span></div>
     <div class="bg-box" id="bgBox"><div class="bg-track"><i class="bg-zone"></i><span class="bg-ball" id="bgBall">⚽</span></div><div class="bg-st" id="bgSt">ボールが まん中の色のところに来たら「キャッチ!」</div>
@@ -4792,7 +4792,7 @@ function friendCardHTML(){ const p=petInit();
   const trip=ts.s==="back"?`<div class="pf-trip back"><b>🎁 「${esc(tripDest(ts.t.dest)[2])}」から もどってきました!</b><button class="fchip pet-feed" data-care="claim">おみやげを受けとる</button></div>`
     :ts.s==="out"?`<div class="pf-trip"><b>🎒 「${esc(tripDest(ts.t.dest)[2])}」へ おでかけ中</b><span class="hint">あと${tripLeft(ts.left)}でもどります。もどったら、おみやげを受けとれます。</span></div>`
     :ts.s==="done"?`<div class="pf-trip"><b>✓ きょうのおつかいは おわりました</b><span class="hint">また明日、たのめます。</span></div>`
-    :`<div class="pf-trip"><b>どこへ行ってもらう?</b><div class="pf-dest">${TRIP_DEST.map(d=>{ const ok=lv>=d[3]; const n=d[4].filter(x=>G[x[0]]).length; return `<button class="fchip" data-trip="${d[0]}" ${ok?"":"disabled"}><span aria-hidden="true">${ok?d[1]:"🔒"}</span> ${esc(d[2])}<small>${ok?`${n}/${d[4].length}`:`「${esc(FR_STAGES[d[3]][1])}」から`}</small></button>`; }).join("")}</div><span class="hint">1日1回。1時間くらいでもどって、おみやげを1つ持ってきます。</span></div>`;
+    :`<div class="pf-trip"><b>どこへ行ってもらう?</b><div class="pf-dest">${TRIP_DEST.map(d=>{ const ok=lv>=d[3]; const n=d[4].filter(x=>G[x[0]]).length; return `<button class="fchip" data-trip="${d[0]}" ${ok?"":"disabled"}><span aria-hidden="true">${ok?d[1]:"🔒"}</span> ${esc(d[2])} <small>${ok?`${n}/${d[4].length}`:`「${esc(FR_STAGES[d[3]][1])}」から`}</small></button>`; }).join("")}</div><span class="hint">1日1回。1時間くらいでもどって、おみやげを1つ持ってきます。</span></div>`;
   return `<section class="card" aria-label="${fn}"><div class="sec-h"><h2>🐥 ともだちの ${fn}</h2><span class="sub">${esc(FR_STAGES[lv][1])}</span></div>
     <div class="pf-top"><button class="pf-av" data-fpat="1" aria-label="${fn}をなでる">${friendSVG(96)}</button><span class="pf-tx"><span class="pf-say" id="pfSay">${ts.s==="out"?"(おつかいに出かけています)":p.ffDay===TODAY?"(おなかいっぱいで ごきげん)":"ぴよ!"}</span>
       <div class="bar"><i style="width:${Math.round(prog*100)}%"></i></div><small>ごはん ${fed}回${nx?` ・ あと${nx[0]-fed}回で「${esc(nx[1])}」`:" ・ いちばん大きくなりました"} ・ 💞 なかよし <b id="pfLove">${+p.flove||0}</b></small></span></div>
@@ -5168,7 +5168,7 @@ function openGenre(g,keep){ const sh=document.getElementById("sheet"); if(g!=="m
   const mine=g==="mine"; const L=gpList(g); const noPick=mine&&!GORDER.some(x=>(ME.interests||{})[x])&&!myTopics().length;
   const exs=mine?[]:Object.entries(D.explainers||{}).filter(([k,e])=>e&&e.g===g&&e.status!=="done"&&String(mdIso(e.updated))>=new Date(Date.parse(TODAY)-EX_QUIET*864e5).toISOString().slice(0,10)).sort((a,b)=>String(mdIso(b[1].updated)).localeCompare(String(mdIso(a[1].updated)))).slice(0,3);
   const days=[...new Set(L.map(n=>n.d))]; let shown=0;
-  const body=days.map(d=>{ if(shown>=GP.lim) return ""; const items=L.filter(n=>n.d===d).slice(0,GP.lim-shown); shown+=items.length; const used=new Set(); return `<h3 class="gp-day">${esc(relDay(d))}<small>${esc(mdLabel(d))}</small></h3><ul class="gp-ul">${items.map(n=>gpItem(n,used)).join("")}</ul>`; }).join("");
+  const body=days.map(d=>{ if(shown>=GP.lim) return ""; const items=L.filter(n=>n.d===d).slice(0,GP.lim-shown); shown+=items.length; const used=new Set(); const rd=relDay(d), ml=mdLabel(d); return `<h3 class="gp-day">${esc(rd)}${rd!==ml?`<small>${esc(ml)}</small>`:""}</h3><ul class="gp-ul">${items.map(n=>gpItem(n,used)).join("")}</ul>`; }).join("");
   if(!sh.hidden&&sh.querySelector(".gp")) SH_SIDE=true; // ジャンルの切りかえは横の移動(もどる は1回で元の画面へ)
   sh.innerHTML=`<div class="bar"><div class="wrap"><button class="iconbtn" id="gpx">← もどる</button><span class="ttl">${mine?"🎯 あなた向けのニュース":esc(GN[g])+"のニュース"}</span></div></div>
   <div class="wrap body gp">${genreBar(g)}
