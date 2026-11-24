@@ -1499,7 +1499,7 @@ b.kn{font-weight:800;text-decoration:underline 3px color-mix(in srgb,var(--accen
 
 /* 2026-11-17 部屋をすっきり */
 .rm-shelf.s2{top:53.5%}.rm-shelf{position:absolute;left:3%;right:3%;top:34.5%;height:7px;border-radius:3px;background:linear-gradient(#b07a46,#8a5a30);box-shadow:0 3px 0 rgba(0,0,0,.12);pointer-events:none}
-.rm-win{font-size:34px;width:40px;margin-left:-20px}
+.rm-win{font-size:30px;width:34px;margin-left:-17px}
 .room .rm-pp{left:1%;right:auto;top:auto;bottom:2%;z-index:3}
 .rm-stat{display:flex;gap:14px;flex-wrap:wrap;margin-top:8px;font-size:.92rem}
 .rm-tools .fchip{min-height:40px}
@@ -1694,6 +1694,11 @@ button.fu-i{cursor:pointer}.fu-i.on{border-color:var(--accent-btn,var(--accent))
 .zk-kinds{display:grid;grid-template-columns:repeat(auto-fill,minmax(64px,1fr));gap:6px;margin:6px 0 10px}.zk-k{display:flex;flex-direction:column;align-items:center;gap:2px}.zk-k small{font-size:.82rem}.zk-k.no svg{filter:brightness(0);opacity:.2}.zk-bar{height:8px;border-radius:4px;background:var(--surface2);border:1px solid var(--line);overflow:hidden;margin-top:4px}.zk-bar i{display:block;height:100%;background:var(--accent-btn,var(--accent))}
 .pt-map{display:grid;grid-template-columns:repeat(13,minmax(0,1fr));gap:3px;max-width:360px;margin:6px auto}.pt-t{aspect-ratio:1;border-radius:4px;border:1px solid var(--line);background:var(--surface2);padding:0;cursor:pointer;min-width:0}.pt-t.got{background:var(--accent-btn,var(--accent));border-color:transparent}.pt-cap{text-align:center}
 @media (prefers-reduced-motion: reduce){.rm-pi[class*="tk-"],.rm-pi[class*="tk-"] svg{animation:none!important}.al-i{transform:none!important}}
+.rm-it.mv{cursor:default;touch-action:auto}.rm-it.ed{cursor:pointer;z-index:4;outline:2px dashed rgba(0,0,0,.18);outline-offset:2px;border-radius:6px}.rm-it.sel{outline:3px solid var(--accent-btn,var(--accent));background:rgba(255,255,255,.75);transform:scale(1.15);z-index:6}
+.rm-it{font-size:22px;width:28px;margin-left:-14px}.rm-it.rm-win{font-size:30px;width:34px;margin-left:-17px}.rm-it.rm-frame{width:36px;margin-left:-18px;font-size:24px}.rm-it.rm-big{width:48px;margin-left:-24px}
+.rm-slot{position:absolute;width:30px;height:26px;margin-left:-15px;border:2px dashed var(--accent-btn,var(--accent));border-radius:6px;background:rgba(255,255,255,.45);padding:0;cursor:pointer;z-index:5}.rm-slot.big{width:48px;height:42px;margin-left:-24px}
+.room.editing .rm-pet,.room.editing .rm-fr,.room.editing .rm-pp,.room.editing .rm-guest{opacity:.45;pointer-events:none}
+.rm-edbar{display:flex;flex-wrap:wrap;align-items:center;gap:6px 10px;margin-top:8px;padding:8px 10px;border-radius:14px;border:2px solid var(--accent-btn,var(--accent));background:var(--accent-soft)}.rm-edbar.off{border:0;background:none;padding:0;justify-content:flex-end}.rm-edbar>b{color:var(--accent-ink,var(--ink))}.rm-edbar .hint{flex:1 1 12em;margin:0}.rm-edbtns{display:flex;gap:6px;flex-wrap:wrap;margin-left:auto}.rm-edbtns .pet-done{background:var(--accent-btn,var(--accent));color:var(--on-accent,#fff);border-color:transparent}
 @media (prefers-reduced-motion:reduce){#ptr .ptr-c{transform:none}#ptr.spin .ptr-c{animation:none}}
 </style>
 </head>
@@ -4357,31 +4362,41 @@ let ROOM_PLAY=null, ROOM_X=50;
 const ROOM_RUG=[["","なし",""],["red","あか","#e5737b"],["blue","あお","#6f9be8"],["green","みどり","#6fbf8a"],["yellow","きいろ","#f1c453"],["cream","しろ","#f5efe2"]];
 function roomGot(){ return GORDER.filter(g=>(ME.auto||{})[g]>=3); }
 // 🏠 部屋の絵(2026-11-21: ペットのページのいちばん上に、たたまずに出す。もようがえ・家具の一覧は「🏠 へや」のタブ)
+let ROOM_EDIT=false, ROOM_SEL=null;
+const ROOM_SLOTS=[...Array(7)].map((_,i)=>"W"+i).concat([..."ST"].flatMap(r=>[...Array(9)].map((_,i)=>r+i)),[0,1,2,3].map(i=>"F"+i));
+function slotRows(k){ return k.startsWith("bf:")?"F":(k==="win"||k.startsWith("pf:"))?"W":"WST"; }
+function roomSlotsFor(small,bigK,R){ R.slot=R.slot||{}; const POS={}, used=new Set();
+  [...small,...bigK].forEach(k=>{ const sl=R.slot[k]; const ok=sl&&ROOM_SLOTS.includes(sl)&&slotRows(k).includes(sl[0])&&!used.has(sl); if(ok){ POS[k]=sl; used.add(sl); } });
+  const free=rows=>ROOM_SLOTS.find(sl=>rows.includes(sl[0])&&!used.has(sl));
+  const put=(k,rows)=>{ if(POS[k]) return; const sl=free(rows)||free(slotRows(k)); if(sl){ POS[k]=sl; used.add(sl); } };
+  small.filter(k=>k==="win"||k==="season"||k.startsWith("td:")||k.startsWith("pf:")).forEach(k=>put(k,"W"));
+  small.filter(k=>!(k==="win"||k==="season"||k.startsWith("td:")||k.startsWith("pf:"))).forEach(k=>put(k,"ST"));
+  bigK.forEach(k=>put(k,"F")); return POS; }
+function roomEditHTML(){ return ROOM_EDIT?`<div class="rm-edbar"><b>🪑 並べかえ中</b><span class="hint">${ROOM_SEL?"置きたい「点線のマス」か、入れかえたい物を押してね。":"動かしたい物を押してね(押すと光ります)。"}</span><span class="rm-edbtns"><button class="fchip" data-rauto="1">↺ おまかせで並べる</button><button class="fchip pet-done" data-redit="0">✓ できあがり</button></span></div>`:`<div class="rm-edbar off"><button class="fchip" data-redit="1">🪑 部屋の物を並べかえる</button></div>`; }
 function roomStageHTML(){ const got=roomGot(); const st=petStage(); const fr=friendOn(); const R=petRoom(); const p=petInit();
   const W=ROOM_WALL.find(x=>x[0]===R.wall)||ROOM_WALL[0], F=ROOM_FLOOR.find(x=>x[0]===R.floor)||ROOM_FLOOR[0], RG=ROOM_RUG.find(x=>x[0]===(R.rug||""))||ROOM_RUG[0];
-  // 窓は左上、家具は「かべの棚(6こまで)」と「床のおく(のこり)」、おみやげは床のおくの右から
-  // 2026-11-21 夜: きちんと並べる(持ち主から「スマホだとグチャグチャ」)。上の段=窓・額・かざり / 棚(1〜2段)=家具とおみやげ / 床の手前のおく=大きい家具。
-  // 前に動かした場所は1回だけ消して、この並びにそろえる(R.lay)。そのあと指で動かした物はそのまま
-  if(R.lay!==2){ R.pos={}; R.lay=2; saveMe(); }
+  // 2026-11-24: 決まった「マス」に置く方式(持ち主から「自由に動かせすぎて、ぐちゃぐちゃ・思ったとおりにできない」)。
+  // 小さい物は 上の段(W)・たな1段目(S)・たな2段目(T)の 9マスずつ、大きい家具は 床のおく(F)の4マスだけ。1マスに1こなので重ならない。
+  // 置き場所は R.slot{キー:マス}。「🪑 並べかえる」で、物を押す → 置きたいマス(または入れかえたい物)を押す。
   const SV=frShow(); const BIG=(R.big||[]).filter(k=>BIG_FURN.some(b=>b[0]===k&&b[3]())); const FR=(R.frames||[]).filter(k=>ppCards()[k]).slice(0,3);
   const TH0=ROOM_THEMES.find(t=>t[0]===R.theme); const SE0=R.noSeason?null:seasonDeco();
-  const DEF={}; const row=(keys,wt,x0,x1,y)=>{ const tot=keys.reduce((a,k)=>a+wt(k),0); const gap=Math.max(0,(x1-x0-tot)/(keys.length+1)); let x=x0+gap; keys.forEach(k=>{ const w=wt(k); DEF[k]=[+(x+w/2).toFixed(1),y]; x+=w+gap; }); };
-  const top=["win",...(SE0?["season"]:[]),...(TH0?["td:0"]:[]),...FR.map(k=>"pf:"+k),...(TH0?["td:1"]:[])];
-  row(top,k=>k.startsWith("pf:")?16:k==="win"?11:9.4,2,98,4);
-  const shelfK=[...got,...SV.map(k=>"sv:"+k)]; const two=shelfK.length>8; const n1=two?Math.ceil(shelfK.length/2):shelfK.length;
-  const dense=n1>9; const sw=dense?7.6:9.4; row(shelfK.slice(0,n1),()=>sw,4,96,24); if(two) row(shelfK.slice(n1),()=>sw,4,96,43);
-  row(BIG.map(k=>"bf:"+k),()=>15,4,96,two?54:47);
-  const SHELF=(shelfK.length?`<i class="rm-shelf" aria-hidden="true"></i>`:"")+(two?`<i class="rm-shelf s2" aria-hidden="true"></i>`:"");
-  const it=(key,i,html,cls,t)=>{ const [x,y]=R.pos[key]||DEF[key]||roomCell(i); return `<span class="rm-it${cls}" data-rk="${key}" style="left:${x}%;top:${y}%"${t?` title="${esc(t)}"`:""}>${html}</span>`; };
+  const small=["win",...(SE0?["season"]:[]),...(TH0?["td:0","td:1"]:[]),...FR.map(k=>"pf:"+k),...got,...SV.map(k=>"sv:"+k)], bigK=BIG.map(k=>"bf:"+k);
+  const POS=roomSlotsFor(small,bigK,R); const EDIT=ROOM_EDIT;
+  const useT=EDIT||Object.values(POS).some(v=>v[0]==="T"), useS=EDIT||Object.values(POS).some(v=>v[0]==="S");
+  const xy=sl=>{ const r=sl[0], n=+sl.slice(1); if(r==="F") return [+(4+92*(n+.5)/4).toFixed(1),useT?54:47]; if(r==="W") return [+(4+92*(n+.5)/7).toFixed(1),4]; return [+(4+92*(n+.5)/9).toFixed(1),{S:24,T:43}[r]]; };
+  const SHELF=(useS?`<i class="rm-shelf" aria-hidden="true"></i>`:"")+(useT?`<i class="rm-shelf s2" aria-hidden="true"></i>`:"");
+  const it=(key,i,html,cls,t)=>{ const sl=POS[key]; if(!sl) return ""; const [x,y]=xy(sl); return `<span class="rm-it${cls}${EDIT?" ed":""}${ROOM_SEL===key?" sel":""}" data-rk="${key}" data-sl="${sl}" style="left:${x}%;top:${y}%"${t?` title="${esc(t)}"`:""}${EDIT?` role="button" tabindex="0" aria-label="${esc(t||"")}を動かす"`:""}>${html}</span>`; };
+  const used=new Set(Object.values(POS));
+  const emptyS=EDIT&&ROOM_SEL?ROOM_SLOTS.filter(sl=>!used.has(sl)&&slotRows(ROOM_SEL).includes(sl[0])).map(sl=>{ const [x,y]=xy(sl); return `<button class="rm-slot${sl[0]==="F"?" big":""}" data-sl="${sl}" style="left:${x}%;top:${y}%" aria-label="ここに置く"></button>`; }).join(""):"";
   const VW=WIN_VIEWS.find(v=>v[0]===(R.view||"")&&v[2]()); const TH=ROOM_THEMES.find(t=>t[0]===R.theme); const SE=R.noSeason?null:seasonDeco();
   const sky=VW&&VW[0]?VW[1]:(()=>{ const w=D.weather; if(w&&relDay(w.iso)==="今日"&&/雪/.test(w.sky)) return "❄️"; if(w&&relDay(w.iso)==="今日"&&/雨/.test(w.sky)) return "🌧️"; const t=skyTOD(); return t==="night"?"🌙":t==="evening"?"🌇":"☀️"; })(); // 窓の外は いまの空(時間と、きょうの天気)
   const slots=SHELF+GORDER.map((g,i)=>got.includes(g)?it(g,i,ROOM[g]," mv",GN[g]):"").join("")+SV.map((k,j)=>{ const g=frGiftInfo(k); return it("sv:"+k,j,g.it[1]," mv rm-sv",g.it[2]+"(おみやげ)"); }).join("")+it("win",13,`🪟<i class="rm-sky" aria-hidden="true">${sky}</i>`," mv rm-win","窓(外は"+sky+")")
     +BIG.map((k,j)=>{ const b=BIG_FURN.find(x=>x[0]===k); return it("bf:"+k,j,b[1]," mv rm-big",b[2]); }).join("")
     +FR.map((k,j)=>it("pf:"+k,j,`🖼️<i class="rm-pfn">${esc(k)}</i>`," mv rm-frame","絵はがき: "+k)).join("")
-    +(SE?it("season",0,SE[0]," mv",SE[1]):"")+(TH?it("td:0",0,TH[5]," mv",TH[1])+it("td:1",0,TH[6]," mv",TH[1]):"");
+    +(SE?it("season",0,SE[0]," mv",SE[1]):"")+(TH?it("td:0",0,TH[5]," mv",TH[1])+it("td:1",0,TH[6]," mv",TH[1]):"")+emptyS;
   const gk=guestKid(); const vis=(p.visitor&&p.visitor.d===TODAY)?p.visitor:null; const tt=petTitle(); const night=skyTOD()==="night";
   const ts=fr?tripState():null; const out=ts&&ts.s==="out", back=ts&&ts.s==="back";
-  return `<div class="room${dense?" dense":""}" id="room" style="--w1:${W[2]};--w2:${W[3]};--f1:${F[2]};--f2:${F[3]}"><div class="rm-wall"></div><div class="rm-floor"></div>${RG[0]?`<i class="rm-rug" aria-hidden="true" style="background:${RG[2]}"></i>`:""}${slots}
+  return `<div class="room${EDIT?" editing":""}" id="room" style="--w1:${W[2]};--w2:${W[3]};--f1:${F[2]};--f2:${F[3]}"><div class="rm-wall"></div><div class="rm-floor"></div>${RG[0]?`<i class="rm-rug" aria-hidden="true" style="background:${RG[2]}"></i>`:""}${slots}
     ${isMonthBd()?`<span class="rm-it" style="left:8%;top:66%">🎂</span>`:""}${ppToday()?`<button class="rm-pp" data-poppo="1" aria-label="ぽっぽの絵はがきを受けとる">${poppoSVG(54)}<span>📮</span></button>`:""}
     ${fr&&!out?`<button class="rm-fr" data-fpat="1" aria-label="${esc(friendName())}${back?"のおみやげを受けとる":"をなでる"}">${friendSVG(56)}${back?`<span class="rm-gift" aria-hidden="true">🎁</span>`:""}</button>`:""}
     ${gk?`<button class="rm-guest" data-gpat="1" aria-label="${esc(friendNm(gk.h))}(なかまの家から遊びに来た)をなでる">${petSVG(friendStageOf(gk.h),"happy",null,64,gk.h.wear||null,gk.h.kind,gk.h.color||null,gk.h.look||{})}</button>`:""}
@@ -4421,10 +4436,15 @@ function bindRoom(){ const room=document.getElementById("room"); if(!room) retur
     else busy=false; };
   ROOM_PLAY=k=>{ if(!alive()) return; play(k); };
   scope.querySelectorAll("[data-rplay]").forEach(b=>b.onclick=()=>play(b.dataset.rplay));
-  // 🪑 家具・窓・おみやげを指で動かす(少し動いたらドラッグ。保存は ME.pet.room.pos)
-  room.querySelectorAll(".rm-it.mv").forEach(el=>{ el.onpointerdown=e=>{ e.preventDefault(); el.setPointerCapture(e.pointerId); el.classList.add("drag"); const rr=room.getBoundingClientRect();
-    el.onpointermove=ev=>{ const nx=Math.max(4,Math.min(96,(ev.clientX-rr.left)/rr.width*100)), ny=Math.max(2,Math.min(86,(ev.clientY-rr.top-12)/rr.height*100)); el.style.left=nx+"%"; el.style.top=ny+"%"; };
-    el.onpointerup=el.onpointercancel=()=>{ el.onpointermove=null; el.classList.remove("drag"); R.pos[el.dataset.rk]=[+parseFloat(el.style.left).toFixed(1),+parseFloat(el.style.top).toFixed(1)]; saveMe(); }; }; });
+  // 🪑 並べかえ: 物を押して選ぶ → マスか物を押す(入れかえ)。R.slot に覚える
+  const relay=()=>{ const sc=window.scrollY; go("my",{keepScroll:true}); requestAnimationFrame(()=>window.scrollTo(0,sc)); };
+  const pick=el=>{ const k=el.dataset.rk; if(!ROOM_SEL){ ROOM_SEL=k; relay(); return; } if(ROOM_SEL===k){ ROOM_SEL=null; relay(); return; }
+    const a=ROOM_SEL, A=room.querySelector(`[data-rk="${CSS.escape(a)}"]`); if(!A){ ROOM_SEL=null; relay(); return; } if(!slotRows(a).includes(el.dataset.sl[0])||!slotRows(k).includes(A.dataset.sl[0])){ toast("🪑 大きい家具は床のおく、窓と額はかべ、そのほかは かべとたなに置けます"); return; }
+    R.slot=R.slot||{}; R.slot[a]=el.dataset.sl; R.slot[k]=A.dataset.sl; ROOM_SEL=null; saveMe(); relay(); };
+  if(ROOM_EDIT){ room.querySelectorAll(".rm-it[data-rk]").forEach(el=>{ el.onclick=e=>{ e.stopPropagation(); pick(el); }; el.onkeydown=e=>{ if(e.key==="Enter"||e.key===" "){ e.preventDefault(); pick(el); } }; });
+    room.querySelectorAll(".rm-slot").forEach(b=>b.onclick=()=>{ if(!ROOM_SEL) return; R.slot=R.slot||{}; R.slot[ROOM_SEL]=b.dataset.sl; ROOM_SEL=null; saveMe(); relay(); }); }
+  scope.querySelectorAll("[data-redit]").forEach(b=>b.onclick=()=>{ ROOM_EDIT=b.dataset.redit==="1"; ROOM_SEL=null; if(!ROOM_EDIT) toast("🪑 並べかえを終わりました"); relay(); });
+  scope.querySelectorAll("[data-rauto]").forEach(b=>b.onclick=()=>{ R.slot={}; ROOM_SEL=null; saveMe(); toast("🪑 おまかせで並べました"); relay(); });
   const redraw=()=>go("my",{keepScroll:true});
   scope.querySelectorAll("[data-rwall]").forEach(b=>b.onclick=()=>{ R.wall=b.dataset.rwall; saveMe(); redraw(); });
   scope.querySelectorAll("[data-rfloor]").forEach(b=>b.onclick=()=>{ R.floor=b.dataset.rfloor; saveMe(); redraw(); });
@@ -4438,8 +4458,8 @@ function bindRoom(){ const room=document.getElementById("room"); if(!room) retur
   scope.querySelectorAll("[data-gplant]").forEach(b=>b.onclick=()=>{ const G=petGarden(); if(G.length>=6) return; G.push({k:b.dataset.gplant,at:TODAY,w:0}); saveMe(); toast("🌱 たねをまきました"); redraw(); });
   scope.querySelectorAll("[data-gwater]").forEach(b=>b.onclick=()=>{ const pl=petGarden()[+b.dataset.gwater]; if(!pl||pl.wd===TODAY) return; pl.wd=TODAY; pl.w=(pl.w||0)+1; saveMe(); toast("💧 水をあげました"); redraw(); });
   scope.querySelectorAll("[data-gpick]").forEach(b=>b.onclick=()=>{ const G=petGarden(); const i=+b.dataset.gpick; const pl=G[i]; if(!pl) return; G.splice(i,1); const p=petInit(); p.picked=(p.picked||0)+1; saveMe(); petLoveAdd(1); toast(`💐 ${(GARDEN_SEEDS.find(x=>x[0]===pl.k)||GARDEN_SEEDS[0])[2]}をつみました。${petName()}「いいにおい!」`); redraw(); });
-  room.querySelectorAll(".rm-frame").forEach(el=>el.addEventListener("click",()=>{ if(el.classList.contains("drag")) return; const k=el.dataset.rk.slice(3); openPostcard(k,false,false); }));
-  scope.querySelectorAll("[data-rreset]").forEach(b=>b.onclick=()=>{ R.pos={}; saveMe(); toast("🪑 家具を元の並びにもどしました"); redraw(); });
+  room.querySelectorAll(".rm-frame").forEach(el=>el.addEventListener("click",()=>{ if(ROOM_EDIT) return; const k=el.dataset.rk.slice(3); openPostcard(k,false,false); }));
+  scope.querySelectorAll("[data-rreset]").forEach(b=>b.onclick=()=>{ R.slot={}; R.pos={}; saveMe(); toast("🪑 おまかせの並びにもどしました"); redraw(); });
 }
 function friendOn(){ return petStage().i>=3 || ME.days.length>=14; }
 function friendName(){ return ((ME.pet||{}).fname)||"ぴよた"; }
@@ -4727,7 +4747,7 @@ function careRefresh(){ const e=document.getElementById("ptCare"); if(e) e.inner
 function petHeroHTML(){ const p=petInit(); const st=petStage(); const mood=petMood(); const egg=st.i===0;
   return `<section class="card pet-home" aria-label="ペット">
     <div class="ph-head"><span class="ph-nm"><b>${esc(petName())}</b><span class="chip">${esc(st.name)}</span>${petTitle()?`<span class="chip ttl-chip">${petTitle()[1]} ${esc(petTitle()[0])}</span>`:""}${petPersona()?`<span class="chip">🎭 ${esc(petPersona())}</span>`:""}</span><span class="ph-acts"><button class="fchip" id="petRename">✏️ 名前</button>${helpBtn("pet","育て方")}</span></div>
-    ${roomStageHTML()}
+    ${roomStageHTML()}${roomEditHTML()}
     ${friendOn()&&tripState().s==="out"?`<div class="hint ph-trip">🎒 ${esc(friendName())}は「${esc(tripDest(tripState().t.dest)[2])}」へ おつかい中(あと${tripLeft(tripState().left)})</div>`:""}
     <div class="ph-say"><span aria-hidden="true">💬</span><span>${esc(petLine(mood,st))}</span></div>
     <div class="bar" role="img" aria-label="そだち ${st.xp}"><i style="width:${Math.round(st.prog*100)}%"></i></div>
@@ -4778,8 +4798,8 @@ function petRoomTabHTML(){ const R=petRoom(); const got=roomGot(); const G=frGif
     <div class="hint">家具は、そのジャンルのニュースをよく読むと届きます(うすい色は、まだ届いていない家具)。</div>
     <h3 class="pt-h">🎁 おみやげをかざる <small>${S.length}/${SOUV_MAX}</small></h3>
     ${owned.length?`<div class="fu-grid">${owned.map(x=>`<button class="fu-i sv${S.includes(x[0])?" on":""}" data-rsouv="${x[0]}" aria-pressed="${S.includes(x[0])}"><span class="fu-em" aria-hidden="true">${x[1]}</span><small>${S.includes(x[0])?"✓ ":""}${esc(x[2])}</small></button>`).join("")}</div><div class="hint">押すと、部屋に出したり しまったりできます(${SOUV_MAX}こまで)。</div>`:`<div class="hint">まだありません。${friendOn()?`「🐥 なかま」で ${esc(friendName())}に おつかいをたのむと、おみやげを持ってきます。`:"ともだちが来ると、おつかいで おみやげを持ってきてくれます。"}</div>`}
-    <div class="hint" style="margin-top:10px">👆 家具・窓・おみやげは、上の部屋の中で、指で好きな場所へ動かせます。</div>
-    <button class="fchip" data-rreset="1" style="margin-top:8px">↺ 家具を元の並びにもどす</button>
+    <div class="hint" style="margin-top:10px">👆 「🪑 部屋の物を並べかえる」を押すと、物を押して、置きたいマス(かべ・たな・床のおく)を選べます。1マスに1こなので重なりません。</div>
+    <div class="rm-tools" style="margin-top:8px"><button class="fchip" data-redit="1">🪑 部屋の物を並べかえる</button><button class="fchip" data-rreset="1">↺ おまかせの並びにもどす</button></div>
   </section>
   <section class="card" aria-label="庭"><div class="sec-h"><h2>🌷 庭</h2><span class="sub">${GD.length}/6</span></div>
     <div class="gd-plots">${[...Array(6)].map((_,i)=>{ const pl=GD[i]; if(!pl) return `<div class="gd-p empty"><span class="gd-e" aria-hidden="true">🟫</span><small>あき</small></div>`; const sd=GARDEN_SEEDS.find(x=>x[0]===pl.k)||GARDEN_SEEDS[0]; const g=plantGrow(pl);
@@ -6090,6 +6110,7 @@ function openShimen(){ const sh=document.getElementById("sheet"); const w=D.weat
 document.addEventListener("click",e=>{ const b=e.target.closest("[data-shimen]"); if(!b) return; e.preventDefault(); openShimen(); });
 // ===== お知らせ(新しくなったところ)。機能を足したら、いちばん上に1つ足す =====
 const UPDATES=[
+  {id:"2026-11-24a",d:"2026-11-24",t:"🪑 部屋の並べかえを「マス」にしました",L:["指で好きな所に動かす方式をやめ、決まったマスに置く方式にしました。物が重なったり、ばらばらになったりしません。","部屋の下の「🪑 部屋の物を並べかえる」を押す → 動かしたい物を押す → 置きたいマス(点線)か、入れかえたい物を押す。窓と額は かべ、大きい家具は床のおく、そのほかは かべとたなに置けます。「↺ おまかせで並べる」でいつでも元の並びにもどせます。"]},
   {id:"2026-11-21e",d:"2026-11-21",t:"🏠 部屋の家具をきちんと並べました",L:["上の段に窓・額・かざり、たなに家具とおみやげ(多いときは2段)、床のおくに大きい家具、と決まった場所に並ぶようにしました。","前に指で動かした場所は、この並びにそろえ直しました。これからも指で好きな場所へ動かせます(へや →「↺ 元の並びにもどす」でこの並びにもどります)。"]},
   {id:"2026-11-21d",d:"2026-11-21",t:"🏠 部屋を明るく・家具が重ならないように",L:["夜に部屋が暗くなるのをやめました(どの壁紙でも明るく見えます)。","家具・おみやげ・額などが重なっていたら、あいている所へ自動でずらします。物が多いときは少し小さくして、ぜんぶ見えるようにします(自分で動かした物の場所はそのままです)。"]},
   {id:"2026-11-21c",d:"2026-11-21",t:"👕 新しい服が7つ",L:["コック帽とフライパン・ナイトキャップ・花かんむり・マリンぼうし・野球ぼう・耳あて・おさんぽぼうし。新しい遊び(料理・庭・おつかい・ボールキャッチ・おさんぽ)をすると着られます。","ごはんをあげても、ペットがまん中にもどらなくなりました。ともだちの「おつかい中」の札は、部屋の下に出すようにしました(ペットに重なっていました)。"]},
@@ -6297,7 +6318,7 @@ const HELP=[
   ["ex","💡","解説ページの読み方",["大きな話題を1つずつ、やさしく説明するページです。上から読めば全体がわかります。","<b>ひとことで言うと</b>…まずここだけ読めば大まかにわかります。","<b>目次</b>を押すと、その場所に飛びます。","<b>🙋 わたしたちへの影響</b>…くらしにどう関係するか。","<b>📅 流れ</b>…これまでに起きたことの年表。<b>🔭 これから</b>…次に注目する日。","<b>🔔 続きを追う</b>を押すと、新しい動きがあったとき「きょう」でお知らせします。","<b>💬 話しながら読む</b>・<b>📖 連載で読む</b>…同じ中身を、会話や1日1話の形で読めます。","画面を<b>左右にすべらせる</b>と、前後の解説に移ります。"]],
   ["manga","🎨","4コマの見かた",["解説の中身を、4つのコマで説明するマンガです。","左にいるのは<b>あなたのペット</b>(名札はペットの名前)。ニュースにくわしくない生徒で、わたしたちと同じ立場で質問します。","右の<b>🦉 ホー先生</b>がやさしく答えます。","上から<b>①はてな? → ②なにがあった? → ③どうなるの? → ④これから</b>の順に読みます。","いちばん下の<b>📝 ホー先生の黒板</b>が、まとめです。"]],
   ["listen","🔊","聞く・読み上げ",["<b>🔊 聞く</b>のボタンで、文を読み上げます。もう一度押すと止まります。","速さ・声の高さ・声の種類は、<b>マイ → ⚙️設定 →「🔊 読み上げの速さと声」</b>で変えられます。","声の種類は「📱 スマホの声」「🐣 ずんだもん」「🐾 ペットの声」から選べます。🐾 は、いま育てている子の種類で声が変わります(たまごの間はスマホの声)。キャラの声は、前もって作った声を読みこむので、1分で約0.3MBの通信がかかります。まだ声のない文はスマホの声で読みます。","読み方がおかしいことばは、<b>「🗣️ 読み方がおかしいときは →」</b>から、このスマホで直したり、作った人に知らせたりできます。","<b>🌙 寝る前ラジオ</b>(おたのしみ)は、3分でニュースを耳で聞けます。うしろの音は「オルゴール・波の音・音なし」から選べます。"]],
-  ["pet","🐣","ペットの育て方",["ペットはニュースといっしょに育ちます。「きょう」のいちばん上で出むかえてくれます。押すと、なでられてひとことが変わります。はじめはたまごで、何が生まれるかはお楽しみです。","<b>🧠 クイズ</b>に正解すると🍙ごはんがもらえます。ごはんをあげたり、毎日開いたり、解説を読んだりすると育ちます。","名前は<b>マイ → 🐣 ペット の「✏️ 名前」</b>で変えられます。変えた名前は4コマなどにも出ます。","<b>マイ → 🐣 ペット</b>は、上に部屋(ペットがいる所)、その下に5つのボタンがあります。<b>🍙 おせわ</b>=きょうできること(🙏 おねがい も)、<b>🎮 あそぶ</b>=とくいわざ・ボールキャッチ・ことば合わせ・おさんぽ・ごはんづくり、<b>👕 きがえ</b>=服・色・もよう、<b>🏠 へや</b>=テーマセット・壁紙・床・ラグ・大きい家具・窓のけしき・季節のかざり・絵はがきの額・庭、<b>🐥 なかま</b>=ともだち・なかまの家(部屋に呼べる)・絵はがきの地図・ペットの名刺、<b>📔 きろく</b>=成長アルバム・日記・ノート・図鑑・そだち。","<b>📸 成長アルバム</b>は、育って次の姿になった日に自動で1まい残ります(何段も一度に育っても、ぜんぶ)。なかまの家に行った子も、アルバムを持っていきます。前から育った子には、あとから思い出のアルバムを作りました。","<b>🐥 ともだち</b>は、ごはんで育ちます。1日1回<b>🎒 おつかい</b>をたのむと、1時間くらいでもどって、おみやげを1つ持ってきます。おみやげは部屋にかざれます。ともだちの色・かざりも選べます。","服・部屋・色は、育つと選べるものが増えます。ごはんやお世話をしなくても、困ることはありません。"]],
+  ["pet","🐣","ペットの育て方",["ペットはニュースといっしょに育ちます。「きょう」のいちばん上で出むかえてくれます。押すと、なでられてひとことが変わります。はじめはたまごで、何が生まれるかはお楽しみです。","<b>🧠 クイズ</b>に正解すると🍙ごはんがもらえます。ごはんをあげたり、毎日開いたり、解説を読んだりすると育ちます。","名前は<b>マイ → 🐣 ペット の「✏️ 名前」</b>で変えられます。変えた名前は4コマなどにも出ます。","<b>マイ → 🐣 ペット</b>は、上に部屋(ペットがいる所)、その下に5つのボタンがあります。<b>🍙 おせわ</b>=きょうできること(🙏 おねがい も)、<b>🎮 あそぶ</b>=とくいわざ・ボールキャッチ・ことば合わせ・おさんぽ・ごはんづくり、<b>👕 きがえ</b>=服・色・もよう、<b>🏠 へや</b>=テーマセット・壁紙・床・ラグ・大きい家具・窓のけしき・季節のかざり・絵はがきの額・庭、<b>🐥 なかま</b>=ともだち・なかまの家(部屋に呼べる)・絵はがきの地図・ペットの名刺、<b>📔 きろく</b>=成長アルバム・日記・ノート・図鑑・そだち。","<b>📸 成長アルバム</b>は、育って次の姿になった日に自動で1まい残ります(何段も一度に育っても、ぜんぶ)。なかまの家に行った子も、アルバムを持っていきます。前から育った子には、あとから思い出のアルバムを作りました。","<b>🐥 ともだち</b>は、ごはんで育ちます。1日1回<b>🎒 おつかい</b>をたのむと、1時間くらいでもどって、おみやげを1つ持ってきます。おみやげは部屋にかざれます。ともだちの色・かざりも選べます。","<b>🪑 部屋の物を並べかえる</b>(部屋の下のボタン)を押すと、部屋に点線のマスが出ます。動かしたい物を押してから、置きたいマスか、入れかえたい物を押します。窓と額は かべ、大きい家具は床のおく、そのほかは かべとたなに置けます。「↺ おまかせで並べる」で元の並びにもどります。","服・部屋・色は、育つと選べるものが増えます。ごはんやお世話をしなくても、困ることはありません。"]],
   ["plan","📅","予定と予測",["<b>📅 予定</b>…これから決まっている日(選挙・発表・値上げなど)。","<b>🎯 予測</b>…Claude(AI)が「こうなりそう」と考えたもの。あたるとは限りません。","あなたも<b>予想</b>して、答え合わせができます。"]],
   ["search","🔎","さがす・地図・数字",["<b>🔎 さがす</b>…ことばやジャンルで、これまでのニュースを探せます。","<b>🗺️ 地図</b>…ニュースがどこで起きたか。2本の指で大きくできます。","<b>📈 数字</b>…日経平均・円・原油のグラフと、くらしの便利。","地図と数字は、「さがす」の上のボタンから開けます。"]],
   ["bousai","🛟","防災",["天気カードの<b>「🛟 防災」</b>で、地震・津波・警報・雨雲・にげる場所が見られます。","地震や警報は<b>気象庁の発表</b>をそのまま出しています。","ゆれる前の速報は、スマホの<b>緊急速報(エリアメール)</b>で受けとるのが正式な方法です。"]],
