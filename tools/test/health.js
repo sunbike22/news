@@ -57,7 +57,7 @@ for(const [mode,dark,w] of [["normal",false,390],["normal",true,390],["easy",fal
       document.querySelector('[data-ptab="care"]').click();
       if(T.friendSVG){ for(let lv=0;lv<5;lv++) for(const c of T.FR_COLORS) for(const a of T.FR_ACC){ const svg=T.friendSVG(60,lv,c[0],a[0]); const d=new DOMParser().parseFromString(svg,"image/svg+xml"); if(d.querySelector("parsererror")) out.bad.push("fr"+lv+c[0]+a[0]); } } else out.bad.push("friendSVG");
       return out; });
-    ok("ペットのページ: 部屋と5つのタブ・たたみなし", pg.room&&pg.tabs==="care,play,wear,room,friends,log"&&pg.det===0, JSON.stringify(pg)); ok("ペットのページ: どのタブも中身があり、横にはみ出さない・ともだちの絵", !pg.bad.length&&pg.sw, pg.bad.join(",")); }
+    ok("ペットのページ: 部屋と7つのタブ・たたみなし", pg.room&&pg.tabs==="care,play,wear,room,friends,log,adv"&&pg.det===0, JSON.stringify(pg)); ok("ペットのページ: どのタブも中身があり、横にはみ出さない・ともだちの絵", !pg.bad.length&&pg.sw, pg.bad.join(",")); }
   const hasBtn=await p.$("#petRestart"); ok("名人: 「新しいたまご」のボタンが出る", !!hasBtn);
   if(hasBtn){ await hasBtn.click(); await p.waitForTimeout(700); const a=await p.evaluate(()=>{const T=window.NW_TEST;return {st:T.petStage().i,hall:T.petHall().length,gen:T.ME.pet.gen};}); ok("名人: 新しいたまごになり、前の子は殿堂へ", a.st===0&&a.hall===1&&a.gen===2, JSON.stringify(a)); }
   ok("ペット画面: エラーなし", !errs.length, errs.slice(0,2).join(" | ")); await ctx.close(); }
@@ -67,7 +67,7 @@ for(const [mode,dark,w] of [["normal",false,390],["normal",true,390],["easy",fal
   const d=await p.evaluate(()=>{ const D=window.NEWS_DATA, P=window.NEWS_PICKS; return {top10:(D.top10||[]).length,three:(D.three||[]).length,news:(D.news||[]).length,en:D.en?[D.en.top10.length,D.en.three.length]:null,picks:!!(P&&P.g),upd:D.updated}; });
   ok("データ: ニュース10が10件・3行が3つ", d.top10===10&&d.three===3, JSON.stringify([d.top10,d.three])); ok("データ: 英語版の数がそろっている", !d.en||(d.en[0]===d.top10&&d.en[1]===d.three), JSON.stringify(d.en));
   { const bad=[]; try{ const w={}; new Function("window",require("fs").readFileSync(require("path").join(__dirname,"../../data.js"),"utf8"))(w);
-      Object.entries(w.NEWS_DATA.explainers||{}).forEach(([k,e])=>["more","faq","timeline","us","next"].forEach(f=>{ if(e[f]!==undefined&&!Array.isArray(e[f])) bad.push(k+"."+f); })); }catch(err){ bad.push("読めない: "+err.message); }
+      Object.entries(w.NEWS_DATA.explainers||{}).forEach(([k,e])=>["more","faq","timeline","us","next"].forEach(f=>{ if(e[f]!==undefined&&!Array.isArray(e[f])) bad.push(k+"."+f); })); (w.NEWS_DATA.markets||[]).forEach((r,i)=>{ if(!Array.isArray(r)) bad.push("markets["+i+"]が行になっていない(カンマ抜け?)"); }); }catch(err){ bad.push("読めない: "+err.message); }
     ok("データ: 解説の形がそろっている(more などが配列)", !bad.length, bad.join(",")); }
   // ニュースの概要(brief.js・2026-11-04〜): キーが news と合っているか・きのうの分がほぼ埋まっているか
   { const fs=require("fs"), path=require("path"), bp=path.join(__dirname,"../../brief.js");

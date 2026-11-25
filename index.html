@@ -1665,10 +1665,31 @@ button.fu-i{cursor:pointer}.fu-i.on{border-color:var(--accent-btn,var(--accent))
 :root[data-mode="easy"] .pet-tabs button{min-height:56px}
 @media (prefers-reduced-motion: reduce){.rm-gift{animation:none}.pf-av.eat svg{animation:none}}
 /* 🐣 ペット 第2弾(2026-11-21) */
-.pet-tabs{grid-template-columns:repeat(6,minmax(0,1fr))}
-@media (max-width:400px){.pet-tabs{grid-template-columns:repeat(3,minmax(0,1fr))}}
+.pet-tabs{grid-template-columns:repeat(7,minmax(0,1fr))}
+@media (max-width:560px){.pet-tabs{grid-template-columns:repeat(4,minmax(0,1fr))}}
 :root[data-size="xl"] .pet-tabs,:root[data-size="xxl"] .pet-tabs{grid-template-columns:repeat(3,minmax(0,1fr))}
 .ttl-chip{background:#fef3c7;color:#78350f;border-color:#f59e0b}
+/* 🗺️ ぼうけん(2026-11-25) */
+.ng-bar{display:flex;align-items:center;gap:10px;width:100%;margin-top:8px;padding:10px 12px;border-radius:14px;border:2px solid var(--accent-btn,var(--accent));background:var(--accent-soft);color:var(--ink);font:inherit;text-align:left;cursor:pointer}
+.ng-bar .ng-l{flex:none;font-weight:800;font-size:.86rem;color:var(--accent-ink,var(--accent));word-break:keep-all}.ng-bar .ng-m{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}.ng-bar .ng-m small{color:var(--muted);font-size:.84rem}.ng-bar .bar{margin:2px 0 0}.ng-bar .ng-r{flex:none;font-size:1.4rem;color:var(--muted)}
+@media (max-width:420px){.ng-bar{flex-wrap:wrap}.ng-bar .ng-l{width:100%}}
+.stp-road{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:6px}.stp{display:flex;flex-direction:column;gap:2px;padding:8px 10px;border-radius:12px;border:1px dashed var(--line);background:var(--surface);min-width:0}.stp small{color:var(--muted);font-size:.84rem}.stp.on{border-style:solid;border-color:var(--ok,#16a34a);background:var(--surface2)}
+.ev-box{display:flex;flex-direction:column;gap:6px}.ev-box>small{color:var(--muted)}
+.bo-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.bo-c{display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 8px;border-radius:14px;border:2px solid var(--line);background:var(--surface);color:var(--ink);font:inherit;cursor:pointer;min-width:0;text-align:center}.bo-c small{color:var(--muted);font-size:.84rem}.bo-c .zk-bar{width:100%;display:block}.bo-c.off{cursor:default;opacity:.75}.bo-c .bo-i svg{display:block}
+.bo-top{display:flex;gap:12px;align-items:center;flex-wrap:wrap}.bo-av{flex:none;border:0;background:none;padding:0;cursor:pointer}.bo-av.hop{animation:tkjump .6s ease-out}.bo-tx{flex:1 1 12em;min-width:0;display:flex;flex-direction:column;gap:4px}.bo-tx small{color:var(--muted)}
+.bo-letter{margin-top:10px;padding:12px 14px;border-radius:14px;background:#fff8e6;color:#3a2a14;border:2px solid #f5c400;line-height:1.8}.bo-letter p{margin:6px 0 0}
+.tl-body{display:flex;flex-direction:column;gap:10px;padding-bottom:40px}.tl-lines{display:flex;flex-direction:column;gap:10px}
+.tl-l{display:flex;gap:8px;align-items:flex-end}.tl-l.me{flex-direction:row-reverse}.tl-av{flex:none}.tl-av svg{display:block}
+.tl-b{min-width:0;max-width:80%;padding:8px 12px;border-radius:16px;border:2px solid var(--line);background:var(--surface);line-height:1.7;display:flex;flex-direction:column}.tl-b small{color:var(--muted);font-size:.82rem;font-weight:700}.tl-l.me .tl-b{background:var(--accent-soft)}
+.tl-n{margin:4px 6px;color:var(--muted);line-height:1.8;text-align:center}
+.tl-lines .in{animation:tlin .35s ease-out}@keyframes tlin{from{opacity:0;transform:translateY(8px)}}
+.tl-rw{width:100%;padding:10px 12px;border-radius:12px;background:#fef3c7;color:#78350f;font-weight:700}
+.pq-say{display:flex;gap:8px;align-items:center;font-weight:700}.pq-say svg{flex:none}.pq-h{font-size:1.05rem;font-weight:700;line-height:1.7;margin:8px 0;padding:8px 12px;border-radius:12px;background:var(--surface2)}
+.pq-done{display:flex;gap:10px;align-items:center}.pq-done span{display:flex;flex-direction:column}.pq-done small{color:var(--muted)}
+.sp-sv svg{display:block;margin:auto}
+@media (prefers-reduced-motion: reduce){.tl-lines .in,.bo-av.hop{animation:none}}
+
 .tk-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:6px;margin:6px 0}.tk-grid .fchip{min-height:40px}.tk-grid .fchip small{margin-left:4px;font-size:.82rem;opacity:.85}.fchip.on{border-color:var(--accent-btn,var(--accent));background:var(--accent-soft);color:var(--accent-ink,var(--ink))}
 .rm-pi.tk-spin svg{animation:tkspin 1.2s ease-in-out}.rm-pi.tk-jump{animation:tkjump 1.2s ease-out}.rm-pi.tk-bow{animation:tkbow 1.4s ease-in-out}.rm-pi.tk-dance{animation:tkdance 1.4s ease-in-out}.rm-pi.tk-banzai{animation:tkbanzai 1.4s ease-in-out}.rm-pi.tk-stretch{animation:tkstretch 1.5s ease-in-out}
 @keyframes tkspin{to{transform:rotateY(720deg)}}@keyframes tkjump{30%{transform:translateY(-70px) rotate(-8deg)}60%{transform:translateY(0)}75%{transform:translateY(-18px)}}@keyframes tkbow{30%,60%{transform:rotate(18deg) translateY(6px)}}@keyframes tkdance{20%{transform:rotate(-14deg)}40%{transform:rotate(14deg)}60%{transform:rotate(-14deg) translateY(-8px)}80%{transform:rotate(14deg)}}@keyframes tkbanzai{30%,70%{transform:scale(1.18) translateY(-10px)}}@keyframes tkstretch{40%,60%{transform:scaleY(1.15) scaleX(.92)}}
@@ -1733,6 +1754,7 @@ button.fu-i{cursor:pointer}.fu-i.on{border-color:var(--accent-btn,var(--accent))
 const D = window.NEWS_DATA;
 /* データの形がちがっても止まらないように(2026-11-01: 解説の more が配列ではなく1つの文字列になっていて、さがすタブの検索がエラーで止まった) */
 (()=>{ const arr=v=>Array.isArray(v)?v:(v==null||v===""?[]:[v]);
+  /* 2026-11-25: markets の行のあいだのカンマが1つ抜けて、行が消えて「きょう」がエラーで止まった → 配列でない行は捨てる */ D.markets=(D.markets||[]).filter(Array.isArray);
   Object.values(D.explainers||{}).forEach(e=>{ if(!e) return; if(typeof e.more==="string") e.more=e.more.split(",").length===2?e.more.split(","):[e.more];
     ["more","faq","timeline","us","next","cast","flow"].forEach(f=>{ if(e[f]!==undefined) e[f]=arr(e[f]); });
     ["name","now","kid"].forEach(f=>{ if(typeof e[f]!=="string") e[f]=e[f]==null?"":String(e[f]); }); }); })();
@@ -2203,12 +2225,11 @@ function bindPicks(inSheet){ const c=document.querySelector(".picks"); if(!c) re
 function weekStart(iso){ const d=new Date(Date.parse(iso)); const w=(d.getUTCDay()+6)%7; return new Date(d.getTime()-w*864e5).toISOString().slice(0,10); }
 function inWeek(iso,ws){ return iso>=ws && iso<=new Date(Date.parse(ws)+6*864e5).toISOString().slice(0,10); }
 const GOALS=[["days","📅","アプリを開く",5,"日",ws=>ME.days.filter(d=>inWeek(d,ws)).length],["quiz","🧠","クイズで満点",2,"回",ws=>Object.entries(ME.quiz).filter(([d,v])=>inWeek(d,ws)&&+v>=3).length],["ex","💡","解説を読む",3,"本",ws=>Object.values(ME.readEx).filter(d=>typeof d==="string"&&inWeek(d,ws)).length]];
-function goalCard(){ const ws=weekStart(TODAY); const R=GOALS.map(g=>({g,n:Math.min(g[3],g[5](ws))})); const all=R.every(r=>r.n>=r.g[3]); ME.weekDone=ME.weekDone||{};
-  if(all&&!ME.weekDone[ws]){ ME.weekDone[ws]=1; const p=petInit(); p.food=(p.food||0)+3; saveMe(); setTimeout(()=>toast(`🎉 今週の目標をぜんぶ達成! ${esc(petName())}にごはん🍙×3`),900); }
-  const done=Object.keys(ME.weekDone).length; const left=7-((new Date(Date.parse(TODAY)).getUTCDay()+6)%7);
-  return `<section class="card goal" aria-label="今週の目標"><div class="sec-h"><h2>🗓️ 今週の目標</h2><span class="sub">${all?"🎉 達成!":`あと${left}日`}</span></div>
-    <ul class="wgoal">${R.map(r=>`<li class="${r.n>=r.g[3]?"ok":""}"><span>${r.g[1]} ${esc(r.g[2])}</span><b class="num">${r.n} / ${r.g[3]}${r.g[4]}</b><span class="tp"><i style="width:${Math.round(r.n/r.g[3]*100)}%"></i></span></li>`).join("")}</ul>
-    <div class="hint" style="margin-top:6px">${all?"すごい! 来週もいっしょにがんばろう。":"ぜんぶ達成すると、ペットのごはん🍙×3。"}${done?` これまでの達成: ${done}週`:""}</div></section>`; }
+function goalCard(){ // 2026-11-25: 「今週の目標」は ぼうけん手帳(週5つ・スタンプ)にした
+  let W; try{ W=advWeek(); advCheck(true); }catch(_){ return ""; } const A=advA(); const all=W.list.length&&W.list.every(m=>m.done); const left=7-((new Date(Date.parse(TODAY)).getUTCDay()+6)%7);
+  return `<section class="card goal" aria-label="今週の ぼうけん手帳"><div class="sec-h"><h2>📒 今週の ぼうけん手帳</h2><span class="sub">${all?"🎉 クリア!":`あと${left}日`}</span></div>
+    <ul class="wgoal">${W.list.map(m=>`<li class="${m.done?"ok":""}"><span>${m.done?"💮":m.ic} ${esc(m.txt)}</span><b class="num">${m.n} / ${m.tg}</b><span class="tp"><i style="width:${Math.round(m.n/m.tg*100)}%"></i></span></li>`).join("")}</ul>
+    <div class="hint" style="margin-top:6px">1つできるとスタンプ💮、ぜんぶで ペットのごはん🍙×3${A.wk[W.ws]?"(今週は もらいました)":""}。スタンプ ${advStamps()}こ <button class="fchip" data-ptgo="adv" data-ptsel="#advBook">📒 手帳を見る</button></div></section>`; }
 function letterData(){ const ws=weekStart(TODAY); const lws=new Date(Date.parse(ws)-7*864e5).toISOString().slice(0,10);
   const days=ME.days.filter(d=>inWeek(d,lws)).length; if(!days) return null;
   const exs=Object.entries(ME.readEx).filter(([k,d])=>typeof d==="string"&&inWeek(d,lws)).map(([k])=>D.explainers[k]&&D.explainers[k].name).filter(Boolean);
@@ -2254,7 +2275,7 @@ function corrRecent(){ try{ const C=D.corrections||[]; const seen=store.get("nw-
 function contCard(){ const L=contItems(); const C=[]; /* 訂正は「きょう」には出さず、下の「✏️ 訂正の記録」にまとめる(2026-10-21) */ if(!L.length&&!C.length) return "";
   return `<section class="card cont" aria-label="つづきがあります"><b>🔔 つづきがあります</b><ul class="ct">${L.map((x,i)=>`<li><button class="ct-b" data-ct="${i}"><span>${x.i} ${esc(x.t)}</span><small>${esc(x.h)}</small></button></li>`).join("")}${C.slice(0,2).map(c=>`<li><button class="ct-b" data-corr="${esc(c.k)}"><span>✏️ 前の記録を直しました</span><small>${esc(c.t)}</small></button></li>`).join("")}</ul></section>`; }
 function quickCard(){ const w=D.weather; const kwN=kwList().reduce((a,k)=>a+NEWS.filter(n=>NEW_KEYS.has(nkey(n))&&(n.h+" "+(n.th||"")).includes(k)).length,0);
-  const ws=weekStart(TODAY); const gl=GOALS.filter(g=>g[5](ws)<g[3]).length;
+  let gl=0; try{ gl=advWeek().list.filter(m=>!m.done).length; }catch(_){}
   return `<section class="card quickc" aria-label="1分まとめ"><div class="sec-h"><h2>⏱️ 1分まとめ</h2><button class="fchip" id="qkSay">🔊 聞く</button></div>
     <ol class="qk">
       <li><span>🌤️</span><b>${esc(relDay(w.iso))}は ${esc(w.sky)}、${w.hi}°/${w.lo}°。${esc(w.umbrella)}</b></li>
@@ -2947,7 +2968,7 @@ function rubyHTML(g){ const key=g.key, yomi=String((g.w&&g.w[1])||"").replace(/\
   if(!yomi||yomi===key||!/[一-龠々]/.test(key)) return esc(key);
   return `<ruby>${esc(key)}<rt>${esc(yomi)}</rt></ruby>`; }
 function applyRuby(){ root.setAttribute("data-ruby",rubyOn()?"1":"0"); }
-function showPop(i){ const w=GTERMS[i].w; if(!ME.words.includes(w[0])){ ME.words.push(w[0]); saveMe(); checkBadges(); } const p=document.getElementById("pop"); p.innerHTML=`<div style="display:flex;justify-content:space-between;gap:10px;align-items:start"><div><b>${esc(w[0])}</b> <span style="opacity:.7;font-size:.8rem">${esc(w[1])}</span></div><button class="iconbtn" id="popx" aria-label="とじる" style="background:transparent;color:inherit;border-color:currentColor">✕</button></div><p style="margin:6px 0 0">${esc(w[2])}</p>${w[3]?`<p style="margin:6px 0 0;opacity:.85">例: ${esc(w[3])}</p>`:""}`; p.hidden=false; document.getElementById("popx").onclick=()=>p.hidden=true; }
+function showPop(i){ const w=GTERMS[i].w; if(!ME.words.includes(w[0])){ ME.words.push(w[0]); saveMe(); checkBadges(); adv("word"); } const p=document.getElementById("pop"); p.innerHTML=`<div style="display:flex;justify-content:space-between;gap:10px;align-items:start"><div><b>${esc(w[0])}</b> <span style="opacity:.7;font-size:.8rem">${esc(w[1])}</span></div><button class="iconbtn" id="popx" aria-label="とじる" style="background:transparent;color:inherit;border-color:currentColor">✕</button></div><p style="margin:6px 0 0">${esc(w[2])}</p>${w[3]?`<p style="margin:6px 0 0;opacity:.85">例: ${esc(w[3])}</p>`:""}`; p.hidden=false; document.getElementById("popx").onclick=()=>p.hidden=true; }
 document.addEventListener("click",e=>{ const g=e.target.closest(".gl"); if(g){ e.preventDefault(); e.stopPropagation(); showPop(+g.dataset.gi); return; } const p=document.getElementById("pop"); if(!p.hidden && !e.target.closest("#pop")) p.hidden=true; });
 
 
@@ -3098,7 +3119,7 @@ function openEx(k){
   try{ NEWS.filter(n=>n.ex===k||(D.explainers[k]&&(n.h||"").includes((D.explainers[k].name||"").slice(0,4)))).slice(0,3).forEach(travelAdd); const t0=D.top10.find(x=>x.ex===k); if(t0) travelAdd({h:t0.title,th:""}); }catch(_){}
   if(D.explainers[k]) track("/ex/"+k,"解説: "+D.explainers[k].name);
   const e=D.explainers[k]; if(!e) return; const sh=document.getElementById("sheet");
-  if(!ME.readEx[k]) learn(e.g,2); const seenAt=ME.readEx[k]; ME.readEx[k]=TODAY; saveMe(); setTimeout(checkBadges,800);
+  if(!ME.readEx[k]) learn(e.g,2); if(ME.readEx[k]!==TODAY){ adv("ex"); knAdd(e.g,2); } const seenAt=ME.readEx[k]; ME.readEx[k]=TODAY; saveMe(); setTimeout(checkBadges,800);
   const rel = NEWS.filter(n=>{ const map={saudi:"サウジ・中東",tax:"消費減税",cyber:"不正アクセスとAI"}; if(map[k]) return (n.th||"").includes(map[k]); if(k==="sato") return /佐藤輝明/.test(n.h); if(k==="series") return /日本シリーズ|CS/.test(n.h); if(k==="yokohama") return /横浜市長/.test(n.h); if(k==="past") return n.d<"2026-10-04"; return false; }).slice(0,8);
   const flow = e.flow.map((f,i)=>`${i>0?`<div class="farrow"><span class="fa-ln" aria-hidden="true"></span>${f.via?`<b class="fa-via">${esc(f.via)}</b>`:""}</div>`:""}<div class="fstep"><span class="fi"><i class="fn">${i+1}</i>${f.i}</span><span><b>${esc(f.t)}</b>${f.s?`<small>${exTxt(f.s)}</small>`:""}</span></div>`).join("");
   sh.innerHTML=`<div class="bar"><div class="wrap"><button class="iconbtn" id="shx" aria-label="もどる">← もどる</button><span class="ttl">${e.icon} ${esc(e.name)}</span>${pinBtn({k:"ex|"+k,h:"解説: "+e.name,g:e.g,d:TODAY,ex:k},"iconbtn")}<button class="iconbtn" id="shshare" aria-label="この解説を送る">📤 送る</button></div><div class="ex-prog" aria-hidden="true"><i id="exProg"></i></div></div>
@@ -3228,7 +3249,7 @@ function relEx(n){ const map={saudi:"サウジ・中東",tax:"消費減税",cybe
     else if(e.name&&e.name.length>=4&&n.h.includes(e.name.slice(0,4))) hit=true; else { try{ if(gdScore(gdQuery(e.name),n.h)>=0.5) hit=true; }catch(_){} }
     if(hit) out.push([k,e]); }); return out.slice(0,2); }
 function newsTrust(n){ if(n.info) return "📌 話題: 会社・団体・役所などの公式発表や、専門のサイトから集めたものです(1つの情報源)。"; if(n.ok) return "✅ 別々の報道機関が2社以上、同じ内容を伝えています。数字や日付は記事どうしをつき合わせています。"; return "⚠️ いまのところ1社だけ、または見出しだけで確かめたニュースです。ほかの社でも確かめられたら ✅ に変わります。"; }
-function openNews(n,side){ if(!n) return; try{ wishMark("g:"+n.g); }catch(_){} if(side) SH_SIDE=true; track("/news/"+n.g,"ニュースのページ: "+GN[n.g]);
+function openNews(n,side){ if(!n) return; try{ wishMark("g:"+n.g); }catch(_){} advNv(n); if(side) SH_SIDE=true; track("/news/"+n.g,"ニュースのページ: "+GN[n.g]);
   const sh=document.getElementById("sheet"); const prefs=newsPrefs(n); const pl=placeOf(n); const outs=newsOuts(n.s); const rel=relNews(n); const exs=relEx(n);
   const preds=(n.p?n.p.split("・"):[]).map(id=>D.predictions.find(p=>p[0]===id)).filter(Boolean);
   const yr=n.d.slice(0,4)!==TODAY.slice(0,4)?n.d.slice(0,4)+"年 ":"";
@@ -4165,7 +4186,7 @@ function petXP(){ const p=petInit(); const b=p.base||{d:0,e:0,w:0}; return Math.
 function petHall(){ return (ME.pet||{}).hall||[]; }
 // 🏡 なかまの家(2026-11-02): 名人になった子(hall)と、入れかえでお休み中の子(rest)。会いに行く(openVisit)・いっしょに読む子を入れかえる(petSwap)
 // ひとりひとりの記録は PET_INDIV のキーだけ。ごはんのストック(food)・部屋・ともだちはみんなで共有
-const PET_INDIV=["born","bdGot","name","kind","color","look","wear","fed","base","gen","hatched","stay","love","loveDay","loveN","feedDay","mAt","album","ttl"];
+const PET_INDIV=["born","bdGot","name","kind","color","look","wear","fed","base","gen","hatched","stay","love","loveDay","loveN","feedDay","mAt","album","ttl","kn","stk","lsn","lsnDay","starGot"];
 function petCnt(){ return {d:ME.days.length,e:Object.keys(ME.readEx).length,w:ME.words.length}; }
 function petMaxGen(){ const p=ME.pet||{}; return Math.max(p.gen||1,...petHall().map(h=>h.gen||1),...(p.rest||[]).map(h=>h.gen||1)); }
 function petSnap(){ const p=petInit(); const o={}; PET_INDIV.forEach(k=>{ if(p[k]!==undefined&&p[k]!==null) o[k]=JSON.parse(JSON.stringify(p[k])); }); o.name=p.name||""; o.kind=petKind(); o.xp=petXP(); o.st=petStage().i; o.cnt=petCnt(); return o; }
@@ -4216,7 +4237,7 @@ function friendFeed(){ const p=petInit(); if(p.food<=0){ toast("🍙 ごはん�
   setTimeout(()=>{ if(up) toast(`✨ ${friendName()}が「${FR_STAGES[friendLv()][1]}」になった!`); if(current==="my") go("my",{keepScroll:true}); },900); }
 document.addEventListener("click",ev=>{ if(ev.target.closest("[data-ffeed]")){ friendFeed(); return; } if(ev.target.closest("[data-fpat]")){ if(friendOn()&&tripState().s==="back") tripClaim(); else friendPat(); return; } const v=ev.target.closest("[data-visit]"); if(v){ const [s,i]=v.dataset.visit.split(":"); openVisit(s,+i); return; } const w=ev.target.closest("[data-swap]"); if(w){ const [s,i]=w.dataset.swap.split(":"); swapAsk(s,+i); } });
 function petRestart(){ const p=petInit(); if(petStage().i<5) return false; albumCheck(); p.hall=p.hall||[]; p.hall.push(Object.assign(petSnap(),{at:p.mAt||TODAY})); delete p.color; delete p.look; delete p.mAt; delete p.love;
-  p.fed=0; p.feedDay=""; p.name=""; p.wear=null; p.stay=0; delete p.album; delete p.ttl; p.kind=petPickKind(p.kind); p.gen=petMaxGen()+1; p.base={d:ME.days.length,e:Object.keys(ME.readEx).length,w:ME.words.length}; saveMe(); return true; }
+  p.fed=0; p.feedDay=""; p.name=""; p.wear=null; p.stay=0; delete p.album; delete p.ttl; delete p.kn; delete p.stk; delete p.lsn; delete p.lsnDay; delete p.starGot; p.kind=petPickKind(p.kind); p.gen=petMaxGen()+1; p.base={d:ME.days.length,e:Object.keys(ME.readEx).length,w:ME.words.length}; saveMe(); return true; }
 function petStage(){ const xp=petXP(); let i=0; PET_STAGES.forEach((s,k)=>{ if(xp>=s[0]) i=k; }); const nx=PET_STAGES[i+1]; return {i,name:PET_STAGES[i][1],xp,next:nx,prog:nx?(xp-PET_STAGES[i][0])/(nx[0]-PET_STAGES[i][0]):1}; }
 function petTopGenre(){ let best=null,v=2.5; Object.entries(ME.auto||{}).forEach(([g,n])=>{ if(PET_ACC[g]&&n>v){v=n;best=g;} }); return best; }
 function petGap(){ const ds=[...ME.days].filter(d=>d<TODAY).sort(); if(!ds.length) return 0; return Math.round((Date.parse(TODAY)-Date.parse(ds[ds.length-1]))/864e5); }
@@ -4298,7 +4319,7 @@ function petCard(){ petHatchCheck(); bdCheck(); const p=petInit(); const st=petS
   return `<section class="pet-card" aria-label="ペット"><button class="pet-av" data-tab="my" aria-label="${esc(petName())}のページへ">${petSVG(st.i,mood,acc&&PET_ACC[acc][0],76,petWear()||(LOOK.mascot===false?null:"newsboy"))}</button>
     <div class="pet-tx"><b>${esc(petName())} <small class="hint">${esc(st.name)}</small></b><span>${esc(petLine(mood,st))}</span>
       <span class="pet-bt">${p.food>0?`<button class="fchip pet-feed" data-feed="1">🍙 ×${p.food} あげる</button>`:""}<button class="fchip" data-petquiz="1">🧠 クイズでごはん</button></span></div></section>`; }
-function petFeed(btnEl){ const p=petInit(); if(p.food<=0) return; p.food--; p.fed++; const first=p.feedDay!==TODAY; p.feedDay=TODAY; saveMe(); checkBadges();
+function petFeed(btnEl){ const p=petInit(); if(p.food<=0) return; adv("feed"); p.food--; p.fed++; const first=p.feedDay!==TODAY; p.feedDay=TODAY; saveMe(); checkBadges();
   const av=document.querySelector("#rmPet svg, .pet-av svg"); if(av){ av.classList.remove("eat"); void av.getBoundingClientRect(); av.classList.add("eat"); const r=av.getBoundingClientRect();
     for(let i=0;i<3;i++){ const h=document.createElement("span"); h.className="pet-heart"; h.textContent="❤️"; h.style.left=(r.left+r.width*(.3+i*.2))+"px"; h.style.top=(r.top+window.scrollY+10)+"px"; h.style.animationDelay=(i*.15)+"s"; document.body.appendChild(h); setTimeout(()=>h.remove(),1500); } }
   const dish=p.dish&&p.dish.d===TODAY&&!p.dish.eaten?p.dish:null; if(dish){ dish.eaten=1; saveMe(); }
@@ -4345,7 +4366,14 @@ const WEAR=[
   ["sailor","マリンぼうし","🎒 ともだちが「うみ」へおつかいに行く",()=>frDestGot("umi")],
   ["cap","野球ぼう","⚽ ボールキャッチで4回キャッチ",()=>(+(ME.pet||{}).bgBest||0)>=4],
   ["earmuff","耳あて","❄️ 冬(12〜2月)に開く",()=>!!(ME.flags||{}).winter],
-  ["walker","おさんぽぼうし","👣 おさんぽに3日行く",()=>(+(ME.pet||{}).walks||0)>=3]
+  ["walker","おさんぽぼうし","👣 おさんぽに3日行く",()=>(+(ME.pet||{}).walks||0)>=3],
+  ["owlhood","ふくろうフード","🦉 ホー先生との きずなレベル6",()=>bondLv("hoo")>=6],
+  ["feather","ポリーのはねかざり","🦜 ポリーとの きずなレベル6",()=>bondLv("polly")>=6],
+  ["goggles","ひこうゴーグル","📮 ぽっぽとの きずなレベル6",()=>bondLv("poppo")>=6],
+  ["piyohood","ひよこフード","🐥 ともだちとの きずなレベル6",()=>bondLv("piyo")>=6],
+  ["bandana","ぼうけんのバンダナ","📒 ぼうけん手帳のスタンプを8こ",()=>advStamps()>=8],
+  ["beanie","ゆきのニット帽","🎄 イベント「クリスマスの じゅんび」をクリア",()=>!!advA().got["w:beanie"]],
+  ["beret","ものがたりのベレー帽","📖 おはなしを さいごまで読む",()=>advA().story>=STORY.length]
 ];
 function petWear(){ const w=(ME.pet||{}).wear; const it=WEAR.find(x=>x[0]===w); return it&&it[3]()?w:null; }
 function wardrobeHTML(){ const w=petWear(); return `<div class="wardrobe">${WEAR.map(([k,n,c,ok])=>{ const open=ok(); return `<button class="wd-i${w===k?" on":""}" data-wear="${k}" ${open?"":"disabled"} title="${esc(open?n:"🔒 "+c)}"><span class="wd-svg">${open?petSVG(Math.max(1,petStage().i),"happy",null,46,k):'<span class="wd-lock">🔒</span>'}</span><small>${esc(open?n:c)}</small></button>`; }).join("")}<button class="wd-i${!w?" on":""}" data-wear=""><span class="wd-svg" style="font-size:1.4rem">🚫</span><small>なにも着ない</small></button></div>`; }
@@ -4380,7 +4408,7 @@ function roomStageHTML(){ const got=roomGot(); const st=petStage(); const fr=fri
   // 置き場所は R.slot{キー:マス}。「🪑 並べかえる」で、物を押す → 置きたいマス(または入れかえたい物)を押す。
   const SV=frShow(); const BIG=(R.big||[]).filter(k=>BIG_FURN.some(b=>b[0]===k&&b[3]())); const FR=(R.frames||[]).filter(k=>ppCards()[k]).slice(0,3);
   const TH0=ROOM_THEMES.find(t=>t[0]===R.theme); const SE0=R.noSeason?null:seasonDeco();
-  const small=["win",...(SE0?["season"]:[]),...(TH0?["td:0","td:1"]:[]),...FR.map(k=>"pf:"+k),...got,...SV.map(k=>"sv:"+k)], bigK=BIG.map(k=>"bf:"+k);
+  const small=["win",...(SE0?["season"]:[]),...(TH0?["td:0","td:1"]:[]),...FR.map(k=>"pf:"+k),...got,...SV.map(k=>"sv:"+k),...decoShow()], bigK=BIG.map(k=>"bf:"+k);
   const POS=roomSlotsFor(small,bigK,R); const EDIT=ROOM_EDIT;
   const useT=EDIT||Object.values(POS).some(v=>v[0]==="T"), useS=EDIT||Object.values(POS).some(v=>v[0]==="S");
   const xy=sl=>{ const r=sl[0], n=+sl.slice(1); if(r==="F") return [+(4+92*(n+.5)/4).toFixed(1),useT?54:47]; if(r==="W") return [+(4+92*(n+.5)/7).toFixed(1),4]; return [+(4+92*(n+.5)/9).toFixed(1),{S:24,T:43}[r]]; };
@@ -4393,7 +4421,7 @@ function roomStageHTML(){ const got=roomGot(); const st=petStage(); const fr=fri
   const slots=SHELF+GORDER.map((g,i)=>got.includes(g)?it(g,i,ROOM[g]," mv",GN[g]):"").join("")+SV.map((k,j)=>{ const g=frGiftInfo(k); return it("sv:"+k,j,g.it[1]," mv rm-sv",g.it[2]+"(おみやげ)"); }).join("")+it("win",13,`🪟<i class="rm-sky" aria-hidden="true">${sky}</i>`," mv rm-win","窓(外は"+sky+")")
     +BIG.map((k,j)=>{ const b=BIG_FURN.find(x=>x[0]===k); return it("bf:"+k,j,b[1]," mv rm-big",b[2]); }).join("")
     +FR.map((k,j)=>it("pf:"+k,j,`🖼️<i class="rm-pfn">${esc(k)}</i>`," mv rm-frame","絵はがき: "+k)).join("")
-    +(SE?it("season",0,SE[0]," mv",SE[1]):"")+(TH?it("td:0",0,TH[5]," mv",TH[1])+it("td:1",0,TH[6]," mv",TH[1]):"")+emptyS;
+    +decoShow().map(k=>it(k,0,DECO[k][0]," mv rm-sv",DECO[k][1])).join("")+(SE?it("season",0,SE[0]," mv",SE[1]):"")+(TH?it("td:0",0,TH[5]," mv",TH[1])+it("td:1",0,TH[6]," mv",TH[1]):"")+emptyS;
   const gk=guestKid(); const vis=(p.visitor&&p.visitor.d===TODAY)?p.visitor:null; const tt=petTitle(); const night=skyTOD()==="night";
   const ts=fr?tripState():null; const out=ts&&ts.s==="out", back=ts&&ts.s==="back";
   return `<div class="room${EDIT?" editing":""}" id="room" style="--w1:${W[2]};--w2:${W[3]};--f1:${F[2]};--f2:${F[3]}"><div class="rm-wall"></div><div class="rm-floor"></div>${RG[0]?`<i class="rm-rug" aria-hidden="true" style="background:${RG[2]}"></i>`:""}${slots}
@@ -4416,7 +4444,7 @@ function bindRoom(){ const room=document.getElementById("room"); if(!room) retur
     moveTo(12+Math.random()*72,()=>setTimeout(wander,1800+Math.random()*3500)); };
   setTimeout(wander,1200);
   if(!egg&&!still&&skyTOD()==="morning"&&petInit().amDay!==TODAY){ setTimeout(()=>{ if(!alive()) return; petInit().amDay=TODAY; saveMe(); pi.classList.add("tk-stretch"); say("ふわぁ〜、おはよう!",2200); setTimeout(()=>pi.classList.remove("tk-stretch"),1600); },900); }
-  const love=()=>{ const p=petInit(); if(p.loveDay!==TODAY){ p.loveDay=TODAY; p.loveN=0; } if(p.loveN<LOVE_DAY){ p.loveN++; p.love=petLove()+1; saveMe(); document.querySelectorAll("[data-rmlove]").forEach(e=>e.textContent=p.love); } careRefresh(); };
+  const love=()=>{ const p=petInit(); if(p.loveDay!==TODAY){ p.loveDay=TODAY; p.loveN=0; } if(p.loveN<LOVE_DAY){ p.loveN++; p.love=petLove()+1; saveMe(); adv("love"); document.querySelectorAll("[data-rmlove]").forEach(e=>e.textContent=p.love); } careRefresh(); };
   const hearts=()=>{ for(let i=0;i<3;i++){ const h=document.createElement("span"); h.className="rm-heart"; h.textContent="💗"; h.style.left=(25+i*25)+"%"; h.style.animationDelay=(i*.12)+"s"; pet.appendChild(h); setTimeout(()=>h.remove(),1300); } };
   const LINES=egg?["…コトコト","(あったかい…)","もうすぐ会えるよ"]:["えへへ","くすぐったい!","もっとなでて〜","きょうも読もうね","ふわぁ〜","すき!",...(PERSONA_L[petPersona()]||[]),...(skyTOD()==="night"?["ねむくなってきた…","おやすみの時間だね"]:[])];
   const pat=()=>{ if(busy) return; if(skyTOD()==="night") petFlag("nightpat"); pet.classList.remove("zz","hop"); void pet.offsetWidth; pet.classList.add("hop"); setTimeout(()=>pet.classList.remove("hop"),550);
@@ -4432,7 +4460,7 @@ function bindRoom(){ const room=document.getElementById("room"); if(!room) retur
       setTimeout(()=>moveTo(sx,()=>{ c.remove(); say("もぐもぐ…おいしい!"); face("happy",2400); hearts(); p.snackDay=TODAY; saveMe(); love(); busy=false; }),still?0:700); }
     else if(k==="trick"||k.startsWith("trick:")){ const T=tricksGot(); if(!T.length){ busy=false; return; } let t; if(k==="trick"){ const p=petInit(); p.tkI=((p.tkI||0)+1)%T.length; t=T[p.tkI]; saveMe(); } else t=T.find(x=>x[0]===k.slice(6)); if(!t){ busy=false; return; }
       pet.classList.remove("zz"); face("happy",2600); say(`✨ ${t[1]}!`,1800); if(t[0]==="nap"){ pet.classList.add("zz"); setTimeout(()=>{ pet.classList.remove("zz"); busy=false; },3000); return; }
-      pi.classList.add("tk-"+t[0]); setTimeout(()=>{ pi.classList.remove("tk-"+t[0]); hearts(); busy=false; },still?300:1500); }
+      pi.classList.add("tk-"+(t[3]||t[0])); setTimeout(()=>{ pi.classList.remove("tk-"+(t[3]||t[0])); hearts(); busy=false; },still?300:1500); }
     else busy=false; };
   ROOM_PLAY=k=>{ if(!alive()) return; play(k); };
   scope.querySelectorAll("[data-rplay]").forEach(b=>b.onclick=()=>play(b.dataset.rplay));
@@ -4478,7 +4506,7 @@ function ppToday(){ const p=petInit(); if(p.ppDay===TODAY||petStage().i<1) retur
   const fresh=L.filter(x=>!C[x.pl[3]]); const P=fresh.length?fresh:L; const r=seeded("pp"+TODAY); return P[Math.floor(r()*P.length)]; }
 function ppPref(nm){ return PLACE_PREF[nm]||null; }
 function ppStats(){ const C=ppCards(); const pref=new Set(), world=new Set(); Object.entries(C).forEach(([nm,c])=>{ if(c.jp){ const pf=ppPref(nm); if(pf) pref.add(pf); } else world.add(nm); }); return {pref:pref.size,world:world.size,all:Object.keys(C).length}; }
-function ppReceive(){ const x=ppToday(); if(!x) return; const p=petInit(); const nm=x.pl[3]; const isNew=!ppCards()[nm]; ppCards()[nm]={d:TODAY,h:x.n.h,jp:isJpPlace(x.pl)}; p.ppDay=TODAY; saveMe(); openPostcard(nm,isNew); setTimeout(checkBadges,900); }
+function ppReceive(){ const x=ppToday(); if(!x) return; const p=petInit(); const nm=x.pl[3]; const isNew=!ppCards()[nm]; ppCards()[nm]={d:TODAY,h:x.n.h,jp:isJpPlace(x.pl)}; p.ppDay=TODAY; saveMe(); adv("card"); openPostcard(nm,isNew); setTimeout(checkBadges,900); }
 const PREF_GROUPS=[["北海道・東北",0,7],["関東",7,7],["中部",14,9],["近畿",23,7],["中国",30,5],["四国",35,4],["九州・沖縄",39,8]];
 function prefMapHTML(){ const C=ppCards(); const got=new Set(); Object.entries(C).forEach(([nm,c])=>{ if(c.jp){ const pf=ppPref(nm); if(pf) got.add(pf); } });
   return `<div class="pc-map">${PREF_GROUPS.map(([nm,i,n])=>`<div class="pc-reg"><b>${nm}</b><div class="pc-cells">${PREFS.slice(i,i+n).map(pf=>`<span class="pc-cell${got.has(pf)?" got":""}" title="${esc(pf)}${got.has(pf)?"":"(まだ)"}">${esc(pf.replace(/[都府県]$/,""))}</span>`).join("")}</div></div>`).join("")}</div>`; }
@@ -4549,7 +4577,7 @@ function frShow(){ const p=petInit(); p.fshow=(p.fshow||[]).filter(k=>frGifts()[
 function tripState(){ const p=petInit(); const t=p.ftrip; if(t&&t.at){ const left=t.at+TRIP_MS-Date.now(); return left>0?{s:"out",left,t}:{s:"back",t}; } return p.ftripDay===TODAY?{s:"done"}:{s:"ready"}; }
 function tripDest(k){ return TRIP_DEST.find(x=>x[0]===k)||TRIP_DEST[0]; }
 function tripLeft(ms){ const m=Math.max(1,Math.ceil(ms/60000)); return m>=60?"約1時間":`約${m}分`; }
-function tripStart(dest){ const p=petInit(); if(!friendOn()||tripState().s!=="ready") return; const d=TRIP_DEST.find(x=>x[0]===dest); if(!d||friendLv()<d[3]) return;
+function tripStart(dest){ const p=petInit(); if(!friendOn()||tripState().s!=="ready") return; const d=TRIP_DEST.find(x=>x[0]===dest); if(!d||friendLv()<d[3]) return; adv("trip");
   p.ftrip={at:Date.now(),dest}; p.ftripDay=TODAY; saveMe(); toast(`🎒 ${friendName()}が「${d[2]}」へ おつかいに出かけました。1時間くらいでもどります`); go("my",{keepScroll:true}); }
 function tripClaim(){ const p=petInit(); const s=tripState(); if(s.s!=="back") return; const d=tripDest(s.t.dest); const G=frGifts();
   const fresh=d[4].filter(x=>!G[x[0]]); const pool=(fresh.length&&Math.random()<.75)?fresh:d[4]; const it=pool[Math.floor(Math.random()*pool.length)]; const isNew=!G[it[0]];
@@ -4583,7 +4611,7 @@ function diaryHTML(){ const end=TODAY; const start=new Date(Date.parse(TODAY)-6*
     ${friendOn()?`<p>${esc(friendName())}も「また来週ね」って言ってたよ。</p>`:""}</div>`; }
 // ===== 🐣 ペットの大型アップデート 第2弾(2026-11-21) =====
 // どれもスマホの中だけ。🍙ごはん・そだちのルールは変えない(遊びは「なかよし」とかざりにつながる)
-function petLoveAdd(n){ const p=petInit(); if(p.loveDay!==TODAY){ p.loveDay=TODAY; p.loveN=0; } const room=Math.max(0,LOVE_DAY-p.loveN); const add=Math.min(n||1,room); if(add>0){ p.loveN+=add; p.love=petLove()+add; saveMe(); document.querySelectorAll("[data-rmlove]").forEach(e=>e.textContent=p.love); } careRefresh(); return add; }
+function petLoveAdd(n){ const p=petInit(); if(p.loveDay!==TODAY){ p.loveDay=TODAY; p.loveN=0; } const room=Math.max(0,LOVE_DAY-p.loveN); const add=Math.min(n||1,room); if(add>0){ p.loveN+=add; p.love=petLove()+add; saveMe(); adv("love",add); document.querySelectorAll("[data-rmlove]").forEach(e=>e.textContent=p.love); } careRefresh(); return add; }
 // 📸 成長アルバム: 段階が上がった瞬間に自動で1まい(何段も一度に上がっても全部)。前からの子は「あとから」の思い出として埋める。手で残すのは10まいまで
 function albumCheck(){ const p=petInit(); const st=petStage().i; p.album=p.album||[]; const auto=p.album.filter(a=>!a.m); const has=new Set(auto.map(a=>a.s));
   let ch=false; if(!auto.length&&st>0){ for(let s=0;s<st;s++){ p.album.push({s,d:null,b:1}); has.add(s); } ch=true; }
@@ -4604,7 +4632,7 @@ const PERSONA_L={"しっかりもの":["きょうのニュース、ちゃんと�
 function petPersona(){ if(petStage().i===0) return null; const g=petTopGenre(); return g?PERSONA[g]:"すなお"; }
 // ✨ とくいわざ(なかよしで覚える)
 const TRICKS=[["spin","くるりん",3],["jump","大ジャンプ",10],["bow","おじぎ",20],["dance","ダンス",35],["banzai","バンザイ",50],["nap","おひるね",70]];
-function tricksGot(){ return petStage().i===0?[]:TRICKS.filter(t=>petLove()>=t[2]); }
+function tricksGot(){ return petStage().i===0?[]:[...TRICKS.filter(t=>petLove()>=t[2]),...senpaiTricks()]; }
 // 🙏 きょうのおねがい(1日1つ。かなえると なかよし +2)
 function wishMark(k){ const w=(ME.pet||{}).wish; if(!w||w.d!==TODAY) return; w.seen=w.seen||{}; if(!w.seen[k]){ w.seen[k]=1; saveMe(); } }
 function petWish(){ const p=petInit(); if(petStage().i===0) return null; if(!p.wish||p.wish.d!==TODAY){ const r=seeded("wish"+TODAY); const low=[...GORDER].sort((a,b)=>((ME.auto||{})[a]||0)-((ME.auto||{})[b]||0)).slice(0,5); const g=low[Math.floor(r()*low.length)];
@@ -4667,8 +4695,8 @@ document.addEventListener("click",e=>{ const g=e.target.closest("[data-guest]");
 // 🎮 あそぶ: ボールキャッチ・ことば合わせ・おさんぽ・ごはんづくり・とくいわざ
 function petPlayHTML(){ const p=petInit(); const st=petStage(); const egg=st.i===0; const T=tricksGot(); const nx=TRICKS.find(t=>petLove()<t[2]);
   const walk=sanpoPlaces(); const mates=petFriends().filter(({h})=>friendStageOf(h)>0);
-  return `<section class="card" aria-label="とくいわざ"><div class="sec-h"><h2>✨ とくいわざ</h2><span class="sub">${T.length}/${TRICKS.length}</span></div>
-    ${egg?`<div class="hint">たまごから生まれると、💞 なかよしが増えるたびに わざを覚えます。</div>`:`<div class="tk-grid">${TRICKS.map(t=>{ const ok=petLove()>=t[2]; return `<button class="fchip" data-trick="${t[0]}" ${ok?"":"disabled"}>${ok?"✨":"🔒"} ${esc(t[1])}${ok?"":` <small>なかよし${t[2]}</small>`}</button>`; }).join("")}</div>
+  return `<section class="card" aria-label="とくいわざ"><div class="sec-h"><h2>✨ とくいわざ</h2><span class="sub">${T.length}/${TRICKS.length+Object.keys(SENPAI_TK).length}</span></div>
+    ${egg?`<div class="hint">たまごから生まれると、💞 なかよしが増えるたびに わざを覚えます。</div>`:`<div class="tk-grid">${TRICKS.map(t=>{ const ok=petLove()>=t[2]; return `<button class="fchip" data-trick="${t[0]}" ${ok?"":"disabled"}>${ok?"✨":"🔒"} ${esc(t[1])}${ok?"":` <small>なかよし${t[2]}</small>`}</button>`; }).join("")}${senpaiTricks().map(t=>`<button class="fchip" data-trick="${t[0]}">🎓 ${esc(t[1])}</button>`).join("")}</div>
     <div class="hint">押すと、上の部屋で${esc(petName())}が見せてくれます。${nx?`つぎは なかよし ${nx[2]} で「${esc(nx[1])}」(いま ${petLove()})。`:"ぜんぶ覚えました!"}</div>`}</section>
   <section class="card" aria-label="ボールキャッチ"><div class="sec-h"><h2>⚽ ボールキャッチ</h2><span class="sub">${p.bgBest?`さいこう ${p.bgBest}/5`:"5回勝負"}</span></div>
     <div class="bg-box" id="bgBox"><div class="bg-track"><i class="bg-zone"></i><span class="bg-ball" id="bgBall">⚽</span></div><div class="bg-st" id="bgSt">ボールが まん中の色のところに来たら「キャッチ!」</div>
@@ -4691,7 +4719,7 @@ function bindPlay(){
       const tick=t=>{ if(!run||!ball.isConnected) return; const ph=((t-t0)/1000*sp)%2; const x=ph<1?ph:2-ph; ball.style.left=(x*100)+"%"; ball.dataset.x=x; raf=requestAnimationFrame(tick); }; raf=requestAnimationFrame(tick);
       stE.textContent="1回め: まん中に来たら押してね"; btn.textContent="🧤 キャッチ!";
       btn.onclick=()=>{ const x=+ball.dataset.x; const ok=Math.abs(x-.5)<=.12; n++; if(ok) hit++; stE.textContent=`${ok?"⭕ キャッチ!":"❌ おしい…"} (${hit}/${n})${n<5?` ・ ${n+1}回め`:""}`; t0=performance.now()-Math.random()*1500;
-        if(n>=5){ run=false; cancelAnimationFrame(raf); const p=petInit(); if(hit>(p.bgBest||0)){ p.bgBest=hit; saveMe(); } const add=hit>=3?petLoveAdd(1):0;
+        if(n>=5){ run=false; cancelAnimationFrame(raf); adv("game"); const p=petInit(); if(hit>(p.bgBest||0)){ p.bgBest=hit; saveMe(); } const add=hit>=3?petLoveAdd(1):0;
           stE.textContent=`けっか: 5回中 ${hit}回キャッチ!${hit>=3?(add?" 💞 なかよし +1":" (きょうの なかよしは いっぱい)"):" また やってみてね"}`; btn.textContent="↻ もう一回"; btn.onclick=()=>{ PETTAB="play"; go("my",{keepScroll:true}); }; } }; }; }
   // 🃏 ことば合わせ
   { const btn=document.getElementById("mmGo"); if(btn) btn.onclick=()=>{ const box=document.getElementById("mmBox"); const W=D.glossary.filter(w=>w[0]&&w[2]).map(w=>[w[0],w[2].split("。")[0]+"。"]).filter(w=>w[1].length<=40&&w[0].length<=14); if(W.length<4){ box.innerHTML='<div class="hint">ことばが足りません。</div>'; return; }
@@ -4700,7 +4728,7 @@ function bindPlay(){
       let open=[], got=0, tries=0, lock=false; box.querySelectorAll("[data-mm]").forEach(b=>b.onclick=()=>{ if(lock||b.classList.contains("on")||b.classList.contains("ok")) return; b.classList.add("on"); open.push(b);
         if(open.length===2){ tries++; const [a,c]=open.map(x=>cards[+x.dataset.mm]); lock=true;
           if(a.i===c.i&&a.k!==c.k){ open.forEach(x=>{ x.classList.add("ok"); x.classList.remove("on"); }); open=[]; got++; lock=false; box.querySelector("#mmSt").textContent=`⭕ そろった! (${got}/4)`;
-            if(got===4){ const p=petInit(); if(!p.mmBest||tries<p.mmBest){ p.mmBest=tries; saveMe(); } const add=petLoveAdd(1); box.querySelector("#mmSt").innerHTML=`🎉 ぜんぶそろった! ${tries}回でクリア${add?" ・ 💞 なかよし +1":""} <button class="fchip" id="mmAgain">↻ もう一回</button>`; box.querySelector("#mmAgain").onclick=()=>{ box.innerHTML='<div class="rm-tools"><button class="fchip pet-feed" id="mmGo">▶ はじめる</button></div>'; bindPlay(); document.getElementById("mmGo").click(); }; } }
+            if(got===4){ adv("game"); const p=petInit(); if(!p.mmBest||tries<p.mmBest){ p.mmBest=tries; saveMe(); } const add=petLoveAdd(1); box.querySelector("#mmSt").innerHTML=`🎉 ぜんぶそろった! ${tries}回でクリア${add?" ・ 💞 なかよし +1":""} <button class="fchip" id="mmAgain">↻ もう一回</button>`; box.querySelector("#mmAgain").onclick=()=>{ box.innerHTML='<div class="rm-tools"><button class="fchip pet-feed" id="mmGo">▶ はじめる</button></div>'; bindPlay(); document.getElementById("mmGo").click(); }; } }
           else { box.querySelector("#mmSt").textContent="❌ ちがう組みあわせ。もう一度!"; setTimeout(()=>{ open.forEach(x=>x.classList.remove("on")); open=[]; lock=false; },1100); } } }); }; }
   // 👣 おさんぽ
   document.querySelectorAll("[data-spmate]").forEach(b=>b.onclick=()=>{ const p=petInit(); const v=b.dataset.spmate; if(v){ const [g,k]=v.split(":"); p.walkMate={gen:+g,kind:k}; } else delete p.walkMate; saveMe(); document.querySelectorAll("[data-spmate]").forEach(x=>{ const on=x===b; x.classList.toggle("on",on); x.setAttribute("aria-pressed",String(on)); }); });
@@ -4710,20 +4738,20 @@ function bindPlay(){
       let k=-1; const draw=()=>{ box.innerHTML=`<div class="sp-road">${L.map((x,i)=>`<span class="sp-pt${i<=k?" on":""}">${i===k?av:`<span class="sp-dot" aria-hidden="true">${x.jp?"🗾":"🌏"}</span>`}<small>${esc(x.nm)}</small></span>`).join('<i class="sp-ln" aria-hidden="true"></i>')}</div>
         ${k>=0?`<div class="sp-msg"><b>📍 ${esc(L[k].nm)}</b> ${mate?`(${esc(friendNm(mate.h))}もいっしょ)`:""}<span class="nv-h" data-nv="${esc(nkey(L[k].n))}" role="button" tabindex="0">${esc(L[k].n.h)}</span></div>`:""}
         <div class="rm-tools">${k<L.length-1?`<button class="fchip pet-feed" id="spNext">👣 ${k<0?"出発!":"つぎの場所へ"}</button>`:`<span class="hint">🏁 おさんぽ おしまい! ${L.length}か所 めぐりました。</span>`}</div>`;
-        const nb=box.querySelector("#spNext"); if(nb) nb.onclick=()=>{ k++; draw(); if(k===L.length-1){ const pp=petInit(); if(pp.walkDay!==TODAY){ pp.walkDay=TODAY; pp.walks=(pp.walks||0)+1; saveMe(); const add=petLoveAdd(1); if(add) toast(`👣 ${petName()}「たのしかった!」 💞 なかよし +1`); } } }; };
+        const nb=box.querySelector("#spNext"); if(nb) nb.onclick=()=>{ k++; draw(); if(k===L.length-1){ const pp=petInit(); if(pp.walkDay!==TODAY){ pp.walkDay=TODAY; pp.walks=(pp.walks||0)+1; saveMe(); adv("walk"); const add=petLoveAdd(1); if(add) toast(`👣 ${petName()}「たのしかった!」 💞 なかよし +1`); } } }; };
       k=0; draw(); }; }
   // 🍳 ごはんづくり
   { const sel=[]; const gb=document.getElementById("ckGo"); document.querySelectorAll("[data-ingr]").forEach(b=>b.onclick=()=>{ const k=b.dataset.ingr; const i=sel.indexOf(k); if(i>=0) sel.splice(i,1); else { if(sel.length>=2) { const old=sel.shift(); const ob=document.querySelector(`[data-ingr="${old}"]`); if(ob){ ob.classList.remove("on"); ob.setAttribute("aria-pressed","false"); } } sel.push(k); }
       document.querySelectorAll("[data-ingr]").forEach(x=>{ const on=sel.includes(x.dataset.ingr); x.classList.toggle("on",on); x.setAttribute("aria-pressed",String(on)); }); if(gb) gb.disabled=sel.length!==2; });
-    if(gb) gb.onclick=()=>{ if(sel.length!==2) return; const key=[...sel].sort().join("+"); const r=RECIPES[key]||["🍙","おにぎり"]; const p=petInit(); p.dish={e:r[0],n:r[1],d:TODAY}; p.dishes=p.dishes||{}; const isNew=!p.dishes[key]; p.dishes[key]=1; saveMe();
+    if(gb) gb.onclick=()=>{ if(sel.length!==2) return; const key=[...sel].sort().join("+"); const r=RECIPES[key]||["🍙","おにぎり"]; const p=petInit(); p.dish={e:r[0],n:r[1],d:TODAY}; p.dishes=p.dishes||{}; const isNew=!p.dishes[key]; p.dishes[key]=1; saveMe(); adv("cook");
       const m=document.getElementById("ckMsg"); if(m) m.innerHTML=`<b style="font-size:1.4rem">${r[0]} ${esc(r[1])}</b> ができた!${isNew?" 🆕 はじめての料理":""} つぎに🍙ごはんをあげると、${esc(petName())}が食べます。`; }; }
 }
 // ===== 🐣 ペットのページ(2026-11-21 に作り直し・持ち主から「折りたたみが多くて使いづらい」) =====
 // 上に部屋(ペットがいる所)とおせわのボタンをたたまずに出し、その下は5つのタブ PET_TABS で切りかえる(details は使わない)。
 // いまのタブは PETTAB(描きなおしても残る)。きがえの中の切りかえは WEARTAB。
 let PETTAB="care", WEARTAB="wear";
-const PET_TABS=[["care","🍙","おせわ"],["play","🎮","あそぶ"],["wear","👕","きがえ"],["room","🏠","へや"],["friends","🐥","なかま"],["log","📔","きろく"]];
-function petTabDot(k){ if(k==="care") return !!ppToday(); if(k==="friends") return friendOn()&&["back","ready"].includes(tripState().s); return false; }
+const PET_TABS=[["care","🍙","おせわ"],["play","🎮","あそぶ"],["wear","👕","きがえ"],["room","🏠","へや"],["friends","🐥","なかま"],["log","📔","きろく"],["adv","🗺️","ぼうけん"]];
+function petTabDot(k){ if(k==="adv"){ try{ return taleNext().s==="ready"; }catch(_){ return false; } } if(k==="care") return !!ppToday(); if(k==="friends") return friendOn()&&["back","ready"].includes(tripState().s); return false; }
 function careRow(ic,ttl,sub,right,done){ return `<li class="pt-row${done?" done":""}"><span class="pt-ic" aria-hidden="true">${ic}</span><span class="pt-tx"><b>${ttl}</b><small>${sub}</small></span><span class="pt-r">${done&&!right?'<span class="pt-ok" aria-label="すんだ">✓</span>':(right||"")}</span></li>`; }
 function careRows(){ const p=petInit(); const st=petStage(); const egg=st.i===0; const R=[]; const nm=esc(petName());
   R.push(careRow("🍙","ごはん",p.food>0?`のこり ${p.food}こ。あげると そだち +5${p.feedDay===TODAY?"(きょうは もうあげました)":""}`:`いまは0こ。クイズに正解するともらえます(1日${PET_DAY_MAX}こまで)`,p.food>0?`<button class="fchip" data-care="feed">あげる</button>`:p.feedDay===TODAY?"":`<button class="fchip" data-care="quiz">🧠 クイズへ</button>`,p.feedDay===TODAY));
@@ -4740,18 +4768,21 @@ function careRows(){ const p=petInit(); const st=petStage(); const egg=st.i===0;
       :ts.s==="done"?careRow("🎒",`${fn}のおつかい`,"きょうのおつかいは おわりました。また明日!","",true)
       :careRow("🎒",`${fn}のおつかい`,"1日1回、おみやげを探しに行ってもらえます",`<button class="fchip" data-care="trip">たのむ</button>`,false)); }
   { const w=petWish(); if(w) R.push(careRow("🙏","きょうのおねがい",esc(w.txt)+(w.done?"(かなえました! 💞 +2)":""),w.done?"":`<button class="fchip" data-care="wish">${w.t==="quiz"?"クイズへ":w.t==="word"?"ことばへ":"読みに行く"}</button>`,w.done)); }
+  try{ const tn=taleNext(); if(tn.s==="ready") R.push(careRow("📖","おはなし",`新しい話「${esc(tn.c[0])}」が読めます`,`<button class="fchip" data-tale="${advA().story}">読む</button>`,false));
+    const W=advWeek(); const d=W.list.filter(m=>m.done).length; R.push(careRow("📒","今週の ぼうけん手帳",`${d}/${W.list.length} できました`,`<button class="fchip" data-ptgo="adv" data-ptsel="#advBook">見る</button>`,d===W.list.length)); }catch(_){}
   if(isMonthBd()) R.push(careRow("🎂","誕生日",`きょうは${nm}の${bdMonths()}か月の誕生日! お祝いの🍙を1こ もらいました`,"",true));
   return R; }
 function careListHTML(){ return `<ul class="pt-list">${careRows().join("")}</ul>`; }
 function careRefresh(){ const e=document.getElementById("ptCare"); if(e) e.innerHTML=careListHTML(); }
 function petHeroHTML(){ const p=petInit(); const st=petStage(); const mood=petMood(); const egg=st.i===0;
   return `<section class="card pet-home" aria-label="ペット">
-    <div class="ph-head"><span class="ph-nm"><b>${esc(petName())}</b><span class="chip">${esc(st.name)}</span>${petTitle()?`<span class="chip ttl-chip">${petTitle()[1]} ${esc(petTitle()[0])}</span>`:""}${petPersona()?`<span class="chip">🎭 ${esc(petPersona())}</span>`:""}</span><span class="ph-acts"><button class="fchip" id="petRename">✏️ 名前</button>${helpBtn("pet","育て方")}</span></div>
+    <div class="ph-head"><span class="ph-nm"><b>${esc(petName())}</b><span class="chip">${esc(st.name)}${st.i>=5&&petStar()?" "+"⭐".repeat(petStar()):""}</span>${petTitle()?`<span class="chip ttl-chip">${petTitle()[1]} ${esc(petTitle()[0])}</span>`:""}${petPersona()?`<span class="chip">🎭 ${esc(petPersona())}</span>`:""}</span><span class="ph-acts"><button class="fchip" id="petRename">✏️ 名前</button>${helpBtn("pet","育て方")}</span></div>
     ${roomStageHTML()}${roomEditHTML()}
     ${friendOn()&&tripState().s==="out"?`<div class="hint ph-trip">🎒 ${esc(friendName())}は「${esc(tripDest(tripState().t.dest)[2])}」へ おつかい中(あと${tripLeft(tripState().left)})</div>`:""}
     <div class="ph-say"><span aria-hidden="true">💬</span><span>${esc(petLine(mood,st))}</span></div>
     <div class="bar" role="img" aria-label="そだち ${st.xp}"><i style="width:${Math.round(st.prog*100)}%"></i></div>
-    <div class="hint ph-xp">そだち <b>${st.xp}</b>${st.next?` ・ 「${esc(st.next[1])}」まで あと${st.next[0]-st.xp}`:" ・ 最高の姿!"} ・ 💞 なかよし <b data-rmlove="1">${petLove()}</b></div>
+    <div class="hint ph-xp">そだち <b>${st.xp}</b>${st.next?` ・ 「${esc(st.next[1])}」まで あと${st.next[0]-st.xp}`:petStar()<STARS.length?` ・ ⭐${petStar()} つぎの星まで あと${STARS[petStar()]-st.xp}`:" ・ ⭐5 さいこうの星!"} ・ 💞 なかよし <b data-rmlove="1">${petLove()}</b></div>
+    ${nextGoalHTML()}
     <div class="rm-tools ph-tools"><button class="fchip pet-feed" data-feed="1" ${p.food>0?"":"disabled"}>🍙 ごはん <b id="petFood">${p.food}</b>こ・あげる</button><button class="fchip" data-rplay="pet">🤚 なでる</button>${egg?"":`<button class="fchip" data-rplay="ball">⚽ ボール</button><button class="fchip" data-rplay="snack">🍪 おやつ</button>${tricksGot().length?`<button class="fchip" data-rplay="trick">✨ わざ</button>`:""}`}</div>
   </section>`; }
 function petCareHTML(){ const p=petInit(); const st=petStage(); const acc=petTopGenre(); const rows=careRows(); const done=rows.filter(r=>r.includes('pt-row done')).length;
@@ -4798,6 +4829,8 @@ function petRoomTabHTML(){ const R=petRoom(); const got=roomGot(); const G=frGif
     <div class="hint">家具は、そのジャンルのニュースをよく読むと届きます(うすい色は、まだ届いていない家具)。</div>
     <h3 class="pt-h">🎁 おみやげをかざる <small>${S.length}/${SOUV_MAX}</small></h3>
     ${owned.length?`<div class="fu-grid">${owned.map(x=>`<button class="fu-i sv${S.includes(x[0])?" on":""}" data-rsouv="${x[0]}" aria-pressed="${S.includes(x[0])}"><span class="fu-em" aria-hidden="true">${x[1]}</span><small>${S.includes(x[0])?"✓ ":""}${esc(x[2])}</small></button>`).join("")}</div><div class="hint">押すと、部屋に出したり しまったりできます(${SOUV_MAX}こまで)。</div>`:`<div class="hint">まだありません。${friendOn()?`「🐥 なかま」で ${esc(friendName())}に おつかいをたのむと、おみやげを持ってきます。`:"ともだちが来ると、おつかいで おみやげを持ってきてくれます。"}</div>`}
+    <h3 class="pt-h">🏅 ごほうびの かざり <small>${decoShow().length}/${DECO_MAX}</small></h3>
+    ${decoList().length?`<div class="fu-grid">${decoList().map(k=>{ const on=decoShow().includes(k); return `<button class="fu-i sv${on?" on":""}" data-rdeco="${k}" aria-pressed="${on}"><span class="fu-em" aria-hidden="true">${DECO[k][0]}</span><small>${on?"✓ ":""}${esc(DECO[k][1])}</small></button>`; }).join("")}</div><div class="hint">押すと、部屋に出したり しまったりできます(${DECO_MAX}こまで)。</div>`:`<div class="hint">「🗺️ ぼうけん」の手帳・おはなし・キャラのきずな・季節のイベントで もらえます。</div>`}
     <div class="hint" style="margin-top:10px">👆 「🪑 部屋の物を並べかえる」を押すと、物を押して、置きたいマス(かべ・たな・床のおく)を選べます。1マスに1こなので重なりません。</div>
     <div class="rm-tools" style="margin-top:8px"><button class="fchip" data-redit="1">🪑 部屋の物を並べかえる</button><button class="fchip" data-rreset="1">↺ おまかせの並びにもどす</button></div>
   </section>
@@ -4846,7 +4879,7 @@ function petLogHTML(){ const p=petInit(); const st=petStage(); const b=p.base||{
   const X=[["🍙","ごはんをあげた",p.fed,5],["📅","開いた日",Math.max(0,ME.days.length-b.d),2],["💡","読んだ解説",Math.max(0,Object.keys(ME.readEx).length-b.e),3],["📖","調べたことば",Math.max(0,ME.words.length-b.w),1]];
   const notes=Object.entries(ME.readEx).filter(([k])=>D.explainers[k]).sort((a,b)=>String(b[1]).localeCompare(String(a[1]))).slice(0,8); const al=p.album||[];
   const kindsMet=new Set([petStage().i>0?petKind():null,...petFriends().filter(({h})=>friendStageOf(h)>0).map(({h})=>h.kind)].filter(Boolean));
-  const Z=[["🐾","会えた種類",kindsMet.size,Object.keys(PET_KINDS).length],["👕","着られる服",WEAR.filter(w=>w[3]()).length,WEAR.length],["✨","とくいわざ",tricksGot().length,TRICKS.length],["🪑","家具",roomGot().length,GORDER.length],["🛋️","大きい家具",BIG_FURN.filter(b=>b[3]()).length,BIG_FURN.length],["🎁","おみやげ",frGiftKinds(),frGiftAll()],["🍳","つくった料理",Object.keys(p.dishes||{}).length,Object.keys(RECIPES).length],["📮","絵はがき(県)",ppStats().pref,47]];
+  const Z=[["🐾","会えた種類",kindsMet.size,Object.keys(PET_KINDS).length],["👕","着られる服",WEAR.filter(w=>w[3]()).length,WEAR.length],["✨","とくいわざ",tricksGot().length,TRICKS.length+Object.keys(SENPAI_TK).length],["📖","おはなし",Math.min(advA().story,STORY.length),STORY.length],["🎁","ごほうびのかざり",decoList().length,Object.keys(DECO).length],["🪑","家具",roomGot().length,GORDER.length],["🛋️","大きい家具",BIG_FURN.filter(b=>b[3]()).length,BIG_FURN.length],["🎁","おみやげ",frGiftKinds(),frGiftAll()],["🍳","つくった料理",Object.keys(p.dishes||{}).length,Object.keys(RECIPES).length],["📮","絵はがき(県)",ppStats().pref,47]];
   return `<section class="card" aria-label="成長アルバム"><div class="sec-h"><h2>📸 成長アルバム</h2><span class="sub">${esc(petName())}</span></div>
     ${albumHTML(al,petKind(),"たまごから生まれると、育つたびに自動で1まいずつ残ります。")}
     <div class="hint">育って次の姿になった日に、自動で1まい残ります(何段も一度に育っても、ぜんぶ)。「(あとから)」は、アルバムができる前に育った姿を、思い出として あとから入れたものです。この子が なかまの家に行っても、アルバムは いっしょに持っていきます。</div>
@@ -4864,8 +4897,8 @@ function petLogHTML(){ const p=petInit(); const st=petStage(); const b=p.base||{
     <div class="hint">あわせて そだち <b>${st.xp}</b>${st.next?` ・ 「${esc(st.next[1])}」まで あと${st.next[0]-st.xp}`:""}${st.i>0&&p.born?` ・ 🎂 毎月${+p.born.slice(8)}日がお誕生日`:""}</div>
   </section>
   <section class="card" aria-label="そだて方"><div class="sec-h"><h2>📖 そだて方</h2></div><ul class="us"><li>🧠 クイズに正解 → 🍙 ごはん(1日${PET_DAY_MAX}こまで)。あげると そだち +5</li><li>📅 開いた日 +2 ・ 💡 解説を読む +3 ・ 📖 ことばを調べる +1</li><li>🤚 なでる・⚽ ボール・🍪 おやつ は「💞 なかよし」が増えます(そだちは変わりません)</li><li>3日以上あけると、すねます。ごはんをあげると元気に。</li><li>🥚 たまごから生まれる子は7種類。どの子が生まれるかは、生まれるまでのお楽しみ!(生まれたあとは変わりません)</li><li>🎓 名人になったら、そのまま育てるか、新しいたまごから育てるか選べます</li><li>🐥 ともだちは、ペットが「おとな」になるか、14日開くとやってきます。ごはんで育ち、おつかいで おみやげを持ってきます</li></ul></section>`; }
-function petBig(){ petHatchCheck(); bdCheck(); petInit(); albumCheck(); if(!PET_TABS.some(t=>t[0]===PETTAB)) PETTAB="care";
-  const P={care:petCareHTML,play:petPlayHTML,wear:petWearHTML,room:petRoomTabHTML,friends:()=>friendCardHTML()+nakamaHTML()+poppoCardHTML(),log:petLogHTML};
+function petBig(){ petHatchCheck(); bdCheck(); petInit(); albumCheck(); try{ advCheck(true); }catch(_){} if(!PET_TABS.some(t=>t[0]===PETTAB)) PETTAB="care";
+  const P={care:petCareHTML,play:()=>petKnowHTML()+petPlayHTML()+senpaiHTML(),adv:petAdvHTML,wear:petWearHTML,room:petRoomTabHTML,friends:()=>friendCardHTML()+nakamaHTML()+poppoCardHTML(),log:petLogHTML};
   return `${petHeroHTML()}
   <nav class="pet-tabs" role="tablist" aria-label="ペットのページの切りかえ">${PET_TABS.map(([k,ic,l])=>`<button role="tab" data-ptab="${k}" aria-selected="${PETTAB===k}" aria-pressed="${PETTAB===k}"><span class="pt-e" aria-hidden="true">${ic}</span><span>${l}</span>${petTabDot(k)?'<i class="fun-dot" aria-label="できることがあります"></i>':""}</button>`).join("")}</nav>
   ${PET_TABS.map(([k])=>`<div class="pet-panel" data-ppanel="${k}" ${PETTAB===k?"":"hidden"}>${P[k]()}</div>`).join("")}`; }
@@ -4888,6 +4921,7 @@ function bindPet(){
   const pr=document.getElementById("petRestart"); if(pr) pr.onclick=()=>{ const n=petName(); if(!confirm(`${n}は「🏡 なかまの家」に入り、新しいたまごから育てはじめます。\n(${n}にはいつでも会いに行けて、もどすこともできます。記録やバッジは消えません)\nよろしいですか?`)) return; if(petRestart()){ toast(`🥚 新しいたまごがやってきました。なにが生まれるかな? ${n}はなかまの家へ!`); go("my",{keepScroll:true}); } };
   const rn=document.getElementById("petRename"); if(rn) rn.onclick=()=>{ const v=prompt("名前をつけてね(10文字まで)",petName()); if(v&&v.trim()){ petInit().name=v.trim().slice(0,10); saveMe(); go(current,{keepScroll:true}); } };
   const wq=document.getElementById("wq"); if(wq) drawWordQuiz(wq,0,[]);
+  try{ drawPq(); }catch(_){}
   document.querySelectorAll(".pt-row [data-ex]").forEach(b=>b.onclick=()=>openEx(b.dataset.ex));
   const ng=document.getElementById("ntGo"); if(ng) ng.onclick=()=>{ const box=document.getElementById("ntQ"); const read=Object.keys(ME.readEx).filter(k=>D.explainers[k]); const all=Object.keys(D.explainers);
     const k=read[Math.floor(Math.random()*read.length)]; const others=all.filter(x=>x!==k).sort(()=>Math.random()-.5).slice(0,3); const ch=[k,...others].sort(()=>Math.random()-.5);
@@ -4895,6 +4929,226 @@ function bindPet(){
     box.querySelectorAll("[data-nt]").forEach(b=>b.onclick=()=>{ const ok=b.dataset.nt===k; box.querySelectorAll("[data-nt]").forEach(x=>{ x.disabled=true; if(x.dataset.nt===k) x.classList.add("ok"); }); if(!ok) b.classList.add("ng"); const add=ok?petLoveAdd(1):0;
       box.insertAdjacentHTML("beforeend",`<div class="hint" style="margin-top:6px">${ok?`⭕ 正解!${add?" 💞 なかよし +1":""}`:"❌ ざんねん。正しいのは 色のついた解説です。"} <button class="fchip" id="ntAgain">↻ つぎの問題</button></div>`); box.querySelector("#ntAgain").onclick=()=>{ box.innerHTML='<div class="rm-tools"><button class="fchip pet-feed" id="ntGo">📝</button></div>'; bindPet(); document.getElementById("ntGo").click(); }; }); };
 }
+// ===== 🗺️ ぼうけん(2026-11-25・持ち主から「キャラの要素をもっとやりがいのあるものに」) =====
+// つぎの目標バー・ぼうけん手帳(週のミッション+スタンプ)・名人のその先(⭐)・先ぱいのわざ・キャラのきずな・おはなし・ペットのニュース力・季節のイベント。
+// 記録は ME.adv と ME.pet だけ(スマホの中)。ごほうびは かざり・服・🍙。クイズでもらう🍙・そだちの計算は変えない。
+function advA(){ ME.adv=ME.adv||{}; const A=ME.adv; A.log=A.log||{}; A.st=A.st||{}; A.wk=A.wk||{}; A.got=A.got||{}; A.bl=A.bl||{}; A.ev=A.ev||{}; A.story=+A.story||0; return A; }
+function isoAdd(iso,n){ return new Date(Date.parse(iso)+n*864e5).toISOString().slice(0,10); }
+// その日にしたことを数える(45日分だけ残す)。数えたあと、少し待ってから ごほうびを確かめる
+function adv(k,n){ try{ const A=advA(); const L=A.log[TODAY]=A.log[TODAY]||{}; L[k]=(L[k]||0)+(n||1); const old=isoAdd(TODAY,-45); Object.keys(A.log).forEach(d=>{ if(d<old) delete A.log[d]; }); saveMe(); clearTimeout(adv.t); adv.t=setTimeout(()=>{ try{ advCheck(true); }catch(_){} },700); }catch(_){} }
+function advSum(k,f,t){ let s=0; Object.entries(advA().log).forEach(([d,L])=>{ if(d>=f&&d<=t) s+=+(L[k]||0); }); return s; }
+// ニュースのページを開いた(同じニュースは1日1回だけ数える)
+function advNv(n){ try{ const A=advA(); const k=nkey(n); if(!A.nv||A.nv.d!==TODAY) A.nv={d:TODAY,k:[]}; if(A.nv.k.includes(k)) return; A.nv.k.push(k); if(A.nv.k.length>80) A.nv.k.shift(); knAdd(n.g,1); adv("g:"+n.g); adv("nv"); }catch(_){} }
+const ADV_CNT={ ex:(f,t)=>advSum("ex",f,t), nv:(f,t)=>advSum("nv",f,t), word:(f,t)=>advSum("word",f,t), feed:(f,t)=>advSum("feed",f,t), love:(f,t)=>advSum("love",f,t), trip:(f,t)=>advSum("trip",f,t),
+  game:(f,t)=>advSum("game",f,t), cook:(f,t)=>advSum("cook",f,t), walk:(f,t)=>advSum("walk",f,t), pq:(f,t)=>advSum("pq",f,t), card:(f,t)=>advSum("card",f,t),
+  days:(f,t)=>ME.days.filter(d=>d>=f&&d<=t).length, perfect:(f,t)=>Object.entries(ME.quiz).filter(([d,v])=>d>=f&&d<=t&&+v>=3).length,
+  lang:(f,t)=>Object.values(ME.langSeen||{}).filter(d=>typeof d==="string"&&d.slice(0,10)>=f&&d.slice(0,10)<=t).length };
+
+// ---- 📒 ぼうけん手帳: 毎週5つ(読む3つ+ペット2つ)。1つできるとスタンプ1こ。ぜんぶで🍙×3 ----
+const MISSIONS=[["ex2","💡","くわしい解説を2本読む",2,"ex","r"],["nv5","📰","ニュースのページを5本開く",5,"nv","r"],["g2","📂","",2,"g","r"],["pf1","🧠","クイズで満点を1回とる",1,"perfect","r"],
+  ["wd3","📖","ことばを3つ調べる",3,"word","r"],["dy4","📅","アプリを4日開く",4,"days","r"],["lg3","🌍","ことばで世界一周で3語おぼえる",3,"lang","r"],["pq3","🐣","ペットのニュースクイズで3問正解",3,"pq","r",()=>petStage().i>0],
+  ["fd3","🍙","ペットにごはんを3回あげる",3,"feed","p"],["lv10","💞","なかよしを10ふやす",10,"love","p"],["tr2","🎒","ともだちに おつかいを2回たのむ",2,"trip","p",()=>friendOn()],["cd3","📮","絵はがきを3まい受けとる",3,"card","p",()=>petStage().i>0],
+  ["gm2","🎮","ボールキャッチか ことば合わせで2回あそぶ",2,"game","p",()=>petStage().i>0],["ck1","🍳","ごはんづくりを1回する",1,"cook","p",()=>petStage().i>0],["wk2","👣","おさんぽに2回行く",2,"walk","p",()=>petStage().i>0]];
+const STAMP_RW=[[3,"dc:compass","🧭 方位じしんのかざり"],[8,"w:bandana","👕 ぼうけんのバンダナ"],[15,"dc:map","🗺️ たからの地図のかざり"],[25,"dc:trophy","🏆 手帳のトロフィー"],[40,"t:ぼうけん家","🏅 称号「ぼうけん家」"]];
+function advWeek(){ const A=advA(); const ws=weekStart(TODAY), we=isoAdd(ws,6);
+  if(!A.wkp||A.wkp.ws!==ws){ const r=seeded("adv"+ws); const pick=(kind,n)=>MISSIONS.filter(m=>m[5]===kind&&(!m[6]||m[6]())).map(m=>[m,r()]).sort((a,b)=>a[1]-b[1]).slice(0,n).map(x=>x[0][0]);
+    const low=[...GORDER].sort((a,b)=>((ME.auto||{})[a]||0)-((ME.auto||{})[b]||0)).slice(0,6); A.wkp={ws,g:low[Math.floor(r()*low.length)],ids:[...pick("r",3),...pick("p",2)]}; saveMe(); }
+  const g=A.wkp.g; return {ws,we,list:A.wkp.ids.map(id=>MISSIONS.find(m=>m[0]===id)).filter(Boolean).map(m=>{ const isG=m[0]==="g2"; const n=isG?advSum("g:"+g,ws,we):ADV_CNT[m[4]](ws,we);
+    return {id:m[0],ic:m[1],txt:isG?`「${GN[g]||"いろいろ"}」のニュースを2本読む`:m[2],tg:m[3],n:Math.min(n,m[3]),done:n>=m[3],g:isG?g:null}; })}; }
+function advStamps(){ return Object.keys(advA().st).length; }
+function advTitle(){ const n=advStamps(); return n>=40?"ぼうけん家":null; }
+
+// ---- ⭐ 名人のその先: 名人になっても そだちは数えつづけ、星が5つまでふえる(星ごとに🍙×3) ----
+const STARS=[500,650,850,1100,1400];
+function petStar(){ const st=petStage(); if(st.i<5) return 0; return STARS.filter(x=>st.xp>=x).length; }
+// ---- 🎓 先ぱいのわざ: 名人の子(なかまの家の🏆)に1日1回ならう。同じ先ぱいに3回ならうと、その種類のわざを覚える ----
+const SENPAI_TK={maru:["korokoro","ころころ","spin"],neko:["nekonobi","ねこのび","stretch"],kaeru:["kerojump","ケロケロジャンプ","jump"],usagi:["pyonpyon","ぴょんぴょん","jump"],pengin:["pendance","ペンギンダンス","dance"],kitsune:["konbow","こんこんおじぎ","bow"],inu:["osuwari","おすわり","bow"]};
+function senpaiTricks(){ const p=ME.pet||{}; return (p.stk||[]).filter(k=>SENPAI_TK[k]).map(k=>{ const s=SENPAI_TK[k]; return [s[0],s[1],0,s[2],k]; }); }
+
+// ---- 🧠 ペットのニュース力: いっしょに読んだジャンルを覚える(ペットごと) ----
+const KN_LV=[[0,"まだ"],[3,"はじめて"],[8,"すこし"],[15,"くわしい"],[25,"とても くわしい"],[40,"はかせ"]];
+function knAdd(g,n){ if(!GN[g]) return; try{ if(petStage().i===0) return; }catch(_){ return; } const p=petInit(); p.kn=p.kn||{}; p.kn[g]=(+p.kn[g]||0)+(n||1); saveMe(); }
+function knLv(v){ let i=0; KN_LV.forEach((x,k)=>{ if(v>=x[0]) i=k; }); return i; }
+function knTop(n){ return Object.entries((ME.pet||{}).kn||{}).filter(([g])=>GN[g]).sort((a,b)=>b[1]-a[1]).slice(0,n||5); }
+// ペットが出すクイズ: この3日の ✅ のニュースの見出しから1語を□に(答えもまちがいも、見出しにあることばだけ)
+function pqQs(){ const p=petInit(); const top=knTop(3).map(x=>x[0]); const since=isoAdd(TODAY,-3); let pool=NEWS.filter(n=>n.ok&&n.d>=since&&n.h); const pg=pool.filter(n=>top.includes(n.g)); if(pg.length>=6) pool=pg;
+  const rx=/[一-龠々]{2,}|[ァ-ヴー]{3,}/g; const r=seeded("pq"+TODAY+(p.gen||1)); const kata=t=>/^[ァ-ヴー]+$/.test(t);
+  const all=[...new Set(NEWS.filter(n=>n.d>=since).flatMap(n=>n.h.match(rx)||[]))]; const Q=[];
+  for(const n of [...pool].sort(()=>r()-.5)){ if(Q.length>=3) break; const h=n.h; const toks=(h.match(rx)||[]).filter(t=>t.length<=8&&h.split(t).length===2); if(!toks.length) continue; const ans=[...toks].sort((a,b)=>b.length-a.length)[0];
+    const pl=all.filter(t=>t!==ans&&!h.includes(t)&&!t.includes(ans)&&!ans.includes(t)&&kata(t)===kata(ans)&&Math.abs(t.length-ans.length)<=2); if(pl.length<3) continue;
+    const o=[...pl].sort(()=>r()-.5).slice(0,3); const a=Math.floor(r()*4); o.splice(a,0,ans); Q.push({h:h.replace(ans,"□".repeat(Math.min(ans.length,4))),o,a,n}); }
+  return Q; }
+function pqState(){ const A=advA(); if(!A.pq||A.pq.d!==TODAY) A.pq={d:TODAY,i:0,res:[]}; return A.pq; }
+
+// ---- 🤝 キャラのきずな(ホー先生・ポリー・ぽっぽ・ともだち)。レベル1〜10。3=かざり・6=服・10=手紙と称号 ----
+const BOND_LV=[0,4,10,20,34,52,75,100,130,170];
+const BONDS=[
+  ["hoo",()=>"ホー先生",S=>owlSVG("o",S),()=>Object.keys(ME.readEx).length*2+Object.values(ME.quiz).filter(v=>+v>=3).length*2,"くわしい解説を読む(+2)・クイズで満点(+2)","bd:hoo","owlhood",
+    ["ホッホー。わからないことは、なんでも聞いてね。","解説は「ひとことで言うと」から読むと、すっと入るよ。","いつも読んでくれるお礼に、ふくろうの置物をどうぞ。部屋にかざってね。","ニュースは「いつ・どこで・だれが・なにを」で考えると、整理できるんだ。","同じできごとでも、伝える会社によって書き方が少しちがうんだよ。","わたしと おそろいの「ふくろうフード」をあげよう。よく似合うよ!","「✅」は2社以上がたしかめたしるし。ときどき気にして見てみてね。","「わからない」と言えるのは、とてもえらいことなんだよ。","きみと読むニュースは、わたしも楽しいんだ。","きみはもう、りっぱな ニュースのなかまだ。これからも よろしくね。"]],
+  ["polly",()=>"ポリー",S=>parrotSVG("n",S),()=>Object.keys(ME.langSeen||{}).length*2,"ことばで世界一周で ことばを覚える(+2)","bd:polly","feather",
+    ["ハロー! わたしはポリー。ことばが大好き!","英語の news は「新しいこと」がいっぱい、という意味なの。","オウムの置物をあげる! いっしょに旅した気分になれるよ。","「ありがとう」は 英語で サンキュー、韓国語で カムサハムニダ!","ことばを1つ覚えると、世界が1つ近くなるの。","わたしの羽をまねした「はねかざり」をどうぞ! カラフルでしょ?","世界のニュースの地名、言えるようになるとかっこいいよ!","ことばはね、毎日ちょっとずつが いちばん覚えられるの。","あなたの「ハロー」、とっても じょうずになったね!","世界一周、まだまだ つづけようね。ずっと いっしょだよ!"]],
+  ["poppo",()=>"ぽっぽ",S=>poppoSVG(S),()=>Object.keys((ME.pet||{}).cards||{}).length*3,"絵はがきを受けとる(+3)","bd:poppo","goggles",
+    ["ポッポー! 郵便でーす。きょうも届けにきたよ。","はがきの場所は、きょうのニュースから選んでるんだ。","ポストの置物をどうぞ! 部屋が にぎやかになるよ。","47都道府県、ぜんぶ回るのが ぽっぽのゆめなんだ。","地図で場所を見ると、ニュースがぐっと身近になるよ。","とっておきの「ひこうゴーグル」をあげる! 空を飛ぶときの ひつじゅひんさ。","遠い国の話も、だれかの町の話なんだよね。","雨の日も 風の日も、はがきは届けるよ!","きみの絵はがき帳、町いちばんかもしれないね。","これからも、いろんな場所を いっしょに旅しよう!"]],
+  ["piyo",()=>friendName(),S=>friendSVG(S),()=>{ const p=ME.pet||{}; return (+p.ffed||0)+(+p.ftrips||0)*2+(+p.flove||0); },"ごはん(+1)・おつかい(+2)・なでる(+1)","bd:piyo","piyohood",
+    ["ぴよ! (よろしくね、と言っているようです)","ぴよぴよ! (ごはん、おいしかったみたい)","ぴよっ! (ひよこの置物をくれました。そっくり!)","ぴよ〜 (おつかい、楽しかったみたい)","ぴよぴよぴよ! (きょうの おみやげの話をしてくれています)","ぴよっ! (おそろいの「ひよこフード」をくれました)","ぴよ…ぴよ (となりで いっしょに新聞を見ています)","ぴよー! (いつもありがとう、と言っているようです)","ぴよっ (あなたの肩に ちょこんと乗りました)","ぴよぴよー! (ずっと ともだちだよ、と言っているようです)"],()=>friendOn()]];
+function bondOf(id){ return BONDS.find(b=>b[0]===id); }
+function bondPts(id){ const b=bondOf(id); try{ return b?Math.max(0,+b[3]()||0):0; }catch(_){ return 0; } }
+function bondOn(id){ const b=bondOf(id); return !!b&&(!b[8]||b[8]()); }
+function bondLv(id){ if(!bondOn(id)) return 0; const v=bondPts(id); return BOND_LV.filter(x=>v>=x).length; }
+
+// ---- 🎁 ごほうびの かざり(部屋の「かべ・たな」のマスに置ける。4こまで) ----
+const DECO={"bd:hoo":["🦉","ふくろうの置物"],"bd:polly":["🦜","オウムの置物"],"bd:poppo":["📮","ポスト"],"bd:piyo":["🐣","ひよこの置物"],"dc:compass":["🧭","方位じしん"],"dc:map":["🗺️","たからの地図"],"dc:trophy":["🏆","手帳のトロフィー"],"st:news":["📰","まいにち町新聞"],
+  "ev:aki":["🍁","もみじのかざり"],"ev:ny":["🎍","門松"],"ev:spring":["🌸","さくらの枝"],"ev:rain":["☂️","かさのかざり"],"ev:summer":["🎐","風鈴"],"ev:hw":["🎃","かぼちゃのランタン"]};
+const DECO_MAX=4;
+function decoOwned(k){ if(!DECO[k]) return false; if(k.startsWith("bd:")) return bondLv(k.slice(3))>=3; return !!advA().got[k]; }
+function decoList(){ return Object.keys(DECO).filter(decoOwned); }
+function decoShow(){ const R=petRoom(); R.deco=(R.deco||[]).filter(decoOwned).slice(0,DECO_MAX); return R.deco; }
+function decoAuto(k){ const R=petRoom(); R.deco=R.deco||[]; if(!R.deco.includes(k)&&R.deco.length<DECO_MAX) R.deco.push(k); }
+
+// ---- 🎪 季節のイベント(期間中に3つの目標。ぜんぶできると限定のかざり・服) ----
+const EVENTS=[
+  ["aki","🍁","秋の よみもの週間","11-20","12-07",[["💡","くわしい解説を3本読む",3,"ex"],["📖","ことばを5つ調べる",5,"word"],["📰","ニュースのページを8本開く",8,"nv"]],"ev:aki"],
+  ["xmas","🎄","クリスマスの じゅんび","12-12","12-25",[["📅","アプリを5日開く",5,"days"],["🍙","ペットにごはんを5回あげる",5,"feed"],["💞","なかよしを15ふやす",15,"love"]],"w:beanie"],
+  ["ny","🎍","お正月の よみはじめ","12-29","01-07",[["💡","くわしい解説を2本読む",2,"ex"],["🧠","クイズで満点を1回とる",1,"perfect"],["📮","絵はがきを3まい受けとる",3,"card"]],"ev:ny"],
+  ["spring","🌸","春の おさんぽ週間","03-20","04-10",[["📅","アプリを5日開く",5,"days"],["👣","おさんぽに2回行く",2,"walk"],["📖","ことばを5つ調べる",5,"word"]],"ev:spring"],
+  ["rain","☂️","つゆの おうち読書","06-05","06-30",[["💡","くわしい解説を3本読む",3,"ex"],["🍳","ごはんづくりを2回する",2,"cook"],["🐣","ペットのニュースクイズで5問正解",5,"pq"]],"ev:rain"],
+  ["summer","🎐","夏休み 世界一周","07-20","08-31",[["🌍","ことばで世界一周で8語おぼえる",8,"lang"],["📮","絵はがきを5まい受けとる",5,"card"],["🎮","ボールキャッチか ことば合わせで3回あそぶ",3,"game"]],"ev:summer"],
+  ["hw","🎃","ハロウィンの なぞとき","10-20","10-31",[["🧠","クイズで満点を2回とる",2,"perfect"],["🐣","ペットのニュースクイズで5問正解",5,"pq"],["💞","なかよしを15ふやす",15,"love"]],"ev:hw"]];
+function evRange(e,y){ const f=y+"-"+e[3]; let t=y+"-"+e[4]; if(t<f) t=(+y+1)+"-"+e[4]; return [f,t]; }
+function evNow(){ const y=+TODAY.slice(0,4); for(const e of EVENTS) for(const yy of [y-1,y]){ const [f,t]=evRange(e,yy); if(TODAY>=f&&TODAY<=t) return {e,f,t,id:e[0]+yy}; } return null; }
+function evNext(){ const y=+TODAY.slice(0,4); let best=null; EVENTS.forEach(e=>[y,y+1].forEach(yy=>{ const [f,t]=evRange(e,yy); if(f>TODAY&&(!best||f<best.f)) best={e,f,t}; })); return best; }
+function evProg(E){ const to=TODAY<E.t?TODAY:E.t; return E.e[5].map(g=>{ const n=ADV_CNT[g[3]](E.f,to); return {ic:g[0],txt:g[1],tg:g[2],n:Math.min(n,g[2]),done:n>=g[2]}; }); }
+function rwName(k){ if(k.startsWith("w:")){ const w=WEAR.find(x=>x[0]===k.slice(2)); return "👕 "+(w?w[1]:"服"); } if(k.startsWith("t:")) return "🏅 称号「"+k.slice(2)+"」"; const d=DECO[k]; return d?d[0]+" "+d[1]:k; }
+
+// ---- 📖 おはなし: まいにち町の5人の おはなし(作り話。ニュースの事実は書かない)。1日1話まで ----
+const STORY=[
+  ["まいにち町の 朝",()=>true,"いつでも",[["n","ここは「まいにち町」。毎朝、町じゅうに新聞がとどく、ちょっとふしぎな町です。"],["p","ふぁ〜あ。きょうも新聞がとどいてる!"],["p","でも…むずかしい字ばかりで、よくわからないや。"],["h","ホッホー。それなら、わたしが手伝おう。"],["p","わっ、だれ!?"],["h","わたしは ホー先生。この町の「ニュースの先生」だよ。"],["h","むずかしいニュースも、「ひとことで言うと」から読めば だいじょうぶ。"],["p","ひとことで言うと…? やってみたい!"],["n","こうして、{P}の「ニュースのぼうけん」がはじまりました。"]]],
+  ["先生の しゅくだい",()=>Object.keys(ME.readEx).length>=2,"くわしい解説を2本読む",[["h","{P}、解説を読んでくれたね。どうだった?"],["p","「ひとことで言うと」を読んだら、少しわかった気がする!"],["h","そうそう。ニュースは、まず「なにが起きた?」をつかむのが大事なんだ。"],["h","つぎは「どうしてそうなった?」を考えてみよう。"],["p","なぜ?って考えると、なんだか探偵みたい!"],["h","いいね。わからないことばは、点線のところを押すと意味が出るよ。"],["n","{P}のノートに、はじめての「なるほど」が書きこまれました。"]]],
+  ["海をこえてきた声",()=>Object.keys(ME.langSeen||{}).length>=3,"ことばで世界一周で3語おぼえる",[["n","ある日、窓の外から 聞いたことのない声がしました。"],["y","ハロー! ニーハオ! アンニョン!"],["p","えっ、いまの なに語!?"],["y","ぜんぶ「こんにちは」だよ! わたしは ポリー。世界じゅうを旅してきたオウムさ。"],["y","世界のニュースにはね、いろんな国のことばが出てくるの。"],["p","ことばがわかると、世界のニュースも近く感じるね!"],["y","そのとおり! いっしょに ことばで世界一周しよう!"],["n","{P}の地図に、遠い国の名前が ひとつ増えました。"]]],
+  ["ぽっぽの 配達",()=>Object.keys((ME.pet||{}).cards||{}).length>=2,"絵はがきを2まい集める",[["o","ポッポー! 郵便でーす!"],["p","絵はがきだ! これ、どこの景色?"],["o","きょうのニュースに出てきた場所さ。ニュースの場所を回って、はがきを集めてるんだ。"],["p","ニュースって、ちゃんと「どこか」で起きてるんだね。"],["o","そう。地図で見ると、遠い話も「あの町の話」になるだろう?"],["p","47都道府県、ぜんぶ集めてみたい!"],["o","よし、まかせとけ! 毎日1まいずつ届けるよ。"]]],
+  ["ちいさな ともだち",()=>friendOn(),"ともだちが来る(ペットが「おとな」になるか、14日開く)",[["n","部屋のすみで、小さな声がしました。"],["f","ぴよ…ぴよぴよ。"],["p","ひよこ? きみ、どこから来たの?"],["f","ぴよ! (新聞の上で、ちょこんと首をかしげています)"],["p","いっしょに住もうよ。名前は…「{F}」!"],["f","ぴよー!"],["h","ホッホー。なかまが増えたね。{F}は、おつかいが得意なんだよ。"],["n","こうして、{P}に はじめての ともだちができました。"]]],
+  ["きえた見出し",()=>Object.values(ME.quiz).filter(v=>+v>=3).length>=3,"クイズで満点を3回とる",[["n","ある朝、町の掲示板の見出しが、ところどころ消えていました。"],["p","たいへん! 「□□」のところ、なんて書いてあったんだろう?"],["h","あわてない、あわてない。手がかりは、まわりのことばの中にあるよ。"],["y","まえとうしろのことばを、よーく読んでみて!"],["p","…わかった! このことばが入るんだ!"],["o","おみごと! 消えた見出しが、もとどおりだ!"],["h","ニュースを毎日読んでいると、こういう力がつくんだよ。"],["n","{P}は「見出しの名探偵」とよばれるようになりました。"]]],
+  ["みんなで 新聞づくり",()=>Object.keys(ME.readEx).length>=8&&ME.days.length>=14,"くわしい解説を8本読み、アプリを14日開く",[["h","みんな、集まってくれてありがとう。きょうは「まいにち町新聞」を作ろう。"],["o","場所のことなら まかせて! 地図のページを作るよ。"],["y","世界のことばのコーナーは わたし!"],["f","ぴよぴよ!(写真係のつもりのようです)"],["p","じゃあ {P}は…「ひとことで言うと」のコーナー!"],["h","いいね。大事なのは、たしかめたことだけを書くことだよ。"],["p","うわさじゃなくて、ちゃんと たしかめたこと…だね。"],["n","その夜、まいにち町新聞の第1号ができあがりました。部屋にかざれます。"]],"st:news"],
+  ["ニュース名人への 道",()=>petStage().i>=4||petHall().length>0,"ペットが「ものしり」まで育つ",[["h","{P}、ここまで よくがんばったね。"],["p","毎日読んでたら、ニュースがおもしろくなってきたんだ!"],["y","ことばも、世界も、ぐっと近くなったでしょ?"],["o","絵はがきも、ずいぶん集まったね。"],["f","ぴよっ!"],["h","ニュース名人に いちばん大事なのは、「知りたい」と思う気持ちなんだ。"],["h","これは、みんなから {P}へのプレゼント。ものがたりの ベレー帽だよ。"],["p","ありがとう! あしたも、いっしょに読もうね!"],["n","(おしまい…でも、{P}のぼうけんは まだまだ つづきます)"]],"w:beret"]];
+function taleNext(){ const A=advA(); if(A.story>=STORY.length) return {s:"end"}; const c=STORY[A.story]; if(petStage().i===0) return {s:"egg",c}; if(!c[1]()) return {s:"lock",c};
+  if(A.storyDay===TODAY) return {s:"tomorrow",c}; return {s:"ready",c}; }
+function taleAv(sp,S){ const st=petStage(); return sp==="p"?petSVG(st.i,"happy",null,S,petWear()):sp==="h"?owlSVG("o",S):sp==="y"?parrotSVG("n",S):sp==="o"?poppoSVG(S):sp==="f"?friendSVG(S):""; }
+function taleWho(sp){ return {p:petName(),h:"ホー先生",y:"ポリー",o:"ぽっぽ",f:friendName()}[sp]||""; }
+function taleTx(t){ return t.replace(/\{P\}/g,petName()).replace(/\{F\}/g,friendName()); }
+function openTale(i){ const A=advA(); const c=STORY[i]; if(!c) return; const isNew=i===A.story; const sh=document.getElementById("sheet");
+  sh.innerHTML=`<div class="bar"><div class="wrap"><button class="iconbtn" id="tlx" aria-label="もどる">← もどる</button><span class="ttl">📖 第${i+1}話 ${esc(c[0])}</span></div></div><div class="wrap body tl-body"><div class="tl-lines" id="tlL"></div><div class="rm-tools tl-ft" id="tlF"></div></div>`;
+  const L=sh.querySelector("#tlL"), F=sh.querySelector("#tlF"); let k=0;
+  const line=([sp,t])=>sp==="n"?`<p class="tl-n">${esc(taleTx(t))}</p>`:`<div class="tl-l ${sp==="p"?"me":""}"><span class="tl-av" aria-hidden="true">${taleAv(sp,48)}</span><span class="tl-b"><small>${esc(taleWho(sp))}</small>${esc(taleTx(t))}</span></div>`;
+  const fin=()=>{ let msg=""; if(isNew){ A.story=i+1; A.storyDay=TODAY; const p=petInit(); p.food=(p.food||0)+1; if(c[4]){ A.got[c[4]]=TODAY; if(c[4].startsWith("st:")) decoAuto(c[4]); } saveMe(); const add=petLoveAdd(2);
+      msg=`<div class="tl-rw">🎉 第${i+1}話を読みました! 🍙ごはん +1${add?` ・ 💞 なかよし +${add}`:""}${c[4]?` ・ ${esc(rwName(c[4]))}`:""}</div>`; adv("tale"); }
+    F.innerHTML=`${msg}<button class="fchip pet-feed" id="tlEnd">✓ とじる</button>${i+1<STORY.length&&i+1<A.story?`<button class="fchip" id="tlNx">つぎの話へ ›</button>`:""}`;
+    F.querySelector("#tlEnd").onclick=close; const nx=F.querySelector("#tlNx"); if(nx) nx.onclick=()=>{ SH_SIDE=true; openTale(i+1); }; };
+  const step=()=>{ if(k<c[3].length){ L.insertAdjacentHTML("beforeend",line(c[3][k])); const last=L.lastElementChild; last.classList.add("in"); k++; try{ last.scrollIntoView({block:"nearest",behavior:"smooth"}); }catch(_){} }
+    if(k>=c[3].length) fin(); else F.innerHTML=`<button class="fchip pet-feed" id="tlGo">▶ つぎへ</button><button class="fchip" id="tlAll">ぜんぶ読む</button>`, F.querySelector("#tlGo").onclick=step, F.querySelector("#tlAll").onclick=()=>{ while(k<c[3].length){ L.insertAdjacentHTML("beforeend",line(c[3][k])); k++; } fin(); }; };
+  const close=()=>{ sh.hidden=true; sh.innerHTML=""; document.body.style.overflow=""; if(current==="my") go("my",{keepScroll:true}); };
+  sh.querySelector("#tlx").onclick=close; step(); sh.hidden=false; sh.scrollTop=0; document.body.style.overflow="hidden"; track("/tale/"+(i+1),"おはなし"); }
+
+// ---- 🤝 きずなのページ ----
+function openBond(id){ const b=bondOf(id); if(!b||!bondOn(id)) return; const lv=bondLv(id), pts=bondPts(id), nx=BOND_LV[lv]; const sh=document.getElementById("sheet"); const nm=b[1]();
+  const rw=[[3,rwName(b[5])],[6,rwName("w:"+b[6])],[10,"✉️ 特別な手紙"]];
+  sh.innerHTML=`<div class="bar"><div class="wrap"><button class="iconbtn" id="bdx" aria-label="もどる">← もどる</button><span class="ttl">🤝 ${esc(nm)}との きずな</span></div></div><div class="wrap body">
+    <section class="card bo-top"><button class="bo-av" id="boAv" aria-label="${esc(nm)}に話しかける">${b[2](96)}</button><div class="bo-tx"><b>${esc(nm)}</b><span class="chip">きずなレベル ${lv}</span><div class="ph-say"><span aria-hidden="true">💬</span><span id="boSay">${esc(b[7][lv-1])}</span></div>
+      <div class="zk-bar"><i style="width:${nx?Math.round((pts-BOND_LV[lv-1])/(nx-BOND_LV[lv-1])*100):100}%"></i></div><small>${nx?`レベル${lv+1}まで あと ${nx-pts}`:"いちばん高いレベルです!"}</small></div></section>
+    <section class="card"><div class="sec-h"><h2>🌱 きずなの深め方</h2></div><p class="hint" style="margin:0">${esc(b[4])}</p></section>
+    <section class="card"><div class="sec-h"><h2>🎁 ごほうび</h2></div><ul class="pt-list">${rw.map(([l,t])=>careRow(lv>=l?"✅":"🔒",`レベル${l}`,esc(t),"",lv>=l)).join("")}</ul>
+      ${lv>=10?`<div class="bo-letter"><b>✉️ ${esc(nm)}からの手紙</b><p>${esc(nickCall()||"きみ")}へ。毎日いっしょにニュースを読んでくれて、ありがとう。知りたいと思う気持ちは、いちばんの たからものです。これからも、どうぞよろしくね。 ― ${esc(nm)}より</p></div>`:""}</section>
+    <section class="card"><div class="sec-h"><h2>💬 思い出のことば</h2><span class="sub">${lv}/10</span></div><ul class="pt-list">${b[7].map((t,i)=>careRow(i<lv?"💬":"🔒",`レベル${i+1}`,i<lv?esc(t):"もっと なかよくなると聞けます","",false)).join("")}</ul></section></div>`;
+  const close=()=>{ sh.hidden=true; sh.innerHTML=""; document.body.style.overflow=""; };
+  sh.querySelector("#bdx").onclick=close; sh.querySelector("#boAv").onclick=()=>{ const s=sh.querySelector("#boSay"); s.textContent=b[7][Math.floor(Math.random()*lv)]; const a=sh.querySelector("#boAv"); a.classList.remove("hop"); void a.offsetWidth; a.classList.add("hop"); };
+  sh.hidden=false; sh.scrollTop=0; document.body.style.overflow="hidden"; track("/bond/"+id,"きずな"); }
+
+// ---- 🎯 つぎの目標: いま いちばん近い ごほうびを1つ(ペットのページの上)と、6つ(ぼうけんタブ) ----
+const WEAR_PROG={newsboy:[()=>bestStreak(),3],randoseru:[()=>bestStreak(),7],professor:[()=>Object.keys(ME.readEx).length,5],traveler:[()=>Object.keys(ME.langSeen||{}).length,10],postman:[()=>Object.keys((ME.pet||{}).cards||{}).length,10],
+  fortune:[()=>Object.keys(ME.votes).length,3],book:[()=>ME.words.length,10],heartpin:[()=>myTopics().length,5],chefhat:[()=>Object.keys((ME.pet||{}).dishes||{}).length,3],flowercrown:[()=>+(ME.pet||{}).picked||0,3],
+  cap:[()=>+(ME.pet||{}).bgBest||0,4],walker:[()=>+(ME.pet||{}).walks||0,3],bandana:[()=>advStamps(),8],beret:[()=>advA().story,STORY.length],
+  owlhood:[()=>bondPts("hoo"),BOND_LV[5]],feather:[()=>bondPts("polly"),BOND_LV[5]],goggles:[()=>bondPts("poppo"),BOND_LV[5]],piyohood:[()=>friendOn()?bondPts("piyo"):0,BOND_LV[5]]};
+const BF_PROG={bed:[()=>ME.days.length,3],sofa:[()=>ME.days.length,7],books:[()=>Object.keys(ME.readEx).length,3],tv:[()=>Object.keys(ME.readEx).length,8],plant:[()=>ME.words.length,5],clock:[()=>ME.days.length,14],piano:[()=>ME.days.length,30],bear:[()=>petLove(),20],globe:[()=>ppStats().all,5],lamp:[()=>+(ME.pet||{}).ftrips||0,5]};
+function nextGoals(){ const G=[]; const st=petStage(); const add=(ic,t,how,n,tg,tab)=>{ n=Math.max(0,+n||0); if(tg>0&&n<tg) G.push({ic,t,how,n,tg,tab}); };
+  try{ if(st.next) add("🐣",`「${st.next[1]}」に育つ`,"そだち",st.xp,st.next[0],"log");
+    if(st.i>=5){ const s=petStar(); if(s<STARS.length) add("⭐",`${s+1}つめの星`,"そだち",st.xp,STARS[s],"log"); }
+    WEAR.forEach(w=>{ const pr=WEAR_PROG[w[0]]; if(pr&&!w[3]()) add("👕",w[1],w[2],pr[0](),pr[1],"wear"); });
+    BIG_FURN.forEach(b=>{ const pr=BF_PROG[b[0]]; if(pr&&!b[3]()) add(b[1],b[2],b[4],pr[0](),pr[1],"room"); });
+    if(st.i>0){ const t=TRICKS.find(x=>petLove()<x[2]); if(t) add("✨",`わざ「${t[1]}」`,"💞 なかよし",petLove(),t[2],"play"); }
+    BONDS.forEach(b=>{ if(!bondOn(b[0])) return; const lv=bondLv(b[0]); if(lv<10) add("🤝",`${b[1]()}との きずなレベル${lv+1}`,b[4],bondPts(b[0]),BOND_LV[lv],"adv"); });
+    const sr=STAMP_RW.find(r=>advStamps()<r[0]); if(sr) add("📒",sr[2].replace(/^\S+ /,""),"ぼうけん手帳のスタンプ",advStamps(),sr[0],"adv");
+  }catch(_){}
+  return G.sort((a,b)=>(b.n/b.tg)-(a.n/a.tg)||(a.tg-a.n)-(b.tg-b.n)); }
+function ngRow(g,btn){ return `<li class="pt-row ng-row"><span class="pt-ic" aria-hidden="true">${g.ic}</span><span class="pt-tx"><b>${esc(g.t)}</b><small>${esc(g.how)} ${g.n}/${g.tg}(あと${g.tg-g.n})</small><span class="bar zk-bar"><i style="width:${Math.round(g.n/g.tg*100)}%"></i></span></span>${btn?`<span class="pt-r"><button class="fchip" data-ptgo="${g.tab}">見る</button></span>`:""}</li>`; }
+function nextGoalHTML(){ const g=nextGoals()[0]; if(!g) return ""; return `<button class="ng-bar" data-ptgo="adv" data-ptsel="#advNext"><span class="ng-l">🎯 つぎの目標</span><span class="ng-m"><b>${g.ic} ${esc(g.t)}</b><small>${esc(g.how)} ${g.n}/${g.tg}(あと${g.tg-g.n})</small><span class="bar"><i style="width:${Math.round(g.n/g.tg*100)}%"></i></span></span><span class="ng-r" aria-hidden="true">›</span></button>`; }
+
+// ---- ごほうびの確かめ(スタンプ・手帳の週ボーナス・星・きずなのレベル・イベント)。quiet=true でトーストを出す ----
+function advCheck(loud){ const A=advA(); const p=petInit(); const T=[]; let ch=false;
+  try{ const W=advWeek(); W.list.forEach(m=>{ const k=W.ws+":"+m.id; if(m.done&&!A.st[k]){ A.st[k]=TODAY; ch=true; T.push(`📒 スタンプ ゲット!「${m.txt}」`); } });
+    if(W.list.length&&W.list.every(m=>m.done)&&!A.wk[W.ws]){ A.wk[W.ws]=1; p.food=(p.food||0)+3; ch=true; T.push(`🎉 今週の ぼうけん手帳を ぜんぶクリア! 🍙ごはん ×3`); }
+    const n=advStamps(); STAMP_RW.forEach(([need,k])=>{ if(n>=need&&!A.got[k]){ A.got[k]=TODAY; if(k.startsWith("dc:")) decoAuto(k); ch=true; T.push(`🎁 スタンプ${need}こ! ${rwName(k)}をもらいました`); } });
+    const s=petStar(); if(p.starGot===undefined){ p.starGot=s; ch=true; } else if(s>(+p.starGot||0)){ const d=s-p.starGot; p.starGot=s; p.food=(p.food||0)+3*d; ch=true; T.push(`⭐ ${petName()}に ${s}つめの星! 🍙ごはん ×${3*d}`); }
+    BONDS.forEach(b=>{ if(!bondOn(b[0])) return; const lv=bondLv(b[0]); const old=A.bl[b[0]]; if(old===undefined){ A.bl[b[0]]=lv; ch=true; if(lv>=3) decoAuto(b[5]); return; }
+      if(lv>old){ A.bl[b[0]]=lv; ch=true; if(lv>=3&&old<3) decoAuto(b[5]); T.push(`🤝 ${b[1]()}との きずなが レベル${lv}に!${lv>=3&&old<3?` ${rwName(b[5])}をもらいました`:""}${lv>=6&&old<6?` ${rwName("w:"+b[6])}が着られます`:""}`); } });
+    const E=evNow(); if(E&&!A.ev[E.id]&&evProg(E).every(g=>g.done)){ A.ev[E.id]=TODAY; A.got[E.e[6]]=TODAY; if(E.e[6].startsWith("ev:")) decoAuto(E.e[6]); ch=true; T.push(`${E.e[1]} イベント「${E.e[2]}」クリア! ${rwName(E.e[6])}をもらいました`); }
+  }catch(_){}
+  if(ch) saveMe(); if(loud) T.slice(0,3).forEach((t,i)=>setTimeout(()=>toast(t),i*2600)); return T; }
+
+// ---- 🗺️ ぼうけんタブ ----
+function petAdvHTML(){ const A=advA(); const W=advWeek(); const NG=nextGoals().slice(0,6); const n=advStamps(); const E=evNow(); const EN=E?null:evNext(); const tn=taleNext(); const st=petStage();
+  const ev=E?(()=>{ const P=evProg(E); const done=!!A.ev[E.id]; return `<div class="ev-box"><b>${E.e[1]} ${esc(E.e[2])}</b><small>${esc(mdLabel(E.f))}〜${esc(mdLabel(E.t))}${done?" ・ クリア!":""}</small><ul class="pt-list">${P.map(g=>`<li class="pt-row${g.done?" done":""}"><span class="pt-ic" aria-hidden="true">${g.ic}</span><span class="pt-tx"><b>${esc(g.txt)}</b><span class="bar zk-bar"><i style="width:${Math.round(g.n/g.tg*100)}%"></i></span></span><span class="pt-r"><b>${g.n}/${g.tg}</b></span></li>`).join("")}</ul><div class="hint">ぜんぶできると: ${esc(rwName(E.e[6]))}${done?"(もらいました)":""}</div></div>`; })()
+    :`<div class="hint">いまは イベントの期間ではありません。${EN?`つぎは <b>${EN.e[1]} ${esc(EN.e[2])}</b>(${esc(mdLabel(EN.f))}から)。`:""}</div>`;
+  return `<section class="card" id="advNext" aria-label="つぎの目標"><div class="sec-h"><h2>🎯 もうすぐ もらえるもの</h2><span class="sub">近い順</span></div>
+    ${NG.length?`<ul class="pt-list">${NG.map(g=>ngRow(g,true)).join("")}</ul>`:`<div class="hint">いまは目標が ありません。ぜんぶ そろいました!</div>`}</section>
+  <section class="card" id="advBook" aria-label="ぼうけん手帳"><div class="sec-h"><h2>📒 ぼうけん手帳</h2><span class="sub">今週 ${W.list.filter(m=>m.done).length}/${W.list.length}</span></div>
+    <ul class="pt-list">${W.list.map(m=>`<li class="pt-row${m.done?" done":""}"><span class="pt-ic" aria-hidden="true">${m.done?"💮":m.ic}</span><span class="pt-tx"><b>${esc(m.txt)}</b><span class="bar zk-bar"><i style="width:${Math.round(m.n/m.tg*100)}%"></i></span></span><span class="pt-r">${m.g&&!m.done?`<button class="fchip" data-gopen="${m.g}">読む</button>`:`<b>${m.n}/${m.tg}</b>`}</span></li>`).join("")}</ul>
+    <div class="hint">毎週月曜に新しくなります。1つできるとスタンプ💮1こ、ぜんぶで🍙ごはん×3${A.wk[W.ws]?"(今週は もらいました)":""}。</div>
+    <h3 class="pt-h">💮 スタンプ <small>これまで ${n}こ</small></h3>
+    <div class="stp-road">${STAMP_RW.map(([need,k,nm])=>`<span class="stp${n>=need?" on":""}"><b>${n>=need?"✅":"🔒"} ${need}こ</b><small>${esc(nm)}</small></span>`).join("")}</div></section>
+  <section class="card" aria-label="季節のイベント"><div class="sec-h"><h2>🎪 季節のイベント</h2></div>${ev}</section>
+  <section class="card" aria-label="おはなし"><div class="sec-h"><h2>📖 おはなし</h2><span class="sub">${Math.min(A.story,STORY.length)}/${STORY.length}話</span></div>
+    <ul class="pt-list">${STORY.map((c,i)=>{ const read=i<A.story, cur=i===A.story;
+      if(read) return careRow("📖",`第${i+1}話 ${esc(c[0])}`,"読みました",`<button class="fchip" data-tale="${i}">もう一度</button>`,false);
+      if(cur) return careRow(tn.s==="ready"?"✨":"🔒",`第${i+1}話 ${esc(c[0])}`,tn.s==="ready"?"新しい話が読めます":tn.s==="tomorrow"?"あした読めます(1日1話)":tn.s==="egg"?"たまごから生まれると読めます":`読める条件: ${esc(c[2])}`,tn.s==="ready"?`<button class="fchip pet-feed" data-tale="${i}">読む</button>`:"",false);
+      return careRow("🔒",`第${i+1}話`,"まだ ないしょ","",false); }).join("")}</ul>
+    <div class="hint">まいにち町に住む ${esc(petName())}と なかまたちの おはなしです(作り話です)。1話読むと 🍙ごはん+1。</div></section>
+  <section class="card" aria-label="キャラのきずな"><div class="sec-h"><h2>🤝 キャラの きずな</h2><span class="sub">押すと話せます</span></div>
+    <div class="bo-grid">${BONDS.map(b=>{ const on=bondOn(b[0]); if(!on) return `<div class="bo-c off"><span class="bo-i pf-ghost" aria-hidden="true">${b[2](56)}</span><b>？？？</b><small>まだ会っていません</small></div>`;
+      const lv=bondLv(b[0]), pts=bondPts(b[0]), nx=BOND_LV[lv]; return `<button class="bo-c" data-bond="${b[0]}"><span class="bo-i" aria-hidden="true">${b[2](56)}</span><b>${esc(b[1]())}</b><small>きずなレベル ${lv}</small><span class="zk-bar"><i style="width:${nx?Math.round((pts-BOND_LV[lv-1])/(nx-BOND_LV[lv-1])*100):100}%"></i></span></button>`; }).join("")}</div>
+    <div class="hint">きずなが深まると、新しいことばが聞けて、レベル3で部屋のかざり、6で服、10で特別な手紙がもらえます。</div></section>
+  ${advTitle()?`<div class="hint" style="text-align:center">🏅 あなたの称号: <b>${esc(advTitle())}</b></div>`:""}`; }
+
+// ---- 🧠 ニュース力 と ペットのクイズ(あそぶタブ)・🎓 先ぱい ----
+function petKnowHTML(){ const st=petStage(); if(st.i===0) return ""; const nm=esc(petName()); const K=knTop(5); const S=pqState();
+  return `<section class="card" aria-label="ニュース力"><div class="sec-h"><h2>🧠 ${nm}の ニュース力</h2><span class="sub">いっしょに読んだジャンル</span></div>
+    ${K.length?`<ul class="pt-list">${K.map(([g,v])=>{ const l=knLv(v), nx=KN_LV[l+1]; return `<li class="pt-row"><span class="pt-ic" aria-hidden="true">${ROOM[g]||"●"}</span><span class="pt-tx"><b>${esc(GN[g])} ・ ${esc(KN_LV[l][1])}</b><span class="bar zk-bar"><i style="width:${nx?Math.round((v-KN_LV[l][0])/(nx[0]-KN_LV[l][0])*100):100}%"></i></span></span><span class="pt-r"><b>${v}</b></span></li>`; }).join("")}</ul>`
+      :`<div class="hint">ニュースのページや くわしい解説を開くと、${nm}が そのジャンルを覚えていきます。</div>`}
+    <h3 class="pt-h">🐣 ${nm}からの クイズ <small>きょう ${S.res.filter(Boolean).length}/3 正解</small></h3>
+    <div id="pqBox"></div>
+    <div class="hint">${nm}が この3日の ✅ のニュースから出します(よく読むジャンルから)。正解すると ${nm}の ニュース力 +1・💞 なかよし +1。1日3問。</div></section>`; }
+function drawPq(){ const box=document.getElementById("pqBox"); if(!box) return; const Q=pqQs(); const S=pqState(); const nm=petName();
+  if(!Q.length){ box.innerHTML=`<div class="hint">きょうは問題を作れませんでした。また明日!</div>`; return; }
+  if(S.i>=Q.length){ const ok=S.res.filter(Boolean).length; box.innerHTML=`<div class="pq-done">${petSVG(petStage().i,"happy",null,56,petWear())}<span><b>きょうのクイズは おしまい! ${ok}/${Q.length}問 正解</b><small>${esc(nm)}「また あした 出すね!」</small></span></div>`; return; }
+  const q=Q[S.i]; box.innerHTML=`<div class="pq-q"><div class="pq-say">${petSVG(petStage().i,"",null,48,petWear())}<span>「この見出しの □ に入ることばは なに?」(${S.i+1}/${Q.length})</span></div><p class="pq-h">${esc(q.h)}</p>${q.o.map((o,j)=>`<button class="opt" data-pq="${j}">${esc(o)}</button>`).join("")}</div>`;
+  box.querySelectorAll("[data-pq]").forEach(b=>b.onclick=()=>{ const ok=+b.dataset.pq===q.a; box.querySelectorAll("[data-pq]").forEach(x=>{ x.disabled=true; if(+x.dataset.pq===q.a) x.classList.add("ok"); }); if(!ok) b.classList.add("ng");
+    S.res.push(ok); S.i++; saveMe(); let add=0; if(ok){ knAdd(q.n.g,1); add=petLoveAdd(1); adv("pq"); }
+    box.insertAdjacentHTML("beforeend",`<div class="hint" style="margin-top:6px">${ok?`⭕ 正解! ${esc(nm)}「すごい! よく読んでるね」${add?" 💞 +1":""}`:`❌ ざんねん。${esc(nm)}「むずかしかったかな?」`}<br>📰 <span class="nv-h" data-nv="${esc(nkey(q.n))}" role="button" tabindex="0">${esc(q.n.h)}</span> <button class="fchip" id="pqNx">${S.i<Q.length?"つぎの問題 ›":"けっかを見る"}</button></div>`);
+    box.querySelector("#pqNx").onclick=drawPq; }); }
+function senpaiHTML(){ const st=petStage(); const H=petHall(); if(st.i===0||!H.length) return ""; const p=petInit(); const L=p.lsn||{}; const today=p.lsnDay===TODAY;
+  return `<section class="card" aria-label="先ぱいにならう"><div class="sec-h"><h2>🎓 先ぱいに ならう</h2><span class="sub">1日1回</span></div>
+    <ul class="pt-list">${H.map((h,i)=>{ const tk=SENPAI_TK[h.kind]||SENPAI_TK.maru; const n=Math.min(3,+L[h.gen||i+1]||0); const got=(p.stk||[]).includes(h.kind);
+      return `<li class="pt-row${got?" done":""}"><span class="pt-ic sp-sv" aria-hidden="true">${petSVG(friendStageOf(h),"happy",null,40,h.wear||null,h.kind,h.color||null,h.look||{})}</span><span class="pt-tx"><b>${esc(friendNm(h))}先ぱい の「${esc(tk[1])}」</b><small>${got?"覚えました! ✨ わざ から見せてくれます":`ならった回数 ${n}/3`}</small></span><span class="pt-r">${got?"":`<button class="fchip" data-lsn="${i}" ${today?"disabled":""}>${today?"またあした":"ならう"}</button>`}</span></li>`; }).join("")}</ul>
+    <div class="hint">名人になった先ぱいに、1日1回 わざを ならえます。3回ならうと、その先ぱいの種類の わざを ${esc(petName())}が覚えます。</div></section>`; }
+function lsnGo(i){ const p=petInit(); const h=petHall()[i]; if(!h||p.lsnDay===TODAY) return; const tk=SENPAI_TK[h.kind]||SENPAI_TK.maru; const key=h.gen||i+1; p.lsn=p.lsn||{}; p.lsn[key]=(+p.lsn[key]||0)+1; p.lsnDay=TODAY;
+  let msg=`🎓 ${friendNm(h)}先ぱい「「${tk[1]}」は こうやるんだよ!」(${Math.min(3,p.lsn[key])}/3)`;
+  if(p.lsn[key]>=3){ p.stk=p.stk||[]; if(!p.stk.includes(h.kind)){ p.stk.push(h.kind); msg=`✨ ${petName()}が「${tk[1]}」を覚えた! ${friendNm(h)}先ぱい「じょうずだね!」`; } }
+  saveMe(); petLoveAdd(1); toast(msg); PETTAB="play"; go("my",{keepScroll:true}); }
+document.addEventListener("click",ev=>{ const t=ev.target;
+  const tl=t.closest("[data-tale]"); if(tl){ openTale(+tl.dataset.tale); return; }
+  const bd=t.closest("[data-bond]"); if(bd){ openBond(bd.dataset.bond); return; }
+  const ls=t.closest("[data-lsn]"); if(ls){ lsnGo(+ls.dataset.lsn); return; }
+  const pg=t.closest("[data-ptgo]"); if(pg){ petTabGo(pg.dataset.ptgo,pg.dataset.ptsel||null); return; }
+  const dc=t.closest("[data-rdeco]"); if(dc){ const k=dc.dataset.rdeco; const R=petRoom(); R.deco=decoShow(); const i=R.deco.indexOf(k); if(i>=0) R.deco.splice(i,1); else if(R.deco.length>=DECO_MAX){ toast(`🏅 かざりは ${DECO_MAX}こまでです。どれかを しまってから選んでね`); return; } else R.deco.push(k); saveMe(); go("my",{keepScroll:true}); } });
+
 // おせわの一覧のボタン(描きなおしても効くように、ここでまとめて拾う)
 document.addEventListener("click",ev=>{ const c=ev.target.closest("[data-care]"); if(!c) return; const k=c.dataset.care; const room=document.getElementById("room");
   const up=()=>{ if(room){ try{ room.scrollIntoView({block:"center",behavior:"smooth"}); }catch(_){} } };
@@ -5119,6 +5373,13 @@ function costumeSVG(c,dy,U,eu,dx,egg){ eu=eu||0; dx=dx||0; const T=`transform="t
     cap:`<path d="M39 51q1-21 21-21t21 21z" fill="#e5484d"/><path d="M60 30v21M49 33q4 9 3 18M71 33q-4 9-3 18" stroke="#b91c1c" stroke-width="1.2" fill="none"/><path d="M78 50q16-3 24 3-10 5-24 2z" fill="#b91c1c"/><circle cx="60" cy="30" r="2.4" fill="#b91c1c"/>`,
     earmuff:`<path d="M30 62q0-36 30-36t30 36" fill="none" stroke="#9ca3af" stroke-width="4.5" stroke-linecap="round"/><circle cx="29" cy="63" r="9.5" fill="#f9a8d4" stroke="#ec4899" stroke-width="1.5"/><circle cx="91" cy="63" r="9.5" fill="#f9a8d4" stroke="#ec4899" stroke-width="1.5"/>`,
     walker:`<ellipse cx="60" cy="50" rx="34" ry="7" fill="#fef3c7" stroke="#d6b98c" stroke-width="1.5"/><path d="M41 50q0-20 19-20t19 20z" fill="#fef9e7" stroke="#d6b98c" stroke-width="1.5"/><rect x="41" y="44" width="38" height="5" fill="#f472b6"/>`,
+    owlhood:`<path d="M30 54q-1-28 30-28t30 28q-8-7-30-7t-30 7z" fill="#8b6b4a" stroke="#6b4f2e" stroke-width="1.5"/><path d="M35 40l-7-15 15 9zM85 40l7-15-15 9z" fill="#6b4f2e"/><circle cx="51" cy="38" r="5" fill="#fff"/><circle cx="69" cy="38" r="5" fill="#fff"/><circle cx="51" cy="38.5" r="2.4" fill="#3a2a14"/><circle cx="69" cy="38.5" r="2.4" fill="#3a2a14"/><path d="M57 43l3 4 3-4z" fill="#f59e0b"/>`,
+    feather:`<g transform="translate(77 46)"><ellipse rx="3.6" ry="13" transform="rotate(-38) translate(0 -11)" fill="#ef4444"/><ellipse rx="3.6" ry="13" transform="rotate(-8) translate(0 -12)" fill="#facc15"/><ellipse rx="3.6" ry="12" transform="rotate(22) translate(0 -11)" fill="#22c55e"/><circle r="4.5" fill="#2563eb" stroke="#1e40af" stroke-width="1.2"/></g>`,
+    goggles:`<path d="M30 46q30-10 60 0" fill="none" stroke="#78350f" stroke-width="4" stroke-linecap="round"/><circle cx="49" cy="42" r="7.5" fill="#bae6fd" stroke="#92400e" stroke-width="3"/><circle cx="71" cy="42" r="7.5" fill="#bae6fd" stroke="#92400e" stroke-width="3"/><path d="M56.5 42h7" stroke="#92400e" stroke-width="3"/><path d="M45 39q3-3 6-1M67 39q3-3 6-1" stroke="#fff" stroke-width="1.6" fill="none" stroke-linecap="round"/>`,
+    piyohood:`<path d="M30 54q-1-28 30-28t30 28q-8-7-30-7t-30 7z" fill="#fde047" stroke="#eab308" stroke-width="1.5"/><path d="M56 27q2-9 7-7-1 4-3 7z" fill="#facc15"/><circle cx="51" cy="38" r="2.6" fill="#3a2a14"/><circle cx="69" cy="38" r="2.6" fill="#3a2a14"/><path d="M56 42h8l-4 5z" fill="#f97316"/>`,
+    bandana:`<path d="M33 50q27-16 54 0l-3 5q-24-11-48 0z" fill="#dc2626"/><path d="M36 44q24-16 48 0" fill="#dc2626"/><circle cx="48" cy="45" r="1.6" fill="#fff"/><circle cx="60" cy="42" r="1.6" fill="#fff"/><circle cx="72" cy="45" r="1.6" fill="#fff"/><path d="M86 50l9-5-2 9zM86 51l8 6-9 1z" fill="#b91c1c"/>`,
+    beanie:`<path d="M37 50q0-23 23-23t23 23z" fill="#ef4444"/><path d="M45 32v16M53 29v19M61 28v20M69 29v19M77 33v15" stroke="#dc2626" stroke-width="1.5"/><rect x="34" y="45" width="52" height="9" rx="4.5" fill="#fff" stroke="#e5e7eb"/><circle cx="60" cy="25" r="6" fill="#fff" stroke="#e5e7eb"/>`,
+    beret:`<ellipse cx="57" cy="42" rx="26" ry="9" fill="#1e3a8a"/><ellipse cx="57" cy="45" rx="22" ry="4" fill="#172554"/><path d="M58 33v-4" stroke="#1e3a8a" stroke-width="3" stroke-linecap="round"/><g transform="translate(80 43) rotate(25)"><rect x="-1.5" y="-9" width="3" height="14" rx="1" fill="#f59e0b"/><path d="M-1.5 5l1.5 4 1.5-4z" fill="#3a2a14"/></g>`,
     traveler:`<path d="M30 50q30-14 60 0l-4 5q-26-10-52 0z" fill="#f0e6d2" stroke="#c9b58f" stroke-width="1.5"/><path d="M40 50q0-20 20-20t20 20z" fill="#f7efdd" stroke="#c9b58f" stroke-width="1.5"/><rect x="40" y="43" width="40" height="6" fill="#2f9e6b"/><g transform="translate(76 26) rotate(12)"><path d="M0 -9l2 6 6 1-5 4 2 6-5-3-5 3 2-6-5-4 6-1z" fill="#ffd34d"/></g>`
   }[c]||"";
   const item={
@@ -5211,7 +5472,7 @@ function menuItems(){ const fun=FUN.map(f=>[f[1],f[2],"fun:"+f[0]]);
     ["🗂️ ジャンルから読む",genreOrder().map(g=>[ROOM[g]||"●",GN[g],"g:"+g])],
     ["🔊 聞く",[["🔊","今日のニュースを聞く","fn:listen"],["🌙","寝る前ラジオ","fun:radio"],["▶️","1分で見る","fun:play"]]],
     ["🎮 あそぶ・まなぶ",fun.filter(f=>!/^fun:(radio|play)$/.test(f[2]))],
-    ["🐣 ペット",[["🏠",petName()+"のへや","pet:care"],["👕","きがえ(服・色・もよう)","pet:wear"],["🎨","部屋のもようがえ","pet:room"],["🎮","ペットとあそぶ(ボール・ことば合わせ・おさんぽ・料理・わざ)","pet:play"],["🐥","なかま(ともだち・おつかい・名刺)","pet:friends"],["📔","日記・そだちのきろく","pet:log"],["✏️","あなたの呼び名","fn:nick"]]],
+    ["🐣 ペット",[["🏠",petName()+"のへや","pet:care"],["👕","きがえ(服・色・もよう)","pet:wear"],["🎨","部屋のもようがえ","pet:room"],["🎮","ペットとあそぶ(ボール・ことば合わせ・おさんぽ・料理・わざ)","pet:play"],["🐥","なかま(ともだち・おつかい・名刺)","pet:friends"],["📔","日記・そだちのきろく","pet:log"],["🗺️","ぼうけん(手帳・おはなし・キャラのきずな・イベント)","pet:adv"],["✏️","あなたの呼び名","fn:nick"]]],
     ["🛟 防災・天気",[["🛟","地震・津波・警報","fn:quake"],["☔","雨雲の動き","fn:radar"],["🗺️","家のまわりの危ない場所","fn:bmap"]]],
     ["⚙️ 設定・使い方",[["🔠","文字の大きさ・画面の色","fn:pop"],["🧩","ページの形をえらぶ","fn:forms"],["🎨","色・こまかい並び","fn:look"],["🧭","下のボタンを選ぶ","fn:tabs"],["🔊","読み上げの声・速さ","set:sound"],["💗","好きなこと・気になるジャンル","set:me"],["🔔","お知らせ(朝・夕方)","set:app"],["📲","スマホの画面にボタンを置く","fn:install"],["💾","記録をとっておく・移す","set:data"],["📖","使い方ガイド","fn:help"],["🔰","はじめての案内","fn:onboard"]]]]; }
 function openMenu(){ const sh=document.getElementById("sheet"); const M=menuItems();
@@ -5285,7 +5546,7 @@ document.addEventListener("click",e=>{ if(e.target.closest("[data-nick]")){ e.pr
 function helloGreet(){ const h=new Date(Date.now()+9*3600e3).getUTCHours(); return h<4?"夜ふかしさんだね🌙":h<10?"おはよう!":h<17?"こんにちは!":h<22?"こんばんは!":"今日もおつかれさま🌙"; }
 function helloLinesBase(){ const st=petStage(); if(st.i===0) return ["コトコト…たまごがゆれた!","(なかで、なにかが動いた気がする…)","あたたかいね。ニュースを読むと、もうすぐ生まれるよ"];
   return ["えへへ、くすぐったい!","いっしょに読むと、ニュースってこわくないね","きょうの3行だけでも読めたら、えらい!","わからないことばは、点線をタップしてね","ぼく、きのうより ちょっと賢くなった気がする!","クイズに正解すると、ごはんがもらえるんだ🍙","おすすめは「💡 解説」。むずかしい話もやさしくなるよ"]; }
-function helloLines(){ const L=helloLinesBase(); const ps=petPersona(); const w=petWish(); return [...L,...(ps?(PERSONA_L[ps]||[]).map(x=>`(${ps}) ${x}`):[]),...(w&&!w.done?["おねがいがあるの。"+w.txt]:[])]; }
+function helloLines(){ const L=helloLinesBase(); const ps=petPersona(); const w=petWish(); let K=[]; try{ const t=knTop(1)[0]; if(t&&knLv(t[1])>=2) K=[`${GN[t[0]]}のニュースなら、ちょっと くわしくなったよ!`]; const tn=taleNext(); if(tn.s==="ready") K.push("新しい おはなしが あるよ。マイの「🗺️ ぼうけん」で読もう!"); }catch(_){} return [...L,...K,...(ps?(PERSONA_L[ps]||[]).map(x=>`(${ps}) ${x}`):[]),...(w&&!w.done?["おねがいがあるの。"+w.txt]:[])]; }
 function helloCard(){ if(LOOK.mascot===false) return ""; const st=petStage(); const mood=petMood(); const acc=petTopGenre(); const p=petInit();
   return `<section class="hello" aria-label="${esc(petName())}のあいさつ"><button class="hello-av" data-hello="0" aria-label="${esc(petName())}をなでる">${petSVG(st.i,mood,acc&&PET_ACC[acc][0],68,petWear()||"newsboy")}</button>
     <div class="hello-b"><b class="hello-h">${nickName()?`<span class="hello-nick">${esc(nickCall())}</span>、`:""}${esc(helloGreet())}</b><span class="hello-t">${esc(petLine(mood,st))}</span>
@@ -6110,6 +6371,7 @@ function openShimen(){ const sh=document.getElementById("sheet"); const w=D.weat
 document.addEventListener("click",e=>{ const b=e.target.closest("[data-shimen]"); if(!b) return; e.preventDefault(); openShimen(); });
 // ===== お知らせ(新しくなったところ)。機能を足したら、いちばん上に1つ足す =====
 const UPDATES=[
+  {id:"2026-11-25a",d:"2026-11-25",t:"🗺️ ペットに「ぼうけん」が増えました",L:["マイ → ペットに「🗺️ ぼうけん」のタブ。毎週かわる📒 ぼうけん手帳(スタンプで かざり・服)、📖 まいにち町の おはなし(1日1話)、🤝 ホー先生・ポリー・ぽっぽ・ともだちとの きずな(レベル10まで)、🎪 季節のイベント(いまは「秋の よみもの週間」)。","部屋の下に「🎯 つぎの目標」。🎮 あそぶ に「🧠 ニュース力」とペットからのクイズ、名人の先ぱいに わざを ならう。名人のあとも⭐の星が5つまで。新しい服が7つ(ふくろうフード・はねかざり・ひこうゴーグル・ひよこフード・バンダナ・ニット帽・ベレー帽)。"]},
   {id:"2026-11-24a",d:"2026-11-24",t:"🪑 部屋の並べかえを「マス」にしました",L:["指で好きな所に動かす方式をやめ、決まったマスに置く方式にしました。物が重なったり、ばらばらになったりしません。","部屋の下の「🪑 部屋の物を並べかえる」を押す → 動かしたい物を押す → 置きたいマス(点線)か、入れかえたい物を押す。窓と額は かべ、大きい家具は床のおく、そのほかは かべとたなに置けます。「↺ おまかせで並べる」でいつでも元の並びにもどせます。"]},
   {id:"2026-11-21e",d:"2026-11-21",t:"🏠 部屋の家具をきちんと並べました",L:["上の段に窓・額・かざり、たなに家具とおみやげ(多いときは2段)、床のおくに大きい家具、と決まった場所に並ぶようにしました。","前に指で動かした場所は、この並びにそろえ直しました。これからも指で好きな場所へ動かせます(へや →「↺ 元の並びにもどす」でこの並びにもどります)。"]},
   {id:"2026-11-21d",d:"2026-11-21",t:"🏠 部屋を明るく・家具が重ならないように",L:["夜に部屋が暗くなるのをやめました(どの壁紙でも明るく見えます)。","家具・おみやげ・額などが重なっていたら、あいている所へ自動でずらします。物が多いときは少し小さくして、ぜんぶ見えるようにします(自分で動かした物の場所はそのままです)。"]},
@@ -6318,7 +6580,7 @@ const HELP=[
   ["ex","💡","解説ページの読み方",["大きな話題を1つずつ、やさしく説明するページです。上から読めば全体がわかります。","<b>ひとことで言うと</b>…まずここだけ読めば大まかにわかります。","<b>目次</b>を押すと、その場所に飛びます。","<b>🙋 わたしたちへの影響</b>…くらしにどう関係するか。","<b>📅 流れ</b>…これまでに起きたことの年表。<b>🔭 これから</b>…次に注目する日。","<b>🔔 続きを追う</b>を押すと、新しい動きがあったとき「きょう」でお知らせします。","<b>💬 話しながら読む</b>・<b>📖 連載で読む</b>…同じ中身を、会話や1日1話の形で読めます。","画面を<b>左右にすべらせる</b>と、前後の解説に移ります。"]],
   ["manga","🎨","4コマの見かた",["解説の中身を、4つのコマで説明するマンガです。","左にいるのは<b>あなたのペット</b>(名札はペットの名前)。ニュースにくわしくない生徒で、わたしたちと同じ立場で質問します。","右の<b>🦉 ホー先生</b>がやさしく答えます。","上から<b>①はてな? → ②なにがあった? → ③どうなるの? → ④これから</b>の順に読みます。","いちばん下の<b>📝 ホー先生の黒板</b>が、まとめです。"]],
   ["listen","🔊","聞く・読み上げ",["<b>🔊 聞く</b>のボタンで、文を読み上げます。もう一度押すと止まります。","速さ・声の高さ・声の種類は、<b>マイ → ⚙️設定 →「🔊 読み上げの速さと声」</b>で変えられます。","声の種類は「📱 スマホの声」「🐣 ずんだもん」「🐾 ペットの声」から選べます。🐾 は、いま育てている子の種類で声が変わります(たまごの間はスマホの声)。キャラの声は、前もって作った声を読みこむので、1分で約0.3MBの通信がかかります。まだ声のない文はスマホの声で読みます。","読み方がおかしいことばは、<b>「🗣️ 読み方がおかしいときは →」</b>から、このスマホで直したり、作った人に知らせたりできます。","<b>🌙 寝る前ラジオ</b>(おたのしみ)は、3分でニュースを耳で聞けます。うしろの音は「オルゴール・波の音・音なし」から選べます。"]],
-  ["pet","🐣","ペットの育て方",["ペットはニュースといっしょに育ちます。「きょう」のいちばん上で出むかえてくれます。押すと、なでられてひとことが変わります。はじめはたまごで、何が生まれるかはお楽しみです。","<b>🧠 クイズ</b>に正解すると🍙ごはんがもらえます。ごはんをあげたり、毎日開いたり、解説を読んだりすると育ちます。","名前は<b>マイ → 🐣 ペット の「✏️ 名前」</b>で変えられます。変えた名前は4コマなどにも出ます。","<b>マイ → 🐣 ペット</b>は、上に部屋(ペットがいる所)、その下に5つのボタンがあります。<b>🍙 おせわ</b>=きょうできること(🙏 おねがい も)、<b>🎮 あそぶ</b>=とくいわざ・ボールキャッチ・ことば合わせ・おさんぽ・ごはんづくり、<b>👕 きがえ</b>=服・色・もよう、<b>🏠 へや</b>=テーマセット・壁紙・床・ラグ・大きい家具・窓のけしき・季節のかざり・絵はがきの額・庭、<b>🐥 なかま</b>=ともだち・なかまの家(部屋に呼べる)・絵はがきの地図・ペットの名刺、<b>📔 きろく</b>=成長アルバム・日記・ノート・図鑑・そだち。","<b>📸 成長アルバム</b>は、育って次の姿になった日に自動で1まい残ります(何段も一度に育っても、ぜんぶ)。なかまの家に行った子も、アルバムを持っていきます。前から育った子には、あとから思い出のアルバムを作りました。","<b>🐥 ともだち</b>は、ごはんで育ちます。1日1回<b>🎒 おつかい</b>をたのむと、1時間くらいでもどって、おみやげを1つ持ってきます。おみやげは部屋にかざれます。ともだちの色・かざりも選べます。","<b>🪑 部屋の物を並べかえる</b>(部屋の下のボタン)を押すと、部屋に点線のマスが出ます。動かしたい物を押してから、置きたいマスか、入れかえたい物を押します。窓と額は かべ、大きい家具は床のおく、そのほかは かべとたなに置けます。「↺ おまかせで並べる」で元の並びにもどります。","服・部屋・色は、育つと選べるものが増えます。ごはんやお世話をしなくても、困ることはありません。"]],
+  ["pet","🐣","ペットの育て方",["ペットはニュースといっしょに育ちます。「きょう」のいちばん上で出むかえてくれます。押すと、なでられてひとことが変わります。はじめはたまごで、何が生まれるかはお楽しみです。","<b>🧠 クイズ</b>に正解すると🍙ごはんがもらえます。ごはんをあげたり、毎日開いたり、解説を読んだりすると育ちます。","名前は<b>マイ → 🐣 ペット の「✏️ 名前」</b>で変えられます。変えた名前は4コマなどにも出ます。","<b>マイ → 🐣 ペット</b>は、上に部屋(ペットがいる所)、その下に5つのボタンがあります。<b>🍙 おせわ</b>=きょうできること(🙏 おねがい も)、<b>🎮 あそぶ</b>=とくいわざ・ボールキャッチ・ことば合わせ・おさんぽ・ごはんづくり、<b>👕 きがえ</b>=服・色・もよう、<b>🏠 へや</b>=テーマセット・壁紙・床・ラグ・大きい家具・窓のけしき・季節のかざり・絵はがきの額・庭、<b>🐥 なかま</b>=ともだち・なかまの家(部屋に呼べる)・絵はがきの地図・ペットの名刺、<b>📔 きろく</b>=成長アルバム・日記・ノート・図鑑・そだち、<b>🗺️ ぼうけん</b>=もうすぐもらえるもの・ぼうけん手帳・季節のイベント・おはなし・キャラのきずな。","<b>🎯 つぎの目標</b>(部屋の下)に、いちばん近いごほうびと あと何回かが出ます。<b>📒 ぼうけん手帳</b>は毎週月曜に5つの目標が出て、1つできるとスタンプ💮、ぜんぶで🍙×3。スタンプがたまると かざりや服がもらえます。<b>📖 おはなし</b>は1日1話。<b>🤝 きずな</b>は ホー先生(解説を読む)・ポリー(世界一周のことば)・ぽっぽ(絵はがき)・ともだち(ごはん・おつかい)と深まり、レベル3でかざり・6で服・10で手紙。<b>🧠 ニュース力</b>は いっしょに読んだジャンルを覚え、ペットがクイズを出します。名人になったあとも⭐の星が5つまで増え、なかまの家の先ぱいから わざを ならえます。","<b>📸 成長アルバム</b>は、育って次の姿になった日に自動で1まい残ります(何段も一度に育っても、ぜんぶ)。なかまの家に行った子も、アルバムを持っていきます。前から育った子には、あとから思い出のアルバムを作りました。","<b>🐥 ともだち</b>は、ごはんで育ちます。1日1回<b>🎒 おつかい</b>をたのむと、1時間くらいでもどって、おみやげを1つ持ってきます。おみやげは部屋にかざれます。ともだちの色・かざりも選べます。","<b>🪑 部屋の物を並べかえる</b>(部屋の下のボタン)を押すと、部屋に点線のマスが出ます。動かしたい物を押してから、置きたいマスか、入れかえたい物を押します。窓と額は かべ、大きい家具は床のおく、そのほかは かべとたなに置けます。「↺ おまかせで並べる」で元の並びにもどります。","服・部屋・色は、育つと選べるものが増えます。ごはんやお世話をしなくても、困ることはありません。"]],
   ["plan","📅","予定と予測",["<b>📅 予定</b>…これから決まっている日(選挙・発表・値上げなど)。","<b>🎯 予測</b>…Claude(AI)が「こうなりそう」と考えたもの。あたるとは限りません。","あなたも<b>予想</b>して、答え合わせができます。"]],
   ["search","🔎","さがす・地図・数字",["<b>🔎 さがす</b>…ことばやジャンルで、これまでのニュースを探せます。","<b>🗺️ 地図</b>…ニュースがどこで起きたか。2本の指で大きくできます。","<b>📈 数字</b>…日経平均・円・原油のグラフと、くらしの便利。","地図と数字は、「さがす」の上のボタンから開けます。"]],
   ["bousai","🛟","防災",["天気カードの<b>「🛟 防災」</b>で、地震・津波・警報・雨雲・にげる場所が見られます。","地震や警報は<b>気象庁の発表</b>をそのまま出しています。","ゆれる前の速報は、スマホの<b>緊急速報(エリアメール)</b>で受けとるのが正式な方法です。"]],
