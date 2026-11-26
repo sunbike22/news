@@ -2365,7 +2365,7 @@ function doneCard(){ const st=todayStats(); ME.done=ME.done||{}; const done=!!ME
   </section>`; }
 function bindDone(){ const c=document.getElementById("doneCard"); if(!c||!("IntersectionObserver" in window)) return; ME.done=ME.done||{}; if(ME.done[TODAY]) return;
   const io=new IntersectionObserver(es=>{ if(!es.some(x=>x.isIntersecting)) return; io.disconnect(); if(ME.done[TODAY]) return; ME.done[TODAY]=1; const ks=Object.keys(ME.done).sort(); if(ks.length>120) delete ME.done[ks[0]]; saveMe();
-    const g=petEarn("done:"+TODAY,1); toast(`🏁 きょうの大事なニュースは、読み終わりです${g?"(🍙 ごはん+1)":""}。また ${D.nextLabel||"次の更新"} に`); try{ track("/done","読み終わり"); }catch(_){}
+    const g=petEarn("done:"+TODAY,1); toast(`🏁 きょうの大事なニュースは、読み終わりです${g?"(🍙 ごはん+1)":""}。次は ${D.nextLabel||"次の更新"} に新しくなります`); try{ track("/done","読み終わり"); }catch(_){}
     const h=c.querySelector(".done-i"); if(h) h.textContent="✅"; },{threshold:.6}); io.observe(c); }
 // ===== 🙋 わたしに関係ある?(くらしの立場を選ぶと、関係しそうなニュースに札。立場はスマホの中だけ) =====
 const LIFE=[["student","🎒","学生"],["work","💼","働いている"],["self","🧾","自営業・フリーランス"],["kids","👶","子育て中"],["car","🚗","車・バイクに乗る"],["train","🚃","電車・バスで通う"],["senior","🧓","年金を受けとっている"],["carer","🤝","家族の介護をしている"],["clinic","🏥","病院・薬局によく行く"],["access","♿","障がいのある人・その家族"],["rent","🔑","家を借りている・一人暮らし"],["owner","🏡","家を持っている・住宅ローン"],["invest","📈","NISA・株など投資をしている"],["farm","🌾","農業・漁業"],["pet","🐾","ペットと暮らしている"],["net","📱","ネットの買い物・サービスを使う"]];
@@ -3085,7 +3085,9 @@ function keyText(raw,opt){ opt=opt||{}; const t=String(raw||""); if(!t) return "
     return `<span class="kt-l${isOld?" kt-old":""}">${head}${html}</span>`; }).join(""); }
 function srcSoft(h){ return String(h).replace(/[（(]([^（(）)<>]{1,60})[）)]/g,(m,x)=>{ try{ return ttsIsSrc(x)?`<span class="src-i">${m}</span>`:m; }catch(_){ return m; } }); }
 function exTxt(t){ return kn(glossify(srcSoft(hlMk(esc(t))))); }
-function exParas(t){ const S=String(t||"").split(/(?<=。)/).map(x=>x.trim()).filter(Boolean); const P=[]; for(let i=0;i<S.length;i+=2) P.push(S.slice(i,i+2).join(""));
+function exParas(t){ // 「。」で文を分ける。ただし「(…。…)」のかっこの中では分けない(出典のかっこの途中で段落が割れていた=2026-11-27)
+  const S=[]; let buf="",dep=0; for(const x of String(t||"").split(/(?<=。)/)){ buf+=x; dep+=(x.match(/[(（]/g)||[]).length-(x.match(/[)）]/g)||[]).length; if(dep<=0){ const y=buf.trim(); if(y) S.push(y); buf=""; dep=0; } } if(buf.trim()) S.push(buf.trim());
+  const P=[]; for(let i=0;i<S.length;i+=2) P.push(S.slice(i,i+2).join(""));
   return P.map(x=>`<p class="ex-p">${exTxt(x)}</p>`).join(""); }
 // 🔎 ひと目でわかる(2026-11-10): 解説にすでに書いてあること(最新の流れ・出てくる人・次の山場・わたしへの影響)を、絵の札で1枚に
 function glanceHTML(e){ const T=e.timeline||[]; const last=T[T.length-1]; const nx=(e.next||[])[0]; const us=(e.us||[])[0]; const C=(e.cast||[]).slice(0,4);
@@ -3965,7 +3967,11 @@ function tierOf(t){ let n=0; try{ n=+t[5]()||0; }catch(_){} const th=t[6]; let l
 function tierHTML(){ return `<div class="tiers">${TIERS.map(t=>{ const r=tierOf(t); return `<div class="tier${r.lv?" got":""}"><span class="tm" aria-hidden="true">${r.lv?MEDAL[r.lv-1]:"⚪"}</span><span class="tb"><b>${t[1]} ${esc(t[2])} ${r.lv?`<span class="tlv">Lv.${r.lv}</span>`:""}</b><small>${esc(t[3])}: <b class="num">${r.n}${t[4]}</b>${r.next?` ・ 次のレベルまで あと${r.next-r.n}${t[4]}`:" ・ 最高レベル!"}</small><span class="tp"><i style="width:${Math.round(r.prog*100)}%"></i></span></span></div>`; }).join("")}</div>`; }
 function checkTiers(silent){ ME.blv=ME.blv||{}; const ups=[]; TIERS.forEach(t=>{ const r=tierOf(t); const was=ME.blv[t[0]]||0; if(r.lv>was){ ME.blv[t[0]]=r.lv; if(!silent) ups.push([t,r]); } }); if(silent||ups.length) saveMe(); return ups; }
 function newBadges(){ const got=[]; BADGES.forEach(b=>{ if(!ME.badges.includes(b[0]) && b[4]()){ ME.badges.push(b[0]); got.push(b); } }); if(got.length) saveMe(); return got; }
-function toast(msg){ if(document.querySelector(".ob")){ setTimeout(()=>toast(msg),800); return; } const t=document.createElement("div"); t.className="toast"; t.setAttribute("role","status"); t.innerHTML=msg; document.body.appendChild(t); setTimeout(()=>t.classList.add("out"),2600); setTimeout(()=>t.remove(),3200); }
+// トーストは1つずつ順に出す(同じ位置に2つ重なって文字が読めなくなっていた=2026-11-27)
+const TOAST_Q=[]; let TOAST_ON=false;
+function toast(msg){ if(document.querySelector(".ob")){ setTimeout(()=>toast(msg),800); return; } TOAST_Q.push(msg); if(!TOAST_ON) toastNext(); }
+function toastNext(){ if(document.querySelector(".toast")){ setTimeout(toastNext,300); return; } const msg=TOAST_Q.shift(); if(msg===undefined){ TOAST_ON=false; return; } TOAST_ON=true;
+  const t=document.createElement("div"); t.className="toast"; t.setAttribute("role","status"); t.innerHTML=msg; document.body.appendChild(t); setTimeout(()=>t.classList.add("out"),2600); setTimeout(()=>{ t.remove(); toastNext(); },3200); }
 function checkBadges(){ if(!ME.blv){ checkTiers(true); } const one=newBadges().filter(b=>!TIER_OLD.includes(b[0])); const ups=checkTiers(false); let k=0;
   one.forEach(b=>setTimeout(()=>toast(`${b[1]} バッジ「${esc(b[2])}」を手に入れました`),400+(k++)*1300));
   ups.forEach(([t,r])=>setTimeout(()=>toast(`${MEDAL[r.lv-1]} ${t[1]}「${esc(t[2])}」が レベル${r.lv} になりました!(${r.n}${t[4]})`),400+(k++)*1300)); }
@@ -4299,16 +4305,19 @@ function petSVG(stage,mood,acc,size,costume,kind,color,look){
   const C=costume?costumeSVG(costume,egg?-12:0,U,egg?0:(KP.eyeUp||0),KP.dx||0,egg):""; const CB=costume&&!egg?costumeBack(costume,KP.dx||0):"";
   return `<svg viewBox="0 0 120 120" width="${S}" height="${S}" role="img" aria-label="${esc(petName())}" style="--pb:${K[1]};--pd:${K[3][1]}"><defs><linearGradient id="pg${U}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${K[3][0]}"/><stop offset="1" stop-color="${K[3][1]}"/></linearGradient><pattern id="plaid${U}" width="8" height="8" patternUnits="userSpaceOnUse"><path d="M0 4h8M4 0v8" stroke="#5a4127" stroke-width="1.2" opacity=".6"/></pattern></defs><ellipse cx="60" cy="112" rx="30" ry="4" fill="#000" opacity=".12"/>${costume?"":leaf}${CB}${body}${costume?"":kfl}${blush}${KP.eyeUp?`<g transform="translate(0 -${KP.eyeUp})">${eyes}</g>`:eyes}${mouth}${accHidden(acc,costume)?"":(KP.eyeUp&&acc==="glasses"?`<g transform="translate(0 -${KP.eyeUp})">${A}</g>`:KP.eyeUp&&/^(band|helmet|straw|chef)$/.test(acc)?`<g transform="translate(0 -14)">${A}</g>`:A)}${C}${stage>=5&&!costume?`<text x="60" y="20" text-anchor="middle" font-size="16">👑</text>`:""}</svg>`;
 }
-function petDream(){ const p=petInit(); if(p.dreamDay===TODAY) return p.dream||""; const y=new Date(Date.parse(TODAY)-864e5).toISOString().slice(0,10); const L=NEWS.filter(n=>n.d===y&&n.ok); if(!L.length) return "";
-  const r=seeded("dream"+TODAY+petName()); const n=L[Math.floor(r()*L.length)]; const g=D.glossary.find(w=>n.h.includes(w[0].replace(/\(.*?\)/,"")));
-  const kw=g?g[0].replace(/\(.*?\)/,""):(String(n.th||"").split(/[,、]/)[0]||n.h.replace(/[、。(].*$/,"").slice(0,12));
+function petDream(){ const p=petInit(); if(p.dreamDay===TODAY) return p.dream||""; const y=new Date(Date.parse(TODAY)-864e5).toISOString().slice(0,10);
+  // 事件・災害・人の死やけがのニュースは夢のネタにしない(住宅火災で2人死亡のニュースが「…の海でおよいでたら」になっていた=2026-11-27)
+  const BAD=/死亡|死者|死去|殺|遺体|不明|けが|負傷|火災|全焼|事故|事件|逮捕|容疑|災害|地震|津波|噴火|豪雨|空爆|戦闘|攻撃|被害|虐待|自殺|倒産|破産/;
+  const kwOf=n=>{ const g=D.glossary.find(w=>n.h.includes(w[0].replace(/\(.*?\)/,""))); if(g) return g[0].replace(/\(.*?\)/,""); const th=String(n.th||"").split(/[,、]/)[0]; if(th) return th; const h=n.h.replace(/[、。(].*$/,""); return h.length<=14?h:""; }; // 見出しを途中で切らない
+  const L=NEWS.filter(n=>n.d===y&&n.ok&&!BAD.test(n.h)&&kwOf(n)); if(!L.length) return "";
+  const r=seeded("dream"+TODAY+petName()); const n=L[Math.floor(r()*L.length)]; const kw=kwOf(n);
   const T=["の海でおよいでたら、目がさめちゃった。","と追いかけっこする夢だった。","の会議に、ぼくも出席してたんだ。","がふわふわの雲になって空にうかんでた。","のニュースを、ぼくが読み上げてたよ。"];
   p.dream=`ゆうべ「${kw}」${T[Math.floor(r()*T.length)]}(きのうのニュースより)`; p.dreamDay=TODAY; saveMe(); return p.dream; }
 function petLine(mood,st){ const n=petName(); const mi=new Date().getMinutes();
   if(st.i>0&&mood!=="sulk"&&mi%5===1){ const w=D.weather; if(w&&relDay(w.iso)==="今日"&&/雨/.test(w.sky)) return "きょうは雨だって。傘、わすれないでね☔"; if(w&&relDay(w.iso)==="今日"&&/雪/.test(w.sky)) return "雪だ! 外は寒いから、あたたかくしてね⛄"; }
   if(st.i>0&&mood!=="sulk"&&mi%5===3&&D.three&&D.three[0]) return `きょうは「${D.three[0].title}」が気になるな。いっしょに読もう?`;
   if(st.i>0&&isMonthBd()) return `きょうはぼくの${bdMonths()}か月の誕生日なんだ! いつもいっしょに読んでくれてありがとう🎂`; if(st.i>0&&ppToday()&&new Date().getMinutes()%2===0) return current==="my"?"あっ、ぽっぽが絵はがきを持ってきてくれたよ! 下のボタンで受けとってね📮":"あっ、ハトの郵便屋さん「ぽっぽ」が来てる! マイのページで絵はがきを受けとってね📮"; if(st.i>0 && (ME.pet||{}).dreamDay!==TODAY && new Date(Date.now()+9*3600e3).getUTCHours()<12){ const d=petDream(); if(d) return "ふぁ〜あ。"+d; } if(st.i>0 && (ME.pet||{}).dreamDay===TODAY && (ME.pet||{}).dream && mood!=="happy" && new Date().getMinutes()%3===0) return (ME.pet||{}).dream;
-  if(st.i===0) return mood==="happy"?`たまごがあたたかい…もうすぐ生まれそう!`:`たまごの中から音がする。ニュースを読むと、${n}が生まれるよ。`;
+  if(st.i===0) return mood==="happy"?`たまごがあたたかい…もうすぐ生まれそう!`:`たまごの中から音がする。ニュースを読むと、たまごから何かが生まれるよ。`;
   if(mood==="happy") return ["ごはんおいしかった!また明日もニュース読もうね","いっしょに読むと、ぼくも賢くなる気がする!","きょうのクイズ、たのしかったね"][new Date().getDate()%3];
   if(mood==="sulk") return `${petGap()}日ぶり…さみしかったんだから。(ぷい) ごはんをくれたら、ゆるしてあげる。`;
   return "おなかすいた〜。クイズに正解すると、ごはん(🍙)がもらえるよ!"; }
